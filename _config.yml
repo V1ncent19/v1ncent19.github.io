@@ -1,21 +1,21 @@
 # Built with Jekyll 3.6.0
 
 # Setup
-title:               Ed.
-tagline:             'a jekyll theme for minimal editions'
-description:         'Ed is a Jekyll theme designed for textual editors based on minimal computing principles, and focused on legibility and flexibility.'
+title:               Tuorui (Vincent) Peng
+tagline:             'A Physics & Statistics Student'
+description:         'A key difference between mathematics and statistics is that the former is full of lemmas while the latter is full of dilemmas.'
+description_author:  'Stephen J. Senn'
 url:                 'http://minicomp.github.io'
-baseurl:             '/ed'
+baseurl:             ''
 
 # About/contact
 author:
-  name:              Alex Gil
-  url:               https://twitter.com/elotroalex
-  email:             colibri.alex@gmail.com
+  name:              Tuorui
+  url:               https://twitter.com/V1ncentPeng
+  email:             pengtr19@mails.tsinghua.edu.cn
 
 # Color scheme. Options: red, orange, magenta, cyan, blue, brown
-color-scheme:
-
+color-scheme: blue
 # Permalinks
 permalink: pretty
 permalink: /:title/

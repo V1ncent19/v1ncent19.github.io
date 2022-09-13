@@ -1,8 +1,27 @@
 ---
 layout: page
-title: Credits
+title: Minor Course Summary
 ---
 
+### Project on GitHub | [A Brief Summary of Statistics Course](https://github.com/V1ncent19/Statistics-Course-Summary-LaTeX)
+
+The statistics course summary actually started from the exam cheetsheet during my first year in minor. At first it only contains some notion explanation, important results. Later I began to add mathematical deductions, intuition of methods, useful external links, etc. [LaTeX](https://www.ctan.org/) is used to compile so that I could include cross reference, citation, index in the note so that I could look something up in case of forgetting. Also I treat it as an opportunity to practice LaTeX.
+
+Since it's written as a reminder, I may not contain many basic knowledge like calculus, linear algebra, etc. Besides, for consistency within file and familiarity for myself, I may not use some commonly used notations. 
+
+### Acknowledgments
+
+The project is mostly based on the course content of statistics minor in [Center of Statistical Science](http://www.stat.tsinghua.edu.cn/en/) at [Tsinghua](https://www.tsinghua.edu.cn/en/). I would like to express my gratitude to the faculty for their careful preparation and for their help to me. They include (in the order I first took their courses): Wanlu Deng, Jiangdian Wang, Zaiying Zhou, Dong Li, Tianying Wang, Sheng Yu, Pengkun Yang. 
+
+And I would like to thank my classmates Mai Zhang and Yong Qin, who offered me help my discussing problems and tackling capstone projects.
+
+
+
+### PDF Preview
+
+<object data="{{ site.baseurl }}/assets/pdf/summary.pdf" width="100%" height="800" type='application/pdf'>
+
+<!-- 
 ### [Susanna Allés Torrent](http://susannalles.github.io/) | Hyper philologist
 
 Susanna teaches Digital Humanities in the Department of Latin American and Iberian Cultures. She earned her Ph.D in Romance Studies at the University of Barcelona in 2012, and completed a M.A. in «Nouvelles technologies appliquées à l’histoire» at the École Nationale des Chartes (Paris). She has taught at the University of Barcelona and she has been a postdoctoral fellow at the Spanish National Research Council (CSIC). Her research explores several aspects of digital humanities, especially, scholarly digital editions, electronic text analysis, intertextuality and text reuse, and digital lexicography. She also works with the intersection of the Iberian Peninsula and Italy in the Middle Ages and the Renaissance, reconstructing cultural and literary networks between the two.
@@ -30,4 +49,4 @@ As many open source projects, Ed is the work of community. The project starts wi
 
 We are strongly indebted to the research work and conversations stemming out of our [Columbia's Group for Experimental Methods in the Humanities](http://xpmethod.plaintext.in/)—or as we like to call it: #xpmethod; the wonderful international comradery of [GO::DH](http://www.globaloutlookdh.org/); and of course, the support of our [Columbia University Libraries](http://library.columbia.edu/) and its cozy [Studio@Butler](https://studio.cul.columbia.edu/).
 
-...and to the writers that inspire us to scribble notes on the margins we protect with our work. Thank you.
+...and to the writers that inspire us to scribble notes on the margins we protect with our work. Thank you. -->
