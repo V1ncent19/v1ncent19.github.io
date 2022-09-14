@@ -8,16 +8,28 @@ I record some interesting topics here and write down my ideas and thoughts. You 
 
 -----------
 
+## Search
+
+<form id="site_search">
+<div>Explore topics you are intersted in:</div>
+<br>
+<input id="search" placeholder='Search in Blogs...' type="text"/></form>
+
+<div id="results"></div>
+<ul id="search_results"></ul>
+<script src="{{site.baseurl}}/assets/js/lunr.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="{{site.baseurl}}/assets/js/search.js"></script>
+
+-----------
+
+
 ## Contents
-
-
-
-
 
 
 <!-- Biostat -->
 
-### [Variance of Odds Ratio in Contingenct Table]({{ site.baseurl }}/texts/VarContingency)
+### [Variance of Odds Ratio in Contingency Table]({{ site.baseurl }}/texts/VarContingency)
 
 
 ### [Cochran Theorem for Variance Decomposition]({{ site.baseurl }}/texts/Cochran)
@@ -26,15 +38,16 @@ I record some interesting topics here and write down my ideas and thoughts. You 
 
 ### [Kernel Method: Application]({{ site.baseurl }}/texts/KernelApplication)
 
-### [Basic Constrained Optimize Theory]({{ site.baseurl }}/texts/OptizationTheory)
 
 ### [Theory of Reproducing Kernel Hilbert Space (RKHS)]({{ site.baseurl }}/texts/RKHS)
+
+### [Basic Constrained Optimize Theory]({{ site.baseurl }}/texts/OptizationTheory)
 
 <!-- Statistical Computing -->
 
 ### [Hamiltonian Markov Chain Monte Carlo]({{ site.baseurl }}/texts/HMC)
 
-### [Expectation-Maximization Algorithm on Gaussian Mixture Model]({{ site.baseurl }}/texts/EM_GMM)
+### [Expectation-Maximization Algorithm in Gaussian Mixture Model]({{ site.baseurl }}/texts/EM_GMM)
 
 ### [Convergence Order of Secant Interpolation Rooting]({{ site.baseurl }}/texts/ConvergenceSecant)
 

@@ -4,24 +4,28 @@
 // Based on a script by Kathie Decora : katydecorah.com/code/lunr-and-jekyll/
 
 // Create the lunr index for the search
-var index = elasticlunr(function () {
-  this.addField('title')
-  this.addField('author')
-  this.addField('layout')
-  this.addField('content')
-  this.setRef('id')
+var index = lunr(function () {
+  this.field('title')
+  this.field('author')
+  this.field('layout')
+  this.field('date')
+  this.field("content", { boost: 10 });
+  this.ref('id')
 });
 
 // Add to this index the proper metadata from the Jekyll content
-{% assign count = 0 %}{% for text in site.texts %}
-index.addDoc({
+{% assign count = 0 %}
+{% for text in site.texts %}
+index.add({
   title: {{text.title | jsonify}},
   author: {{text.author | jsonify}},
   layout: {{text.layout | jsonify}},
-  content: {{text.content | jsonify | strip_html}},
+  date: {{text.date | jsonify}},
+  // content: {{text.content  | strip_html| jsonify}},
   id: {{count}}
-});{% assign count = count | plus: 1 %}{% endfor %}
-console.log( jQuery.type(index) );
+});{% assign count = count | plus: 1 %}
+{% endfor %}
+// console.log( jQuery.type(index) );
 
 // Builds reference data (maybe not necessary for us, to check)
 var store = [{% for text in site.texts %}{
@@ -29,8 +33,10 @@ var store = [{% for text in site.texts %}{
   "author": {{text.author | jsonify}},
   "layout": {{ text.layout | jsonify }},
   "link": {{text.url | jsonify}},
+  "date": {{text.date |date: '%B %-d, %Y'| jsonify }}
+  // "excerpt": {{ text.content | strip_html | jsonify }}
 }
-{% unless forloop.last %},{% endunless %}{% endfor %}]
+{% unless forloop.last %},{% endunless %}{% endfor %}];
 
 // Query
 var qd = {}; // Gets values from the URL
@@ -40,6 +46,40 @@ location.search.substr(1).split("&").forEach(function(item) {
         v = s[1] && decodeURIComponent(s[1]);
     (k in qd) ? qd[k].push(v) : qd[k] = [v]
 });
+// $(document).ready(function () {
+//   $("input#search").on("keyup", function () {
+//     var resultdiv = $("#results");
+//     // Get query
+//     var query = $(this).val();
+//     // Search for it
+//     var result = index.search(query);
+//     // Show results
+//     resultdiv.empty();
+//       if (result.length == 0) {
+//         resultdiv.append('<p class="">No results found.</p>');
+//       } else if (result.length == 1) {
+//         resultdiv.append('<p class="">Found: '+result.length+' result</p>');
+//       } else {
+//         resultdiv.append('<p class="">Found: '+result.length+' results</p>');
+//       }
+//     for (var item in result) {
+//       var ref = result[item].ref;
+//       var searchitem =
+//         '<div class="result"><a href="' +
+//         store[ref].link +
+//         '" class="post-title">' +
+//         store[ref].title +
+//         '</a> <div class="post-date small">' +
+//         store[ref].category +
+//         " &times; " +
+//         store[ref].date +
+//         "<div><p>" +
+//         store[ref].excerpt +
+//         "</p></div>";
+//       resultdiv.append(searchitem);
+//     }
+//   });
+// });
 
 function doSearch() {
   var resultdiv = $('#results');
@@ -55,12 +95,27 @@ function doSearch() {
   } else {
     resultdiv.append('<p class="">Found '+result.length+' results</p>');
   }
-  // Loop through, match, and add results
   for (var item in result) {
-    var ref = result[item].ref;
-    var searchitem = '<div class="result"><p><a href="{{ site.baseurl }}'+store[ref].link+'?q='+query+'">'+store[ref].title+'</a></p></div>';
-    resultdiv.append(searchitem);
-  }
+          var ref = result[item].ref;
+          var searchitem =
+            '<div class="result"><a href="' +
+            store[ref].link +
+            '" class="post-title">' +
+            store[ref].title +
+            '</a> <div class="post-date small">' +
+            " Last updated: " +
+            store[ref].date +
+            "<div><p>" +
+            "</p></div>";
+          resultdiv.append(searchitem);
+        }
+
+  // Loop through, match, and add results
+  // for (var item in result) {
+  //   var ref = result[item].ref;
+  //   var searchitem = '<div class="result"><p><a href="{{ site.baseurl }}'+store[ref].link+'?q='+query+'">'+store[ref].title+'</a></p></div>';
+  //   resultdiv.append(searchitem);
+  // }
 }
 
 $(document).ready(function() {
