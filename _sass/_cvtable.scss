@@ -1,0 +1,46 @@
+th,td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0;
+}
+
+table
+  {
+  border-collapse:separate;
+  border-spacing:40px 3px;
+  }
+
+td:hover {background-color: #f5f5f5;}
+
+.shadowbox {
+        width: 100%;
+        padding: 6px;
+        padding-left: 15px;
+        padding-bottom: 25px;
+        position: relative;
+        // background-color: yellow;
+        border-radius: 7px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+// CV table
+.left-half {
+    // background-color: #ea68a2;
+    float: left;
+    width: 20%;
+  }
+  .right-half {
+    // background-color: pink;
+    float: right;
+    width: 80%;
+  }
+
+.yearbox {
+    width: 125px;
+    border-radius: 3px;
+    box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.2), 0 3px 3px 0 rgba(0, 0, 0, 0.19);
+    background-color: #2da9de;
+    text-align: center;
+}
+.yeartext {
+    color: #ffffff;
+}

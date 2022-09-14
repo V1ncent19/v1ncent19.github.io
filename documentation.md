@@ -1,18 +1,81 @@
 ---
-layout: post
-title: Documentation
-author: Alex Gil
+layout: page
+title: Ideas & Thoughts
+author: Tuorui Peng
 ---
 
+I record some interesting topics here and write down my ideas and thoughts. You are more than welcome to discuss any of them with me so please [email](mailto:v1ncent19@outlook.com) me if you have any fancy ideas.
+
+-----------
+
 ## Contents
+
+
+
+
+
+
+<!-- Biostat -->
+
+### [Variance of Odds Ratio in Contingenct Table]({{ site.baseurl }}/texts/VarContingency)
+
+
+### [Cochran Theorem for Variance Decomposition]({{ site.baseurl }}/texts/Cochran)
+
+<!-- Statistical Learning -->
+
+### [Kernel Method: Application]({{ site.baseurl }}/texts/KernelApplication)
+
+### [Basic Constrained Optimize Theory]({{ site.baseurl }}/texts/OptizationTheory)
+
+### [Theory of Reproducing Kernel Hilbert Space (RKHS)]({{ site.baseurl }}/texts/RKHS)
+
+<!-- Statistical Computing -->
+
+### [Hamiltonian Markov Chain Monte Carlo]({{ site.baseurl }}/texts/HMC)
+
+### [Expectation-Maximization Algorithm on Gaussian Mixture Model]({{ site.baseurl }}/texts/EM_GMM)
+
+### [Convergence Order of Secant Interpolation Rooting]({{ site.baseurl }}/texts/ConvergenceSecant)
+
+### [Positive-Definition of Diagonal Dominant Matrix]({{ site.baseurl }}/texts/DiagonalDominant)
+
+
+<!-- Linear Regression -->
+
+### [Best Linear Estimator]({{ site.baseurl }}/texts/BestLinearEstimator)
+
+### [Cox-Box Transformation]({{ site.baseurl }}/texts/CoxBox)
+
+### [Deleted Residual]({{ site.baseurl }}/texts/DeletedResidual)
+
+<!-- Statistical Inference -->
+
+### [Likelihood Ratio Test for Normal Distrabution]({{ site.baseurl }}/texts/LRTNormal)
+
+### [Indepency between $\bar{X}$ and $S^2$]({{ site.baseurl }}/texts/indepencyXS)
+
+### [Two Properties of Log-likelihood]({{ site.baseurl }}/texts/score_and_information)
+
+<!-- Probability -->
+
+### [Derivation of Poisson Distribution]({{ site.baseurl }}/texts/Poisson)
+
+--------------
+
+Author: [*Vincent*]({{site.baseurl}}/)
+
+
+
+<!-- ## Contents
 {:.no_toc}
 
 * ToC
 {:toc}
 
----
+--- -->
+<!-- 
 
-## Prerequisites
 
 This documentation was built with beginners in mind, but has the necessary information for more seasoned producers.
 
@@ -29,6 +92,8 @@ The easy way to do this is not necessarily the more robust, and may simply not w
 
 If you're using a Mac, make sure you have the appropriate version of [XCode command line tools](https://developer.apple.com/xcode/download/) for your OSX. Using the terminal's `cd` command, switch to the directory where you want to install your project. Once inside the folder, you are ready to download and start using Ed. Enter each of these lines into your terminal (remember to ignore the `$`):
 
+![](../assets/open-graph-logo.png)
+ ![](images/2022-09-14-16-06-54.png)
 ~~~ bash
 $ git clone https://github.com/minicomp/ed.git
 $ cd ed
@@ -480,5 +545,6 @@ That should do it. If you have suggestions on how to improve Ed, make sure to le
 
 Happy editing!
 
-Alex Gil  
-April 2016
+  -->
+
+

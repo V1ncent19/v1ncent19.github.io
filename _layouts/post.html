@@ -6,3 +6,9 @@ layout: default
   <h1 class="text-title">{{ page.title }}</h1>
   {{ content }}
 </article>
+
+<hr>
+
+<p>Author: <I>{{ page.author }}</I></p>
+
+<p>Latest edited: <I>{{ page.date | date: '%d %b %Y' }}</I></p>

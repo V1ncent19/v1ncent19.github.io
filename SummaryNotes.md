@@ -1,5 +1,6 @@
 ---
-layout: page
+layout: page_pdf
+pdf_file: summary.pdf
 title: Minor Course Summary
 ---
 
@@ -20,6 +21,10 @@ And I would like to thank my classmates Mai Zhang and Yong Qin, who offered me h
 ### PDF Preview
 
 <object data="{{ site.baseurl }}/assets/pdf/summary.pdf" width="100%" height="800" type='application/pdf'>
+
+<hr>
+
+Author: *Vincent*
 
 <!-- 
 ### [Susanna Allés Torrent](http://susannalles.github.io/) | Hyper philologist
