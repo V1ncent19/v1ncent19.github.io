@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: default
 title: Knowledge & Thoughts
 author: Tuorui Peng
 ---
@@ -18,7 +18,7 @@ I record some interesting topics here and write down my thoughts and ideas. You 
 <div id="results"></div>
 <ul id="search_results"></ul>
 <script src="{{site.baseurl}}/assets/js/lunr.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="{{site.baseurl}}/assets/js/jquery.min.js"></script>
 <script src="{{site.baseurl}}/assets/js/search.js"></script>
 
 -----------
