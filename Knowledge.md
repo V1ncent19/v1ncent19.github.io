@@ -6,20 +6,6 @@ author: Tuorui Peng
 
 I record some interesting topics here and write down my thoughts and ideas. You are more than welcome to discuss any of them with me so please [email](mailto:v1ncent19@outlook.com) me if you have any fancy ideas.
 
------------
-
-## Search
-
-<form id="site_search">
-<div>Explore topics you are intersted in:</div>
-<br>
-<input id="search" placeholder='Search in Blogs...' type="text"/></form>
-
-<div id="results"></div>
-<ul id="search_results"></ul>
-<script src="{{site.baseurl}}/assets/js/lunr.min.js"></script>
-<script src="{{site.baseurl}}/assets/js/jquery.min.js"></script>
-<script src="{{site.baseurl}}/assets/js/search.js"></script>
 
 -----------
 
