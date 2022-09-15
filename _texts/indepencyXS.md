@@ -3,6 +3,7 @@ layout: post
 title: Indepency between $\bar{X}$ and $S^2$
 author: Vincent Peng
 date: 2020/11/24
+category: Knowledge
 ---
 
 Data is given as $\mathcal{D}=\{X_i\}_{i=1}^n$, with $X_i$ i.i.d. $\sim N(\mu ,\sigma ^2)$. Two crucial statistics are mean value $\bar{X}$ and variance $S^2_X$:
@@ -37,7 +38,8 @@ $$
     =&\sum_{i=2}^nY_i^2 \perp\!\!\!\perp Y_1=\sqrt{n}\bar{Z}
 \end{align}
 $$ 
-4. i.e. $\bar{X}\perp\!\!\!\perp S_X^2$
+4. i.e. we have independency between $\bar{X}$ and $S_X^2$:
+$$\bar{X}\perp\!\!\!\perp S_X^2$$
 
 
 

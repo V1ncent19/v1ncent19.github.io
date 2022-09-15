@@ -9,6 +9,7 @@ var index = lunr(function () {
   this.field('author')
   this.field('layout')
   this.field('date')
+  this.field('category')
   this.field("content", { boost: 10 });
   this.ref('id')
 });
@@ -21,6 +22,7 @@ index.add({
   author: {{text.author | jsonify}},
   layout: {{text.layout | jsonify}},
   date: {{text.date | jsonify}},
+  // category: {{text.category | jsonify}}
   // content: {{text.content  | strip_html| jsonify}},
   id: {{count}}
 });{% assign count = count | plus: 1 %}
@@ -33,7 +35,8 @@ var store = [{% for text in site.texts %}{
   "author": {{text.author | jsonify}},
   "layout": {{ text.layout | jsonify }},
   "link": {{text.url | jsonify}},
-  "date": {{text.date |date: '%B %-d, %Y'| jsonify }}
+  "date": {{text.date |date: '%B %-d, %Y'| jsonify }},
+  "category": {{text.category | jsonify}},
   // "excerpt": {{ text.content | strip_html | jsonify }}
 }
 {% unless forloop.last %},{% endunless %}{% endfor %}];
@@ -46,40 +49,6 @@ location.search.substr(1).split("&").forEach(function(item) {
         v = s[1] && decodeURIComponent(s[1]);
     (k in qd) ? qd[k].push(v) : qd[k] = [v]
 });
-// $(document).ready(function () {
-//   $("input#search").on("keyup", function () {
-//     var resultdiv = $("#results");
-//     // Get query
-//     var query = $(this).val();
-//     // Search for it
-//     var result = index.search(query);
-//     // Show results
-//     resultdiv.empty();
-//       if (result.length == 0) {
-//         resultdiv.append('<p class="">No results found.</p>');
-//       } else if (result.length == 1) {
-//         resultdiv.append('<p class="">Found: '+result.length+' result</p>');
-//       } else {
-//         resultdiv.append('<p class="">Found: '+result.length+' results</p>');
-//       }
-//     for (var item in result) {
-//       var ref = result[item].ref;
-//       var searchitem =
-//         '<div class="result"><a href="' +
-//         store[ref].link +
-//         '" class="post-title">' +
-//         store[ref].title +
-//         '</a> <div class="post-date small">' +
-//         store[ref].category +
-//         " &times; " +
-//         store[ref].date +
-//         "<div><p>" +
-//         store[ref].excerpt +
-//         "</p></div>";
-//       resultdiv.append(searchitem);
-//     }
-//   });
-// });
 
 function doSearch() {
   var resultdiv = $('#results');
@@ -103,7 +72,8 @@ function doSearch() {
             '" class="post-title">' +
             store[ref].title +
             '</a> <div class="post-date small">' +
-            " Last updated: " +
+            store[ref].category +
+            " &times Last updated: " +
             store[ref].date +
             "<div><p>" +
             "</p></div>";

@@ -3,6 +3,7 @@ layout: post
 title: Proof Two Properties of Log-Likelihood
 author: Vincent Peng
 date: 2020/11/30
+category: Knowledge
 ---
 
 ## Likelihood Function, Score and Fisher Information
