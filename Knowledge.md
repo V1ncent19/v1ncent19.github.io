@@ -10,9 +10,11 @@ I record some interesting topics here and write down my thoughts and ideas. You 
 -----------
 
 <div class="toc">
-  <h2>Contents</h2>
-  <ul class="texts">
   {% assign texts_list = site.texts | sort: "date"  %}
+  <h2>Content</h2>
+  <p></p>
+  <ul class="texts">
+  
   {% for node in texts_list reversed %}
     {% if node.title != null and node.category == 'Knowledge' and node.date != null and node.url != "/404.html" %} 
       <li class="text-title">

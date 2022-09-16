@@ -10,6 +10,7 @@ Here are some useful scripts, programs, or any resources I think useful.
 
 <div class="toc">
   <h2>Contents</h2>
+  <p></p>
   <ul class="texts">
   {% assign texts_list = site.texts | sort: "date"  %}
   {% for node in texts_list reversed %}
