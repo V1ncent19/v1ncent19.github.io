@@ -16,7 +16,7 @@ I record some interesting topics here and write down my thoughts and ideas. You 
   {% for node in texts_list reversed %}
     {% if node.title != null and node.category == 'Knowledge' and node.date != null and node.url != "/404.html" %} 
       <li class="text-title">
-        <a href="{{ site.baseurl }}/{{ node.url }}">
+        <a href="{{ site.baseurl }}/../{{ node.url }}">
           {{ node.title }}
         </a>
         <div class="post-date small"> <I>{{ node.date | date: '%B %-d, %Y' }}</I></div>

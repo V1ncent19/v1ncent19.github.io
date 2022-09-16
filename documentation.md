@@ -4,7 +4,7 @@ title: Documentation
 author: Tuorui Peng
 ---
 
-Here are some useful scripts or programs.
+Here are some useful scripts, programs, or any resources I think useful.
 
 -----------
 
@@ -15,7 +15,7 @@ Here are some useful scripts or programs.
   {% for node in texts_list reversed %}
     {% if node.title != null and node.category == 'Documentation' and node.date != null and node.url != "/404.html" %} 
       <li class="text-title">
-        <a href="{{ site.baseurl }}/{{ node.url }}">
+        <a href="{{ site.baseurl }}/../{{ node.url }}">
           {{ node.title }}
         </a>
         <div class="post-date small"> <I>{{ node.date | date: '%B %-d, %Y' }}</I></div>
