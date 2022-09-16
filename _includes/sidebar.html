@@ -18,7 +18,7 @@
       `layout: page` in the front-matter. See readme for usage.
     {% endcomment %}
 
-    {% assign pages_list = site.pages | sort:"url"  %}
+    {% assign pages_list = site.pages | sort:"title"  %}
     {% for node in pages_list %}
       {% if node.title != null and node.url != "/404.html" %}
         {% if node.layout == "page" or node.layout == "page_pdf" or node.layout == "cv" %}
@@ -53,7 +53,7 @@
     
   <div class="sidebar-item">
     <p>
-      This website is built with the <a href="https://jekyllrb.com/">Jekyll</a> theme <a href="https://minicomp.github.io/ed/">Ed.</a>. Distributed with an <a href="https://mit-license.org/">MIT license</a>.
+      This website is powered by the <a href="https://jekyllrb.com/">Jekyll</a> theme <a href="https://minicomp.github.io/ed/">Ed.</a>. Distributed with an <a href="https://mit-license.org/">MIT license</a>.
     </p>
   </div>
 </aside>

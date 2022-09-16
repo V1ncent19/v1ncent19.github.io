@@ -1,10 +1,12 @@
 ---
 layout: post
-title: LaTex Head File
+title: LaTeX Head File
 author: Vincent Peng
-date: 2022/4/15
+date: 2022/4/24
 category: Documentation
 ---
+
+Here I document two LaTeX head files I frequently use. By replacing all `CAPITALIZED CONTENTS` to what you need and compile with `xelatex` you could obtain a well pre-designed LaTeX document. For help with package or command, refer to [CTAN](https://www.ctan.org/) or [LaTeX Studio](https://www.latexstudio.net/).
 
 ### LaTeX head for general purpose:
 

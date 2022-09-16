@@ -9,56 +9,22 @@ I record some interesting topics here and write down my thoughts and ideas. You 
 
 -----------
 
-
-## Contents
-
-
-<!-- Biostat -->
-
-### [Variance of Odds Ratio in Contingency Table]({{ site.baseurl }}/texts/VarContingency)
-
-
-### [Cochran Theorem for Variance Decomposition]({{ site.baseurl }}/texts/Cochran)
-
-<!-- Statistical Learning -->
-
-### [Kernel Method: Application]({{ site.baseurl }}/texts/KernelApplication)
-
-
-### [Theory of Reproducing Kernel Hilbert Space (RKHS)]({{ site.baseurl }}/texts/RKHS)
-
-### [Basic Constrained Optimize Theory]({{ site.baseurl }}/texts/OptizationTheory)
-
-<!-- Statistical Computing -->
-
-### [Hamiltonian Markov Chain Monte Carlo]({{ site.baseurl }}/texts/HMC)
-
-### [Expectation-Maximization Algorithm in Gaussian Mixture Model]({{ site.baseurl }}/texts/EM_GMM)
-
-### [Convergence Order of Secant Interpolation Rooting]({{ site.baseurl }}/texts/ConvergenceSecant)
-
-### [Positive-Definition of Diagonal Dominant Matrix]({{ site.baseurl }}/texts/DiagonalDominant)
-
-
-<!-- Linear Regression -->
-
-### [Best Linear Estimator]({{ site.baseurl }}/texts/BestLinearEstimator)
-
-### [Box-Cox Transformation]({{ site.baseurl }}/texts/BoxCox)
-
-### [Deleted Residual]({{ site.baseurl }}/texts/DeletedResidual)
-
-<!-- Statistical Inference -->
-
-### [Likelihood Ratio Test for Normal Distrabution]({{ site.baseurl }}/texts/LRTNormal)
-
-### [Indepency between $\bar{X}$ and $S^2$]({{ site.baseurl }}/texts/indepencyXS)
-
-### [Two Properties of Log-likelihood]({{ site.baseurl }}/texts/score_and_information)
-
-<!-- Probability -->
-
-### [Derivation of Poisson Distribution]({{ site.baseurl }}/texts/Poisson)
+<div class="toc">
+  <h2>Contents</h2>
+  <ul class="texts">
+  {% assign texts_list = site.texts | sort: "date"  %}
+  {% for node in texts_list reversed %}
+    {% if node.title != null and node.category == 'Knowledge' and node.date != null and node.url != "/404.html" %} 
+      <li class="text-title">
+        <a href="{{ site.baseurl }}/{{ node.url }}">
+          {{ node.title }}
+        </a>
+        <div class="post-date small"> <I>{{ node.date | date: '%B %-d, %Y' }}</I></div>
+      </li>
+    {% endif %}
+  {% endfor %}
+  </ul>
+</div>
 
 --------------
 

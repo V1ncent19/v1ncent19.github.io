@@ -16,12 +16,12 @@ $$
 
 Express equation $(2)$ in terms of $\mathbb{E}$ and $\Sigma _{\cdot ,\cdot }$:
 $$
-\begin{aligned}
+\begin{align}
     \mathbb{E}_{X_\tau,X}\left[  \left( X_\tau- L(X_\tau|X) \right)^2 \right]=&\mathbb{E}\left( X_\tau^2 \right) -2\mathbb{E}\left( X_\tau(\beta _0+ X'\beta ) \right) +\mathbb{E}\left( (\beta _0+X'\beta )^2 \right) \\
     =&\Sigma _{X_\tau}+\mathbb{E}\left( X_\tau \right)^2\\
     &-2\beta _0\mathbb{E}\left( X_\tau \right) -2\left( \Sigma_{X,X_\tau}+\mathbb{E}\left( X_\tau \right) \mathbb{E}\left( X \right) \right)'\beta  \\
     &+\beta _0^2+2\beta _0\mathbb{E}\left( X \right)'\beta  +\beta '\left( \Sigma _X+\mathbb{E}\left( X \right) \mathbb{E}\left( X \right) ' \right)\\
-\end{aligned}
+\end{align}
 $$ 
 
 where $$\Sigma _{X,X_\tau}=cov(X,X_\tau)$$

@@ -6,6 +6,7 @@ date: 2020/11/24
 category: Knowledge
 ---
 
+
 Data is given as $\mathcal{D}=\{X_i\}_{i=1}^n$, with $X_i$ i.i.d. $\sim N(\mu ,\sigma ^2)$. Two crucial statistics are mean value $\bar{X}$ and variance $S^2_X$:
 $$
 \begin{align}
@@ -47,15 +48,15 @@ Comment: Normal distribution is the most important distribution (because CLT ind
 
 Further we could obtain their distribution for $X_i $ i.i.d. $\sim N(\mu ,\sigma ^2)$:
 $$
-\begin{aligned}
+\begin{align}
     &\dfrac{\sqrt{n}(\bar{X}-\mu )}{\sigma }\sim N(0,1)\\
     &\dfrac{(n-1)S^2}{\sigma ^2}\sim \chi^2_{n-1}
-\end{aligned}
+\end{align}
 $$ 
 
 and independency allows we to, e.g. use $\hat{\sigma }^2=S^2$ to construct pivot variable like
 $$
-\begin{aligned}
+\begin{align}
     T=\dfrac{\sqrt{n}(\bar{X}-\mu )}{S}\sim t_{n-1}
-\end{aligned}
+\end{align}
 $$  
