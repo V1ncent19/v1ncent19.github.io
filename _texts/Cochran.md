@@ -35,7 +35,7 @@ Here an intuitive proof for this simplified version is provided:
 
 Note that positive semi-definite matrix $$\mathrm{rank}(A_i)=r_i$$, i.e. $$A_i$$'s eigen decomposition could be written as
 $$
-\begin{equation}
+\begin{align}
     A_i=P_i\Lambda _iP_i'=   \tiny \begin{bmatrix}
         *_{11}&\ldots&*_{1r_i}&0&\ldots &0\\
         *_{21}&\ldots&*_{2r_i}&0&\ldots &0\\
@@ -49,7 +49,7 @@ $$
         \vdots&\vdots&\vdots&\vdots&\\
         0&0&\vdots&0
     \end{bmatrix}
-\end{equation}
+\end{align}
 $$ 
 
 **Note**: Non-zero rows of $$P_i$$ & $$\Lambda _i$$ could be changed, here we would select rows $$(1+\sum_{j<i}r_j):(\sum_{j\leq j}r_i)$$. i.e. $$P_1$$ uses row $$1:r_1$$, $$P_2$$ uses row $$(r_1+1):(r_1+r_2)$$, $$\ldots$$, $$P_k$$ uses row $$(n-r_k):n$$. In this way we would find that:
@@ -66,9 +66,7 @@ $$
 \end{align}
 $$ 
 
-and zero otherwise.
-
-
+and zero otherwise. The orthogonal property or $Y_i$ indicates that
 $$
 \begin{align}
     I_n=&\sum_{i=1}^kA_i=\sum_{i=1}^kP_i\Lambda _iP_i'\\

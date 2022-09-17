@@ -85,7 +85,7 @@
   -webkit-border-radius: 50px;
   font-weight: bold; /* 小按钮中文字的粗细 */
   text-decoration: none !important;
-  box-shadow:0 2px 0px rgba(0,0,0,.15), 0 3px 0 #ffffff inset;
+  box-shadow: 0 1px 0.8px 1.5px rgba(0,0,0,.15), 0 0 0 0 #ffffff inset;
 }
 
 #backtop a:hover { /* 小按钮上有鼠标悬停时 */
@@ -94,4 +94,61 @@
 }
 
 
+#contact_button { /* back to top button */
+  font-family: 'icomoon';
+  text-align: center;
+  // line-height: 50px;
+  // font-size: 20px;
+  width: min-content;
+  // height: 10px;
+  // position:inherit;
+  display: inline-block;
+  // bottom: 30px; /* 小按钮到浏览器底边的距离 */
+  // right: 60px; /* 小按钮到浏览器右边框的距离 */
+  // // color: rgb(64,120,192); /* 小按钮中文字的颜色 */
+  // z-index: 1000;
+  // // background: #fff; /* 小按钮底色 */
+  // padding: auto; /* 小按钮中文字到按钮边缘的距离 */
+  // border-radius: 50px; /* 小按钮圆角的弯曲程度（半径）*/
+  // -moz-border-radius: 50px;
+  // -webkit-border-radius: 50px;
+  // font-weight: bold; /* 小按钮中文字的粗细 */
+  // text-decoration: none !important;
+  // box-shadow: 0 1px 0.8px 1.5px rgba(0,0,0,.15), 0 0 0 0 #ffffff inset;
+}
 
+#contact_button a:hover { /* 小按钮上有鼠标悬停时 */
+  // background: rgb(174, 174, 174); /* 小按钮的底色 */
+  color: rgb(214, 214, 214); /* 文字颜色 */
+  // box-shadow: 0 1px 0.8px 1.5px rgba(0,0,0,.15), 0 0 0 0 #ffffff inset;
+}
+
+
+#backpage a { /* back to top button */
+  font-family: 'icomoon';
+  position: fixed;
+  top:  3rem;
+  left: 1rem;
+  display: block;
+  padding: .25rem .75rem;
+  color: #505050;
+  background-color: #fff;
+  border-radius: .25rem;
+  cursor: pointer;
+  // box-shadow:0 2px 0px rgba(0,0,0,.15), 0 3px 0 #ffffff inset;
+}
+
+// #backpage a:hover { /* 小按钮上有鼠标悬停时 */
+//   background: #505050; /* 小按钮的底色 */
+//   color: #fff; /* 文字颜色 */
+// }
+
+
+// top:  .8rem;
+// left: 1rem;
+// display: block;
+// padding: .25rem .75rem;
+// color: #505050;
+// background-color: #fff;
+// border-radius: .25rem;
+// cursor: pointer;

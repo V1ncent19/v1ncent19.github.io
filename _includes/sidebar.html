@@ -45,15 +45,26 @@
 
   
     <span class="sidebar-nav-item icons">
-      <a class="twitter-share-button" href="mailto:pengtr19@mails.tsinghua.edu.cn" target="_blank">&#xe945;</a> <!-- mail icon -->
-      <a class="twitter-share-button" href="mailto:v1ncent19@outlook.com" target="_blank">&#xe945;</a> <!-- mail icon -->
-      <a href="https://twitter.com/V1ncentPeng" class="twitter-share-button" target="_blank">&#xea96;</a> <!-- twitter icon -->
-      <a href="https://github.com/V1ncent19/v1ncent19.github.io" target="_blank">&#xeab0;</a> <!-- github icon -->
+      <div style="margin: 0 auto; width:14rem; text-align: center;">
+      <div id="contact_button">
+      <a class="inline-block" style="display:inline-block; width: 2rem;" href="mailto:pengtr19@mails.tsinghua.edu.cn" target="_blank">&#xe945;</a> <!-- mail icon --></div>
+      <div id="contact_button">
+      <a class="inline-block" style="display:inline-block; width: 2rem;" href="mailto:v1ncent19@outlook.com" target="_blank">&#xe945;</a></div><!-- mail icon -->
+      <div id="contact_button">
+      <a class="inline-block" style="display:inline-block; width: 2rem;" href="https://twitter.com/V1ncentPeng" target="_blank">&#xea96;</a></div> <!-- twitter icon -->
+      <div id="contact_button">
+      <a class="inline-block" style="display:inline-block; width: 2rem;" href="https://github.com/V1ncent19/v1ncent19.github.io" target="_blank">&#xeab0;</a> </div><!-- github icon -->
+      </div>
     </span>
     
   <div class="sidebar-item">
     <p>
       This website is powered by the <a href="https://jekyllrb.com/">Jekyll</a> theme <a href="https://minicomp.github.io/ed/">Ed.</a>. Distributed with an <a href="https://mit-license.org/">MIT license</a>.
+    </p>
+  </div>
+  <div class="sidebar-item">
+    <p>
+      Last updated: {{ "today" | date: '%b %-d, %Y' }}
     </p>
   </div>
 </aside>

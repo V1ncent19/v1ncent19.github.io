@@ -16,25 +16,31 @@ Hilbert space $\mathcal{H}$, as introduced in Quantum mechanics, is *a complete 
 
 ### Reproducing Kernel
 
-A *reproducing kernel* $K_\mathcal{H}(\, \cdot \, ,\, \cdot ,):\mathcal{X}\times\mathcal{X}\to \mathbb{R} $ on Hilbert space $\mathcal{H}$ satisties:
-- symmetry: 
-$$
-\begin{align}
-    K(x,y)=K(y,x)
-\end{align}
-$$ 
-- semi-positive definition: 
-$$
-\begin{align}
-    \sum_{i,j=1}^nK(x_i,x_j)a_ia_j\geq 0,\quad \forall \{x_i\}_{i=1}^n,\{a_i\}_{i=1}^n,\quad \forall n\in\mathbb{Z}^+
-\end{align}
-$$ 
-- reproducing:
-$$
-\begin{align}
-    f(x)=\langle K(x,y ), f(y ) \rangle
-\end{align}
-$$ 
+A *reproducing kernel* $K_\mathcal{H}(\, \cdot \, ,\, \cdot \,):\mathcal{X}\times\mathcal{X}\to \mathbb{R} $ on Hilbert space $\mathcal{H}$ satisties:
+- Symmetry: 
+    $$
+    \begin{align}
+        K(x,y)=K(y,x)
+    \end{align}
+    $$ 
+- Positive semi-definition: 
+    $$
+    \begin{align}
+        \sum_{i,j=1}^nK(x_i,x_j)a_ia_j\geq 0,\quad \forall \{x_i\}_{i=1}^n,\{a_i\}_{i=1}^n,\quad \forall n\in\mathbb{Z}^+
+    \end{align}
+    $$ 
+- Reproducing:
+    $$
+    \begin{align}
+        f(x)=\langle K(x,y ), f(y ) \rangle
+    \end{align}
+    $$ 
+    we will see that a direct result would be 
+    $$
+    \begin{align}
+        K(x,y)=\langle K(x,\xi ),K(\xi ,y)\rangle
+    \end{align}
+    $$ 
 
 ### Construct RKHS
 
@@ -69,7 +75,7 @@ $$
 With Kernel $K(\, \cdot \, ,\, \cdot \, )$ and its correaponding RKHS $\mathcal{H}$ defined, we could write a loss+$\ell_2$penalty optimization problem in $\mathcal{H}$:
 $$
 \begin{align}
-    \mathop{\arg\min}\limits_{f\in\mathcal{H}}\sum_{i=1}^N\mathcal{L}\left( y_i,f(x_i) \right)+\dfrac{\lambda }{2}\left\Vert f \right\Vert ^2,\qquad |\, \cdot \, |^2:=\langle\, \cdot \, ,\, \cdot \, \rangle 
+    \mathop{\arg\min}\limits_{f\in\mathcal{H}}\sum_{i=1}^N\mathcal{L}\left( y_i,f(x_i) \right)+\dfrac{\lambda }{2}\left\Vert f \right\Vert ^2,\qquad \Vert\, \cdot \, \Vert^2:=\langle\, \cdot \, ,\, \cdot \, \rangle 
 \end{align}
 $$ 
 

@@ -21,7 +21,7 @@ $$
     </tr> -->
     <tr>
       <td>  </td>
-      <td>$$D$$</td>
+      <td>$$D^{\,}$$</td>
       <td> $$D^\complement$$</td>
     </tr>
     <tr>
@@ -112,7 +112,6 @@ $$
 $$ 
 
 ### Variance of Odds Ratio
-
 $$
 \begin{align}
     var\left( \log \dfrac{n_{11}n_{22}}{n_{12}n_{21}} \right)=&var\left( \log n_{11}+\log n_{22}-\log_{21}-\log_{12} \right)\\

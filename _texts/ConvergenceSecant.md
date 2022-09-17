@@ -10,7 +10,7 @@ category: Knowledge
 
 ### Convergence Order
 
-For some iteration algorithm $x^{(t+1)}=g\left( x^{(t)} \right)$ with final solution denoted $x^*$, error $\varepsilon ^{(t)}:=x^{(t)}-x^*$, its convergence order $\alpha $ and converngence rate $c$:
+For some iteration algorithm $$x^{(t+1)}=g\left( x^{(t)} \right)$$ with final solution denoted $$x^*$$, error $$\varepsilon ^{(t)}:=x^{(t)}-x^*$$, its convergence order $$\alpha $$ and converngence rate $$c$$:
 $$
 \begin{align}
     \lim_{t\to\infty}\dfrac{|\varepsilon ^{(t+1)}|}{|\varepsilon ^{(t)}|^\alpha }=c
@@ -19,8 +19,7 @@ $$
 
 ### Secant Interpolation for Rooting:
 
-In rooting $f(x)$, with initial points $x^{(-1)}$, $x^{(0)}$ set, root of secant interpolation in each step $(t)$ is:
-
+In rooting $$f(x)$$, with initial points $$x^{(-1)}$$, $$x^{(0)}$$ set, root of secant interpolation in each step $$(t)$$ is:
 $$
 \begin{align}
         x^{(t+1)}=\dfrac{x^{(t-1)}f\left( x^{(t)} \right)-x^{(t)}f\left( x^{(t-1)} \right)}{f\left( x^{(t)} \right)-f\left( x^{(t-1)} \right)}
@@ -29,8 +28,7 @@ $$
 
 ## Deduction:
 
-Taylor series of $f(x)$ at $x^*$ to the second order is:
-
+Taylor series of $$f(x)$$ at $$x^*$$ to the second order is:
 $$
 \begin{align}
     f(x)=f'(x^{*})(x-x^{*})+\dfrac{1}{2}f''(x^{*})\left(x-x^{*}\right)^2
@@ -54,15 +52,14 @@ $$
 \end{align}
 $$
 
-Denote $e^{(t)}\equiv x^{(t)}-x^*$, take $t\to\infty$ to obtain
-
+Denote $$e^{(t)}\equiv x^{(t)}-x^*$$, take $$t\to\infty$$ to obtain
 $$
 \begin{align}
 \dfrac{e^{(t+1)}}{e^{(t)}e^{(t-1)}}=\dfrac{f''(x^*)}{2f'(x^*)-f''(x^*)(e^{(t)}+e^{(t-1)})}\to \dfrac{f''(x^*)}{2f'(x^*)}
 \end{align}
 $$
 
-Denote $e^{(t-1)}\equiv a$. We could first assume convergence order $\alpha$ and convergence rate $c$, then
+Denote $$e^{(t-1)}\equiv a$$. We could first assume convergence order $$\alpha$$ and convergence rate $$c$$, then
 $$
 \begin{align}
   \lim_{t\to\infty}\dfrac{e^{(t+1)}}{[e^{(t)}]^\alpha }= \lim_{t\to\infty}\dfrac{e^{(t)}}{[e^{(t-1)}]^\alpha }=c\Rightarrow e^{(t+1)}=c^\alpha a^{\alpha^2},\quad e^{(t)}=ca^\alpha
@@ -76,7 +73,7 @@ $$
 \end{align}
 $$
 
-Considering that $\lim_{t\to\infty}e^{(t-1)}=0$, there must be ${\alpha ^2-\alpha -1} =0$, thus
+Considering that $$\lim_{t\to\infty}e^{(t-1)}=0$$, there must be $${\alpha ^2-\alpha -1} =0$$, thus
 $$
 \begin{align}
 \alpha=\frac{\sqrt{5}+1}{2}\approx 1.618

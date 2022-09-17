@@ -1,9 +1,20 @@
 ---
-layout: default
+layout: page
 ---
 
+{% if page.category == "Knowledge" %}
+<div id="backpage">
+  <a href="{{site.baseurl}}/Knowledge">&#xea40;</a>
+</div> </a>
+{% elsif page.category == "Documentation" %}
+<div id="backpage">
+  <a href="{{site.baseurl}}/Documentation">&#xea40;</a>
+</div> </a>
+{% endif %}
+
+
 <article class="post">
-  <h1 class="text-title">{{ page.title }}</h1>
+  <!-- <h1 class="text-title">{{ page.title }}</h1> -->
   {{ content }}
 </article>
 

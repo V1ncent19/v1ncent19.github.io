@@ -42,7 +42,6 @@ $$
 ### Another Interesting Proof for Strictly Diagonal Dominant
 
 *Strictly Diagonal Dominant Matrix:*
-
 $$
 \begin{align}
     \vert a_{ii}\vert >\sum_{j\neq i}\vert a_{ij}\vert ,\quad \forall i

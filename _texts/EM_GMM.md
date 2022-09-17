@@ -15,18 +15,21 @@ Main appication: Probability Generative Model, observed value $$ x_i $$ is gener
 
 ### Requisite Knowledge
 - Kullback-Leibler Divergence: mearures the difference of distribution $$ p(x) $$ from distribution $$ q(x) $$
-   $$     \begin{align}
-             \mathrm{KL}(q\Vert p)\equiv -\int q(x)\log\dfrac{p(x)}{q(x)} \,\mathrm{d}x 
-        \end{align}
-        $$
+   $$     
+   \begin{align}
+        \mathrm{KL}(q\Vert p)\equiv -\int q(x)\log\dfrac{p(x)}{q(x)} \,\mathrm{d}x 
+    \end{align}
+    $$
 
     Note: non-exchange for $$ p $$, $$ q $$.
 
     Property: $$ \mathrm{KL}(q\Vert p)\geq 0  $$, $$ \forall p(x) $$, take equal when $$ p(x)=q(x) $$
 - Jensen Inequality: For **concave**  function $$ h(x) $$ and random variable $$ X\sim f $$
-$$    \begin{align}
+$$    
+\begin{align}
     \mathbb{E}_f\left(h(X)\right)\leq h\left(\mathbb{E}_f(X)\right) 
-    \end{align}$$
+\end{align}
+$$
         
     
         
@@ -49,12 +52,13 @@ $$
 $$
 
 where $$ \displaystyle\int q(z)\log \dfrac{f(x,z\vert \theta )}{q(z)} \,\mathrm{d}z  $$ is also called ELBO (Evidence Lower Bound) of $$ \log f(x\vert \theta ) $$. And we could similarly get the ELBO of log-likelihood:
-    $$\begin{align}
-        l(\theta \vert X)=\sum_{i=1}^N\log f(x_i\vert \theta )\geq \sum_{i=1}^N\int_z q_i(z)\log\dfrac{f(x_i,z\vert \theta )}{q_i(z)} \,\mathrm{d}z\equiv \mathrm{ELBO}(q,\theta ),\quad q=\{q_i\}
-    \end{align}$$
+$$
+\begin{align}
+    l(\theta \vert X)=\sum_{i=1}^N\log f(x_i\vert \theta )\geq \sum_{i=1}^N\int_z q_i(z)\log\dfrac{f(x_i,z\vert \theta )}{q_i(z)} \,\mathrm{d}z\equiv \mathrm{ELBO}(q,\theta ),\quad q=\{q_i\}
+\end{align}
+$$
     
 i.e. $$ \mathrm{ELBO}  $$ provides a lower bound estimate for $$ l(\theta \vert X) $$, thus we can instead maximize $$ \mathrm{ELBO}(q,\theta)  $$, using coordiante ascent is the Maximization-Maximization Algorithm, where one of the `coordinate' is the function space $$ q(z) $$.
-
 $$
 \begin{align}
     q\text{ Maximum : }q^{(t+1)}=&\mathop{\arg\max}\limits_{q(z)}\mathrm{ELBO}(q,\theta ^{(t)})=p(z\vert x,\theta ^{(t)})\\
@@ -71,11 +75,12 @@ $$
 \end{align}$$
     
 and naturally $$ q $$ maximization Step becomes computing $$ \displaystyle Q(\theta \vert \theta ^{(t)})=\sum_{i=1}^N \int_z p(z\vert x_i,\theta^{(t)})\log f(x_i,z\vert \theta ) \,\mathrm{d}z $$, i.e. the Expectation of $$ f(x_i,z\vert \theta ) $$ on the posterior $$ p(z\vert x_i,\theta ^{(t)}) $$, gather as Expectation-Maximization Algorithm:
-
-$$\begin{align}
+$$
+\begin{align}
     \mathrm{E_{xpectation}}\text{-Step}:&\,Q(\theta \vert \theta ^{(t)})=\sum_{i=1}^N \int_z p(z\vert x_i,\theta^{(t)})\log f(x_i,z\vert \theta ) \,\mathrm{d}z=\sum_{i=1}^NE_{p(z\vert x_i,\theta ^{(t)})}\left[\log f(x_i,z\vert \theta )\right]\\
     \mathrm{M_{aximization}}\text{-Step}:&\, \theta ^{(t+1)}=\mathop{\arg\max}\limits_{\theta }Q(\theta \vert \theta ^{(t)})=  \mathop{\arg\max}\limits_{\theta }\sum_{i=1}^N \int_z p(z\vert x_i,\theta^{(t)})\log f(x_i,z\vert \theta ) \,\mathrm{d}z
-\end{align}$$
+\end{align}
+$$
 
 
 E-M Algorithm can guarentee ascent of $$ \mathrm{ELBO}  $$, and finally can ensure convergence (at least to a local maximum).
@@ -93,7 +98,7 @@ An application of E-M Algorithm is Gaussian Mixture Model for Clustering, detail
 ## GMM Model
 
  The Gaussian Mixture Model (GMM) for clustering assumes $$ X $$ is generated from a mixed distribution of $$ K $$ normal, i.e. $$ X $$ has probability $$ \pi_l $$ to be generated from corresponding normal $$ N(\mu _l,\Sigma _l) $$:
- $$
+$$
     \begin{align}
         X\sim \sum_{l=1}^K\pi_lN(\mu_l,\Sigma _l)=\sum_{l=1}^K\pi_lN(\theta _l),\quad \sum_{l=1}^K\pi_l=1,\,\pi_l\geq 0.
     \end{align}
@@ -139,13 +144,13 @@ The above constraint equations are difficult to solve, use iteration algorithm:
 
     (a). $$ \mathrm{E_{xpectation}} $$-Step: Compute posterior of latent variable on each point;
     $$
-\begin{align}
-    \hat{\gamma }_{il}^{(t)}=\dfrac{\pi_l^{(t)}\phi(x_i\vert \mu _l^{(t)},\Sigma _l^{(t)})}{\sum\limits_{j=1}^K\pi_j^{(t)}\phi (x_i\vert \mu _j^{(t)},\Sigma _j^{(t)})} ,\quad  1\leq i\leq N,\,\, 1\leq l\leq K
-\end{align}
-$$
+    \begin{align}
+        \hat{\gamma }_{il}^{(t)}=\dfrac{\pi_l^{(t)}\phi(x_i\vert \mu _l^{(t)},\Sigma _l^{(t)})}{\sum\limits_{j=1}^K\pi_j^{(t)}\phi (x_i\vert \mu _j^{(t)},\Sigma _j^{(t)})} ,\quad  1\leq i\leq N,\,\, 1\leq l\leq K
+    \end{align}
+    $$
 
     (b). $$ \mathrm{M_{aximize}} $$-Step: Re-calculate parameters $$ \{\mu_l,\Sigma _l,\pi_l\} $$.
-1. Repeat until convergence.
+3. Repeat until convergence.
 
 
 Note: EM method for Gaussion Mixture Model is a greedy algorithm $$ \longrightarrow $$ local maximum.

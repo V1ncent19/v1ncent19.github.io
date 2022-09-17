@@ -20,25 +20,25 @@ Here's the proof for their indepency, which is important for further constructio
 ***Proof:***
 
 1. Stadardization would not change (in)dependency relation. Denote $Z=(Z_1,\ldots,Z_n)'$ for standardized variable
-$$
-\begin{align}
-    Z_i=&\dfrac{X_i-\mu }{\sigma }\sim N(0,1),\quad \forall i=1,2,\ldots,n\\
-    \bar{Z}=&\dfrac{1}{n}\sum_{i=1}^nZ_i\\
-    S^2=&\dfrac{1}{n-1}\sum_{i=1}^n(Z_i-\bar{Z})^2
-\end{align}
-$$ 
+    $$
+    \begin{align}
+        Z_i=&\dfrac{X_i-\mu }{\sigma }\sim N(0,1),\quad \forall i=1,2,\ldots,n\\
+        \bar{Z}=&\dfrac{1}{n}\sum_{i=1}^nZ_i\\
+        S^2=&\dfrac{1}{n-1}\sum_{i=1}^n(Z_i-\bar{Z})^2
+    \end{align}
+    $$ 
 
-i.e. $Z\sim N_n(0,I)$
+    i.e. $Z\sim N_n(0,I)$
 2. Construct a orthonormal linear transformation $A$, in which the first row is $(\frac{1}{\sqrt{n}},\ldots,\frac{1}{\sqrt{n}})$, i.e. $A'A=AA'=I$, then we could further define $Y:=AZ$. $Y\sim N_n(A0,A'IA)=N_n(0,I)$
 3. Express $\bar{Z}$ and $S^2$ in terms of $Y$:
-$$
-\begin{align}
-    \sqrt{n}\bar{Z}=&\dfrac{1}{\sqrt{n}}\sum_{i=1}^nZ_i=Y_1\\
-    (n-1)S^2=&\sum_{i=1}^n(Z_i-\bar{Z})^2=Z'Z-n\bar{Z}^2\\
-    =&(A'Y)'(A'Y)-Y_1^2=Y'Y-Y_1^2\\
-    =&\sum_{i=2}^nY_i^2 \perp\!\!\!\perp Y_1=\sqrt{n}\bar{Z}
-\end{align}
-$$ 
+    $$
+    \begin{align}
+        \sqrt{n}\bar{Z}=&\dfrac{1}{\sqrt{n}}\sum_{i=1}^nZ_i=Y_1\\
+        (n-1)S^2=&\sum_{i=1}^n(Z_i-\bar{Z})^2=Z'Z-n\bar{Z}^2\\
+        =&(A'Y)'(A'Y)-Y_1^2=Y'Y-Y_1^2\\
+        =&\sum_{i=2}^nY_i^2 \perp\!\!\!\perp Y_1=\sqrt{n}\bar{Z}
+    \end{align}
+    $$ 
 4. i.e. we have independency between $\bar{X}$ and $S_X^2$:
 $$\bar{X}\perp\!\!\!\perp S_X^2$$
 

@@ -127,8 +127,6 @@ Studying the 'averaging property' v.s. 'specific problem'
 - self averaging: when size of the system grows, the average of some observable $[O(x)]_\mathcal{C}$ '*represents almost all typical cases*' of $\mathcal{C}$. 
   
 $f$ is a self-averaging quantity $\to$ evaluate $[f]$ instead of studying any explicit $f(x,\mathcal{C})$
-
-
 $$
 \begin{align}
     [f]=&\lim_{N\to\infty}\dfrac{1}{N}[F]_\mathcal{C}\lim_{N\to\infty}-\dfrac{1}{N\beta }[\log Z]_\mathcal{C}
@@ -136,7 +134,6 @@ $$
 $$ 
 
 ### Replica trick:
-
 $$
 \begin{align}
     [\log Z]=[\dfrac{1}{n}\log Z^n]=\lim_{n\to 0}[\dfrac{Z^n-1}{n}]=\lim_{n\to 0}\dfrac{[Z^n]-1}{n}\tag{2.6}
@@ -169,8 +166,6 @@ $$
 $$ 
 
 Comment: $\bar{J}_{ij}=J_0\big/N$ to ensures $\mathcal{H}$ grows linearly with $N$. ($\mathcal{H}$ should be *extensive quantity*)
-
-
 $$
 \begin{align}
     [F]=-\dfrac{1}{\beta }[\log Z]=-\dfrac{1}{\beta }\int \log Z  \,\prod_{i<j}\mathbb{P}\left( J_{ij} \right)\,\mathrm{d}J_{ij}\tag{2.5}
@@ -186,20 +181,20 @@ $$
 
 Key steps:
 1. replica: $(\sum_{}\,\cdot \,)^n\to (\sum_{\mathrm{replica} 1 })\times (\sum_{\mathrm{replica} 2 })\times \ldots\times  (\sum_{\mathrm{replica} n })  $, use $S^\alpha $ to denote replica$\alpha $
-
     $$
     \begin{align}
         [Z^n]=&\int \left(\sum_{\{S_{i=1}^N\}_{\alpha =1}^n}\prod_{\alpha =1}^ne^{-\beta \mathcal{H}(S_{i=1}^{\alpha N})}\right) \,\prod_{i<j}\mathbb{P}\left( J_{ij} \right)\,\mathrm{d}J_{ij}\tag{2.10}\\
         =&\int \left(\sum_{\{S_{i=1}^N\}_{\alpha =1}^n}\exp\left\{ \beta \sum_{i<j}J_{ij}\sum_{\alpha =1}^nS_i^\alpha S_j^\alpha +\beta h\sum_{i}\sum_{\alpha =1}^nS_i^\alpha   \right\}\right) \,\prod_{i<j}\mathbb{P}\left( J_{ij} \right)\,\mathrm{d}J_{ij}\\
-        \mathop{=}\limits_{Lemma1}  &\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\exp\left\{ \dfrac{1}{N}\sum_{i<j}\left(\dfrac{1}{2}\beta ^2J^2\sum_{\alpha ,\beta }S_i^\alpha S_j^\alpha S_i^\beta S_j^\beta +\beta J_0\sum_{\alpha }S_i^\alpha S_j^\alpha  \right)+\beta h\sum_{i}\sum_{\alpha }S_i^\alpha  \right\}
+        \mathop{=}\limits_{Lemma1}  &\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\exp\Bigg\{ \dfrac{1}{N}\sum_{i<j}\Bigg(\dfrac{1}{2}\beta ^2J^2\sum_{\alpha ,\beta }S_i^\alpha S_j^\alpha S_i^\beta S_j^\beta \\
+        &\qquad\qquad\qquad\quad+\beta J_0\sum_{\alpha }S_i^\alpha S_j^\alpha  \Bigg)+\beta h\sum_{i}\sum_{\alpha }S_i^\alpha  \Bigg\}
     \end{align}
     $$ 
 
 2. Expectation $\mathbb{E}$ using gaussian integral
-
     $$
     \begin{align}
-        [Z^n]=\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\exp\left\{ \dfrac{1}{N}\sum_{i<j}\left(\dfrac{1}{2}\beta ^2J^2\sum_{\alpha ,\beta }S_i^\alpha S_j^\alpha S_i^\beta S_j^\beta +\beta J_0\sum_{\alpha }S_i^\alpha S_j^\alpha  \right)+\beta h\sum_{i}\sum_{\alpha }S_i^\alpha  \right\}\\ \tag{2.11}
+        [Z^n]=\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\exp\Bigg\{ \dfrac{1}{N} &\sum_{i<j}\Bigg(\dfrac{1}{2}\beta ^2J^2\sum_{\alpha ,\beta }S_i^\alpha S_j^\alpha S_i^\beta S_j^\beta\\
+        & +\beta J_0\sum_{\alpha }S_i^\alpha S_j^\alpha  \Bigg)+\beta h\sum_{i}\sum_{\alpha }S_i^\alpha  \Bigg\} \tag{2.11}
     \end{align}
     $$ 
     Note: 
@@ -207,18 +202,17 @@ Key steps:
     - $\sum_{\alpha ,\beta }S_i^\alpha S_j^\alpha S_i^\beta S_j^\beta=n+2\sum_{\alpha <\beta }S_i^\alpha S_j^\alpha S_i^\beta S_j^\beta$
     - $\sum_{i<j}S_i^\alpha S_j^\alpha S_i^\beta S_j^\beta=-N+\dfrac{1}{2}\sum_{i,j}S_i^\alpha S_j^\alpha S_i^\beta S_j^\beta=-N+\dfrac{1}{2}\left(\sum_{i=1}^NS_i^\alpha S_i^\beta \right)^2$
     - $\sum_{i<j}S_i^\alpha S_j^\alpha =-N+\dfrac{1}{2}\sum_{i,j}S_i^\alpha S_j^\alpha =-N+\dfrac{1}{2}\left(\sum_{i=1}^NS_i^\alpha \right)^2  $
-
-
     $$
     \begin{align}
-        [Z^n]=&\exp\left[ \dfrac{Nn\beta ^2J^2}{4} \right]\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\exp\left\{ \dfrac{\beta ^2J^2}{2N}\sum_{\alpha<\beta}\left(\sum_iS^\alpha_iS^\beta _i \right)^2+\dfrac{\beta J_0}{2N}\sum_{\alpha }\left(\sum_i S_i^\alpha \right)^2+\beta h\sum_i\sum_\alpha S_i^\alpha  \right\}
+        [Z^n]=&\exp\left[ \dfrac{Nn\beta ^2J^2}{4} \right]\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\exp\Bigg\{ \dfrac{\beta ^2J^2}{2N}\sum_{\alpha<\beta}\left(\sum_iS^\alpha_iS^\beta _i \right)^2\\
+        &+\dfrac{\beta J_0}{2N}\sum_{\alpha }\left(\sum_i S_i^\alpha \right)^2+\beta h\sum_i\sum_\alpha S_i^\alpha  \Bigg\}
     \end{align}
     $$  
 3. Change summation indices
     $$
     \begin{align}
-            [Z^n]=&\exp\left[ \dfrac{Nn\beta ^2J^2}{4} \right]\\\cdot 
-            &\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\exp\left\{ \dfrac{\beta ^2J^2}{2N}\sum_{\alpha<\beta}\left(\sum_iS^\alpha_iS^\beta _i \right)^2+\dfrac{\beta J_0}{2N}\sum_{\alpha }\left(\sum_i S_i^\alpha \right)^2+\beta h\sum_i\sum_\alpha S_i^\alpha  \right\}\\ \tag{2.12}
+            [Z^n]=&\exp\left[ \dfrac{Nn\beta ^2J^2}{4} \right]\cdot \sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\exp\Bigg\{ \dfrac{\beta ^2J^2}{2N}\sum_{\alpha<\beta}\left(\sum_iS^\alpha_iS^\beta _i \right)^2\\
+            &+\dfrac{\beta J_0}{2N}\sum_{\alpha }\left(\sum_i S_i^\alpha \right)^2+\beta h\sum_i\sum_\alpha S_i^\alpha  \Bigg\}\\ \tag{2.12}
     \end{align}
     $$ 
 
@@ -231,7 +225,7 @@ Key steps:
     \end{align}
     $$ 
 
-5. Reduction of $\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}$: equivalent for all $i$, $\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\to (\sum_{\alpha })^N$
+5. Reduction of $$\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}$$: equivalent for all $$i$$, $$\sum_{\{S^\alpha |_{i=1}^N\}_{\alpha =1}^n}\to (\sum_{\alpha })^N$$
     $$
     \begin{align}
         [Z^n]=&\exp\left\{ \dfrac{Nn\beta ^2J^2}{4} \right\}\int \prod_{\alpha <\beta }\,\mathrm{d}q_{\alpha \beta }\prod_{\alpha } \,\mathrm{d}m_\alpha \\
@@ -308,8 +302,6 @@ $$
     \Rightarrow \exp\left[ q_{\alpha \beta }\dfrac{\partial^{2} }{\partial h_\alpha h_\beta } \right]\exp\left[ \sum_{\alpha }S^\alpha  \right]=&\exp\left[ q_{\alpha \beta }S^\alpha S^\beta+\sum_{\alpha }h_\alpha S^\alpha   \right]
 \end{align}
 $$ 
-
-
 $$
 \begin{align}
     G=&\mathrm{Tr}\exp\left[ \dfrac{1}{2}\sum_{\alpha ,\beta }^nq_{\alpha \beta }S^\alpha S^\beta +h\sum_{\alpha }^nS^\alpha  \right]\\
@@ -319,7 +311,6 @@ $$
 $$ 
 
 #### (B.8)
-
 $$
 \begin{align}
     g(x+\mathrm{d}x,h )&=\exp\left[ -\dfrac{1}{2}\,\mathrm{d}q(x)\dfrac{\partial^{2} }{\partial h^{2}} \right]g(x,h)^{1+\mathrm{d}\log x }\\
@@ -331,7 +322,6 @@ $$
 $$ 
 
 #### (B.10)
-
 $$
 \begin{align}
     \dfrac{1}{n}\log\mathrm{Tr}e^L=&\exp\left[ \dfrac{1}{2}q(0)\dfrac{\partial^{2} }{\partial h^{2}} \right] \dfrac{1}{n}\log [g(m_1,h)]^{n/m_1}\Big|_{h\to 0,m_1\to 0,m_1-0=\mathrm{d}x=x\to 0 }\\

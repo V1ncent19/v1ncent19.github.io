@@ -24,13 +24,14 @@ $$
 which is called the **primal problem** for optimization.
 
 The **generalized Lagrange function** for primal problem is defined as
-
 $$
 \begin{align}
 \mathcal{L}(x,\kappa ,\lambda )\equiv& f(x)+\sum_{i=1}^k\kappa _ig_i(x)+\sum_{j=1}^l\lambda _jh_j(x) \\
 w.r.t. \quad&\kappa _i\geq 0,\quad i=1,2,\ldots,k
 \end{align}   
 $$
+
+Comment: here the constraint $\kappa _i\geq 0$ suggest that, if $g_i(x)<0$, then a $\kappa_i\to\infty$ would result in $\mathcal{L}\to -\infty$, which cannot be minimized. This is how $\kappa _i\geq 0$ helps keep the constraints.
 
 and we could further define a function of $$ x $$:
 $$
@@ -44,9 +45,9 @@ $$
 
 which means we can give the solution value of primal problem (P) simply by minimizing $$ \theta _P(x) $$, minimum denoted $$ p^* $$
 $$
-\begin{align}
-p^* \equiv \mathop{\min}\limits_{x}\theta _P(x)=\mathop{\min}\limits_{x}  \mathop{\max}\limits_{\kappa ,\lambda :\kappa _i\geq 0}\mathcal{L}(x,\kappa ,\lambda )
-\end{align}
+    \begin{align}
+    p^* \equiv \mathop{\min}\limits_{x}\theta _P(x)=\mathop{\min}\limits_{x}  \mathop{\max}\limits_{\kappa ,\lambda :\kappa _i\geq 0}\mathcal{L}(x,\kappa ,\lambda )
+    \end{align}
 $$
 
 
@@ -83,9 +84,7 @@ KKT condition to allow $$ d^*=p^* $$ at $$ (x^*,\kappa ^*,\lambda ^*) $$: in the
 - $$ h_j(x) $$ in the form of affine function $$ A_jx+b $$
 - $$ g_i(x) $$ are feasible constraints
 
-then $$ \mathrm{KKT}\,\Leftrightarrow\, p^*=d^*=\mathcal{L}(x^*,\kappa ^*,\lambda ^*)  $$.
-
-the KKT conditions are:
+then $$ \mathrm{KKT}\,\Leftrightarrow\, p^*=d^*=\mathcal{L}(x^*,\kappa ^*,\lambda ^*)  $$. The KKT conditions are:
 $$
 \begin{align}
 &\nabla_x\mathcal{L}(x^*,\kappa ^*,\lambda ^*)=0&\\
