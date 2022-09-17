@@ -28,9 +28,9 @@ I record some interesting topics here and write down my thoughts and ideas. You 
   </ul>
 </div>
 
---------------
+------------------
 
-Author: [*Vincent*]({{site.baseurl}}/)
+<!-- Author: [*Vincent Peng*]({{site.baseurl}}/) -->
 
 
 
