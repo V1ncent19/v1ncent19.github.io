@@ -61,5 +61,5 @@ $$
     \end{align}
 $$
 
-Comment: Information is the (negative) second derivative. It could be a measure of **accuracy** of estimator, in terms of maxizing $\ell(\theta )$, i.e. the **information** contained in the
+Comment: Information is the (negative) second derivative. It could be a measure of **accuracy** of estimator, in terms of maxizing $\ell(\theta )$, i.e. the **information** contained in the estimator.
         
