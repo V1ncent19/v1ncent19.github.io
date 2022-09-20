@@ -67,9 +67,9 @@ $$
 $$ 
 i.e. note that $P_0(0)=1$
 $$
-\begin{aligned}
+\begin{align}
     P_0'(t)=\lim_{h\to 0}\dfrac{P_0(t+h)-P_0(t)}{h}=-\lambda \Rightarrow P_0(t)=e^{-\lambda t}
-\end{aligned}
+\end{align}
 $$ 
 
 Then focus on $n\geq 1$. We could use mathematical induction to obtain all $n\geq 1$ cases:
