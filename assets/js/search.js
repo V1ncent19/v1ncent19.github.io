@@ -73,14 +73,13 @@ function doSearch() {
             store[ref].title +
             '</a> <div class="post-date small">' +
             store[ref].category +
-            " | <I>" +
+            ' | <I>'+
             store[ref].date +
             "</I><p>" +
             store[ref].excerpt +
             "</p></div></div>";
           resultdiv.append(searchitem);
         }
-
   // Loop through, match, and add results
   // for (var item in result) {
   //   var ref = result[item].ref;
