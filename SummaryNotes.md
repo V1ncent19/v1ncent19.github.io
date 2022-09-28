@@ -16,7 +16,7 @@ The project is mostly based on the course content of statistics minor in [Center
 
 In particular, I would like to express my appreciation to Professor [Zaiying Zhou](http://www.stat.tsinghua.edu.cn/en/teambuilder/faculty/zaiying-zhou/) for her guidance, encouragement and inspiration, which are largely the driving force for my further study into the field of statistics.
 
-And I would like to thank my classmates Mai Zhang and Yong Qin, who offered me help my discussing problems and tackling capstone projects. I learned a lot from them, both in knowledge and the way they study.
+And I would like to thank my classmates Mai Zhang, [Hao Meng]() and Yong Qin, who offered me help by discussing problems with me, proofreading the draft and tackling capstone projects together. I learned a lot from them, both in knowledge and the way they learn.
 
 
 
