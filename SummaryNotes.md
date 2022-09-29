@@ -8,7 +8,7 @@ title: Minor Course Summary
 
 The statistics course summary actually started from the exam cheetsheets during my first year in minor. At first it only contained some notion explanation / important results. Later I began to add mathematical deductions, intuition of methods, useful external links, etc. [LaTeX](https://www.ctan.org/) is used to compile so that I could include cross reference, citation, index in the note so that I could look something up in case of forgetting. Also I treat it as an opportunity to practice LaTeX.
 
-Since it's written as a reminder, I may not contain some basic knowledge like calculus, linear algebra, etc. Besides, for consistency within file and familiarity for myself, I might not use some commonly used notations (An example may be the size of designed matrix. I use $$(p+1)\times n$$ while some others use $$p\times n$$). I will consider adding notation declarations later...
+Since it's written as a reminder, I may not contain some basic knowledge like calculus, linear algebra, etc. Besides, for consistency within file and familiarity for myself, I might not use some commonly used notations (An example may be the size of designed matrix. I use $$n\times (p+1)$$ while some others use $$n\times p$$). I will consider adding notation declarations later...
 
 ### Acknowledgments
 
