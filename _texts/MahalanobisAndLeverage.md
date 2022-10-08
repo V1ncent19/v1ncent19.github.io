@@ -67,7 +67,7 @@ Note that $$X_{:,1}=\mathbf{1}_n$$, then we could obtain that e.g.
 - $$l_{(p+1),1}'x_i=1$$, etc.
 
 
-
+With above notation, we could express $d_{\mathrm{M}}$ in terms of $X$:
 $$
 \begin{align}
     \dfrac{d_\mathrm{M}(x_i)^2 }{n-1}=&(x_i-\bar{x})'\left[(n-1)S\right]^{-1}(x_i-\bar{x})\\

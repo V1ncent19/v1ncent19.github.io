@@ -148,6 +148,6 @@ $$
 \begin{align}
     t_i=&\dfrac{e_i}{\hat{\sigma }_{(\wedge i)}\sqrt{1-h_{ii}}}\\
     =&\dfrac{e_i}{\hat{\sigma }\sqrt{1-h_{ii}}}\left(\dfrac{\hat{\sigma }}{\hat{\sigma }_{(\wedge i)}}\right)^{1/2}\\
-    =&r_i\left(\dfrac{n-p-2}{n-p-1-r_i^2}\right)^{1/2}
+    =&r_i\left(\dfrac{n-p-2}{n-p-1-r_i^2}\right)^{1/2}<r_i
 \end{align}
 $$ 
