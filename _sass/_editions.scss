@@ -3,6 +3,7 @@
     background-color: rgba($color, $opacity);
 }
 
+
 div.ediciones {
   display: flex;
   justify-content: space-between;
@@ -119,7 +120,7 @@ div.materiales {
     height: 100%;
     background-image: url("/assets/photos/volunteer1.jpg");
     background-size: 11em;
-    background-position: top;
+    background-position: bottom;
     -webkit-filter: blur(2px);
     filter: blur(1px);
     margin: -2px -4px -4px -2px;
