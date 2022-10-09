@@ -19,9 +19,9 @@ div.ediciones {
     font-size: 24.4px;
   }
   @media screen and (max-width: 610px) {
-    font-size: 22.5px;
+    font-size: 25px;
     flex-wrap: wrap;
-
+    justify-content: center;
   }
 
 }
@@ -55,6 +55,7 @@ div.materiales {
   height: 13.5em;
   width: 11em;
   overflow: hidden;
+  margin-bottom: 0.5em;
   .summarynote {
     position: absolute;
     top: 0;
@@ -112,6 +113,20 @@ div.materiales {
   height: 6.5em;
   width: 11em;
   overflow: hidden;
+  margin-bottom: 0.5em;
+  .blog {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/assets/photos/blog1.png");
+    background-size: 11em;
+    background-position: top;
+    -webkit-filter: blur(2px);
+    filter: blur(1px);
+    // margin: -2px -4px -4px -2px;
+  }
   .volunteer {
     position: absolute;
     top: 0;
@@ -123,7 +138,7 @@ div.materiales {
     background-position: bottom;
     -webkit-filter: blur(2px);
     filter: blur(1px);
-    margin: -2px -4px -4px -2px;
+    // margin: -2px -4px -4px -2px;
   }
   .sports {
     position: absolute;
@@ -151,19 +166,7 @@ div.materiales {
     filter: blur(1px);
     margin: -2px -4px -4px -2px;
   }
-  .blog {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("/assets/photos/blog1.png");
-    background-size: 11em;
-    background-position: top;
-    -webkit-filter: blur(2px);
-    filter: blur(1px);
-    margin: -2px -4px -4px -2px;
-  }
+
 
   // .moderno {
   //   position: absolute;
