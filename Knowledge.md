@@ -4,7 +4,7 @@ title: Knowledge & Thoughts
 author: Tuorui Peng
 ---
 
-I record some interesting topics here and write down my thoughts and ideas. You are more than welcome to discuss any of them with me so please [email](mailto:v1ncent19@outlook.com) me if you have any fancy ideas.
+I record some interesting topics here and write down my thoughts and ideas. You are more than welcome to discuss any of them with me so please [email](mailto:v1ncent19@outlook.com) me if you have any fancy ideas. To look for specific key words, you can use the search box at [home page]({{site.baseurl}}../).
 
 
 -----------
@@ -71,4 +71,3 @@ I record some interesting topics here and write down my thoughts and ideas. You 
   }
   </script>
 
------------------

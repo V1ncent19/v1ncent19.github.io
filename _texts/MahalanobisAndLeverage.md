@@ -115,7 +115,7 @@ $$
     =&1-\dfrac{1}{n}tr \left(\mathbf{1}_n\mathbf{1}_n'\right)=0
 \end{align}
 $$ 
-which means that the term concerning $$(\ldots )\dfrac{\dfrac{1}{n}(X'X)^{-1}X'\mathcal{J}_nX(X'X)^{-1}}{1-\dfrac{1}{n}tr\left(X'\mathcal{J}_nX(X'X)^{-1}\right)}(\ldots )$$ is actually something like $$\dfrac{0}{0}$$ (lol).
+which means that the term concerning $$(\ldots )\dfrac{\dfrac{1}{n}(X'X)^{-1}X'\mathcal{J}_nX(X'X)^{-1}}{1-\dfrac{1}{n}tr\left(X'\mathcal{J}_nX(X'X)^{-1}\right)}(\ldots )$$ is actually something like $$\dfrac{0}{0}$$ (lol). So some more complex deduction is needed to prove that it really vanishes.
 
 - Note that $$\mathrm{L.H.S.}$$ of the equation is non-negative, which is an evidence of the property of leverage
 $$

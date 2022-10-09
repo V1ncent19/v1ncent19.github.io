@@ -3,23 +3,32 @@
     background-color: rgba($color, $opacity);
 }
 
+.img_container{
+  display:flex;
+}
+.img_container>div>img{
+  width: 100%;
+  height: 150px;
+}
+
 div.ediciones {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 0.5em;
   a {
     display: block;
   }
-  font-size: 36px;
+  font-size: 32px;
   @media screen and (max-width: 900px) {
-    font-size: 30px;
+    font-size: 26.5px;
   }
-  @media screen and (max-width: 810px) {
-    font-size: 26px;
+  @media screen and (max-width: 680px) {
+    font-size: 24.4px;
   }
-  @media screen and (max-width: 650px) {
-    font-size: 20px;
+  @media screen and (max-width: 610px) {
+    font-size: 22.5px;
     flex-wrap: wrap;
+
   }
 
 }
@@ -43,55 +52,41 @@ div.materiales {
     font-weight: 700;
     padding-left: 10px;
     font-size: 1.5em;
-    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font-family: "Gill Sans Extrabold", sans-serif;
     text-transform: lowercase;
   }
 }
 
 .box {
   position: relative;
-  height: 9.44em;
-  width: 9.44em;
+  height: 13.5em;
+  width: 11em;
   overflow: hidden;
-  .facsimilar {
+  .summarynote {
     position: absolute;
     top: 0;
     right: 0;
     width: 100%;
     height: 100%;
-    background-image: url("/assets/facsimilar.png");
-    background-size: 9.44em;
-    background-position: center;
+    background-image: url("/assets/photos/summarynote1.png");
+    background-size: 11em;
+    background-position: top;
     -webkit-filter: blur(2px);
-    filter: blur(2px);
+    filter: blur(1px);
     margin: -2px -4px -4px -2px;
-  }
-
-  .moderno {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("/assets/moderno.png");
-    background-sze: 9.44em;
-    -webkit-filter: blur(2px);
-    filter: blur(2px);
-    margin: -2px -4px -4px -2px;
-
   }
   .overlay {
     position: absolute;
     bottom: 0px;
     height: 100%;
     width: 100%;
-    padding-top: 69%;
+    padding-top: 108.7%;
     transition: padding-top 0.5s, background 0.7s;
     background: $dark-theme-seethru;
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 69%, $dark-theme-seethru 69%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 80%, $dark-theme-seethru 90%);
 
     &:hover {
-      padding-top: 0px;
+      padding-top: 0.4em;
       transition: padding-top 0.5s, background 0.7s;
       background: $dark-theme-seethru;
     }
@@ -110,12 +105,123 @@ div.materiales {
   @media screen and (max-width: 420px) {
 
     margin-bottom: 20px;
-    height: 9.44em;
-  width: 9.44em;
+    height: 11em;
+  width: 11em;
  
 
   }
 }
+
+
+
+.minibox {
+  position: relative;
+  height: 6.5em;
+  width: 11em;
+  overflow: hidden;
+  .volunteer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/assets/photos/volunteer1.jpg");
+    background-size: 11em;
+    background-position: top;
+    -webkit-filter: blur(2px);
+    filter: blur(1px);
+    margin: -2px -4px -4px -2px;
+  }
+  .sports {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/assets/photos/shooting1.jpg");
+    background-size: 11em;
+    background-position: top;
+    -webkit-filter: blur(2px);
+    filter: blur(1px);
+    margin: -2px -4px -4px -2px;
+  }
+  .moc {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/assets/photos/MOC1.jpg");
+    background-size: 11em;
+    background-position: top;
+    -webkit-filter: blur(2px);
+    filter: blur(1px);
+    margin: -2px -4px -4px -2px;
+  }
+  .blog {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/assets/photos/blog1.png");
+    background-size: 11em;
+    background-position: top;
+    -webkit-filter: blur(2px);
+    filter: blur(1px);
+    margin: -2px -4px -4px -2px;
+  }
+
+  // .moderno {
+  //   position: absolute;
+  //   top: 0;
+  //   right: 0;
+  //   width: 100%;
+  //   height: 100%;
+  //   background-image: url("/assets/moderno.png");
+  //   background-size: 11em;
+  //   -webkit-filter: blur(2px);
+  //   filter: blur(2px);
+  //   margin: -2px -4px -4px -2px;
+
+  // }
+  .overlay {
+    position: absolute;
+    bottom: 0px;
+    height: 100%;
+    width: 100%;
+    padding-top: 45%;
+    transition: padding-top 0.5s, background 0.7s;
+    background: $dark-theme-seethru;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 69%, $dark-theme-seethru 80%);
+
+    &:hover {
+      padding-top: 0.3em;
+      transition: padding-top 0.5s, background 0.7s;
+      background: $dark-theme-seethru;
+    }
+  }
+  span {
+    display: block;
+    color: white;
+    position: absolute;
+    width: 100%;
+    font-weight: 700;
+    padding-left: 10px;
+    font-size: 1em;
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+
+  }
+  @media screen and (max-width: 420px) {
+
+    margin-bottom: 20px;
+    height: 11em;
+  width: 11em;
+ 
+
+  }
+}
+
 
 .fascimile {
   display: flex;
@@ -137,3 +243,5 @@ div.materiales {
 
 
 }
+
+
