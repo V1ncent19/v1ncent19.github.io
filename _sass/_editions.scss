@@ -3,14 +3,6 @@
     background-color: rgba($color, $opacity);
 }
 
-.img_container{
-  display:flex;
-}
-.img_container>div>img{
-  width: 100%;
-  height: 150px;
-}
-
 div.ediciones {
   display: flex;
   justify-content: space-between;
