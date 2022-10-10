@@ -380,8 +380,14 @@ a.sidebar-nav-item:focus {
   background-image:         linear-gradient(to bottom, #555, #555 20%, #fff 20%, #fff 40%, #555 40%, #555 60%, #fff 60%, #fff 80%, #555 80%, #555 100%);
 }
 
-.sidebar-toggle:active,
-#sidebar-checkbox:focus ~ .sidebar-toggle,
+.sidebar-toggle:active ~ .sidebar-toggle{
+  color: #fff;
+  background-color: #555;
+}
+#sidebar-checkbox:focus ~ .sidebar-toggle{
+  color: #fff;
+  background-color: #555;
+}
 #sidebar-checkbox:checked ~ .sidebar-toggle {
   color: #fff;
   background-color: #555;
@@ -768,9 +774,11 @@ li.prose-indent {
 }
 
 /* Blue */
-.theme-base-blue .sidebar,
 .theme-base-blue .sidebar-toggle:active {
-  background-color: #4baad3;
+  background-color: #555555;
+}
+.theme-base-blue .sidebar {
+  background-color:  #2da9de;
 }
 
 .theme-base-blue .container a,
