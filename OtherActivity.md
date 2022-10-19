@@ -55,3 +55,6 @@ At first I aimed at a coaxial contra-rotating rotor (同轴反桨) sturcture but
 <div style="text-align: center; ">
 <img alt="" src="{{site.baseurl}}/assets/photos/MOC2.jpg" style="display: inline-block;width:70%;"/>
 </div>
+
+
+-------------------
