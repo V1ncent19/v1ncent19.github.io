@@ -51,7 +51,7 @@ $$
 
 ***proof:***
 
-We need the following lemma
+We need the following Sherman-Morrison lemma
 $$
 \begin{align}
     (A+B)^{-1}=A^{-1}-\dfrac{A^{-1}BA^{-1}}{1+tr(BA^{-1})},\quad \mathrm{rank}(B)=1 
@@ -80,7 +80,8 @@ $$
 in which
 $$
 \begin{align}
-    \left(x_i'- \dfrac{1}{n}X'_{1,:}X\right)  (X'X)^{-1} \left(x_i- \dfrac{1}{n}X'X_{:,1}\right)=&h_{ii}-\dfrac{2}{n}X'_{1,:}X(X'X)^{-1}x_i+\dfrac{1}{n^2}X'_{1,:}X(X'X)^{-1}X'X_{:,1}\\
+    &\left(x_i'- \dfrac{1}{n}X'_{1,:}X\right)  (X'X)^{-1} \left(x_i- \dfrac{1}{n}X'X_{:,1}\right)\\
+    =&h_{ii}-\dfrac{2}{n}X'_{1,:}X(X'X)^{-1}x_i+\dfrac{1}{n^2}X'_{1,:}X(X'X)^{-1}X'X_{:,1}\\
     =&h_{ii}-\dfrac{2}{n}l_{(p+1),1}'x_i+\dfrac{1}{n^2}l'_{(p+1),1}X'X_{:,1}\\
     =&h_{ii}-\dfrac{2}{n}+\dfrac{1}{n^2}\mathbf{1}_n'\mathbf{1}_n\\
     =&h_{ii}-\dfrac{1}{n}

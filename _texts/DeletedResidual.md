@@ -72,7 +72,7 @@ $$
 
 Here's the proof for $$\color{red}=$$:
 
-1. A lemma: $$(A+B)^{-1}=A^{-1}-\dfrac{1}{1+tr(BA^{-1})}A^{-1}BA^{-1} $$, where $$\mathrm{rank}(B)=1$$. Denote $$B=uv'$$, then:
+1. Sherman-Morrison lemma: $$(A+B)^{-1}=A^{-1}-\dfrac{1}{1+tr(BA^{-1})}A^{-1}BA^{-1} $$, where $$\mathrm{rank}(B)=1$$. Denote $$B=uv'$$, then:
     $$
     \begin{align}
         (A+B)^{-1}(A+B)=&I+A^{-1}B-\dfrac{A^{-1}B+A^{-1}BA^{-1}B}{1+tr(BA^{-1})}\\

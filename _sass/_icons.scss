@@ -94,7 +94,7 @@
 }
 
 
-#contact_button { /* back to top button */
+#contact_button { /* contact button */
   font-family: 'icomoon';
   text-align: center;
   // line-height: 50px;
@@ -124,10 +124,10 @@
 }
 
 
-#backpage a { /* back to top button */
+#backpage a { /* backpage */
   font-family: 'icomoon';
   position: fixed;
-  top:  3rem;
+  top:  5rem;
   left: 1rem;
   display: block;
   padding: .25rem .75rem;
@@ -137,6 +137,21 @@
   cursor: pointer;
   // box-shadow:0 2px 0px rgba(0,0,0,.15), 0 3px 0 #ffffff inset;
 }
+
+#backhome a { /* backhome */
+  font-family: 'icomoon';
+  position: fixed;
+  top:  2.85rem;
+  left: 1rem;
+  display: block;
+  padding: .25rem .75rem;
+  color: #505050;
+  background-color: #fff;
+  border-radius: .25rem;
+  cursor: pointer;
+  // box-shadow:0 2px 0px rgba(0,0,0,.15), 0 3px 0 #ffffff inset;
+}
+
 
 .icon-sort-amount-desc {
   font-family: 'icomoon';
@@ -155,17 +170,3 @@
   // content: "\ea4d";
 }
 
-// #backpage a:hover { /* 小按钮上有鼠标悬停时 */
-//   background: #505050; /* 小按钮的底色 */
-//   color: #fff; /* 文字颜色 */
-// }
-
-
-// top:  .8rem;
-// left: 1rem;
-// display: block;
-// padding: .25rem .75rem;
-// color: #505050;
-// background-color: #fff;
-// border-radius: .25rem;
-// cursor: pointer;
