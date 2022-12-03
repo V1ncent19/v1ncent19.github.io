@@ -1,10 +1,10 @@
 ---
 layout: page_pdf
 pdf_file: summary.pdf
-title: Minor Course Summary
+title: Statistics Note
 ---
 
-### Project on GitHub | [A Brief Summary of Statistics Course](https://github.com/V1ncent19/Statistics-Course-Summary-LaTeX)
+### A Brief Summary of Statistics Minor Courses | [Project on GitHub](https://github.com/V1ncent19/Statistics-Course-Summary-LaTeX)
 
 The statistics course summary actually started from the exam cheetsheets during my first year in minor. At first it only contained some notion explanation / important results. Later I began to add mathematical deductions, intuition of methods, useful external links, etc. [LaTeX](https://www.ctan.org/) is used to compile so that I could include cross reference, citation, index in the note so that I could look something up in case of forgetting. Also I treat it as an opportunity to practice LaTeX.
 
