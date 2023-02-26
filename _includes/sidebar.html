@@ -66,19 +66,8 @@
     <p>
       Last updated: {{ "today" | date: '%B %Y' }}
     </p>
-    <p>
-      <script type="text/javascript">
 
-        if(null !=localStorage.pagecount){
-          localStorage.pagecount=Number(localStorage.pagecount)+1;
-        }else{
-          localStorage.pagecount=1;
-          }
-        document.write("Page View: "+localStorage.pagecount+".");
-      
-      </script>
-    </p>
-    <!-- <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span id="busuanzi_container_site_pv">PVs: <span id="busuanzi_value_site_pv"></span></span> -->
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span id="busuanzi_container_site_pv">PVs: <span id="busuanzi_value_site_pv"></span></span>
   </div>
 </aside>
