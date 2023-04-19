@@ -6,12 +6,12 @@ author: Tuorui Peng
 
 ## Volunteering
 
-### Volunteer @ THU Summer School / Winter Camp (Guangdong)
+### Volunteer @ THU Summer School & Winter Camp (Guangdong)
 
 Summer School and Winter Camp are annual events for high school sophomores. They aim at providing students with opportunities to get introduced to interested disciplines and university life. I volunteer in summer school (Guangdong 2022) and winter camp (Guangdong 2023) in which I participated in the preparation and organization work and acted as assistant instructor of students. I had a good time with students and my colleagues there. 
 
 
-##### (sharing my experience / students in my class / with some of my colleagues)
+##### (sharing my experience / our summer school class / with some of my colleagues)
 <div class="ediciones">
     <div style='width:7.2em;'><img src="{{site.baseurl}}/assets/photos/volunteer4.jpg" alt=""></div>
     <div style='width:7.2em;'><img src="{{site.baseurl}}/assets/photos/volunteer2.jpg" alt=""></div>
