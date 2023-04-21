@@ -4,7 +4,7 @@ pdf_file: summary.pdf
 title: Statistics Note
 ---
 
-Recent Version Updated @ 2023/01/15
+Recent Version Updated @ 2023/04/21. Correct some mistakes and Add Bayesian Intro, DoE section. 
 
 ### A Brief Summary of Statistics Minor Courses | [Project on GitHub](https://github.com/V1ncent19/Statistics-Course-Summary-LaTeX)
 
