@@ -31,9 +31,10 @@ The project is mostly based on the course content of statistics minor in [Center
 
 In particular, I would like to express my appreciation to Professor [Zaiying Zhou](http://www.stat.tsinghua.edu.cn/en/teambuilder/faculty/zaiying-zhou/) for her guidance, encouragement and inspiration, which are largely the driving force for my further study into the field of statistics.
 
-And I would like to thank my classmates Mai Zhang, [Hao Meng](https://github.com/mengh20) and Yong Qin, who offered me help by discussing problems with me, proofreading the draft and tackling capstone projects together. I really learned a lot from them, both in knowledge and the way they learn.
 
-本项目的内容基于[清华大学统计学辅修课程](http://www.stat.tsinghua.edu.cn/programs/undergraduate-programs/)的课程内容。首先我想向统辅课的课程教师们表示感谢，他们包括（按我第一次上课的时间顺序）：邓琬璐、王江典、周在莹、李东、王天颖、俞声、杨朋昆。特别地，我想向周在莹老师表示特别感谢，她在我统辅课期间提供了无私的指引、鼓励和激励，并很大程度上让我决定在统计学领域继续深修。另外我还想感谢我的课友章迈、[孟灏](https://github.com/mengh20)、秦勇，他们常在课后与我讨论学术问题并给予我各种帮助。
+I would like to thank [Suqing Liu](https://github.com/lsq0000) for his invaluable contributions to ZH translation in this project. And I would like to thank my classmates Mai Zhang, [Hao Meng](https://github.com/mengh20) and Yong Qin, who offered me help by discussing problems with me, proofreading the draft and tackling capstone projects together. I really learned a lot from them, both in knowledge and the way they learn.
+
+本项目的内容基于[清华大学统计学辅修课程](http://www.stat.tsinghua.edu.cn/programs/undergraduate-programs/)的课程内容。首先我想向统辅课的课程教师们表示感谢，他们包括（按我第一次上课的时间顺序）：邓琬璐、王江典、周在莹、李东、王天颖、俞声、杨朋昆。特别地，我想向周在莹老师表示特别感谢，她在我统辅课期间提供了无私的指引、鼓励和激励，并很大程度上让我决定在统计学领域继续深修。感谢[刘苏青](https://github.com/lsq0000)参与到汉化工作中。另外我还想感谢我的课友章迈、[孟灏](https://github.com/mengh20)、秦勇，他们常在课后与我讨论学术问题并给予我各种帮助。
 
 
 ### PDF Preview
