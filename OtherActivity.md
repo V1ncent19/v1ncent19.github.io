@@ -6,6 +6,8 @@ author: Tuorui Peng
 
 ## Volunteering
 
+I was awarded five-star volunteer @ Tsinghua Univ in 2023.
+
 ### Volunteer @ THU Summer School & Winter Camp (Guangdong)
 
 Summer School and Winter Camp are annual events for high school sophomores. They aim at providing students with opportunities to get introduced to interested disciplines and university life. I volunteer in summer school (Guangdong 2022) and winter camp (Guangdong 2023) in which I participated in the preparation and organization work and acted as assistant instructor of students. I had a good time with students and my colleagues there. 
