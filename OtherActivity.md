@@ -6,7 +6,7 @@ author: Tuorui Peng
 
 ## Volunteering
 
-I was awarded five-star volunteer @ Tsinghua Univ in 2023.
+I was awarded [five-star Zijing volunteer @ Tsinghua Univ]({{site.baseurl}}/assets/photos/volunteer_five_star.jpg) in 2023.
 
 ### Volunteer @ THU Summer School & Winter Camp (Guangdong)
 

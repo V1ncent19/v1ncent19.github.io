@@ -4,7 +4,7 @@ pdf_file: summary.pdf
 title: Statistics Note
 ---
 
-Recent Version Updated @ 2023/June/06. I plan to complete the final version of this note by the end of 2023 June, when a version for print will also be released.
+Recent Version Updated @ 2023/June/24. Almost the final version. Later updates will be minor (e.g. fixing some typos, adding links, etc.)
 
 ### A Brief Summary of Statistics Minor Courses | [Project on GitHub](https://github.com/V1ncent19/Statistics-Course-Summary-LaTeX)
 
