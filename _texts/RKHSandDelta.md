@@ -75,7 +75,7 @@ $$
 
 这里的一个直接解释是 Riesz 表示定理（这里我直接给出内容了，不会证）
 
-> 对于矢量空间 $V$，对于任意的 $ \omega \in V^*$，都存在唯一的 $ \phi _\omega \in V$ w.r.t. $\Vert \phi_\omega \Vert = 1$，使得 $\forall v\in V$
+> 对于矢量空间 $V$，对于任意的 $ \omega \in V^*$，都存在唯一的 $ \phi _\omega \in V$ w.r.t. $\Vert \phi_\omega \Vert_{V} = \Vert \omega \Vert_{V^*}$，使得 $\forall v\in V$
 $$
 \begin{aligned}
     \omega (v) = \langle \phi_\omega ,v \rangle
