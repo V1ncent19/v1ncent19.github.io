@@ -53,7 +53,7 @@ $$
 \end{align}
 $$ 
 
-inner product that could make $K(\, \cdot \, ,\, \cdot \, $ a reproducing one satisfies
+inner product that could make $K(\, \cdot \, ,\, \cdot \, )$ a reproducing one satisfies
 $$
 \begin{align}
     f(y)=&\langle K(x,y ), \mu (x) \rangle\\

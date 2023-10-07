@@ -3,6 +3,14 @@ layout: page
 title: Experiences
 ---
 
+### Undergraduate Dissertation @ [THU Center of Statistical Science](http://www.stat.tsinghua.edu.cn/en/) | 2023
+
+- Title: *Statistical Modeling and Inference Based on Neural Network Prediction of Gene-Expression*.  Advisor: Tianying Wang.
+- We applied the Mixture Density Network to predicting the gene expression level, studied the model performance and robustness;
+- We extended the Conformal Prediction framework so as to apply to conctruct a conformal band for the distribution function of gene expression level.
+
+
+
 ### Research Assistant @ [NUS Department of Statistics and Data Science](https://www.stat.nus.edu.sg/) | 2022
 
 - Studied landscape modification in Simulated Annealing, especially on discrete Hamiltonian, to speed up
