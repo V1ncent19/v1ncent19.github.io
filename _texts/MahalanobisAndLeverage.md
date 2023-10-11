@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: post
 title: Mahalanobis Distance and Leverage
 author: Vincent Peng
@@ -124,4 +124,4 @@ $$
     h_{ii}\geq \dfrac{1}{n}
 \end{align}
 $$ 
-- Mahalanobis distance measures the deviation of $$x$$, with the distribution variance considered. i.e. here we see that large leverage is proportional to large $$d_\mathrm{M}$$, which conform to our intuition that `leverage' detects abnormal $$x_i$$.
+- Mahalanobis distance measures the deviation of $$x$$, with the distribution variance considered. i.e. here we see that large leverage is proportional to large $$d_\mathrm{M}$$, which conform to our intuition that `leverage' detects abnormal $$x_i$$. -->
