@@ -2,7 +2,7 @@
 layout: post
 title: Steak
 author: Vincent Peng
-date: 2023/10/19
+date: 2023/9/30
 category: Cuisine
 ---
 
