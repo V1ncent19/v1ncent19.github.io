@@ -92,6 +92,19 @@ Being a native cantonese, my favourite chinese cuisine is definitely cantonese c
 [豉汁排骨]({{ site.baseurl }}/texts/chizhipaigu). 真的就是材料太难买了，下次试试能不能整个黑椒牛仔骨玩玩。
 ![豉汁排骨]({{site.baseurl}}/assets/photos/cuisine/chizhipaigu.jpg)
 
+### 青椒炒鸡
+
+
+[青椒炒鸡]({{ site.baseurl }}/texts/qingjiaochaoji)，展现了一定的烹饪方法上的解析延拓能力，但是辣麻了。
+
+![青椒炒鸡]({{site.baseurl}}/assets/photos/cuisine/qingjiaochaorou2.jpg)
+
+### （广式）炖牛腩
+
+[炖牛腩]({{ site.baseurl }}/texts/niunan). 牛腩汤意大利面确实不行。
+
+![炖牛腩]({{site.baseurl}}/assets/photos/cuisine/niunan2.jpg)
+
 ## Western Cuisine
 
 ### Ragù alla Bolognese
@@ -122,6 +135,6 @@ Being a native cantonese, my favourite chinese cuisine is definitely cantonese c
 
 [Mousse]({{site.baseurl}}/texts/mousse). 目前还处在研发阶段，处于一个还不错，能吃的状态，以后买了称和硅胶勺应该能做的更好，主要是现在有甜点吃了。
 
-![慕斯蛋糕]({{site.baseurl}}/assets/photos/cuisine/mousse.jpg)
+![慕斯蛋糕]({{site.baseurl}}/assets/photos/cuisine/mousse1.jpg)
 
 
