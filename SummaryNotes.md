@@ -4,7 +4,11 @@ pdf_file: summary.pdf
 title: Statistics Note
 ---
 
-Recent Version Updated @ 2023/June/24. Almost the final version. Later updates will be minor (e.g. fixing some typos, adding links, etc.).
+Recent Version Updated @ 2024/Sept/20. Fixed some typos.
+
+Version Updated @ 2023/June/24. Almost the final version. Later updates will be minor (e.g. fixing some typos, adding links, etc.).
+
+
 
 此外，我在树洞上进行了关于统辅课程的测评，以及一些课程先修关系建议，有兴趣的同学可以前往 [树洞帖子](https://thuhollow.github.io/?##122635) 查看。
 
