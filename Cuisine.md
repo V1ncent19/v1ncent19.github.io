@@ -105,6 +105,22 @@ Being a native cantonese, my favourite chinese cuisine is definitely cantonese c
 
 ![炖牛腩]({{site.baseurl}}/assets/photos/cuisine/niunan2.jpg)
 
+### 炒饭
+
+[炒饭]({{ site.baseurl }}/texts/chaofan). 一直以为炒饭这个东西应该有很多种炒法，而大家都会认为自己的炒法是最正宗的（笑）。这个假期我在家尝试了若干次，在此提供一下实验成果和相关的炒饭哲学。
+
+![炒饭]({{site.baseurl}}/assets/photos/cuisine/chaofan1.jpg)
+
+
+
+
+
+
+
+
+
+
+
 ## Western Cuisine
 
 ### Ragù alla Bolognese
@@ -138,3 +154,8 @@ Being a native cantonese, my favourite chinese cuisine is definitely cantonese c
 ![慕斯蛋糕]({{site.baseurl}}/assets/photos/cuisine/mousse1.jpg)
 
 
+### Clam Chowder
+
+[Clam Chowder]({{site.baseurl}}/texts/clamchowder). 在Boston吃到后一直觉得不错，回来后自己复刻的，感觉还不错。
+
+![Clam Chowder]({{site.baseurl}}/assets/photos/cuisine/clamchowder.jpg)
