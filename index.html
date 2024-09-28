@@ -10,7 +10,10 @@ title: "Tuorui (Vincent) Peng"
         <a href="{{ site.baseurl }}"><img src="{{site.baseurl}}/assets/v1ncent19_photo.jpg" style='width: 14em;' alt="" ><br/> </a>
     </div></div>
     <h1 style="white-space: nowrap;">hi, there.</h1>
-    <p>I am a <a href="https://statistics.northwestern.edu/people/phd-graduate-students/index.html#P">Ph.D. student in Statistics</a> at <a href="https://statistics.northwestern.edu/">Department of Statistics and Data Science</a> at <a href="https://www.northwestern.edu/">Northwestern University</a>. Prior to this, I reveiced my B.S. degree in Maths and Physics from <a href="https://www.phys.tsinghua.edu.cn/phyen/">Department of Physics</a> at <a href="https://www.tsinghua.edu.cn/en/">Tsinghua University</a> in 2023, with a minor B.S. degree in Statistics. Both disciplines of Physics and Statistics attract me a lot and you are welcome to discuss any interesting topics with me. I record my thoughts and ideas at <a href="{{ site.baseurl }}/Knowledge">blog pages</a> and post my <a href="{{ site.baseurl }}/SummaryNotes">Statistics summary notes</a> for <a href="http://www.stat.tsinghua.edu.cn/en/programs/undergraduate-programs/">Statitics minor courses at Tsinghua Univ.</a> in the site. I am also maintaining an open resource project of <a href="https://thu-stat-wiki.github.io/">THU Stat Wiki</a>. Please feel free to leave me any comments by <a href="mailto:v1ncent19@outlook.com" >email</a> or on <a href="https://github.com/V1ncent19" >GitHub</a>.
+    <p>I am a <a href="https://statistics.northwestern.edu/people/phd-graduate-students/index.html#P">Ph.D. student in Statistics</a> at <a href="https://statistics.northwestern.edu/">Department of Statistics and Data Science</a> at <a href="https://www.northwestern.edu/">Northwestern University</a>. Prior to this, I reveiced my B.S. degree in Maths and Physics from <a href="https://www.phys.tsinghua.edu.cn/phyen/">Department of Physics</a> at <a href="https://www.tsinghua.edu.cn/en/">Tsinghua University</a> in 2023, with a minor B.S. degree in Statistics from <a href="https://www.stat.tsinghua.edu.cn/en/">Department of Statistics and Data Science</a>.
+      
+      
+      . Both disciplines of Physics and Statistics attract me a lot and you are welcome to discuss any interesting topics with me. I record my thoughts and ideas at <a href="{{ site.baseurl }}/Knowledge">blog pages</a> and post my <a href="{{ site.baseurl }}/SummaryNotes">Statistics summary notes</a> for <a href="http://www.stat.tsinghua.edu.cn/en/programs/undergraduate-programs/">Statitics minor courses at Tsinghua Univ.</a> in the site. I am also maintaining an open resource project of <a href="https://thu-stat-wiki.github.io/">THU Stat Wiki</a>. Please feel free to leave me any comments by <a href="mailto:v1ncent19@outlook.com" >email</a> or on <a href="https://github.com/V1ncent19" >GitHub</a>.
     </p>
     
     <p>
@@ -36,7 +39,37 @@ title: "Tuorui (Vincent) Peng"
 <hr>
 
 
+
+
+
+<!-- Recent posts -->
+
+
+<div class="toc">
+  {% assign texts_list = site.texts | sort: "date"  %}
+  <h2>Recent Posts </h2>
+  <p></p>
+
+  <ul id="sort_lst">
+    {% assign texts_list = site.texts | sort: "date"  %}
+    <!-- show only first 5 --> {% assign texts_list = texts_list | reverse  %}
+    {% for node in texts_list limit:5 %}
+      {% if node.title != null and node.date != null and node.url != "/404.html" %} 
+        <li class="text-title">
+          <a href="{{ site.baseurl }}/../{{ node.url }}">
+            {{ node.title }}
+          </a>
+          <div class="post-date small"> <I>{{node.category }} @ {{  node.date | date: '%B %-d, %Y' }}</I></div>
+        </li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+</div>
+
+
 <!-- Navigation Grid -->
+
+<h2>Navigation</h2>
 
 <div class="ediciones">
   <a href="{{ site.baseurl }}/SummaryNotes" class="edition-link">

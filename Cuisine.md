@@ -6,7 +6,7 @@ author: Tuorui Peng
 
 I love cooking! I've been exploring all kinds of cuisines, and I'm still learning. Here are some of my favorite repasts. I just treat this section as a personal cookbook or diary. I hope you enjoy it!
 
-Side note: maybe a better name for this part is "La science Culinaire", because for me cooking is more like a science than an art lol.
+**Side note**: maybe a better name for this part is "La science Culinaire", because for me cooking is more like a science than an art lol. If possible, I always try to understand the mechanism behind the recipe and cooking tricks. 
 
 有时候我也会翻车，观看更多失败案例请移步我的 pyq。
 
@@ -96,6 +96,8 @@ Being a native cantonese, my favourite chinese cuisine is definitely cantonese c
 
 
 [青椒炒鸡]({{ site.baseurl }}/texts/qingjiaochaoji)，展现了一定的烹饪方法上的解析延拓能力，但是辣麻了。
+
+**Note**：经过多次试验，目前这里的版本是错误的做法，改日录制了正确的做法会再加更新。
 
 ![青椒炒鸡]({{site.baseurl}}/assets/photos/cuisine/qingjiaochaorou2.jpg)
 
