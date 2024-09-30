@@ -42,6 +42,7 @@ A *reproducing kernel* $K_\mathcal{H}(\, \cdot \, ,\, \cdot \,):\mathcal{X}\time
     \end{align}
     $$ 
 
+
 ### Construct RKHS
 
 With a Kernel $K(x,y)$ given, we could construct a corresponding RKHS $\mathcal{H}$ (and its inner product) as follows. Here we temporarily consider finite countable case, continuous case is similar with $\sum \to\int$
@@ -56,7 +57,7 @@ $$
 inner product that could make $K(\, \cdot \, ,\, \cdot \, )$ a reproducing one satisfies
 $$
 \begin{align}
-    f(y)=&\langle K(x,y ), \mu (x) \rangle\\
+    \mu (y)=&\langle K(x,y ), \mu (x) \rangle\\
     =&\langle \phi _{y_i}(x), \sum_{i} \mu _i\phi_i(x) \rangle\\
     =&\sum_{i}\mu _i\langle \phi _{y}(x), \phi_i(x) \rangle
     =&\sum_{i} \mu _i\phi_i(y) 
@@ -67,6 +68,14 @@ i.e. the inner product should be set so that
 $$
 \begin{align}
     K(y,y_i)=\phi_i(y) = \langle \phi _{y}(x), \phi_i(x) \rangle=\langle K(y,x),K(x,y_i)\rangle
+\end{align}
+$$ 
+
+
+We can also see that the RKHS induced by $K(x,y)$ is given by the $L^2$ space of the eigenfunctions of $K(x,y)$, i.e.
+$$
+\begin{align}
+    \mathcal{H}=\left\{ f(x)=\sum_{i=1}^\infty f_i\phi_i(x): \sum_{i=1}^\infty \dfrac{ f_i^2 }{ \lambda _i } <\infty \right\},\quad \int K(x,y)\phi_i(y)\,\mathrm{d}y=\lambda _i\phi_i(x)
 \end{align}
 $$ 
 
