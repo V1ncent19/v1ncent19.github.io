@@ -142,6 +142,20 @@ p {
   margin-bottom: 1rem;
 }
 
+p:lang(ja) {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino,"noto-serif-jp", serif;
+}
+p:lang(zh) {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif,
+}
+
+span:lang(ja) {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino,"noto-serif-jp", serif;
+}
+span:lang(zh) {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif,
+}
+
 /* Lists */
 ul {
   list-style: circle;

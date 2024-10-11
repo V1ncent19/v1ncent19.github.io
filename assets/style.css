@@ -10,6 +10,11 @@
   font-display: block;
 }
 
+@font-face{
+  font-family: 'noto-serif-jp';
+  src: url('fonts/NotoSerifJP-Light.ttf');
+}
+
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;

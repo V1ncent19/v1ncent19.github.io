@@ -14,8 +14,17 @@ layout: page
 
 
 <article class="post">
+
+  {% if page.lang %}
+  <div class="post" lang="{{page.lang}}">
+  {% else %}
+  <div class="post">
+  {% endif %}
+
   <!-- <h1 class="text-title">{{ page.title }}</h1> -->
   {{ content }}
+
+</div>
 </article>
 
 <hr>
