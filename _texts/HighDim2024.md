@@ -3,6 +3,7 @@ layout: page_pdf
 pdf_file: HighDimSum.pdf
 title: High Dimensional Statistics Note 2024 Summer
 category: Knowledge
+date: 2024/9/10
 ---
 
 ***Still Updating***
