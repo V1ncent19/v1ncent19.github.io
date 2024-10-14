@@ -16,6 +16,7 @@ category: Documentation
   - [日语中的清浊音](#日语中的清浊音)
 - [日语中的颜色](#日语中的颜色)
 - [关于日语与广东话的相似词汇](#关于日语与广东话的相似词汇)
+- [星期几 - 法语与日语的对比](#星期几---法语与日语的对比)
 
 
 
@@ -193,9 +194,6 @@ Praat 是一个用于语音分析的软件，可以帮助我们分析一段音�
 - 三是其他颜色，作为形容词时本质是进行名词+の的形容词化，例如【<span lang="ja">緑の</span>+名词】，【<span lang="ja">紫色の</span>+名词】。
 
 
-
-
-
 ## 关于日语与广东话的相似词汇
 
 既然日语中确实很多汉字词是唐宋时期从中国引入的，那么日语和广东话之间的相似之处也是可以理解的。下面是一些偶然发现的具有相似发音的词语：
@@ -230,6 +228,53 @@ Praat 是一个用于语音分析的软件，可以帮助我们分析一段音�
 <td><span lang="zh">国家(gwok ga)</span></td>
 </tr>
 </table>
+
+
+
+## 星期几 - 法语与日语的对比
+
+非常神奇地发现星期几的标记方法其实法语和日语是基本一致的
+
+<table>
+<tr>
+<th></th>
+<th>星期日</th>
+<th>星期一</th>
+<th>星期二</th>
+<th>星期三</th>
+<th>星期四</th>
+<th>星期五</th>
+<th>星期六</th>
+</tr>
+<tr>
+<th>法语</th>
+<td>dimanche</td>
+<td>lundi</td>
+<td>mardi</td>
+<td>mercredi</td>
+<td>jeudi</td>
+<td>vendredi</td>
+<td>samedi</td>
+</tr>
+<tr>
+<th>日语</th>
+<td><span lang="ja">日曜日</span></td>
+<td><span lang="ja">月曜日</span></td>
+<td><span lang="ja">火曜日</span></td>
+<td><span lang="ja">水曜日</span></td>
+<td><span lang="ja">木曜日</span></td>
+<td><span lang="ja">金曜日</span></td>
+<td><span lang="ja">土曜日</span></td>
+</tr>
+</table>
+
+
+所以其实日语仅仅是从中文借用了“曜日”这个概念，但是日月火水木金土的顺序实际还是使用了西方历法。
+
+
+
+
+
 
 
 --------------------------------------------
