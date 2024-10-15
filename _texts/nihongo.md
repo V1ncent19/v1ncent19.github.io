@@ -238,35 +238,47 @@ Praat 是一个用于语音分析的软件，可以帮助我们分析一段音�
 <table>
 <tr>
 <th></th>
-<th>星期日</th>
-<th>星期一</th>
-<th>星期二</th>
-<th>星期三</th>
-<th>星期四</th>
-<th>星期五</th>
-<th>星期六</th>
-</tr>
-<tr>
 <th>法语</th>
-<td>dimanche</td>
-<td>lundi</td>
-<td>mardi</td>
-<td>mercredi</td>
-<td>jeudi</td>
-<td>vendredi</td>
-<td>samedi</td>
+<th>日语</th>
 </tr>
 <tr>
-<th>日语</th>
+<th>星期日</th>
+<td>dimanche</td>
 <td><span lang="ja">日曜日</span></td>
+</tr>
+<tr>
+<th>星期一</th>
+<td>lundi</td>
 <td><span lang="ja">月曜日</span></td>
+</tr>
+<tr>
+<th>星期二</th>
+<td>mardi</td>
 <td><span lang="ja">火曜日</span></td>
+</tr>
+<tr>
+<th>星期三</th>
+<td>mercredi</td>
 <td><span lang="ja">水曜日</span></td>
+</tr>
+<tr>
+<th>星期四</th>
+<td>jeudi</td>
 <td><span lang="ja">木曜日</span></td>
+</tr>
+<tr>
+<th>星期五</th>
+<td>vendredi</td>
 <td><span lang="ja">金曜日</span></td>
+</tr>
+<tr>
+<th>星期六</th>
+<td>samedi</td>
 <td><span lang="ja">土曜日</span></td>
 </tr>
 </table>
+
+
 
 
 所以其实日语仅仅是从中文借用了“曜日”这个概念，但是日月火水木金土的顺序实际还是使用了西方历法。

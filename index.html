@@ -16,54 +16,12 @@ title: "Tuorui (Vincent) Peng"
     </p>
     
     <p>
-    Please refer to my <a href="{{ site.baseurl }}/About">informal introduction</a> for more random facts. & Don't hesitate to use the search box and the navigation panel below or the toggle box at the upper-left corner to explore more about me!
+    Please refer to my <a href="{{ site.baseurl }}/About_en">informal introduction</a> for more random facts. & Don't hesitate to use the search box and the navigation panel below or the toggle box at the upper-left corner to explore more about me!
     </p>
 </div>
 
 <hr>
 
-<form id="site_search">
-  <div>  
-
-  </div class="post-date small">{{ site.texts.size }} blogs live here. Explore topics you interst in:</div>
-  <br>
-  <input id="search" placeholder='Search in Blogs...' type="text"/></form>
-  
-  <div id="results"></div>
-  <ul id="search_results"></ul>
-  <script src="{{site.baseurl}}/assets/js/lunr.min.js"></script>
-  <script src="{{site.baseurl}}/assets/js/jquery.min.js"></script>
-  <script src="{{site.baseurl}}/assets/js/search.js"></script>
-
-<hr>
-
-
-
-
-
-<!-- Recent posts -->
-
-
-<div class="toc">
-  {% assign texts_list = site.texts | sort: "date"  %}
-  <h2>Recent Posts </h2>
-  <p></p>
-
-  <ul id="sort_lst">
-    {% assign texts_list = site.texts | sort: "date"  %}
-    <!-- show only first 5 --> {% assign texts_list = texts_list | reverse  %}
-    {% for node in texts_list limit:5 %}
-      {% if node.title != null and node.date != null and node.url != "/404.html" %} 
-        <li class="text-title">
-          <a href="{{ site.baseurl }}/../{{ node.url }}">
-            {{ node.title }}
-          </a>
-          <div class="post-date small"> <I>{{node.category }} @ {{  node.date | date: '%B %-d, %Y' }}</I></div>
-        </li>
-      {% endif %}
-    {% endfor %}
-    </ul>
-</div>
 
 
 <!-- Navigation Grid -->
@@ -104,7 +62,7 @@ title: "Tuorui (Vincent) Peng"
 </div>
 
 <div class="ediciones">
-  <a href="{{ site.baseurl }}/About" class="edition-link">
+  <a href="{{ site.baseurl }}/About_en" class="edition-link">
     <div class="minibox">
       <div class="jokes"></div>
       <div class="overlay">
@@ -122,8 +80,51 @@ title: "Tuorui (Vincent) Peng"
   </a>
 </div>
 
+<hr>
 
 
+<!-- Recent posts -->
+
+
+<div class="toc">
+  {% assign texts_list = site.texts | sort: "date"  %}
+  <h2>Recent Posts</h2>
+  <p></p>
+
+  <ul id="sort_lst">
+    {% assign texts_list = site.texts | sort: "date"  %}
+    <!-- show only first 5 --> {% assign texts_list = texts_list | reverse  %}
+    {% for node in texts_list limit:5 %}
+      {% if node.title != null and node.date != null and node.url != "/404.html" %} 
+        <li class="text-title">
+          <a href="{{ site.baseurl }}/../{{ node.url }}">
+            {{ node.title }}
+          </a>
+          <div class="post-date small"> <I>{{node.category }} @ {{  node.date | date: '%B %-d, %Y' }}</I></div>
+        </li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+</div>
+
+
+
+
+<hr>
+
+
+<form id="site_search">
+  <div>  
+
+  </div class="post-date small">{{ site.texts.size }} blogs live here. Explore topics you are interested in:</div>
+  <br>
+  <input id="search" placeholder='Search in Blogs...' type="text"/></form>
+  
+  <div id="results"></div>
+  <ul id="search_results"></ul>
+  <script src="{{site.baseurl}}/assets/js/lunr.min.js"></script>
+  <script src="{{site.baseurl}}/assets/js/jquery.min.js"></script>
+  <script src="{{site.baseurl}}/assets/js/search.js"></script>
 
 <hr>
 
