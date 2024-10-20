@@ -68,6 +68,8 @@ Hello! / 你好！/ Bonjour! / <span lang="ja">こんにちは！</span> / Γε�
 
 - incoming 的旅游爱好者，目前严重受困于签证问题 = =. 
 
+- [猫猫虫 capoo](https://www.facebook.com/capoocat) 爱好者。
+
 
 
 

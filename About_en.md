@@ -39,3 +39,4 @@ This is a less formal 'About' page. For a more formal version, please visit the 
 - CS2/HoK/DSP/KSP.
 - A museum enthusiast, the primary destination for most travel is the local museum/art gallery.
 - An incoming traveller, currently seriously troubled by visa issues = =.
+- [Bugcat capoo](https://www.facebook.com/capoocat) fan.
