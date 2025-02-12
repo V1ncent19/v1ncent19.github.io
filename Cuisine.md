@@ -161,3 +161,8 @@ Being a native cantonese, my favourite chinese cuisine is definitely cantonese c
 [Clam Chowder]({{site.baseurl}}/texts/clamchowder). 在Boston吃到后一直觉得不错，回来后自己复刻的，感觉还不错。
 
 ![Clam Chowder]({{site.baseurl}}/assets/photos/cuisine/clamchowder.jpg)
+
+
+### 芝士焗饭
+
+[Cuisine]({{site.baseurl}}/texts/zhishijufan). 近期我会大量尝试芝士焗饭焗面相关食谱，所以本帖应该能够长期更新。
