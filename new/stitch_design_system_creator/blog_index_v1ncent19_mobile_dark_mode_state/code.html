@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Eb+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"surface-container":"#e9eff2","secondary-fixed":"#bce9ff","on-secondary-fixed":"#001f29","primary":"#006783","secondary-fixed-dim":"#a0cde2","inverse-primary":"#62d4ff","on-tertiary-fixed":"#291800","surface-bright":"#f5fafd","on-primary-container":"#00556d","on-tertiary":"#ffffff","surface-container-low":"#eff4f8","on-primary":"#ffffff","outline":"#6d797f","tertiary":"#825500","tertiary-container":"#feb136","on-tertiary-container":"#6d4600","on-secondary-container":"#3c687b","on-background":"#171c1f","tertiary-fixed-dim":"#ffb952","surface-container-high":"#e3e9ec","surface-tint":"#006783","surface-variant":"#dee3e7","surface-container-lowest":"#ffffff","on-primary-fixed":"#001f29","on-surface-variant":"#3d484e","surface-container-highest":"#dee3e7","on-secondary":"#ffffff","secondary-container":"#b9e6fc","on-tertiary-fixed-variant":"#633f00","tertiary-fixed":"#ffddb3","on-secondary-fixed-variant":"#1d4c5e","on-primary-fixed-variant":"#004d63","error-container":"#ffdad6","primary-fixed-dim":"#62d4ff","primary-fixed":"#bce9ff","primary-container":"#41cfff","background":"#f5fafd","on-error-container":"#93000a","error":"#ba1a1a","on-surface":"#171c1f","surface":"#f5fafd","secondary":"#376476","on-error":"#ffffff","outline-variant":"#bcc8cf","inverse-surface":"#2b3134","surface-dim":"#d5dbde","inverse-on-surface":"#ecf1f5"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{},"fontFamily":{"headline":["Eb Garamond"],"display":["Eb Garamond"],"body":["Eb Garamond"],"label":["Inter"]},"fontSize":{}}}}</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-[#0a1016] font-body text-[#e2e8f0] antialiased min-h-screen">
+<!-- 1. Compact Single-Row Mobile Header (Home Mobile Standard) -->
+<header class="fixed top-0 inset-x-0 z-50 bg-[#0a1016]/90 backdrop-blur-md border-b border-[#233547]/80 shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
+<div class="h-16 max-w-xl mx-auto px-4 flex items-center justify-between"><div class="flex items-center gap-3"><button aria-label="Open Navigation Drawer" class="w-10 h-10 -ml-1.5 rounded-lg flex items-center justify-center text-[#e2e8f0] hover:bg-[#1a2938] active:scale-95 transition-all" id="mobileMenuBtn" type="button"><span class="material-symbols-outlined text-[24px]">menu</span></button><div class="flex flex-col justify-center"><div class="flex items-baseline gap-1.5 leading-none"><span class="font-display font-semibold text-lg text-white tracking-tight">Tuorui</span><span class="font-display font-bold text-lg text-[#3ccfff] tracking-tight">“v1ncent19”</span><span class="font-display font-semibold text-lg text-white tracking-tight">Peng</span></div><span class="font-body italic text-[11px] text-[#94a3b8] leading-tight mt-0.5">En voyage dans l'espace de Hilbert.</span></div></div><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full bg-[#1e3449] border border-[#3ccfff]/30 text-[#3ccfff] flex items-center justify-center shadow-xs"><span class="material-symbols-outlined text-[19px]">person</span></div></div></div>
+</header>
+<!-- 2. Navigation Drawer Overlay & Dropdown / Slide Panel -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300" id="drawerMenu">
+<div class="w-80 max-w-[85vw] h-full bg-[#101923] border-r border-[#233547] p-5 flex flex-col justify-between shadow-2xl overflow-y-auto text-[#e2e8f0]">
+<div class="space-y-6">
+<!-- Drawer Header -->
+<div class="flex items-center justify-between pb-3 border-b border-surface-container-high">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">explore</span>
+</div>
+<div>
+<span class="font-display font-semibold text-base text-on-surface block leading-tight">Navigation</span>
+<span class="font-label text-[10px] uppercase tracking-wider text-secondary">v1ncent19 Index</span>
+</div>
+</div>
+<button aria-label="Close menu" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors" id="closeDrawerBtn" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Quick Utility Strip: Language & Dark Mode -->
+<div class="flex items-center justify-between p-2 rounded-xl bg-surface-container-low">
+<span class="text-xs font-label text-on-surface-variant font-medium pl-1.5">Preferences</span>
+<div class="flex items-center gap-2">
+<a class="text-xs font-label uppercase tracking-widest px-2.5 py-1 rounded-md bg-surface-container-lowest text-on-surface font-semibold shadow-xs hover:bg-secondary-container transition-colors" href="#">/ZH</a>
+<button aria-label="Toggle theme" class="p-1.5 rounded-md bg-surface-container-lowest text-on-surface-variant hover:text-on-surface transition-colors shadow-xs" type="button">
+<span class="material-symbols-outlined text-[17px]">dark_mode</span>
+</button>
+</div>
+</div>
+<!-- Main Nav Links (Transferred from desktop header) -->
+<nav class="flex flex-col space-y-1.5 font-label text-sm">
+<a class="px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface flex items-center justify-between transition-all" href="#">
+<span class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] text-outline">person_outline</span>About</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</a>
+<a class="px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface flex items-center justify-between transition-all" href="#">
+<span class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] text-outline">description</span>CV</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</a>
+<a class="px-3.5 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-semibold flex items-center justify-between transition-all" href="#">
+<span class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] text-primary" style='font-variation-settings: "FILL" 1;'>history_edu</span>Blog / Writings</span>
+<span class="text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full font-bold">38</span>
+</a>
+<a class="px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface flex items-center justify-between transition-all" href="#">
+<span class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] text-outline">photo_library</span>Gallery</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</a>
+<a class="px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface flex items-center justify-between transition-all" href="#">
+<span class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] text-outline">terminal</span>Project</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</a>
+</nav>
+<!-- Academic & Institution Passport -->
+<div class="pt-2 border-t border-surface-container-high/60">
+<p class="text-[10px] uppercase font-label tracking-widest text-secondary font-semibold mb-2">Academic Affiliation</p>
+<div class="space-y-1.5 text-xs font-label text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="">Tsinghua University</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="">Northwestern University</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-low text-xs text-on-surface-variant mt-6">
+<p class="font-display italic text-sm text-on-surface">Index Notation TP-2024</p>
+<p class="text-[10px] mt-0.5 font-label text-secondary">Department of Statistics &amp; Data Science</p>
+</div>
+</div>
+</div>
+<main class="w-full pt-16 bg-[#0a1016]"><div class="flex flex-col w-full pb-28">
+<div class="max-w-xl mx-auto w-full px-5">
+<!-- 2. Blog Section Title (Blog板块标题) -->
+<section class="mt-6 mb-5"><div class="flex items-center justify-between gap-3"><div class="flex items-center gap-2"><span class="text-[11px] font-label text-[#3ccfff] tracking-widest uppercase font-semibold">Bibliotheca</span></div><div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#182635] text-[#94a3b8] border border-[#233547] text-[11px] font-label font-medium shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-[#3ccfff]"></span><span>38 Dispatches • 4 Categories</span></div></div><h1 class="font-headline text-3xl font-semibold text-white mt-2.5 leading-tight tracking-tight">Writings &amp; Dispatches</h1><p class="font-display italic text-sm text-[#3ccfff] -mt-0.5 mb-1.5">博文与手稿</p><p class="font-body text-base text-[#94a3b8] leading-relaxed">Chronicles in stochastic processes, culinary ethnography, and classical philology recorded between Lake Michigan and Haidian.</p></section>
+<!-- 3. Blog Search Box (接着是搜索框) -->
+<section class="mb-4"><div class="relative w-full"><div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#3ccfff]"><span class="material-symbols-outlined text-[20px]">search</span></div><input class="w-full pl-11 pr-10 py-3 rounded-xl bg-[#131d27] border border-[#233547] text-white text-sm font-label placeholder:text-[#64748b] focus:outline-none focus:border-[#3ccfff] focus:ring-1 focus:ring-[#3ccfff] shadow-sm transition-all" id="blogSearchInput" placeholder="Search blogs, notes, theorems..." type="text"/><button class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#64748b] hover:text-white hidden" id="clearSearchBtn" type="button"><span class="material-symbols-outlined text-[18px]">cancel</span></button></div></section>
+<!-- 4. Tag Selection (再接着是tag选择) -->
+<section class="mb-4"><div class="flex flex-wrap items-center gap-2"><button class="tag-chip active-tag px-3 py-1.5 rounded-full text-xs font-label font-semibold tracking-wide transition-all bg-[#3ccfff] text-[#0a1016] shadow-sm" data-category="all" type="button">All (38)</button><button class="tag-chip px-3 py-1.5 rounded-full text-xs font-label font-medium tracking-wide transition-all bg-[#131d27] border border-[#233547] text-[#94a3b8] hover:bg-[#1a2938] hover:text-white shadow-sm" data-category="statistics" type="button">Statistics (14)</button><button class="tag-chip px-3 py-1.5 rounded-full text-xs font-label font-medium tracking-wide transition-all bg-[#131d27] border border-[#233547] text-[#94a3b8] hover:bg-[#1a2938] hover:text-white shadow-sm" data-category="cuisine" type="button">Cuisine (9)</button><button class="tag-chip px-3 py-1.5 rounded-full text-xs font-label font-medium tracking-wide transition-all bg-[#131d27] border border-[#233547] text-[#94a3b8] hover:bg-[#1a2938] hover:text-white shadow-sm" data-category="philology" type="button">Philology (5)</button><button class="tag-chip px-3 py-1.5 rounded-full text-xs font-label font-medium tracking-wide transition-all bg-[#131d27] border border-[#233547] text-[#94a3b8] hover:bg-[#1a2938] hover:text-white shadow-sm" data-category="archive" type="button">Archive (6)</button><button class="tag-chip px-3 py-1.5 rounded-full text-xs font-label font-medium tracking-wide transition-all bg-[#131d27] border border-[#233547] text-[#94a3b8] hover:bg-[#1a2938] hover:text-white shadow-sm" data-category="code" type="button">Code (4)</button></div></section>
+<!-- 5. Blog Sorting (再接着是排序) -->
+<section class="mb-5 p-3 rounded-xl bg-[#131d27] border border-[#233547]"><div class="flex items-center justify-between mb-2.5"><div class="flex items-center gap-1.5 text-xs font-label text-[#3ccfff]"><span class="material-symbols-outlined text-[16px] text-[#3ccfff]">tune</span><span class="uppercase tracking-wider text-[11px] font-semibold text-[#3ccfff]">Ordered by</span></div><span class="text-[11px] font-label text-[#64748b]">Chronological &amp; Alpha</span></div><div class="grid grid-cols-2 gap-2"><button class="sort-btn active-sort flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-label font-semibold bg-[#1c2c3b] border border-[#3ccfff]/30 text-white shadow-xs transition-all text-center" data-sort="newest" type="button"><span class="material-symbols-outlined text-[14px] text-[#3ccfff]">arrow_downward</span><span>Newest (最新)</span></button><button class="sort-btn flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-label font-medium text-[#94a3b8] hover:bg-[#1a2837] hover:text-white transition-all text-center" data-sort="oldest" type="button"><span class="material-symbols-outlined text-[14px] text-[#64748b]">arrow_upward</span><span>Oldest (最早)</span></button><button class="sort-btn flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-label font-medium text-[#94a3b8] hover:bg-[#1a2837] hover:text-white transition-all text-center" data-sort="az" type="button"><span class="material-symbols-outlined text-[14px] text-[#64748b]">sort_by_alpha</span><span>Title (A → Z)</span></button><button class="sort-btn flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-label font-medium text-[#94a3b8] hover:bg-[#1a2837] hover:text-white transition-all text-center" data-sort="za" type="button"><span class="material-symbols-outlined text-[14px] text-[#64748b]">swap_vert</span><span>Title (Z → A)</span></button></div></section>
+<!-- 6. Post Stream (Featured Card + Editorial Post List Entries) -->
+<section class="space-y-4" id="postStreamContainer">
+<!-- Highlighted Lead Dispatch Card -->
+<article class="post-card group relative bg-[#131d27] border border-[#233547] rounded-xl p-4 shadow-sm hover:shadow-lg hover:border-[#3ccfff]/40 transition-all duration-200" data-cat="statistics"><div class="relative w-full h-40 rounded-lg overflow-hidden mb-3"><div class="bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-500" data-alt="Blackboard covered in intricate mathematical chalk proofs and measure theoretic formulas, lit by warm afternoon library sunlight with soft leather notebooks and fountain pens on a rustic wooden study desk, academic serene aesthetic." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAFy-cBh_6TMg9sGMnqRzuX0JuZDPyjDRU35fUuJCqOIkyCcZlpFBQnr-GC2Pkew5_9gW15gwDkPpOY5kg69JARop8vciasi0QCAx658C803Avkvj7Bl7yZpMo36PXO7zUQdHqICSFFPGlT_1_nir-8mKsm0ifyQ1Zd7XdBuYRyov_vjXo9j5_BIVJfZZNT7IVc4Fw30y90FF2GFLhjipzlQApy7iWkLgXQYfRaCy-w5auBVqqmC-9h");'></div><div class="absolute inset-0 bg-gradient-to-t from-[#0a1016]/90 via-transparent to-transparent"></div><div class="absolute top-2.5 left-2.5 flex items-center gap-1.5"><span class="px-2 py-0.5 rounded-full bg-[#0a1016]/90 backdrop-blur-md border border-[#233547] text-[10px] font-label font-bold tracking-wider uppercase text-[#3ccfff]">Monograph</span><span class="px-2 py-0.5 rounded-full bg-[#feb136] text-[#291800] text-[10px] font-label font-semibold">Featured</span></div><div class="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[11px] text-[#e2e8f0] font-label"><span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span> 14 min read</span><span class="tracking-widest uppercase text-[10px] text-[#94a3b8]">TP-STAT-810</span></div></div><div class="flex items-center gap-2 text-xs font-label text-[#94a3b8] mb-1"><span class="font-semibold text-[#3ccfff]">Statistics</span><span>•</span><span>October 24, 2024</span><span>•</span><span class="flex items-center gap-0.5 text-[#94a3b8]"><span class="material-symbols-outlined text-[13px]">visibility</span> 1,420</span></div><h2 class="font-headline text-xl font-semibold text-white group-hover:text-[#3ccfff] transition-colors leading-snug">On Martingale Convergence and the Topology of Hilbertian Function Spaces</h2><p class="font-body text-sm text-[#94a3b8] mt-1.5 line-clamp-2 leading-relaxed">An examination into infinite-dimensional filtration properties, drawing connections between classical Doob theorems and functional analytic representations in reproducing kernel spaces.</p><div class="mt-3.5 pt-3 border-none bg-[#0e1620] -mx-4 -mb-4 px-4 py-2.5 rounded-b-xl flex items-center justify-between"><div class="flex items-center gap-2 text-[11px] font-label text-[#94a3b8]"><span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-[#feb136]">bookmark</span>#StochasticProcesses</span><span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-[#feb136]">science</span>#MeasureTheory</span></div><a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-[#3ccfff] hover:text-white transition-colors" href="#">Read Entry<span class="material-symbols-outlined text-[14px]">arrow_forward</span></a></div></article>
+<!-- Post Card 2: Culinary & Philology (Visual Split) -->
+<article class="post-card group bg-[#131d27] border border-[#233547] rounded-xl p-4 shadow-sm hover:shadow-lg hover:border-[#3ccfff]/40 transition-all duration-200" data-cat="cuisine"><div class="flex gap-3.5"><div class="w-24 h-24 shrink-0 rounded-lg overflow-hidden relative"><div class="bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-500" data-alt="Traditional handmade Chinese claypot stew with simmered duck and star anise, subtle fragrant steam rising under soft moody evening tavern lights, ceramic antique dishware with calligraphy scrolls in blurred background." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA4rZ7TGS6FVmHCuGx7NcmvmI_nwOAA8UllMxEeYKxJDQocbMrFY4WgSwmCIfyia5-CDo9BFhga-zg5V7pt4j5akcvsPyNooomh6NG4BuH_YYEmHgQvS_uKrnV2OmoFBAQI6KusCxcGqemGQgXkxX_4SqykezNfehVUzoQYihOM8M3zA6i8DxPNT1sMmvQrCq2qcoxRKIUBTbGzAtFatUVfjtIWn2plrGzYAKmeyo6ZMItATFOfxP7m");'></div></div><div class="flex-1 min-w-0 flex flex-col justify-between"><div><div class="flex items-center gap-2 text-[11px] font-label text-[#94a3b8] mb-0.5"><span class="font-semibold text-[#feb136]">Cuisine • Notes</span><span>•</span><span>Sept 18, 2024</span></div><h3 class="font-headline text-lg font-semibold text-white leading-tight group-hover:text-[#3ccfff] transition-colors line-clamp-2">An Epistemology of Huaiyang Broths: Salt, Water, and Temporal Reduction</h3><p class="font-body text-xs text-[#94a3b8] mt-1 line-clamp-2">Field observations on the linguistic nuances of “Xian” (鲜) and the slow coagulation thermodynamics of imperial stockpots.</p></div><div class="flex items-center justify-between mt-2 pt-1 text-[11px] font-label text-[#64748b]"><span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">location_on</span>Yangzhou • Evanston</span><span class="text-[#3ccfff] font-semibold flex items-center">Read <span class="material-symbols-outlined text-[12px] ml-0.5">arrow_forward</span></span></div></div></div></article>
+<!-- Post Card 3: Philology & Manuscript -->
+<article class="post-card group bg-[#131d27] border border-[#233547] rounded-xl p-4 shadow-sm hover:shadow-lg hover:border-[#3ccfff]/40 transition-all duration-200" data-cat="philology"><div class="flex items-center justify-between text-xs font-label text-[#94a3b8] mb-1"><div class="flex items-center gap-1.5"><span class="px-2 py-0.5 rounded-full bg-[#1e3449] text-[#3ccfff] text-[10px] font-bold border border-[#3ccfff]/20">Philology</span><span>August 29, 2024</span></div><span class="font-display italic text-xs text-[#94a3b8]">Archived in Tsinghua Lib</span></div><h3 class="font-headline text-lg font-semibold text-white group-hover:text-[#3ccfff] transition-colors leading-snug">Marginalia on the Shuowen Jiezi: Radical 140 and Botanical Taxonomies</h3><p class="font-body text-sm text-[#94a3b8] mt-1 line-clamp-2 leading-relaxed">Comparing Han dynasty lexicographical arrangements with modern binomial classifications, examining ideographic shifts in ancient herbal catalogs.</p><div class="mt-3 flex items-center justify-between pt-2.5 text-[11px] font-label border-t border-[#1c2c3b]"><div class="flex items-center gap-2 text-[#94a3b8]"><span class="bg-[#182433] px-2 py-0.5 rounded text-[10px] border border-[#233547]">#Lexicology</span><span class="bg-[#182433] px-2 py-0.5 rounded text-[10px] border border-[#233547]">#ArchaicChinese</span></div><div class="flex items-center gap-1 text-[#3ccfff] font-medium"><span class="material-symbols-outlined text-[14px]">auto_stories</span><span>8 min read</span></div></div></article>
+<!-- Post Card 4: Archive / Stamp Edition -->
+<article class="post-card group bg-[#131d27] border border-[#233547] rounded-xl p-4 shadow-sm hover:shadow-lg hover:border-[#3ccfff]/40 transition-all duration-200" data-cat="archive"><div class="flex gap-3.5"><div class="flex-1 min-w-0 flex flex-col justify-between"><div><div class="flex items-center gap-2 text-[11px] font-label text-[#94a3b8] mb-0.5"><span class="font-semibold text-[#3ccfff]">Archive • Travelogue</span><span>•</span><span>July 04, 2024</span></div><h3 class="font-headline text-lg font-semibold text-white leading-tight group-hover:text-[#3ccfff] transition-colors line-clamp-2">Cartographic Solitude: A Stroll through the Newberry Map Collection</h3><p class="font-body text-xs text-[#94a3b8] mt-1 line-clamp-2">Notes on 17th-century copperplate projections of the Pacific Northwest and the cartographer’s recurring fear of vacuum.</p></div><div class="flex items-center justify-between mt-2 pt-1 text-[11px] font-label text-[#64748b]"><span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">pin_drop</span>Chicago, Illinois</span><span class="text-[#3ccfff] font-semibold flex items-center">Read <span class="material-symbols-outlined text-[12px] ml-0.5">arrow_forward</span></span></div></div><div class="w-24 h-24 shrink-0 rounded-lg overflow-hidden relative"><div class="bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-500" data-alt="Antique parchment nautical map from the seventeenth century unfurled under warm magnifying lamp, showing ornate compass roses, sea monsters, and Latin calligraphy inscriptions." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJ98xUHoOw0kWLEg-x6WP6yDH7u72dNMYda9Zmbe6WQcnttDSTKGn880Ex7jTOlwVAjHiPRAqOCgBJ3n_UV3KluQoDsSwQj47valBEIcqOwjpjNA-POIfQbLOKsksVNU72LZu3YMNmKvC4sPz-ljv30tsF3FlUfQ__JYIoLFK_ZSsH72m5ADm7JxE0lPDlk41uyGD79H7BoG3tipAy8sjowclD89qzXm93W-ZV1c9javd52qaf5haJ");'></div></div></div></article>
+<!-- Post Card 5: Code & Computation -->
+<article class="post-card group bg-[#131d27] border border-[#233547] rounded-xl p-4 shadow-sm hover:shadow-lg hover:border-[#3ccfff]/40 transition-all duration-200" data-cat="code"><div class="flex items-center justify-between text-xs font-label text-[#94a3b8] mb-1"><div class="flex items-center gap-1.5"><span class="px-2 py-0.5 rounded-full bg-[#182635] text-[#3ccfff] text-[10px] font-bold border border-[#233547]">Code</span><span>June 12, 2024</span></div><span class="font-label text-[10px] uppercase tracking-wider text-[#94a3b8]">R / C++ Armadillo</span></div><h3 class="font-headline text-lg font-semibold text-white group-hover:text-[#3ccfff] transition-colors leading-snug">High-Throughput Markov Chain Monte Carlo via SIMD Vectorization</h3><p class="font-body text-sm text-[#94a3b8] mt-1 line-clamp-2 leading-relaxed">Benchmarking AVX-512 intrinsic instructions against standard Gibbs samplers in Gaussian graphical model covariance selection.</p><div class="mt-3 flex items-center justify-between pt-2.5 text-[11px] font-label border-t border-[#1c2c3b]"><div class="flex items-center gap-2 text-[#94a3b8]"><span class="bg-[#182433] px-2 py-0.5 rounded text-[10px] border border-[#233547]">#ParallelComputing</span><span class="bg-[#182433] px-2 py-0.5 rounded text-[10px] border border-[#233547]">#MCMC</span></div><div class="flex items-center gap-1 text-[#3ccfff] font-medium"><span class="material-symbols-outlined text-[14px]">code</span><span>6 min read</span></div></div></article>
+</section>
+<!-- Interactive Delight Empty State (Hidden unless filter matches zero) -->
+<div class="hidden flex flex-col items-center justify-center text-center py-12 px-4 bg-surface-container-lowest rounded-xl mt-4 shadow-sm" id="emptySearchState">
+<div class="w-14 h-14 rounded-full bg-secondary-container flex items-center justify-center text-primary mb-3">
+<span class="material-symbols-outlined text-[28px]">search_off</span>
+</div>
+<h4 class="font-headline text-xl font-semibold text-on-surface">No Dispatches Uncovered</h4>
+<p class="font-body italic text-sm text-on-surface-variant max-w-xs mt-1 mb-4">
+        “In Hilbert space, some points lie further beyond the current subspace basis.”
+      </p>
+<button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-label text-xs font-semibold hover:bg-on-primary-container transition-colors shadow-sm" id="resetFiltersBtn" type="button">
+        Reset Search &amp; Tags
+      </button>
+</div>
+<!-- Archival Pagination Indicator -->
+<div class="mt-8 mb-4 flex items-center justify-between text-xs font-label text-on-surface-variant px-2"><span class="text-[11px] uppercase tracking-wider text-[#94a3b8]">Showing 1–5 of 38 records</span><div class="flex items-center gap-1.5"><button class="w-7 h-7 rounded bg-[#131d27] border border-[#233547] text-[#64748b] disabled:opacity-40 flex items-center justify-center" disabled="" type="button"><span class="material-symbols-outlined text-[16px]">chevron_left</span></button><span class="px-2 font-semibold text-white">Page 1</span><button class="w-7 h-7 rounded bg-[#1a2938] border border-[#233547] text-white hover:bg-[#233547] flex items-center justify-center transition-colors" type="button"><span class="material-symbols-outlined text-[16px]">chevron_right</span></button></div></div>
+</div>
+<!-- 7. Fixed Bottom Mobile Navigation Bar (Archive, Projects, Notes, Gallery, About) -->
+<aside class="fixed bottom-0 inset-x-0 z-40 bg-[#0a1016]/90 backdrop-blur-md border-t border-[#233547] shadow-[0_-4px_16px_rgba(0,0,0,0.5)]"><div class="max-w-md mx-auto px-4 py-2 flex items-center justify-around font-label text-[11px]"><a class="flex flex-col items-center gap-0.5 text-[#3ccfff] font-semibold transition-colors group" href="#"><span class="material-symbols-outlined text-[20px]" style='font-variation-settings: "FILL" 1;'>local_library</span><span>Archive</span><span class="w-1 h-1 rounded-full bg-[#3ccfff] mt-0.5"></span></a><a class="flex flex-col items-center gap-0.5 text-[#94a3b8] hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">terminal</span><span>Projects</span><span class="w-1 h-1 rounded-full bg-transparent mt-0.5"></span></a><a class="flex flex-col items-center gap-0.5 text-[#94a3b8] hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">edit_note</span><span>Notes</span><span class="w-1 h-1 rounded-full bg-transparent mt-0.5"></span></a><a class="flex flex-col items-center gap-0.5 text-[#94a3b8] hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">collections_bookmark</span><span>Gallery</span><span class="w-1 h-1 rounded-full bg-transparent mt-0.5"></span></a><a class="flex flex-col items-center gap-0.5 text-[#94a3b8] hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">person</span><span>About</span><span class="w-1 h-1 rounded-full bg-transparent mt-0.5"></span></a></div></aside>
+<!-- Client-side Micro-Interactions & Live Filtering -->
+<script>
+    (function() {
+      // Drawer Toggling
+      var menuBtn = document.getElementById('mobileMenuBtn');
+      var drawer = document.getElementById('drawerMenu');
+      var closeBtn = document.getElementById('closeDrawerBtn');
+
+      function openDrawer() {
+        drawer.classList.remove('hidden');
+        setTimeout(function() {
+          drawer.classList.remove('opacity-0');
+        }, 10);
+      }
+
+      function closeDrawer() {
+        drawer.classList.add('opacity-0');
+        setTimeout(function() {
+          drawer.classList.add('hidden');
+        }, 300);
+      }
+
+      if (menuBtn) menuBtn.addEventListener('click', openDrawer);
+      if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+      if (drawer) {
+        drawer.addEventListener('click', function(e) {
+          if (e.target === drawer) closeDrawer();
+        });
+      }
+
+      // Live Search & Category Filtering
+      var searchInput = document.getElementById('blogSearchInput');
+      var clearBtn = document.getElementById('clearSearchBtn');
+      var tagChips = document.querySelectorAll('.tag-chip');
+      var sortBtns = document.querySelectorAll('.sort-btn');
+      var postCards = document.querySelectorAll('.post-card');
+      var emptyState = document.getElementById('emptySearchState');
+      var resetBtn = document.getElementById('resetFiltersBtn');
+
+      var currentCat = 'all';
+
+      function applyFilter() {
+        var query = (searchInput.value || '').trim().toLowerCase();
+        var visibleCount = 0;
+
+        if (query.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+
+        postCards.forEach(function(card) {
+          var postCat = card.getAttribute('data-cat') || '';
+          var textContent = card.innerText.toLowerCase();
+          var matchesCat = (currentCat === 'all' || postCat === currentCat);
+          var matchesQuery = (query === '' || textContent.indexOf(query) !== -1);
+
+          if (matchesCat && matchesQuery) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        if (visibleCount === 0) {
+          emptyState.classList.remove('hidden');
+        } else {
+          emptyState.classList.add('hidden');
+        }
+      }
+
+      tagChips.forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          tagChips.forEach(function(c) {
+            c.classList.remove('bg-primary', 'text-on-primary', 'font-semibold');
+            c.classList.add('bg-surface-container-high', 'text-on-surface-variant', 'font-medium');
+          });
+          chip.classList.add('bg-primary', 'text-on-primary', 'font-semibold');
+          chip.classList.remove('bg-surface-container-high', 'text-on-surface-variant', 'font-medium');
+
+          currentCat = chip.getAttribute('data-category');
+          applyFilter();
+        });
+      });
+
+      sortBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          sortBtns.forEach(function(b) {
+            b.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'font-semibold');
+            b.classList.add('text-on-surface-variant', 'font-medium');
+          });
+          btn.classList.add('bg-surface-container-lowest', 'text-on-surface', 'font-semibold');
+          btn.classList.remove('text-on-surface-variant', 'font-medium');
+        });
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', applyFilter);
+      }
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+          searchInput.value = '';
+          applyFilter();
+          searchInput.focus();
+        });
+      }
+
+      if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+          searchInput.value = '';
+          currentCat = 'all';
+          tagChips[0].click();
+        });
+      }
+    })();
+  </script>
+</div></main><footer class="w-full bg-[#080d12] border-t border-[#233547]/80 mt-24 py-12"><div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-[#94a3b8]"><div class="flex flex-col items-center md:items-start gap-1"><p class="font-display text-base text-white">© 2024 Tuorui Peng (v1ncent19). All rights reserved.</p><p class="font-body italic text-xs text-[#94a3b8]">Archived under index notation: TP-HILBERT-SPEC // Classical &amp; Statistical Inquiries</p></div><div class="flex flex-col md:flex-row items-center gap-2 md:gap-4 font-label text-xs uppercase tracking-wider text-[#3ccfff]"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">school</span>Tsinghua University</span><span class="hidden md:inline text-[#64748b]">•</span><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">apartment</span>Northwestern University</span></div></div></footer>
+</body></html>

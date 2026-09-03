@@ -1,0 +1,392 @@
+<div id="v1ncent19-soft-dark-preview">
+  <style>
+    #v1ncent19-soft-dark-preview {
+      font-family: "Palatino Linotype", "Book Antiqua", Palatino, "Noto Serif SC", "Source Han Serif SC", SimSun, serif;
+      color: #e8edf0;
+      padding: 18px;
+    }
+
+    #v1ncent19-soft-dark-preview * {
+      box-sizing: border-box;
+    }
+
+    #v1ncent19-soft-dark-preview .preview-shell {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      max-width: 1024px;
+      margin: 0 auto;
+    }
+
+    #v1ncent19-soft-dark-preview .preview-panel {
+      min-height: 560px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+    }
+
+    #v1ncent19-soft-dark-preview .cyan-night {
+      background: #071016;
+      border-color: rgba(70, 216, 255, 0.28);
+    }
+
+    #v1ncent19-soft-dark-preview .soft-ink {
+      background:
+        radial-gradient(circle at 12% 8%, rgba(62, 106, 130, 0.18), transparent 28%),
+        linear-gradient(180deg, #151d22 0%, #10171b 100%);
+      border-color: rgba(196, 211, 217, 0.18);
+    }
+
+    #v1ncent19-soft-dark-preview .preview-header {
+      padding: 24px 28px 16px;
+      border-bottom: 1px solid rgba(218, 229, 233, 0.12);
+    }
+
+    #v1ncent19-soft-dark-preview .brand {
+      margin: 0;
+      font-size: 29px;
+      line-height: 1.05;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    #v1ncent19-soft-dark-preview .cyan-night .brand-accent {
+      color: #25d7ff;
+      text-shadow: 0 0 18px rgba(37, 215, 255, 0.34);
+    }
+
+    #v1ncent19-soft-dark-preview .soft-ink .brand-accent {
+      color: #70b8d6;
+      text-shadow: none;
+    }
+
+    #v1ncent19-soft-dark-preview .tagline {
+      margin: 5px 0 18px;
+      color: rgba(232, 237, 240, 0.66);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    #v1ncent19-soft-dark-preview .nav-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 13px;
+    }
+
+    #v1ncent19-soft-dark-preview .nav-item {
+      padding: 7px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(218, 229, 233, 0.14);
+      color: rgba(232, 237, 240, 0.78);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    #v1ncent19-soft-dark-preview .cyan-night .nav-item.active {
+      background: #007ea3;
+      color: white;
+      border-color: rgba(57, 219, 255, 0.7);
+    }
+
+    #v1ncent19-soft-dark-preview .soft-ink .nav-item.active {
+      background: #2f5f75;
+      color: #f3f8fa;
+      border-color: rgba(148, 191, 208, 0.46);
+    }
+
+    #v1ncent19-soft-dark-preview .preview-body {
+      padding: 24px 28px 28px;
+      display: grid;
+      gap: 18px;
+    }
+
+    #v1ncent19-soft-dark-preview .intro-card,
+    #v1ncent19-soft-dark-preview .blog-card,
+    #v1ncent19-soft-dark-preview .gallery-card {
+      border: 1px solid;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    #v1ncent19-soft-dark-preview .cyan-night .intro-card,
+    #v1ncent19-soft-dark-preview .cyan-night .blog-card,
+    #v1ncent19-soft-dark-preview .cyan-night .gallery-card {
+      background: #101a23;
+      border-color: rgba(63, 202, 241, 0.2);
+    }
+
+    #v1ncent19-soft-dark-preview .soft-ink .intro-card,
+    #v1ncent19-soft-dark-preview .soft-ink .blog-card,
+    #v1ncent19-soft-dark-preview .soft-ink .gallery-card {
+      background: rgba(230, 238, 241, 0.055);
+      border-color: rgba(210, 223, 226, 0.14);
+    }
+
+    #v1ncent19-soft-dark-preview .eyebrow {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      margin: 0 0 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #89c8df;
+    }
+
+    #v1ncent19-soft-dark-preview .soft-ink .eyebrow {
+      color: #9bbdc9;
+    }
+
+    #v1ncent19-soft-dark-preview h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    #v1ncent19-soft-dark-preview p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.58;
+      color: rgba(232, 237, 240, 0.74);
+    }
+
+    #v1ncent19-soft-dark-preview .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 12px;
+    }
+
+    #v1ncent19-soft-dark-preview .action {
+      border-radius: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(218, 229, 233, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    #v1ncent19-soft-dark-preview .cyan-night .action.primary {
+      color: #061016;
+      background: #23d3ff;
+      border-color: #23d3ff;
+    }
+
+    #v1ncent19-soft-dark-preview .soft-ink .action.primary {
+      color: #f6fbfc;
+      background: #396d82;
+      border-color: #5f93a7;
+    }
+
+    #v1ncent19-soft-dark-preview .sample-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+    }
+
+    #v1ncent19-soft-dark-preview .photo-surface {
+      position: relative;
+      min-height: 190px;
+      border-radius: 13px;
+      overflow: hidden;
+      background:
+        linear-gradient(145deg, rgba(38, 95, 114, 0.72), rgba(23, 32, 34, 0.2)),
+        linear-gradient(40deg, #263e45, #83644b 48%, #20383f);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+    }
+
+    #v1ncent19-soft-dark-preview .photo-overlay {
+      position: absolute;
+      inset: auto 12px 12px;
+      padding: 12px;
+      border-radius: 10px;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: rgba(12, 18, 20, 0.56);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    #v1ncent19-soft-dark-preview .place {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    #v1ncent19-soft-dark-preview .date {
+      color: rgba(232, 237, 240, 0.68);
+      font-size: 12px;
+    }
+
+    #v1ncent19-soft-dark-preview .stamp {
+      width: 42px;
+      height: 34px;
+      border-radius: 8px;
+      border: 2px solid;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    #v1ncent19-soft-dark-preview .cyan-night .stamp {
+      color: #23d3ff;
+      border-color: #23d3ff;
+    }
+
+    #v1ncent19-soft-dark-preview .soft-ink .stamp {
+      color: #d7a86b;
+      border-color: #d7a86b;
+    }
+
+    #v1ncent19-soft-dark-preview .blog-card {
+      min-height: 190px;
+    }
+
+    #v1ncent19-soft-dark-preview .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 12px;
+    }
+
+    #v1ncent19-soft-dark-preview .chip {
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: rgba(232, 237, 240, 0.76);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(218, 229, 233, 0.12);
+    }
+
+    #v1ncent19-soft-dark-preview .cyan-night .chip.active {
+      background: rgba(35, 211, 255, 0.18);
+      border-color: rgba(35, 211, 255, 0.5);
+      color: #91eaff;
+    }
+
+    #v1ncent19-soft-dark-preview .soft-ink .chip.active {
+      background: rgba(112, 184, 214, 0.14);
+      border-color: rgba(112, 184, 214, 0.36);
+      color: #b9d6df;
+    }
+
+    #v1ncent19-soft-dark-preview .note {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 12px;
+      color: rgba(232, 237, 240, 0.55);
+      margin-top: 12px;
+    }
+
+    @media (max-width: 760px) {
+      #v1ncent19-soft-dark-preview .preview-shell {
+        grid-template-columns: 1fr;
+      }
+
+      #v1ncent19-soft-dark-preview .sample-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="preview-shell" aria-label="Soft dark mode comparison for v1ncent19 site">
+    <section class="preview-panel cyan-night" aria-label="Current high-cyan dark direction">
+      <header class="preview-header">
+        <h2 class="brand">Tuorui <span class="brand-accent">“v1ncent19”</span> Peng</h2>
+        <p class="tagline">Current Stitch-like high-cyan night</p>
+        <div class="nav-row" aria-label="Navigation preview">
+          <span class="nav-item active">About</span>
+          <span class="nav-item">CV</span>
+          <span class="nav-item">Gallery</span>
+          <span class="nav-item">Blog</span>
+          <span class="nav-item">Project</span>
+        </div>
+      </header>
+      <main class="preview-body">
+        <section class="intro-card">
+          <p class="eyebrow">Personal Index</p>
+          <h3>Hi, there.</h3>
+          <p>A compact homepage module with stronger contrast, brighter cyan controls, and a more technical dark surface.</p>
+          <div class="action-row">
+            <span class="action primary">Download CV</span>
+            <span class="action">GitHub</span>
+          </div>
+        </section>
+        <div class="sample-grid">
+          <section class="gallery-card">
+            <div class="photo-surface">
+              <div class="photo-overlay">
+                <div>
+                  <div class="place">Kyoto</div>
+                  <div class="date">2025.11</div>
+                </div>
+                <div class="stamp">JP</div>
+              </div>
+            </div>
+          </section>
+          <section class="blog-card">
+            <div class="chip-row">
+              <span class="chip active">Statistics</span>
+              <span class="chip">Cuisine</span>
+            </div>
+            <h3>Blog card sample</h3>
+            <p>Sharper glow and higher cyan saturation make selected states very visible, but the interface feels more digital.</p>
+            <p class="note">Best when you want a crisp technical atmosphere.</p>
+          </section>
+        </div>
+      </main>
+    </section>
+
+    <section class="preview-panel soft-ink" aria-label="Softer dark direction">
+      <header class="preview-header">
+        <h2 class="brand">Tuorui <span class="brand-accent">“v1ncent19”</span> Peng</h2>
+        <p class="tagline">Softer ink-paper night</p>
+        <div class="nav-row" aria-label="Navigation preview">
+          <span class="nav-item active">About</span>
+          <span class="nav-item">CV</span>
+          <span class="nav-item">Gallery</span>
+          <span class="nav-item">Blog</span>
+          <span class="nav-item">Project</span>
+        </div>
+      </header>
+      <main class="preview-body">
+        <section class="intro-card">
+          <p class="eyebrow">Personal Index</p>
+          <h3>Hi, there.</h3>
+          <p>A compact homepage module with warmer dark surfaces, less glow, lower cyan saturation, and softer reading contrast.</p>
+          <div class="action-row">
+            <span class="action primary">Download CV</span>
+            <span class="action">GitHub</span>
+          </div>
+        </section>
+        <div class="sample-grid">
+          <section class="gallery-card">
+            <div class="photo-surface">
+              <div class="photo-overlay">
+                <div>
+                  <div class="place">Kyoto</div>
+                  <div class="date">2025.11</div>
+                </div>
+                <div class="stamp">JP</div>
+              </div>
+            </div>
+          </section>
+          <section class="blog-card">
+            <div class="chip-row">
+              <span class="chip active">Statistics</span>
+              <span class="chip">Cuisine</span>
+            </div>
+            <h3>Blog card sample</h3>
+            <p>Muted accents and translucent borders keep the page readable while preserving the blue identity.</p>
+            <p class="note">Best when you want serious, calm, long-reading comfort.</p>
+          </section>
+        </div>
+      </main>
+    </section>
+  </div>
+</div>
