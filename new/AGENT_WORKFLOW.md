@@ -4,6 +4,10 @@ This file describes how future vibe-coding agents should work on the rebuild.
 
 The goal is to prevent the rebuild from drifting into generated filler, broken static export, or a visually inconsistent site.
 
+## Status Checkpoint (2026-09-04)
+
+The rebuild is underway on branch `nextjs-rebuild` (Next 16 App Router, static export). Before starting any work, read `IMPLEMENTATION_STATUS.md` — it reports what is built route-by-route, the **user-locked v1 design baseline**, and the resume checklist. The phases below are the planning order; the actual build is "stitch-first" (example pages with real legacy content were built ahead of the Phase 4–5 content), so see the status doc's phase-map table for where each phase really stands.
+
 ## Ground Rules
 
 - Read the planning files in `new/` before editing.

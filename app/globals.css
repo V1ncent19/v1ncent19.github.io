@@ -1,0 +1,285 @@
+@import "tailwindcss";
+
+/*
+ * Theme switching is class-based: `.dark` on <html> enables the dark palette.
+ * A no-FOUC inline script (components/theme/theme-script.tsx) sets the class
+ * before hydration. `dark:` utilities below are driven by that class, not by
+ * `prefers-color-scheme`.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+ * Design tokens
+ * Palette is editable in one place so future color experiments are cheap.
+ *
+ * AUTHORITATIVE SOURCE: the Stitch "Home – Desktop Layout Variant 3" mocks
+ * (new/stitch_design_system_creator/home_..._animated_interactive/code.html for
+ * light, home_..._dark_mode_refined/code.html for dark). Stitch generated
+ * per-page palettes that disagree with each other; per the 2026-09-04 decision
+ * every conflict resolves to the HOME page, so these tokens ARE home's palette:
+ *   light  → M3 "icy": #f5fafd paper, sky-cyan #1ba7c9 primary (deepened
+ *            from the dark #3ccfff so it reads on near-white), #171c1f ink,
+ *            containers #eff4f8 / #e9eff2, light-cyan accents #41cfff/#bce9ff.
+ *   dark   → deep slate #0c1219, cards #101824→#223348, crisp cyan #3ccfff,
+ *            near-white ink #f0f6fc.
+ * ------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  /* surfaces — near-white ice, cool tint */
+  --canvas: #f5fafd;
+  --surface: #ffffff; /* card = surface-container-lowest */
+  --raised: #ffffff;
+  --surface-tint: #eff4f8; /* subtle hover fills, code chips (container-low) */
+  --surface-sink: #e9eff2; /* pressed / active chip (surface-container) */
+
+  /* text — soft near-black */
+  --ink: #171c1f;
+  --muted: #3d484e; /* on-surface-variant */
+  --faint: #6d797f; /* outline */
+
+  /* lines */
+  --line: #d7e1e7;
+  --line-strong: #b6c3cb;
+
+  /* brand + accents — sky-cyan primary. Light deepens the shared cyan
+     (#1ba7c9 vs dark #3ccfff) so it stays readable on the near-white canvas,
+     but the hues read as the same sky blue across modes. */
+  --brand: #1ba7c9;
+  --brand-strong: #0f86a3; /* hover: darker sky on light, brighter on dark */
+  --brand-soft: color-mix(in srgb, var(--brand) 10%, transparent);
+  --on-brand: #ffffff; /* on-primary */
+  --accent: #376476; /* secondary */
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+  --tertiary: #825500; /* warm accent, used for chips/variety */
+  --tertiary-soft: color-mix(in srgb, var(--tertiary) 10%, transparent);
+
+  /* typography stacks */
+  --font-serif-latin: "Palatino Linotype", "Book Antiqua", Palatino, Georgia,
+    "Times New Roman", serif;
+  --font-serif-zh: "Noto Serif SC", "Source Han Serif SC", SimSun,
+    "Songti SC", "Songti TC", serif;
+  --font-serif-ja: "Noto Serif JP", "Yu Mincho", "YuMincho", serif;
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* shape */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  /* elevation — borders + restrained shadows */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.05);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.05), 0 14px 32px rgb(0 0 0 / 0.1);
+  --shadow-panel: 0 24px 60px -20px rgb(0 0 0 / 0.35);
+
+  /* motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 160ms;
+  --dur: 240ms;
+
+  /* reading measure */
+  --measure: 68ch;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* surfaces — deep slate navy */
+  --canvas: #0c1219;
+  --surface: #101824; /* card (surface-container-low) */
+  --raised: #162232; /* surface-container */
+  --surface-tint: #162232; /* hover fills (surface-container) */
+  --surface-sink: #1c2b3e; /* active chip / stronger hover (container-high) */
+
+  /* text */
+  --ink: #f0f6fc;
+  --muted: #94a3b8;
+  --faint: #6e7681;
+
+  /* lines */
+  --line: #2a3745;
+  --line-strong: #3e4d5c;
+
+  /* brand + accents — sharp cyan-on-slate */
+  --brand: #3ccfff;
+  --brand-strong: #62d4ff;
+  --brand-soft: color-mix(in srgb, var(--brand) 14%, transparent);
+  --on-brand: #001f29; /* on-primary (deep teal, high-contrast on cyan) */
+  --accent: #62d4ff;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --tertiary: #ffb952; /* warm amber accent on dark */
+  --tertiary-soft: color-mix(in srgb, var(--tertiary) 14%, transparent);
+
+  /* elevation */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 20px rgb(0 0 0 / 0.25);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 40px rgb(0 0 0 / 0.45);
+  --shadow-panel: 0 24px 70px -18px rgb(0 0 0 / 0.8);
+}
+
+/* Map tokens to Tailwind utility names (bg-canvas, text-ink, text-muted,
+ * border-line, text-brand, text-accent, bg-raised, bg-surface, …).
+ * `inline` keeps utilities referencing the custom properties directly so the
+ * `.dark` overrides above apply without a rebuild.
+ */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-surface-tint: var(--surface-tint);
+  --color-surface-sink: var(--surface-sink);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-soft: var(--tertiary-soft);
+
+  --font-serif: var(--font-serif-latin), var(--font-serif-zh);
+  --font-ui: var(--font-ui);
+  --font-mono: var(--font-mono);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-lift: var(--shadow-lift);
+  --shadow-panel: var(--shadow-panel);
+}
+
+@layer base {
+  html {
+    background: var(--canvas);
+    scroll-behavior: smooth;
+    /* keep anchor targets (#main, blog #category tags, …) clear of the
+       floating capsule nav once it pins to the top on scroll */
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-serif-latin), var(--font-serif-zh);
+    font-size: 1.0625rem; /* ~17px, comfortable for serif reading */
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background-color var(--dur-fast) var(--ease),
+      color var(--dur-fast) var(--ease);
+  }
+
+  /* Language-aware stacks: zh/ja fragments fall back to the right serif. */
+  :lang(zh) {
+    font-family: var(--font-serif-latin), var(--font-serif-zh);
+  }
+  :lang(ja) {
+    font-family: var(--font-serif-latin), var(--font-serif-ja);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif-latin), var(--font-serif-zh);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.005em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  a {
+    color: var(--brand);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  a:hover {
+    color: var(--brand-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--brand-soft);
+  }
+
+  :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Semantic helpers used across the shell. Kept minimal here; page-level
+ * components compose layout with Tailwind utilities. */
+@layer components {
+  /* Sans-serif surface for UI text: labels, nav, tags, metadata, buttons. */
+  .ui-text {
+    font-family: var(--font-ui);
+  }
+
+  .shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 72rem;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .shell {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Horizontally scrollable chip rows that do not show a scrollbar. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Theme toggle — 3-way (light / dark / system).
+ * All three stacked icons are always in the DOM; exactly one is shown based on
+ * `data-theme` on <html> (set by theme-script before hydration, updated on
+ * click). When no attribute is present yet, "system" is the safe default.
+ * ------------------------------------------------------------------------- */
+.ti-sun,
+.ti-moon,
+.ti-system {
+  display: none;
+}
+
+html[data-theme="light"] .ti-sun {
+  display: block;
+}
+
+html[data-theme="dark"] .ti-moon {
+  display: block;
+}
+
+html[data-theme="system"] .ti-system,
+html:not([data-theme]) .ti-system {
+  display: block;
+}

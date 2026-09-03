@@ -1,0 +1,157 @@
+/* Prose: author markdown rendered by react-markdown. Tailwind v4 preflight
+ * zeroes element margins/list styles, so every rhythm rule is re-declared
+ * here, scoped to `.prose`. Colours reference the tokens from globals.css so
+ * light/dark both fall out of the palette. */
+
+.prose {
+  color: var(--ink);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  max-width: var(--measure);
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+.prose p {
+  margin: 1.15em 0;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  margin: 2em 0 0.65em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 6rem;
+}
+.prose h3 {
+  font-size: 1.22rem;
+  margin: 1.7em 0 0.55em;
+  scroll-margin-top: 6rem;
+}
+.prose h4 {
+  font-size: 1.06rem;
+  margin: 1.5em 0 0.5em;
+  scroll-margin-top: 6rem;
+}
+
+.prose ul,
+.prose ol {
+  margin: 1em 0;
+  padding-left: 1.6em;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ul ul {
+  list-style: circle;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li {
+  margin: 0.4em 0;
+  padding-left: 0.15em;
+}
+.prose li::marker {
+  color: var(--faint);
+}
+.prose li > p {
+  margin: 0.3em 0;
+}
+
+.prose a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--brand) 45%, transparent);
+  text-underline-offset: 3px;
+}
+.prose a:hover {
+  color: var(--brand-strong);
+  text-decoration-color: var(--brand-strong);
+}
+
+.prose blockquote {
+  margin: 1.5em 0;
+  padding: 0.15em 0 0.15em 1.1em;
+  border-left: 3px solid var(--line-strong);
+  color: var(--muted);
+}
+.prose blockquote p {
+  font-style: italic;
+}
+
+.prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Inline code chips (KaTeX output uses spans, so it is not affected). */
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  background: var(--surface-tint);
+  border-radius: var(--radius-sm);
+  padding: 0.12em 0.35em;
+}
+.prose pre {
+  margin: 1.5em 0;
+  padding: 1em 1.15em;
+  background: var(--surface-tint);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+.prose pre code {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+
+.prose hr {
+  margin: 2.4em auto;
+  width: 42%;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.prose table {
+  display: block;
+  margin: 1.5em 0;
+  max-width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+  font-size: 0.95em;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--line);
+  padding: 0.42em 0.75em;
+  text-align: left;
+}
+.prose th {
+  background: var(--surface-tint);
+  font-weight: 600;
+}
+
+.prose img {
+  border-radius: var(--radius-md);
+}
+
+.prose del {
+  color: var(--muted);
+}
+
+/* Display equations overflow rather than bursting the column. */
+.prose .katex-display {
+  margin: 1.1em 0;
+  padding: 0.25em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}

@@ -1,54 +1,38 @@
-# Ignore docs files
-_gh_pages
-_site
-.ruby-version
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
 
-# Numerous always-ignore extensions
-*.diff
-*.err
-*.orig
-*.log
-*.rej
-*.swo
-*.swp
-*.zip
-*.vi
-*.gem
-*~
+# next.js
+/.next/
+/out/
 
-# POSSIBLE ENVIRONMENTS
+# typescript
+*.tsbuildinfo
+next-env.d.ts
 
-# OS or Editor folders
+# eslint
+.eslintcache
+
+# production / build
+/build
+
+# misc / os
 .DS_Store
-._*
 Thumbs.db
-.cache
-.project
-.settings
-.tmproj
-*.esproj
-nbproject
-*.sublime-project
-*.sublime-workspace
-.idea
+*.pem
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Komodo
-*.komodoproject
-.komodotools
+# env files
+.env*
 
-# grunt-html-validation
-validation-status.json
-validation-report.json
+# vercel
+.vercel
 
-# Folders to ignore
-node_modules
-bower_components
-
-# Recommended in Ben Balter's Jekyll Style Guide
-.sass-cache
+# jekyll legacy build artifacts (old source remains during migration)
+_site/
 .jekyll-metadata
-Gemfile.lock
-
-# BackstopJS Test Files and Reports
-backstop_data/bitmaps_test
-backstop_data/html_report
+.sass-cache

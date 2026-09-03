@@ -1,0 +1,26 @@
+{
+  "handle": "v1ncent19",
+  "givenName": "Tuorui",
+  "familyName": "Peng",
+  "tagline": "En voyage dans l'espace de Hilbert.",
+  "role": {
+    "en": "Ph.D. student in Statistics",
+    "zh": "统计学博士生"
+  },
+  "avatar": "/assets/profile/avatar.jpg",
+  "cv": {
+    "en": "/assets/cv/v1ncent19-cv-en.pdf",
+    "zh": null
+  },
+  "email": "v1ncent19@outlook.com",
+  "links": [
+    {
+      "label": "GitHub",
+      "href": "https://github.com/V1ncent19"
+    }
+  ],
+  "legacyStats": {
+    "sitePvBaseline": 0,
+    "siteUvBaseline": 0
+  }
+}

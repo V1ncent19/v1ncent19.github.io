@@ -4,6 +4,22 @@ This file records decisions already made during planning. Future agents should t
 
 Do not treat placeholder text from Stitch exports, old page content, or generated screenshots as user instructions.
 
+## Implementation-Era Confirmations (2026-09-04)
+
+Recorded while the example pages were being built on branch `nextjs-rebuild`. Everything else in this file remains in force; the items below **override or clarify** earlier lines. For the full route-by-route state and the locked v1 design spec read `IMPLEMENTATION_STATUS.md`. The current visual framework is user-locked as the v1 baseline — do not restyle without asking.
+
+- **Mobile header/tagline (supersedes the "drawer/sidebar tagline" note under Identity):** there is no drawer yet. The tagline always shows under the name in the identity block on every screen; the capsule nav is `sticky` and floats the whole page.
+- **Mobile nav (supersedes "top bar plus drawer" under Navigation):** the drawer is **still planned** for a later phase (user, 2026-09-04). The interim v1 mobile nav is the sticky capsule pill with a horizontally scrolling chip row; LangSwitch + ThemeToggle live inside the pill on every page.
+- **Top nav order:** the capsule's first item is Home (user-confirmed deviation from the five-card homepage set). The five homepage section cards still exclude Home and keep the order About → CV → Gallery → Blog → Project.
+- **Homepage sections (2026-09-04 redesign):** cardless hero self-introduction with avatar figure floating right; action row = three default-white buttons (Download CV, GitHub Profile, Contact Email) + a cyan-filled "More about me"; Contact Email is a copy micro-interaction (idle → hover "copy to clipboard" → click "√ email clipped"); modules below = Sections, Recent Posts (latest 5, blog + project merged), Direct access, and **Site Statistics** (static placeholder — Page views/Visitors from `legacyStats`, plus a giscus comment-count tile; live counters wire in at deployment).
+- **Homepage comments:** still no comment threads/search box on Home. The giscus *count* tile in Site Statistics is only a number, not a discussion module.
+- **Section-heading convention (site-wide):** `§` (serif italic, sky blue) + plain black heading, with the grey explanatory line underneath unchanged; no eyebrows. CV page main title is now **"Experience" / "经历"** (page h1 + metadata only — the nav chip and gateway card still read "CV"). Also supersedes the blog/gallery eyebrow labels listed in `copy` (keys remain, unused).
+- **Palette (confirms Theme / "blue-based identity"):** light brand deepened to sky-cyan `#1ba7c9` (dark keeps `#3ccfff`) so it reads identically across modes on near-white; lock the tokens in `app/globals.css` (authoritative home palette from the Stitch Home mock, variant 3).
+- **Header name:** renders `Tuorui "v1ncent19" Peng`; the two quotes and `v1ncent19` are sky-blue with a hover underline-glow, outside parts in ink.
+- **Content column widths:** card/list pages use `max-w-5xl` (matching CV); prose reading pages (About, single project-note detail) keep ~`max-w-3xl`.
+- **Blog index (confirms Blog search/tag/sort intent):** implemented with live client-side search, category chips with real counts, and a newest/oldest two-option sort (the draft's compact four-option control stays a future idea). Per-post `/blog/[year]/[slug]` pages and giscus are still pending — until then blog cards are not clickable and homepage Recent Posts blog rows link to `/blog`.
+- **Visitor count baselines:** `content/profile.json` → `legacyStats.sitePvBaseline / siteUvBaseline` exist but are **0 placeholders**. The real old busuanzi numbers must be supplied before launch (ties to the Visitor Count section below).
+
 ## Product Direction
 
 - Rebuild the current Jekyll GitHub Pages personal homepage as a modern static-first Next.js site.
@@ -156,7 +172,10 @@ Noto Serif JP
 - Project items should support status such as active, completed, paused, or archived.
 - Ongoing projects should show latest update information.
 - `HighDim2024.md` should be treated as a long-running note under Project, not as an ordinary Blog post.
-- `OtherActivity.md` should become a Blog post rather than being split into CV/About/Project in version one.
+- `OtherActivity.md` should become a Blog post (tagged `documentation`), not a separate top-level menu item.
+- `joke.md` should become a Blog post (tagged `documentation`), not a separate top-level menu item.
+- Project items (including `stat-summary-note` and the high-dimensional statistics note) live under the `/project` top-level menu, not under `/blog`.
+- The three never-published drafts in `_texts/` (`HMC.md`, `NTK.md`, `MahalanobisAndLeverage.md`) are excluded from version one (confirmed 2026-09-03).
 
 ## Visitor Count
 
