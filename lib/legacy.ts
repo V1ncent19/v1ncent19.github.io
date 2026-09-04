@@ -22,7 +22,11 @@ export type LegacyCategory = "knowledge" | "cuisine" | "documentation";
 export type LegacyLang = "zh" | "en" | "mix";
 
 export interface LegacyPost {
-  /** Stable basename of the source file (`_texts/<slug>.md`). */
+  /**
+   * Canonical post slug — the kebab-cased basename used in the stable URL
+   * `/blog/<year>/<slug>` (per new/CONTENT_MIGRATION_AUDIT.md slug rule). E.g.
+   * `_texts/BestLinearEstimator.md` → `best-linear-estimator`.
+   */
   slug: string;
   title: string;
   /** Normalised ISO date (`YYYY-MM-DD`). */
@@ -34,6 +38,8 @@ export interface LegacyPost {
   minutes: number;
   /** First real paragraph of prose, cleaned, truncated for the card. */
   excerpt: string;
+  /** Full legacy markdown body, rendered on the post page. */
+  body: string;
   /** Old published URL, kept for redirects later. */
   oldPath: string;
 }
@@ -54,6 +60,28 @@ const CATEGORIES: ReadonlySet<string> = new Set<LegacyCategory>([
   "cuisine",
   "documentation",
 ]);
+
+/** Filenames whose naive camel-split would read wrong (acronym words). */
+const SLUG_OVERRIDES: Readonly<Record<string, string>> = {
+  LaTeX: "latex",
+};
+
+/**
+ * Old basename → stable lower-kebab slug for the URL, per the audit slug rule.
+ * Splits camelCase/digit boundaries and `_` separators only (acronym runs such
+ * as `RKHS` or `RPackage` stay one token); every class-string-free pure string
+ * operation, so slugs are deterministic across builds.
+ */
+function slugifyFilename(base: string): string {
+  const override = SLUG_OVERRIDES[base];
+  if (override) return override;
+  return base
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/[_\s.]+/g, "-")
+    .toLowerCase()
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 function normalizeDate(value: unknown): string | null {
   if (!value) return null;
@@ -155,16 +183,23 @@ function readPost(file: string): LegacyPost | null {
   if (!date) return null;
   if (!CATEGORIES.has(category)) return null;
 
+  const base = file.replace(/\.md$/i, "");
   return {
-    slug: file.replace(/\.md$/i, ""),
+    slug: slugifyFilename(base),
     title,
     date,
     category: category as LegacyCategory,
     lang: detectLang(content),
     minutes: readingMinutes(content),
     excerpt: firstParagraph(content),
-    oldPath: `/texts/${file.replace(/\.md$/i, "")}/`,
+    body: content,
+    oldPath: `/texts/${base}/`,
   };
+}
+
+/** Canonical static path for a post: `/blog/<year>/<slug>` (trailingSlash). */
+export function blogPostPath(post: Pick<LegacyPost, "date" | "slug">): string {
+  return `/blog/${post.date.slice(0, 4)}/${post.slug}`;
 }
 
 /** Published blog posts, newest first (each call re-reads disk — build-time). */
@@ -175,5 +210,30 @@ export function getLegacyPosts(): LegacyPost[] {
     .sort();
   const posts = files.map(readPost).filter((p): p is LegacyPost => p !== null);
   posts.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+
+  // Two files must never collapse onto one exported route — the static export
+  // would silently overwrite a page. Guard loudly instead.
+  const seen = new Map<string, string>();
+  for (const post of posts) {
+    const key = `${post.date.slice(0, 4)}/${post.slug}`;
+    const previous = seen.get(key);
+    if (previous !== undefined) {
+      throw new Error(
+        `[lib/legacy] duplicate blog path /blog/${key}/ — "${previous}" and ` +
+          `"${post.title}" map to the same slug. Rename one source file.`,
+      );
+    }
+    seen.set(key, post.title);
+  }
   return posts;
+}
+
+/** Look up one post by its URL year + kebab slug (404 → `undefined`). */
+export function getLegacyPost(
+  year: string,
+  slug: string,
+): LegacyPost | undefined {
+  return getLegacyPosts().find(
+    (p) => p.date.slice(0, 4) === year && p.slug === slug,
+  );
 }

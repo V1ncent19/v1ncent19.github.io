@@ -1,10 +1,10 @@
 ---
-title: "High Dimensional Statistics Note 2024 Summer"
-slug: "high-dimensional-statistics-note-2024"
+title: "High Dimensional Statistics Note 2024-2025"
+slug: "high-dimensional-statistics-note-2024-2025"
 type: "note"
 status: "active"
 startedAt: "2024-06"
-updatedAt: "2024-09-10"
+updatedAt: "2025-06-10"
 featured: false
 tags: ["statistics"]
 links: []

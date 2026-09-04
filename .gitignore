@@ -36,3 +36,8 @@ yarn-error.log*
 _site/
 .jekyll-metadata
 .sass-cache
+
+# full-resolution gallery originals — stay local, never pushed.
+# The committed web tiers live under public/assets/gallery/{thumb,large} and are
+# produced by `npm run gallery:gen` (scripts/gallery.mjs).
+/GalleryPhoto/

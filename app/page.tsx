@@ -23,6 +23,7 @@ import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import { getLegacyPosts, type LegacyCategory } from "@/lib/legacy";
 import { copy, formatMonth } from "@/lib/i18n";
 import { EmailCopyButton } from "@/components/home/email-copy-button";
+import { MathDivider } from "@/components/home/math-divider";
 
 type SectionId = Exclude<NavId, "home">;
 
@@ -61,6 +62,12 @@ const sectionBlurbs: Record<SectionId, { sub: string; desc: string }> = {
 /**
  * Accent tone per gateway. Every class is a full literal so Tailwind's scanner
  * sees it; tones stay within the home token set (primary/secondary/warm).
+ *
+ * `fill` is the Stitch doc-card hover treatment (2026-09-04): while the card is
+ * hovered, the icon chip and any inner action fill with the tone's solid
+ * colour and its text flips to the matching `on-<tone>` (on-accent/on-tertiary
+ * added to the palette for this). `waterHover` deepens the faint gateway
+ * watermark from /10 to /30 so the decorative icon reads on hover.
  */
 const tones = {
   brand: {
@@ -69,6 +76,8 @@ const tones = {
     water: "text-brand/10",
     wash: "from-brand-soft/70 via-transparent to-transparent",
     hover: "group-hover:text-brand",
+    fill: "group-hover:bg-brand group-hover:text-on-brand",
+    waterHover: "group-hover:text-brand/30",
   },
   accent: {
     fg: "text-accent",
@@ -76,6 +85,8 @@ const tones = {
     water: "text-accent/10",
     wash: "from-accent-soft/60 via-transparent to-transparent",
     hover: "group-hover:text-accent",
+    fill: "group-hover:bg-accent group-hover:text-on-accent",
+    waterHover: "group-hover:text-accent/30",
   },
   tertiary: {
     fg: "text-tertiary",
@@ -83,16 +94,23 @@ const tones = {
     water: "text-tertiary/10",
     wash: "from-tertiary-soft/60 via-transparent to-transparent",
     hover: "group-hover:text-tertiary",
+    fill: "group-hover:bg-tertiary group-hover:text-on-tertiary",
+    waterHover: "group-hover:text-tertiary/30",
   },
 } as const;
 type ToneName = keyof typeof tones;
 const toneSeq: ToneName[] = ["brand", "accent", "brand", "tertiary", "accent"];
 
-/* Chip tones shared with the Blog index — colour carries the post's category. */
+/* Feed chip tones — page-local (the Blog index keeps components/blog/post-tone.ts).
+   Colour carries the post's category; the group-hover fill mirrors the DocRow
+   icon-chip treatment (2026-09-04): soft tone → solid tone fill on hover. */
 const POST_TONE: Record<LegacyCategory, string> = {
-  knowledge: "bg-brand-soft text-brand",
-  cuisine: "bg-tertiary-soft text-tertiary",
-  documentation: "bg-accent-soft text-accent",
+  knowledge:
+    "bg-brand-soft text-brand transition-colors group-hover:bg-brand group-hover:text-on-brand",
+  cuisine:
+    "bg-tertiary-soft text-tertiary transition-colors group-hover:bg-tertiary group-hover:text-on-tertiary",
+  documentation:
+    "bg-accent-soft text-accent transition-colors group-hover:bg-accent group-hover:text-on-accent",
 };
 
 /** "2024-09-20" → "Sept 20, 2024" */
@@ -113,9 +131,9 @@ function feedDate(date: string): string {
 
 /* ---------------------------------------------------------------------------
  * Recent Posts feed — latest five items across the Blog and Project indices.
- * Blog posts get their category colour and link to /blog for now (per-post
- * pages land during content migration, so nothing here 404s); projects link to
- * their own pages. Sorted newest-first by the ISO date string.
+ * Blog posts get their category colour and link to their own post pages
+ * (/blog/<year>/<slug>); projects link to their own pages. Sorted
+ * newest-first by the ISO date string.
  * ------------------------------------------------------------------------- */
 interface FeedItem {
   key: string;
@@ -133,7 +151,7 @@ function recentPosts(limit = 5): FeedItem[] {
   for (const p of getLegacyPosts()) {
     items.push({
       key: `post-${p.slug}`,
-      href: "/blog",
+      href: `/blog/${p.date.slice(0, 4)}/${p.slug}`,
       date: p.date,
       title: p.title,
       summary: p.excerpt,
@@ -149,7 +167,10 @@ function recentPosts(limit = 5): FeedItem[] {
       date,
       title: pr.meta.title,
       summary: projectSummary(pr, "en"),
-      chip: { cls: "bg-surface-tint text-muted", label: en.project.type[pr.meta.type] },
+      chip: {
+        cls: "bg-surface-tint text-muted transition-colors group-hover:bg-brand group-hover:text-on-brand",
+        label: en.project.type[pr.meta.type],
+      },
     });
   }
 
@@ -335,17 +356,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---- Mathematical divider ---- */}
-      <div
-        aria-hidden
-        className="shell flex items-center justify-center gap-4 py-4"
-      >
-        <span className="h-px flex-1 bg-line-strong/60" />
-        <span className="ui-text select-none text-lg tracking-wide text-brand">
-          ∫ · ∇ · ∑
-        </span>
-        <span className="h-px flex-1 bg-line-strong/60" />
-      </div>
+      {/* ---- Mathematical divider (hover easter egg → decodes into a
+          greeting) ---- */}
+      <MathDivider />
 
       {/* ---- Gateway grid: 1 featured (About) + 2×2 ---- */}
       <section className="shell mt-4">
@@ -523,12 +536,12 @@ function GatewayCard({
       />
       <Icon
         aria-hidden
-        className={`pointer-events-none absolute -bottom-4 -right-4 ${featured ? "h-40 w-40" : "h-24 w-24"} ${tone.water}`}
+        className={`pointer-events-none absolute -bottom-4 -right-4 ${featured ? "h-40 w-40" : "h-24 w-24"} transition-colors ${tone.water} ${tone.waterHover}`}
         strokeWidth={1}
       />
       <div className="relative flex items-center gap-2">
         <span
-          className={`ui-text inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${tone.soft} ${tone.fg}`}
+          className={`ui-text inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${tone.soft} ${tone.fg} ${tone.fill}`}
         >
           {String(index + 1).padStart(2, "0")}
         </span>
@@ -645,12 +658,14 @@ function DocRow({
       <div className="group flex items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift">
         <div className="flex min-w-0 items-center gap-3.5">
           <span
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${t.soft} ${t.fg}`}
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors ${t.soft} ${t.fg} ${t.fill}`}
           >
             <Icon className="h-[22px] w-[22px]" aria-hidden />
           </span>
           <div className="min-w-0">
-            <h4 className="truncate text-lg font-medium tracking-tight text-ink">
+            <h4
+              className={`truncate text-lg font-medium tracking-tight text-ink transition-colors ${t.hover}`}
+            >
               {title}
             </h4>
             <span className="block truncate text-sm text-muted">{subtitle}</span>
@@ -661,7 +676,7 @@ function DocRow({
           download={download || undefined}
           target={external ? "_blank" : undefined}
           rel={external ? "noreferrer noopener" : undefined}
-          className="ui-text inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line-strong bg-surface-tint px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-brand hover:text-on-brand hover:no-underline"
+          className={`ui-text inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line-strong bg-surface-tint px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:no-underline ${t.fill}`}
         >
           {external ? (
             <ExternalLink className="h-4 w-4" aria-hidden />

@@ -58,12 +58,13 @@ export interface Copy {
     newest: string;
     oldest: string;
     minRead: string;
+    /** Back-link label from a post page to the blog index. */
+    allPosts: string;
     category: Record<LegacyCategory, string>;
     lang: { zh: string; en: string; mix: string };
     empty: string;
   };
   gallery: {
-    eyebrow: string;
     title: string;
     lead: string;
     statLabel: string;
@@ -71,12 +72,17 @@ export interface Copy {
     byDate: string;
     byPlace: string;
     shuffle: string;
-    /** Why the sort/filter chips are inert right now. */
-    unavailable: string;
-    emptyTitle: string;
-    emptyText: string;
+    /** Label for the column-count control at the right of the sort strip. */
+    columns: string;
     /** Colophon / storage note at the bottom of the page. */
     note: string;
+    /** Link on an original full-res copy (shown only when the item has one). */
+    downloadOriginal: string;
+    /** Visible + a11y label for closing the lightbox. */
+    close: string;
+    /** Prev / next photo buttons in the lightbox. */
+    prevPhoto: string;
+    nextPhoto: string;
   };
   home: {
     roleNote: string;
@@ -156,6 +162,7 @@ export const copy: Record<Lang, Copy> = {
       newest: "Newest first",
       oldest: "Oldest first",
       minRead: "min read",
+      allPosts: "All posts",
       category: {
         knowledge: "Mathematics & Statistics",
         cuisine: "Cuisine",
@@ -165,19 +172,19 @@ export const copy: Record<Lang, Copy> = {
       empty: "Nothing matches that search — try another keyword or clear the filters.",
     },
     gallery: {
-      eyebrow: "Field gallery",
       title: "Gallery",
-      lead: "A quiet archive for photographs taken on trips and in the field. Frames land here during content migration; the layout is already in place.",
-      statLabel: "Photographs archived",
+      lead: "Photographs taken on trips and in the field, captioned with place and date where they are known. Click any frame to view it large — where the original is shared, a download link sits beneath it.",
+      statLabel: "Photographs",
       filterLabel: "Sort",
       byDate: "By date",
       byPlace: "By place",
       shuffle: "Shuffle",
-      unavailable: "Available once photographs are archived.",
-      emptyTitle: "No photographs yet",
-      emptyText:
-        "The old site's travel photographs arrive in a later migration phase and will appear here, captioned with place and date where they are known.",
-      note: "Photographs are stored in the site repository and rendered responsively — no external hosting.",
+      columns: "Columns",
+      note: "The images here are compressed WebP generated from full-resolution originals that stay off GitHub. Original files download through my shared drive — a link appears under the large view when one is shared for that photo.",
+      downloadOriginal: "Download original",
+      close: "Close",
+      prevPhoto: "Previous photo",
+      nextPhoto: "Next photo",
     },
     home: {
       roleNote: "",
@@ -254,6 +261,7 @@ export const copy: Record<Lang, Copy> = {
       newest: "最新优先",
       oldest: "最早优先",
       minRead: "分钟",
+      allPosts: "全部文章",
       category: {
         knowledge: "数学与统计",
         cuisine: "料理",
@@ -263,18 +271,19 @@ export const copy: Record<Lang, Copy> = {
       empty: "没有匹配的笔记——换个关键词或清除筛选试试。",
     },
     gallery: {
-      eyebrow: "路上影集",
       title: "影集",
-      lead: "旅途与野外所拍照片的安静档案。照片在内容迁移阶段陆续归档；版面已就位。",
-      statLabel: "已归档照片",
+      lead: "旅途与野外拍下的照片，凡已知的地点与日期都标注在图上。点击任一照片可放大查看；若某张原图已共享，放大视图下方会有下载入口。",
+      statLabel: "照片",
       filterLabel: "排序",
       byDate: "按时间",
       byPlace: "按地点",
       shuffle: "随机",
-      unavailable: "照片归档后即可使用。",
-      emptyTitle: "还没有照片",
-      emptyText: "旧站旅行照片将在后续迁移阶段整理进这里，并在已知地点与日期时配上说明。",
-      note: "照片随站点仓库存放、响应式渲染——不使用外部图床。",
+      columns: "列数",
+      note: "网页上的图片是由全分辨率原图生成的压缩 WebP，原图不存入 GitHub。需要原图时可从我的共享云盘下载——某张原图已公开共享时，其放大视图下会出现下载入口。",
+      downloadOriginal: "下载原图",
+      close: "关闭",
+      prevPhoto: "上一张",
+      nextPhoto: "下一张",
     },
     home: {
       roleNote: "",

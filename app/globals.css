@@ -51,8 +51,10 @@
   --on-brand: #ffffff; /* on-primary */
   --accent: #376476; /* secondary */
   --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+  --on-accent: #ffffff; /* on-secondary — added 2026-09-04 for card hover-fill */
   --tertiary: #825500; /* warm accent, used for chips/variety */
   --tertiary-soft: color-mix(in srgb, var(--tertiary) 10%, transparent);
+  --on-tertiary: #ffffff; /* added 2026-09-04 for card hover-fill */
 
   /* typography stacks */
   --font-serif-latin: "Palatino Linotype", "Book Antiqua", Palatino, Georgia,
@@ -110,8 +112,10 @@
   --on-brand: #001f29; /* on-primary (deep teal, high-contrast on cyan) */
   --accent: #62d4ff;
   --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --on-accent: #001f29; /* deep teal on bright cyan (added 2026-09-04) */
   --tertiary: #ffb952; /* warm amber accent on dark */
   --tertiary-soft: color-mix(in srgb, var(--tertiary) 14%, transparent);
+  --on-tertiary: #2a1c00; /* near-black on amber (added 2026-09-04) */
 
   /* elevation */
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 20px rgb(0 0 0 / 0.25);
@@ -141,8 +145,10 @@
   --color-on-brand: var(--on-brand);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
   --color-tertiary: var(--tertiary);
   --color-tertiary-soft: var(--tertiary-soft);
+  --color-on-tertiary: var(--on-tertiary);
 
   --font-serif: var(--font-serif-latin), var(--font-serif-zh);
   --font-ui: var(--font-ui);
@@ -283,3 +289,128 @@ html[data-theme="system"] .ti-system,
 html:not([data-theme]) .ti-system {
   display: block;
 }
+
+/* ---------------------------------------------------------------------------
+ * Gallery lightbox motion (2026-09-04, Request C).
+ * Open: the overlay fades in (.gb-overlay-in). The panel itself expands from
+ * the clicked thumbnail via a shared-element (FLIP) transition driven by inline
+ * styles in gallery-view.tsx, so it needs no CSS keyframe. Close: requestClose
+ * swaps the overlay class to .gb-overlay-out (fade out) and shrinks the panel
+ * back onto the thumbnail with inline transitions, then unmounts. Photos
+ * switched with ←/→ remount the <img> by key, so .gb-img-in fades each frame in.
+ * Reduced motion is already flattened by the global `*` rule in @layer base.
+ * ------------------------------------------------------------------------- */
+@keyframes gb-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes gb-stage-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.gb-overlay-in {
+  animation: gb-overlay-in 0.25s ease-out both;
+}
+.gb-overlay-out {
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.gb-img-in {
+  animation: gb-stage-in 0.22s ease-out both;
+}
+
+/* ---------------------------------------------------------------------------
+ * Homepage "email-copy" button — stacked three-state micro-interaction
+ * (reference 2026-09-04). Three text states occupy the same grid cell and
+ * slide vertically: idle ("Email me" + envelope) → hover cue ("click to
+ * copy") while hovering, and → success (check + "copied") for ~1.8 s after a
+ * click. The grid overlap keeps the button width constant at the widest
+ * state, so neighbours in the hero action row never reflow.
+ *
+ * The base look reuses the action-row tokens via the utility classes on the
+ * element (rounded-lg surface card, border, paddings, hover lift). Only the
+ * transient `.is-copied` fill introduces the success green #20a05a chosen
+ * against the locked v1 palette (2026-09-04). Rules here sit outside @layer,
+ * so they override the layered Tailwind utilities when both apply.
+ * ------------------------------------------------------------------------- */
+.email-copy {
+  position: relative;
+  display: inline-grid;
+  min-width: max-content;
+  overflow: hidden;
+
+  transition:
+    background-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms ease,
+    transform 180ms ease;
+}
+
+.email-copy:hover {
+  /* same lift the other action-row buttons get on hover */
+  transform: translateY(-2px);
+}
+
+/* Each state fills the shared cell and centres its content. */
+.email-copy__state {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* matches the action-row gap-1.5 */
+  white-space: nowrap;
+
+  transition:
+    transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 350ms ease;
+}
+
+.email-copy__idle {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* hover-cue and success states wait one row below the fold */
+.email-copy__hover,
+.email-copy__done {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+/* Hover: idle slides up, hover cue slides in */
+.email-copy:hover .email-copy__idle {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.email-copy:hover .email-copy__hover {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Copied: both upper states clear, success slides in on a green fill */
+.email-copy.is-copied {
+  background: #20a05a;
+  border-color: #20a05a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgb(32 160 90 / 0.22);
+}
+.email-copy.is-copied .email-copy__idle,
+.email-copy.is-copied .email-copy__hover {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.email-copy.is-copied .email-copy__done {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Reduced motion is already flattened by the global `*` rule in @layer base. */

@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
-import { BookOpen, Search } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { ArrowRight, BookOpen, Search } from "lucide-react";
 import type { LegacyCategory, LegacyLang } from "@/lib/legacy";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
+import { POST_TONE } from "./post-tone";
 
 /** A serialisable post card handed over from the server page. */
 export interface BlogPostCard {
@@ -19,24 +21,17 @@ export interface BlogPostCard {
 
 const CAT_ORDER: LegacyCategory[] = ["knowledge", "cuisine", "documentation"];
 
-/** Per-category tones — every class is a full literal so Tailwind sees it. */
-const TONES: Record<LegacyCategory, { chip: string; dot: string; value: string }> = {
-  knowledge: {
-    chip: "bg-brand-soft text-brand",
-    dot: "bg-brand",
-    value: "text-brand",
-  },
-  cuisine: {
-    chip: "bg-tertiary-soft text-tertiary",
-    dot: "bg-tertiary",
-    value: "text-tertiary",
-  },
-  documentation: {
-    chip: "bg-accent-soft text-accent",
-    dot: "bg-accent",
-    value: "text-accent",
-  },
-};
+/** `id` of the category-chip strip — the `/blog#category` scroll target. */
+const CATEGORY_ANCHOR_ID = "category";
+
+/** Turn the current `#hash` into a category, or null when it is not one. */
+function categoryFromHash(): LegacyCategory | null {
+  if (typeof window === "undefined") return null;
+  const h = window.location.hash.slice(1).trim().toLowerCase();
+  return (CAT_ORDER as readonly string[]).includes(h)
+    ? (h as LegacyCategory)
+    : null;
+}
 
 const EN_MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -76,6 +71,33 @@ export function BlogIndexView({
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<"all" | LegacyCategory>("all");
   const [oldestFirst, setOldestFirst] = useState(false);
+
+  // Deep-link support: opening /blog#cuisine (or the zh index) selects that
+  // category on arrival and scrolls the chip strip into view. The bare
+  // /blog#category case is handled natively by the browser via id="category".
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      const cat = categoryFromHash();
+      if (!cat) return;
+      setActiveCat(cat);
+      // Scroll on the next frame so the filtered list has re-rendered.
+      requestAnimationFrame(() => {
+        document
+          .getElementById(CATEGORY_ANCHOR_ID)
+          ?.scrollIntoView({ block: "start" });
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  function selectCategory(cat: "all" | LegacyCategory) {
+    setActiveCat(cat);
+    // Mirror the choice into the hash (replace, not push) so a filtered view
+    // is shareable without littering the browser history.
+    const url = new URL(window.location.href);
+    url.hash = cat === "all" ? "" : cat;
+    history.replaceState(null, "", url);
+  }
 
   const counts = useMemo(() => {
     const map = new Map<LegacyCategory, number>();
@@ -145,13 +167,16 @@ export function BlogIndexView({
         </div>
 
         {/* ---- Category chips (real counts) ---- */}
-        <div className="no-scrollbar -mx-1 mt-5 flex items-center gap-2 overflow-x-auto px-1 pb-2">
-          <Chip active={activeCat === "all"} onClick={() => setActiveCat("all")}>
+        <div
+          id={CATEGORY_ANCHOR_ID}
+          className="no-scrollbar -mx-1 mt-5 flex items-center gap-2 overflow-x-auto px-1 pb-2"
+        >
+          <Chip active={activeCat === "all"} onClick={() => selectCategory("all")}>
             <span>{s.blog.allLabel}</span>
             <Count active={activeCat === "all"}>{posts.length}</Count>
           </Chip>
           {CAT_ORDER.filter((cat) => (counts.get(cat) ?? 0) > 0).map((cat) => (
-            <Chip key={cat} active={activeCat === cat} onClick={() => setActiveCat(cat)}>
+            <Chip key={cat} active={activeCat === cat} onClick={() => selectCategory(cat)}>
               <span>{s.blog.category[cat]}</span>
               <Count active={activeCat === cat}>{counts.get(cat)}</Count>
             </Chip>
@@ -275,9 +300,13 @@ function SortChip({
 
 function PostCard({ post, lang }: { post: BlogPostCard; lang: Lang }) {
   const s = copy[lang];
-  const tone = TONES[post.category];
+  const tone = POST_TONE[post.category];
+  const href = `/blog/${post.date.slice(0, 4)}/${post.slug}`;
   return (
-    <article className="group rounded-xl border border-line bg-surface p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift sm:p-6">
+    <Link
+      href={href}
+      className="group block rounded-xl border border-line bg-surface p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift hover:no-underline sm:p-6"
+    >
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="ui-text flex items-center gap-2.5">
           <span
@@ -305,10 +334,19 @@ function PostCard({ post, lang }: { post: BlogPostCard; lang: Lang }) {
 
       <div className="ui-text mt-4 flex items-center justify-between gap-3 border-t border-line pt-3 text-xs">
         <span className="font-medium text-faint">{s.blog.lang[post.lang]}</span>
-        <span aria-hidden className="font-mono font-medium text-faint">
-          #{post.category}
+        <span className="flex items-center gap-3">
+          <span aria-hidden className="font-mono font-medium text-faint">
+            #{post.category}
+          </span>
+          <span className="inline-flex items-center gap-1 font-semibold text-brand">
+            {lang === "zh" ? "阅读" : "Read"}
+            <ArrowRight
+              className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+              aria-hidden
+            />
+          </span>
         </span>
       </div>
-    </article>
+    </Link>
   );
 }

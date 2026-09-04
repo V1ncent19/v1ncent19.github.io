@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gallery:gen": "node scripts/gallery.mjs"
   },
   "dependencies": {
+    "@giscus/react": "^3.1.0",
     "gray-matter": "^4.0.3",
     "katex": "^0.18.5",
     "lucide-react": "^1.40.0",
@@ -27,6 +29,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
+    "exifr": "^7.1.3",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

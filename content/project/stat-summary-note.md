@@ -2,7 +2,7 @@
 title: "Statistics Note — A Brief Summary of Statistics Minor Courses"
 slug: "stat-summary-note"
 type: "note"
-status: "active"
+status: "completed"
 updatedAt: "2024-09-20"
 featured: true
 tags: ["statistics", "documentation"]
