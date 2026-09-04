@@ -3,21 +3,11 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ArrowRight, BookOpen, Search } from "lucide-react";
-import type { LegacyCategory, LegacyLang } from "@/lib/legacy";
+import type { BlogPostCard, LegacyCategory } from "@/lib/legacy";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
 import { POST_TONE } from "./post-tone";
-
-/** A serialisable post card handed over from the server page. */
-export interface BlogPostCard {
-  slug: string;
-  title: string;
-  date: string; // YYYY-MM-DD
-  category: LegacyCategory;
-  lang: LegacyLang;
-  minutes: number;
-  excerpt: string;
-}
+import { LedText } from "./led-text";
 
 const CAT_ORDER: LegacyCategory[] = ["knowledge", "cuisine", "documentation"];
 
@@ -112,8 +102,8 @@ export function BlogIndexView({
       if (activeCat !== "all" && p.category !== activeCat) return false;
       if (!q) return true;
       return (
-        p.title.toLowerCase().includes(q) ||
-        p.excerpt.toLowerCase().includes(q) ||
+        p.titleText.toLowerCase().includes(q) ||
+        p.excerptText.toLowerCase().includes(q) ||
         p.category.includes(q)
       );
     });
@@ -205,7 +195,7 @@ export function BlogIndexView({
         {filtered.length > 0 ? (
           <div className="mt-7 flex flex-col gap-6">
             {filtered.map((post) => (
-              <PostCard key={post.slug} post={post} lang={lang} />
+              <PostCard key={post.slug} post={post} lang={lang} query={query} />
             ))}
           </div>
         ) : (
@@ -298,7 +288,15 @@ function SortChip({
   );
 }
 
-function PostCard({ post, lang }: { post: BlogPostCard; lang: Lang }) {
+function PostCard({
+  post,
+  lang,
+  query,
+}: {
+  post: BlogPostCard;
+  lang: Lang;
+  query: string;
+}) {
   const s = copy[lang];
   const tone = POST_TONE[post.category];
   const href = `/blog/${post.date.slice(0, 4)}/${post.slug}`;
@@ -326,10 +324,10 @@ function PostCard({ post, lang }: { post: BlogPostCard; lang: Lang }) {
       </div>
 
       <h2 className="mt-3 text-xl font-semibold leading-snug tracking-tight text-ink transition-colors group-hover:text-brand sm:text-2xl">
-        {post.title}
+        <LedText parts={post.titleParts} query={query} />
       </h2>
       <p className="mt-2 line-clamp-3 text-[0.97rem] leading-relaxed text-muted">
-        {post.excerpt}
+        <LedText parts={post.excerptParts} query={query} />
       </p>
 
       <div className="ui-text mt-4 flex items-center justify-between gap-3 border-t border-line pt-3 text-xs">

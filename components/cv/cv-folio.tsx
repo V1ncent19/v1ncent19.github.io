@@ -7,6 +7,7 @@ import {
   BookOpen,
   Download,
   ExternalLink,
+  FileText,
   FlaskConical,
   FolderOpen,
   GraduationCap,
@@ -15,7 +16,7 @@ import {
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
-import { cvSections } from "@/content/cv/entries";
+import { cvSections, publications } from "@/content/cv/entries";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
@@ -57,12 +58,11 @@ const HONORS: Honor[] = [
 ];
 
 const INTERESTS = [
-  "High-dimensional statistics",
-  "Theoretical statistics",
-  "Statistical physics",
-  "Sampling & optimization",
-  "Machine learning",
-  "Statistical theory",
+  "Robust statistics",
+  "Heavy-tailed minimax theory",
+  "High-dimensional statistical inference",
+  "Distribution-free & conformal inference",
+  "Statistical learning theory",
 ];
 
 function pdfSizeLabel(href: string | null): string | null {
@@ -85,7 +85,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
 
   const statNote = getProjects().find((p) => p.meta.slug === "stat-summary-note");
   const highDim = getProjects().find(
-    (p) => p.meta.slug === "high-dimensional-statistics-note-2024",
+    (p) => p.meta.slug === "high-dimensional-statistics-note-2024-2025",
   );
   const readLabel = lang === "zh" ? "阅读" : "Read";
 
@@ -259,12 +259,54 @@ export function CvFolio({ lang }: { lang: Lang }) {
               </ul>
             </ModuleCard>
 
+            {/* Publications */}
+            <ModuleCard
+              icon={FileText}
+              tone="bg-accent-soft text-accent"
+              title={s.cvFolio.publications}
+              sectionNo="03"
+            >
+              <ol className="space-y-3">
+                {publications.map((pub, i) => (
+                  <li key={pub.title} className="rounded-xl bg-surface-tint/70 px-4 py-3.5">
+                    <div className="flex items-start gap-3">
+                      <span
+                        aria-hidden
+                        className="ui-text mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-surface font-mono text-[11px] font-semibold text-muted"
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <div className="min-w-0">
+                        <h4 className="text-[0.95rem] font-medium leading-snug text-ink">
+                          {pub.href ? (
+                            <a
+                              href={pub.href}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                              className="underline decoration-line-strong underline-offset-2 transition hover:text-brand hover:no-underline"
+                            >
+                              {pub.title}
+                            </a>
+                          ) : (
+                            pub.title
+                          )}
+                        </h4>
+                        <p className="mt-1.5 text-xs leading-relaxed text-muted">
+                          {pub.authors} · {pub.venue} · {pub.year}
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </ModuleCard>
+
             {/* Honors & awards */}
             <ModuleCard
               icon={Award}
               tone="bg-tertiary-soft text-tertiary"
               title={s.cvFolio.honors}
-              sectionNo="03"
+              sectionNo="04"
             >
               <ul className="divide-y divide-line">
                 {HONORS.map((h) => (
@@ -296,7 +338,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
                 icon={FolderOpen}
                 tone="bg-accent-soft text-accent"
                 title={s.cvFolio.artifacts}
-                sectionNo="04"
+                sectionNo="05"
               >
                 <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {[statNote, highDim].filter(Boolean).map((p) => {
@@ -520,6 +562,23 @@ function RecordEntry({
         <ul className="mt-2.5 space-y-1.5 text-sm leading-relaxed text-muted">
           {entry.lines.map((line) => (
             <li key={line}>— {line}</li>
+          ))}
+        </ul>
+      ) : null}
+      {entry.links?.length ? (
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {entry.links.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="ui-text inline-flex items-center gap-1 rounded-md border border-line bg-surface px-2 py-1 text-xs font-semibold text-brand transition hover:border-line-strong hover:no-underline"
+              >
+                {link.label}
+                <ExternalLink className="h-3 w-3" aria-hidden />
+              </a>
+            </li>
           ))}
         </ul>
       ) : null}

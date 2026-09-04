@@ -6,7 +6,7 @@ This is a less formal About page. For a more formal version, please visit the [C
 
 - For the spelling and pronunciation of my name, please refer to the [CV](/cv); my online pseudonym is v1ncent19 on most sites, where v**1**n is used to avoid duplication, and cent**19** comes from the year of my undergraduate enrollment. You can call me "Vincent" or "Vincent nineteen".
 - I am from Shenzhen, a city close to Hong Kong.
-- [SZSHS](https://www.cn-school.com/swkz/index/index.html) @ 2013 → [THU](https://www.tsinghua.edu.cn/en/) @ 2019 → [NU](https://www.northwestern.edu/) @ 2023. *(Shared feature: the theme colors of the schools are all purple.)*
+- [SZSHS](https://www.cn-school.com/swkz/index/index.html) @ 2013 → [THU](https://www.tsinghua.edu.cn/en/) @ 2019 → [NU](https://www.northwestern.edu/) @ 2023. <span class="heimu">(Shared feature: the theme colors of the schools are all purple.)</span>
 - Previously a physics student, now a statistics student.
 
 ## Hobbies
@@ -24,7 +24,7 @@ This is a less formal About page. For a more formal version, please visit the [C
 - Favorite anime: [『サマーゴースト』 (Summer Ghost)](https://summerghost.jp/) and [『ジャストビコーズ』 (Just Because!)](https://justbecause.jp/).
 - Favorite artists: [Pierre-Auguste Renoir](https://fr.wikipedia.org/wiki/Auguste_Renoir) and [loundraw](https://www.pixiv.net/users/772547).
 - Science fiction novel enthusiast; favorite authors include [Cixin Liu](https://zh.wikipedia.org/wiki/刘慈欣), [Ken Liu](https://zh.wikipedia.org/wiki/刘宇昆) and [Isaac Asimov](https://en.wikipedia.org/wiki/Isaac_Asimov).
-- Favorite music mainly ranges in [classical](http://163cn.tv/yazW5l0) (*recommendation: Glenn Gould*), [j-pop](http://163cn.tv/yazVo3n) (*recommendation: ユイカ*) and [light music](http://163cn.tv/yaz01aM) (*recommendation: V.K 克*).
+- Favorite music mainly ranges in [classical](http://163cn.tv/yazW5l0 "Recommendation: Glenn Gould"), [j-pop](http://163cn.tv/yazVo3n "Recommendation: ユイカ") and [light music](http://163cn.tv/yaz01aM "Recommendation: V.K 克").
 - My avatar is from [Pixiv](https://www.pixiv.net/artworks/675540).
 - Social phobia (?), ISTJ (2022/Oct) → [INTJ](https://www.16personalities.com/profiles/intj-t/m/pitr7txzh) (2024/Oct).
 - CS2 / HoK / DSP / KSP.

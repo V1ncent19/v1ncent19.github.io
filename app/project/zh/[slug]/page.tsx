@@ -29,7 +29,7 @@ export default async function ProjectZhDetailPage({
 
   return (
     <section className="shell pb-24 pt-10">
-      <div className="mx-auto max-w-3xl" lang="zh">
+      <div className="mx-auto max-w-5xl" lang="zh">
         <ProjectDetail project={project} lang="zh" />
       </div>
     </section>

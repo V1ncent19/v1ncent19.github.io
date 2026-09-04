@@ -3,11 +3,12 @@
  * here, scoped to `.prose`. Colours reference the tokens from globals.css so
  * light/dark both fall out of the palette. */
 
+/* User-directed 2026-09-04: prose fills its (home-width max-w-5xl) column — the
+ * old 68ch measure cap was removed so every reading page matches the home width. */
 .prose {
   color: var(--ink);
   font-size: 1.0625rem;
   line-height: 1.75;
-  max-width: var(--measure);
 }
 
 .prose > :first-child {
@@ -141,7 +142,20 @@
 }
 
 .prose img {
+  max-width: 100%;
+  height: auto;
   border-radius: var(--radius-md);
+}
+
+/* Legacy blog bodies embed <video>; preflight already caps size — this adds
+ * figure rhythm, rounded corners, and a letterbox tone before frames load. */
+.prose video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5em 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-tint);
 }
 
 .prose del {

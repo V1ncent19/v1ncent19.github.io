@@ -90,7 +90,7 @@ export function SiteHeader() {
         <div className="shell flex flex-col pt-5 pb-6 sm:pt-8 sm:pb-7">
           <h1 className="font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl xl:text-6xl">
             <Link
-              href="/"
+              href={lang === "zh" ? "/zh" : "/"}
               aria-label="Home"
               className="inline-block text-ink no-underline hover:no-underline"
             >
@@ -127,10 +127,14 @@ export function SiteHeader() {
             <ul className="no-scrollbar flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
               {navItems.map((item) => {
                 const active = isActive(pathname, item);
+                // Keep the reader in the current UI language: nav chips point
+                // at the matching /…/zh target on Chinese pages and only the
+                // LangSwitch button ever crosses languages.
+                const target = lang === "zh" ? item.hrefZh : item.href;
                 return (
                   <li key={item.id} className="shrink-0">
                     <Link
-                      href={item.href}
+                      href={target}
                       aria-current={active ? "page" : undefined}
                       className={chipClasses(active)}
                     >

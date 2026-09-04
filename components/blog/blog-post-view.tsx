@@ -3,9 +3,12 @@ import { ArrowLeft } from "lucide-react";
 import { Prose } from "@/components/content/prose";
 import { GiscusComments } from "@/components/blog/giscus-comments";
 import { POST_TONE } from "@/components/blog/post-tone";
+import { StickyBackLink } from "@/components/blog/sticky-back-link";
+import { LedText } from "@/components/blog/led-text";
+import { hydrateMath } from "@/lib/lede-math";
 import type { LegacyLang, LegacyPost } from "@/lib/legacy";
+import { blogPostPath, titleLed } from "@/lib/legacy";
 import { copy } from "@/lib/i18n";
-import { blogPostPath } from "@/lib/legacy";
 
 const EN_MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -25,26 +28,21 @@ function formatDay(iso: string, lang: LegacyLang): string {
  * language it was written in (posts are not translated); only this page is a
  * canonical English-interface route, mirroring the Blog index — the zh index
  * lists the same posts. Reads full markdown from the legacy `_texts` source
- * and renders it with GFM + KaTeX, in a narrow reading column like About /
- * project-note detail.
+ * and renders it with GFM + KaTeX. The back link is sticky below the pinned
+ * nav (StickyBackLink); the content column is the site-wide home width
+ * (max-w-5xl), like every other page.
  */
 export function BlogPostView({ post }: { post: LegacyPost }) {
   const s = copy.en;
   const tone = POST_TONE[post.category];
   const contentLang = post.lang === "zh" ? "zh" : undefined;
+  // Typeset inline math in the title (e.g. "$\bar{X}$") like the cards do.
+  const titleParts = hydrateMath(titleLed(post.title));
 
   return (
     <section className="shell pb-20">
-      <div className="mx-auto max-w-3xl">
-        <div className="pt-2 sm:pt-4">
-          <Link
-            href="/blog"
-            className="ui-text inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-brand hover:no-underline"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden />
-            {s.blog.allPosts}
-          </Link>
-        </div>
+      <div className="mx-auto max-w-5xl">
+        <StickyBackLink />
 
         <header className="mt-6 border-b border-line pb-8">
           <div className="ui-text flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
@@ -76,7 +74,7 @@ export function BlogPostView({ post }: { post: LegacyPost }) {
             lang={contentLang}
             className="mt-5 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl"
           >
-            {post.title}
+            <LedText parts={titleParts} />
           </h1>
         </header>
 

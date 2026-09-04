@@ -1,25 +1,32 @@
+import { useState } from "react";
 import type { ComponentType } from "react";
 
 /**
  * Travel-stamp "badges" for the gallery. Each photo's `badge` value in
- * content/gallery/items.json names a preset stamp. The real per-place vector
- * files arrive later; until then every item renders the generic placeholder
- * below (a dashed postmark ring + location pin, tinted by the item accent).
+ * content/gallery/items.json names a stamp. Two sources, in priority order:
  *
- * To plug in a real stamp later: register an entry here keyed by the `badge`
- * string you put in items.json (e.g. `kaohsiung: () => <svg …/>`). No other
- * code changes — the tile + lightbox look it up by key.
+ *  1. A drop-in SVG file at `public/assets/gallery/badges/<badge>.svg`
+ *     (served at `/assets/gallery/badges/<badge>.svg`). Put your real artwork
+ *     there, square, and it renders as-is — no code changes needed.
+ *  2. The React `STAMP_PRESETS` registry below (used as a fallback while a
+ *     badge is set but its .svg has not been added yet, or for stamps that
+ *     live inline instead of as files).
  *
- * All stamps inherit `currentColor`, so the caller colours them (tiles use the
- * item's theme accent). Keep the drawing inside one <svg> so it scales with
- * the className the caller passes.
+ * When neither exists, every item renders the generic dashed placeholder
+ * (postmark ring + pin). `onError` makes the file lookup safe: a badge key
+ * with no matching .svg still shows the placeholder, never a broken image.
+ *
+ * All inline stamps inherit `currentColor`, so callers colour them (tiles use
+ * the item's theme accent); a real multi-colour .svg is exempt. Keep the
+ * drawing square and centred so it scales with the className the caller
+ * passes (the mark boxes are h-9..h-10).
  */
 
 export interface StampProps {
   className?: string;
 }
 
-/** Registry of real per-place stamps (added when the vector files are ready). */
+/** Registry of real per-place React stamps (added when the vector files are ready). */
 const STAMP_PRESETS: Record<string, ComponentType<StampProps>> = {
   // kaohsiung: () => <svg viewBox="0 0 48 48" …/>,
 };
@@ -55,7 +62,7 @@ function PlaceholderStamp({ className }: StampProps) {
   );
 }
 
-/** Render the stamp for a `badge` preset (placeholder when empty/unknown). */
+/** Render the stamp for a `badge` preset (file → registry → placeholder). */
 export function TravelStamp({
   preset,
   className,
@@ -63,6 +70,23 @@ export function TravelStamp({
   preset?: string;
   className?: string;
 }) {
-  const Preset = (preset && STAMP_PRESETS[preset]) || PlaceholderStamp;
-  return <Preset className={className} />;
+  // File-backed artwork wins. Start optimistic and fall back on a 404 so a
+  // badge key without its .svg yet still shows the placeholder.
+  const [missing, setMissing] = useState(false);
+  const Registered = (preset && STAMP_PRESETS[preset]) || PlaceholderStamp;
+  const fileUrl = preset ? `/assets/gallery/badges/${preset}.svg` : null;
+  if (fileUrl && !missing) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={fileUrl}
+        alt=""
+        draggable={false}
+        style={{ objectFit: "contain" }}
+        onError={() => setMissing(true)}
+        className={className}
+      />
+    );
+  }
+  return <Registered className={className} />;
 }

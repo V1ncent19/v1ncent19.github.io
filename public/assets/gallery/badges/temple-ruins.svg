@@ -1,0 +1,39 @@
+<svg
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- outer travel badge rings -->
+  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
+  <circle cx="50" cy="50" r="35"/>
+
+  <!-- temple ruins: stone steps -->
+  <line x1="32" y1="69" x2="68" y2="69"/>
+  <line x1="37" y1="72" x2="63" y2="72"/>
+
+  <!-- standing fluted columns -->
+  <line x1="37" y1="50" x2="37" y2="69"/>
+  <line x1="42" y1="50" x2="42" y2="69"/>
+  <line x1="39.5" y1="57" x2="39.5" y2="66"/>
+
+  <line x1="58" y1="50" x2="58" y2="69"/>
+  <line x1="63" y1="50" x2="63" y2="69"/>
+  <line x1="60.5" y1="57" x2="60.5" y2="66"/>
+
+  <!-- broken column lying on the steps -->
+  <line x1="45.5" y1="60" x2="54.5" y2="60"/>
+  <line x1="45.5" y1="64.5" x2="54.5" y2="64.5"/>
+  <circle cx="44.8" cy="62.25" r="2.7"/>
+
+  <!-- broken lintel (two surviving segments) -->
+  <line x1="35" y1="44" x2="45" y2="44"/>
+  <line x1="55" y1="44" x2="65" y2="44"/>
+
+  <!-- surviving fragment of the pediment -->
+  <line x1="36" y1="44" x2="47" y2="31"/>
+  <line x1="47" y1="31" x2="53" y2="36"/>
+</svg>

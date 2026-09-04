@@ -1,0 +1,67 @@
+<svg
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- outer badge rings -->
+  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
+  <circle cx="50" cy="50" r="35"/>
+
+  <!-- characteristic curved canopy -->
+  <path d="M27 48
+           Q31 36 43 34
+           H55
+           Q62 35 66 42"/>
+  <line x1="29" y1="43" x2="62" y2="43"/>
+
+  <!-- rear cabin -->
+  <path d="M28 48 V61 H55"/>
+  <line x1="36" y1="43" x2="36" y2="60"/>
+
+  <!-- open passenger compartment -->
+  <path d="M40 47 V57 H55"/>
+  <line x1="41" y1="54" x2="53" y2="54"/>
+
+  <!-- angled windshield -->
+  <path d="M55 43 L63 47 L61 57"/>
+
+  <!-- compact front body -->
+  <path d="M61 57
+           L69 58
+           L73 63
+           H58"/>
+
+  <!-- front nose / headlight -->
+  <path d="M69 58 L73 57"/>
+  <circle cx="70" cy="60" r="1.3"/>
+
+  <!-- handlebar -->
+  <path d="M59 48 L65 45"/>
+  <line x1="63" y1="45" x2="67" y2="45"/>
+
+  <!-- rear body -->
+  <path d="M28 61 H57"/>
+  <path d="M31 61 L33 65"/>
+  <path d="M53 61 L51 65"/>
+
+  <!-- rear wheel -->
+  <circle cx="37" cy="66" r="6"/>
+  <circle cx="37" cy="66" r="1.5"/>
+
+  <!-- single front wheel -->
+  <circle cx="65" cy="66" r="5"/>
+  <circle cx="65" cy="66" r="1.3"/>
+
+  <!-- front fork -->
+  <line x1="61" y1="57" x2="65" y2="66"/>
+
+  <!-- decorative bumper -->
+  <line x1="70" y1="63" x2="75" y2="63"/>
+
+  <!-- ground -->
+  <line x1="27" y1="74" x2="73" y2="74"/>
+</svg>

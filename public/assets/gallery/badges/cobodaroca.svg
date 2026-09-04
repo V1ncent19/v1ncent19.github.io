@@ -1,0 +1,43 @@
+<svg
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- outer badge rings -->
+  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
+  <circle cx="50" cy="50" r="35"/>
+
+  <!-- main wave -->
+  <path
+    d="
+      M24 63
+      C31 61 36 56 40 49
+      C45 40 53 33 63 32
+      C69 31 75 34 78 39
+      C71 37 65 39 61 44
+      C57 48 57 53 61 57
+      C55 54 50 54 46 58
+      C42 62 37 66 30 66
+    "
+  />
+
+  <!-- inner curl -->
+  <path
+    d="
+      M61 44
+      C66 42 71 44 73 48
+      C68 46 64 48 62 52
+    "
+  />
+
+  <!-- lower wave -->
+  <path d="M24 66 C32 70 39 70 46 66 C53 62 60 63 66 67"/>
+
+  <!-- water lines -->
+  <path d="M35 72 C41 69 47 69 53 72"/>
+  <path d="M56 73 C61 70 67 70 72 72"/>
+</svg>

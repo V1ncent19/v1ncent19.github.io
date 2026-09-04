@@ -794,7 +794,15 @@ export function GalleryView({
                     width: railW,
                     maxHeight: box.h,
                   }}
-                  className="flex min-h-0 flex-col overflow-y-auto bg-surface p-6"
+                  className="
+                    flex
+                    min-h-0
+                    flex-col
+                    overflow-y-auto
+                    bg-surface
+                    px-8
+                    py-7
+                  "
                 >
                   {captionContent(active)}
                 </aside>

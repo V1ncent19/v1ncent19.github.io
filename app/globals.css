@@ -166,9 +166,13 @@
 @layer base {
   html {
     background: var(--canvas);
-    scroll-behavior: smooth;
-    /* keep anchor targets (#main, blog #category tags, …) clear of the
-       floating capsule nav once it pins to the top on scroll */
+    /* No global `scroll-behavior: smooth` here: Next.js resets scroll to the
+       top of a newly navigated page during client-side transitions, and a
+       page-wide smooth would turn that instant reset into a visible "fly back
+       to top" from wherever the previous page was scrolled (reported on blog
+       posts, 2026-09-04). Animations that want easing pass `behavior:
+       "smooth"` explicitly (BackToTop button). This offset keeps anchor
+       targets (#main, blog #category tags, …) clear of the pinned capsule nav. */
     scroll-padding-top: 5.5rem;
   }
 
@@ -411,6 +415,107 @@ html:not([data-theme]) .ti-system {
 .email-copy.is-copied .email-copy__done {
   transform: translateY(0);
   opacity: 1;
+}
+
+/* ---------------------------------------------------------------------------
+ * About-page prose widgets (2026-09-04) — spoiler text + recommendation pill.
+ * Both live in hand-authored markdown (content/about/*.md), rendered through
+ * components/content/prose.tsx:
+ *
+ *  • heimu (<span class="heimu">…</span>) — the classic wiki spoiler. The text
+ *    sits under an ink bar and lights up only on hover; About's tiny client
+ *    wrapper adds a tap/click toggle (.is-open) for touch & keyboard. Style
+ *    mirrors the legacy Jekyll rule (bar stays, text turns light), theme-aware:
+ *    near-black bar on light, a slate bar that still reads against the deep
+ *    navy canvas in dark mode. Reveal text is a fixed near-white so it stays
+ *    legible on the bar in both themes.
+ *  • a.rec — a markdown link whose title begins with "推荐：" / "Recommendation:"
+ *    is turned into a capsule trigger by a rehype plugin in prose.tsx; hovering
+ *    (or keyboard focus) pops a little pill just above the text via ::after
+ *    reading the data-rec attribute. No layout shift — it overlays.
+ * ------------------------------------------------------------------------- */
+
+/* ---- spoiler: concealed until hover / tap ---- */
+.heimu {
+  --heimu-bar: #171c1f; /* light: near-black ink bar */
+  background-color: var(--heimu-bar);
+  color: transparent;
+  border-radius: 0.16em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0.02em 0.14em;
+  transition: color 120ms ease;
+}
+.dark .heimu {
+  --heimu-bar: #3a4c61; /* slate "black" that shows on the #0c1219 canvas */
+}
+.heimu a {
+  color: inherit;
+  text-decoration-color: inherit;
+}
+.heimu:hover,
+.heimu:active,
+.heimu:focus-visible,
+.heimu.is-open {
+  color: #eef4fa; /* reveal inside the bar (kept, like the legacy rule) */
+  transition-delay: 0s;
+}
+
+/* ---- recommendation pill above a hovered link ---- */
+.prose a.rec {
+  position: relative;
+}
+.prose a.rec::after {
+  content: attr(data-rec);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.55em);
+  transform: translate(-50%, 4px) scale(0.96);
+  transform-origin: bottom center;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: min(46vw, 24rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.24em 0.9em;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  z-index: 30;
+  transition: opacity 140ms var(--ease), transform 180ms var(--ease);
+}
+.prose a.rec:hover::after,
+.prose a.rec:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* Blog search-result match highlight (LedText). Soft brand wash, no underline
+   change, inline so it never breaks line-clamp or the surrounding sentence. */
+.led-mark {
+  background: color-mix(in srgb, var(--brand) 22%, transparent);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 0.08em;
+  margin: 0 -0.02em;
+}
+.dark .led-mark {
+  background: color-mix(in srgb, var(--brand) 34%, transparent);
+}
+
+/* Room for typeset inline math inside card text (KaTeX spans are inline). */
+.led-math {
+  line-height: inherit;
+  vertical-align: baseline;
 }
 
 /* Reduced motion is already flattened by the global `*` rule in @layer base. */

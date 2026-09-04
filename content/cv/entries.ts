@@ -1,7 +1,13 @@
 /** Structured CV entries, migrated from the old `Experiences.md` page plus the
  * education timeline that already appears publicly on the old site
  * (About_en.md / index.html). Source content is preserved; no facts invented.
- * The formal, complete CV remains the downloadable PDF. */
+ * The formal, complete CV remains the downloadable PDF.
+ *
+ * The `research` (研究经历) section mirrors the Experiences list, `education`
+ * the full Education list (incl. the M.S. and the statistics minor), and
+ * `publications` the Publications section of `assets/pdf/cv.tex` (2026-09-04) —
+ * same entries, same order, same wording; entries the tex no longer carries
+ * were dropped. */
 
 export interface CvEntry {
   title: string;
@@ -28,7 +34,16 @@ export const cvSections: CvSection[] = [
         title: "Ph.D. in Statistics",
         institution: "Northwestern University",
         institutionHref: "https://www.northwestern.edu/",
-        period: "2023 —",
+        period: "Sep 2023 — Present",
+        lines: [
+          "Department of Statistics and Data Science. Advisor: Prof. Matey Neykov.",
+        ],
+      },
+      {
+        title: "M.S. in Statistics",
+        institution: "Northwestern University",
+        institutionHref: "https://www.northwestern.edu/",
+        period: "Sep 2023 – Jun 2025",
         lines: [
           "Department of Statistics and Data Science.",
         ],
@@ -37,10 +52,17 @@ export const cvSections: CvSection[] = [
         title: "B.S. in Mathematics and Physics",
         institution: "Tsinghua University",
         institutionHref: "https://www.phys.tsinghua.edu.cn/phyen/",
-        period: "2019 – 2023",
+        period: "Sep 2019 – Jun 2023",
         lines: [
           "Department of Physics.",
-          "Minor in Statistics, Department of Statistics and Data Science.",
+        ],
+      },
+      {
+        title: "B.S. (minor) in Statistics",
+        institution: "Tsinghua University",
+        period: "Mar 2021 – Jun 2023",
+        lines: [
+          "Department of Industrial Engineering.",
         ],
       },
     ],
@@ -49,47 +71,45 @@ export const cvSections: CvSection[] = [
     id: "research",
     entries: [
       {
+        title: "Graduate Researcher",
+        institution: "Northwestern University",
+        institutionHref: "https://www.northwestern.edu/",
+        period: "Jan 2025 — Present",
+        lines: [
+          "Project: Robust inference under shape constraints with heavy-tailed noise.",
+          "Formulated a novel framework for robust mean estimation under star-shaped constraints, explicitly addressing non-Gaussian and heavy-tailed noise structures.",
+          "Derived optimal minimax error bounds and established theoretical guarantees for estimators under non-convex and non-smooth geometric constraints.",
+          "Presented the findings in a comprehensive research paper.",
+        ],
+        links: [
+          { label: "arXiv:2604.05063", href: "https://arxiv.org/abs/2604.05063" },
+        ],
+      },
+      {
         title: "Undergraduate Dissertation",
-        institution: "THU Center of Statistical Science",
-        institutionHref: "http://www.stat.tsinghua.edu.cn/en/",
-        period: "2023",
+        institution: "Tsinghua University",
+        period: "Dec 2022 – May 2023",
         lines: [
-          "Title: “Statistical Modeling and Inference Based on Neural Network Prediction of Gene-Expression.” Advisor: Tianying Wang.",
-          "Applied the Mixture Density Network to predicting gene-expression levels; studied the model's performance and robustness.",
-          "Extended the Conformal Prediction framework to construct a conformal band for the distribution function of gene-expression level.",
+          "Project: Distribution-free inference and neural-network modeling for gene expression.",
+          "Applied Mixture Density Networks (MDN) to model complex, multi-modal conditional distributions for high-dimensional genetic data.",
+          "Extended the Conformal Prediction framework to construct distribution-free conformal bands for conditional distribution functions.",
+          "Programmed the entire pipeline in Python, achieving predictive coverage guarantees without relying on strong distributional assumptions.",
         ],
       },
       {
-        title: "Research Assistant",
-        institution: "NUS Department of Statistics and Data Science",
-        institutionHref: "https://www.stat.nus.edu.sg/",
-        period: "2022",
+        title: "Undergraduate Researcher & RA",
+        institution: "Tsinghua University",
+        period: "Dec 2021 – Jul 2022",
         lines: [
-          "Studied landscape modification in Simulated Annealing, especially on discrete Hamiltonians, to speed up sampling and optimization.",
-          "Focused on the applicability of the spin-glass model and replica symmetric theory to explaining landscape modification.",
+          "Project: Large-scale medical-record dataset.",
+          "Developed a scalable data pipeline to crawl, parse, and structure case-report articles from PubMed OA.",
+          "Formed a large-scale public dataset of patient summaries and their links (160k patient summaries, 293k similarity annotations).",
+          "Fine-tuned large language models (LLMs) to automate text mining and medical entity extraction from unstructured biomedical literature.",
+          "Published the open-source dataset on Nature Scientific Data.",
         ],
-      },
-      {
-        title: "Research Assistant",
-        institution: "THU Center of Statistical Science",
-        institutionHref: "http://www.stat.tsinghua.edu.cn/en/",
-        period: "2021 – 2022",
-        lines: [
-          "Crawled and parsed case-report articles on PubMed to build the PMC-Patient large-scale Electronic Medical Record dataset.",
-          "Used PMC-Patient as a seed dataset to fine-tune a language model for crawling the whole PubMed Open-Access subset.",
-          "Mapped the citation graph into patient links as a database for the retrieval system.",
-          "Crawled and parsed medical entity–relation pairs from public medical websites to form a knowledge graph.",
-        ],
-      },
-      {
-        title: "Student Research Training",
-        institution: "THU Department of Physics",
-        institutionHref: "https://www.phys.tsinghua.edu.cn/phyen/",
-        period: "2021 – 2022",
-        lines: [
-          "Studied heterogeneous junctions between metal electrodes and low-dimensional semiconductor MoS₂ to explore their characteristics and fabrication techniques.",
-          "Experimented with different processing methods and technologies to obtain junctions with more stable and ideal performance.",
-          "Further explored the use of low-dimensional materials in ionic micro-devices.",
+        links: [
+          { label: "Nature Scientific Data", href: "https://www.nature.com/articles/s41597-023-02814-8" },
+          { label: "Project website", href: "https://pmc-patients.github.io/" },
         ],
       },
     ],
@@ -109,5 +129,34 @@ export const cvSections: CvSection[] = [
         ],
       },
     ],
+  },
+];
+
+/** One bibliography entry as it should read on the CV page. */
+export interface Publication {
+  /** Full author list, in citation order. */
+  authors: string;
+  year: string;
+  title: string;
+  /** Journal + volume/pages, or preprint id. */
+  venue: string;
+  href?: string;
+}
+
+/** Publications, newest first — mirrors the Publications section of cv.tex. */
+export const publications: Publication[] = [
+  {
+    authors: "Peng, T., Prasadan, A., & Neykov, M.",
+    year: "2026",
+    title: "Robust mean estimation under star-shaped constraints with heavy-tailed noise",
+    venue: "arXiv preprint arXiv:2604.05063",
+    href: "https://arxiv.org/abs/2604.05063",
+  },
+  {
+    authors: "Zhao, Z., Jin, Q., Chen, F., Peng, T., & Yu, S.",
+    year: "2023",
+    title: "A large-scale dataset of patient summaries for retrieval-based clinical decision support systems",
+    venue: "Scientific Data, 10(1), 909",
+    href: "https://www.nature.com/articles/s41597-023-02814-8",
   },
 ];

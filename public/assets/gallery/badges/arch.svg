@@ -1,0 +1,46 @@
+<svg
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- outer badge rings -->
+  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
+  <circle cx="50" cy="50" r="35"/>
+
+  <!-- upper attic -->
+  <line x1="28" y1="30" x2="72" y2="30"/>
+  <rect x="31" y="34" width="38" height="10"/>
+
+  <!-- cornice -->
+  <line x1="28" y1="44" x2="72" y2="44"/>
+  <line x1="31" y1="48" x2="69" y2="48"/>
+
+  <!-- main monument body -->
+  <path d="M32 48 V70"/>
+  <path d="M68 48 V70"/>
+
+  <!-- central triumphal arch -->
+  <path d="M40 70 V59 A10 10 0 0 1 60 59 V70"/>
+
+  <!-- inner arch line -->
+  <path d="M44 70 V59 A6 6 0 0 1 56 59 V70"/>
+
+  <!-- side pilasters -->
+  <line x1="36" y1="49" x2="36" y2="70"/>
+  <line x1="64" y1="49" x2="64" y2="70"/>
+
+  <!-- simple sculptural reliefs -->
+  <path d="M33 54 L36 51 L39 54"/>
+  <path d="M61 54 L64 51 L67 54"/>
+
+  <path d="M33 61 L36 58 L39 61"/>
+  <path d="M61 61 L64 58 L67 61"/>
+
+  <!-- lower cornice / base -->
+  <line x1="29" y1="70" x2="71" y2="70"/>
+  <line x1="26" y1="75" x2="74" y2="75"/>
+</svg>

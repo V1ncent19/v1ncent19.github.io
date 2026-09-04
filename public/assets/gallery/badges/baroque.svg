@@ -1,0 +1,56 @@
+<svg
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- outer badge rings -->
+  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
+  <circle cx="50" cy="50" r="35"/>
+
+  <!-- capital top -->
+  <line x1="30" y1="32" x2="70" y2="32"/>
+  <line x1="34" y1="37" x2="66" y2="37"/>
+
+  <!-- left volute -->
+  <path d="M42 40
+           C36 37 31 39 31 44
+           C31 48 36 49 39 46
+           C41 44 40 42 37 42"/>
+
+  <!-- right volute -->
+  <path d="M58 40
+           C64 37 69 39 69 44
+           C69 48 64 49 61 46
+           C59 44 60 42 63 42"/>
+
+  <!-- central ornament -->
+  <path d="M50 39 V51"/>
+  <path d="M50 43 L45 39"/>
+  <path d="M50 43 L55 39"/>
+
+  <!-- stylized acanthus leaves -->
+  <path d="M48 52 C43 48 39 49 37 55 C42 53 46 56 48 61"/>
+  <path d="M52 52 C57 48 61 49 63 55 C58 53 54 56 52 61"/>
+
+  <path d="M48 58 C44 56 42 58 41 63"/>
+  <path d="M52 58 C56 56 58 58 59 63"/>
+
+  <!-- necking -->
+  <line x1="39" y1="64" x2="61" y2="64"/>
+  <line x1="42" y1="68" x2="58" y2="68"/>
+
+  <!-- column shaft -->
+  <line x1="44" y1="68" x2="44" y2="76"/>
+  <line x1="56" y1="68" x2="56" y2="76"/>
+
+  <!-- shaft fluting -->
+  <line x1="48" y1="69" x2="48" y2="76"/>
+  <line x1="52" y1="69" x2="52" y2="76"/>
+
+  <!-- base line -->
+  <line x1="41" y1="76" x2="59" y2="76"/>
+</svg>

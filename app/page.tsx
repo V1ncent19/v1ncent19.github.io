@@ -213,7 +213,7 @@ export default function HomePage() {
   const feed = recentPosts();
   const statNote = getProjects().find((p) => p.meta.slug === "stat-summary-note");
   const highDim = getProjects().find(
-    (p) => p.meta.slug === "high-dimensional-statistics-note-2024",
+    (p) => p.meta.slug === "high-dimensional-statistics-note-2024-2025",
   );
   const cvHref = profile.cv.en;
   const { sitePvBaseline, siteUvBaseline } = profile.legacyStats;
@@ -293,7 +293,7 @@ export default function HomePage() {
               </Link>{" "}
               and the{" "}
               <Link
-                href="/project/high-dimensional-statistics-note-2024"
+                href="/project/high-dimensional-statistics-note-2024-2025"
                 className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
               >
                 high-dimensional statistics note

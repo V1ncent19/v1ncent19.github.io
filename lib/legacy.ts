@@ -44,6 +44,25 @@ export interface LegacyPost {
   oldPath: string;
 }
 
+/**
+ * Serialisable blog-card payload handed from the server pages to the client
+ * Blog index. `titleParts` / `excerptParts` are hydrated with KaTeX html
+ * (lib/lede-math.ts) so cards typeset inline math; `titleText` / `excerptText`
+ * are the plain prose (math dropped) that search matches and highlights.
+ */
+export interface BlogPostCard {
+  slug: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  category: LegacyCategory;
+  lang: LegacyLang;
+  minutes: number;
+  titleParts: LedPart[];
+  excerptParts: LedPart[];
+  titleText: string;
+  excerptText: string;
+}
+
 const textsDir = path.join(process.cwd(), "_texts");
 
 /** Files that are not blog posts on the rebuilt site (see audit above). */
@@ -117,66 +136,255 @@ function readingMinutes(body: string): number {
   return Math.max(1, Math.round(minutes));
 }
 
-const SKIP_LINE = /^(#{1,6}\s|>\s?|\||[-*+]\s|\d+\.\s|```|!\[|\$\$|\s*<\/?|https?:\/\/|---)/;
+/* ---------------------------------------------------------------------------
+ * Card ledes — readable prose + typeset inline math.
+ *
+ * Legacy bodies interleave prose with MathJax `$…$` (inline) and `$$…$$`
+ * (display) math. The old plain-text excerpt stripped backslash commands and
+ * the `$ { } ( ) [ ]` characters but kept `_ ^ = &`, so any paragraph glued to
+ * a `\begin{align}` block (no blank line between them) degraded into
+ * "align N 0 =0, N t 0 , …" garbage on the cards. Instead we carve the body
+ * into PROSE RUNS — a run ends at a blank line or any structural line
+ * (heading / list / fence / `$$` / HTML) — keep the first readable run, and
+ * split it into alternating text + inline-math segments. Cards can then
+ * typeset the math with KaTeX while search & highlight operate on clean prose.
+ * Display `$$` blocks are deliberately not part of a card lede (not a
+ * sentence), and titles go through the same tokenizer so `$\bar{X}$` no longer
+ * shows its source in a heading.
+ *
+ * LedPart.hmtl is filled in by lib/lede-math.ts (KaTeX) at build time; the
+ * pure tokenizer here leaves it empty. `math` segments never carry markdown,
+ * so rendering them needs no rehype-raw sanitizer.
+ * ------------------------------------------------------------------------- */
 
-function stripInline(md: string): string {
-  return (
-    md
-      // images and links → keep the link label only
-      .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
-      .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-      // inline code / emphasis ticks
-      .replace(/`([^`]*)`/g, "$1")
-      .replace(/\*\*([^*]+)\*\*/g, "$1")
-      .replace(/\*([^*]+)\*/g, "$1")
-      // html tags
-      .replace(/<[^>]+>/g, "")
-      // stray LaTeX backslash commands from mixed prose
-      .replace(/\\[a-zA-Z]+/g, "")
-      .replace(/[$\\{}()[\]]/g, " ")
-      .replace(/&amp;/g, "&")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/\s+/g, " ")
-      .trim()
-  );
+export type LedPart =
+  | { kind: "text"; value: string }
+  | { kind: "math"; value: string; html: string };
+
+export interface LedeSource {
+  /** Text/math segments for the card (math html left empty). */
+  parts: LedPart[];
+  /** Readable text version (math dropped) for meta descriptions / home. */
+  plain: string;
 }
 
-function firstParagraph(body: string): string {
-  const paras: string[] = [];
-  let current = "";
-  for (const raw of body.split(/\r?\n/)) {
-    const line = raw.trim();
+/** Inline `$…$` / `$$…$$` on one logical line (not own-line display blocks). */
+const INLINE_MATH_RE = /(\${1,2})([^$]+?)\1/g;
+
+/** Lines that end a prose run without joining it (also never part of a lede). */
+const STRUCT_LINE_RE =
+  /^(#{1,6}\s|>\s?|\||[-*+]\s|\d+\.\s|```|!\[|<|---|<!--)/;
+
+/**
+ * Split a body into runs of contiguous plain-text lines. Display math on its
+ * own line (`$$…$$`) and `\begin{…}…\end{…}` environments are swallowed whole
+ * — a paragraph is never allowed to "merge" across them (that is what used to
+ * smear `\begin{align}` bodies into the card excerpt).
+ */
+function proseRuns(body: string): string[] {
+  const runs: string[] = [];
+  let cur: string[] = [];
+  let inDisplay = false; // inside own-line `$$` … `$$`
+  let inEnv = false; // inside \begin{…} … \end{…} without `$$` wrapping
+  const flush = (): void => {
+    if (cur.length) {
+      runs.push(cur.join("\n"));
+      cur = [];
+    }
+  };
+  for (const rawLine of body.split(/\r?\n/)) {
+    const line = rawLine.trim();
     if (!line) {
-      if (current) {
-        paras.push(current);
-        current = "";
-      }
+      flush();
       continue;
     }
-    if (SKIP_LINE.test(line)) continue;
-    current += (current ? " " : "") + line;
-  }
-  if (current) paras.push(current);
-
-  let text = "";
-  for (const para of paras) {
-    const cleaned = stripInline(para);
-    if (cleaned.length >= 40) {
-      text = cleaned;
-      break;
+    if (/^\$\$/.test(line)) {
+      if (!inDisplay && !inEnv && cur.length) flush();
+      inDisplay = !inDisplay;
+      continue;
     }
-    if (!text) text = cleaned;
+    if (inDisplay) continue;
+    if (/^\\begin\{[^}]*\}/.test(line)) {
+      if (cur.length) flush();
+      inEnv = true;
+      continue;
+    }
+    if (/^\\end\{[^}]*\}/.test(line)) {
+      if (cur.length) flush();
+      inEnv = false;
+      continue;
+    }
+    if (inEnv) continue;
+    if (STRUCT_LINE_RE.test(line)) {
+      flush();
+      continue;
+    }
+    cur.push(rawLine.trim());
   }
-  if (text.length <= 220) return text;
-  const cut = text.slice(0, 220);
-  const lastSpace = cut.lastIndexOf(" ");
-  return (lastSpace > 120 ? cut.slice(0, lastSpace) : cut).replace(/\s+$/, "") + " …";
+  flush();
+  return runs;
+}
+
+/**
+ * Light inline-markdown cleanup for a TEXT segment (never runs on math, whose
+ * `$…$` was already carved out, so backslash removal is safe here). Whitespace
+ * is collapsed but NOT trimmed: the leading/trailing space around an inline
+ * math token is what keeps glyphs separated from surrounding words.
+ */
+function cleanTextSeg(s: string): string {
+  return s
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/`([^`]*)`/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/(^|[^*])\*([^*\n]+)\*(?![*])/g, "$1$2")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\\+/g, " ") // stray LaTeX line-break backslashes in prose
+    .replace(/\s+/g, " ");
+}
+
+/** Split raw text into alternating cleaned-text / inline-math segments. */
+function tokenizeInlineMath(raw: string): LedPart[] {
+  const parts: LedPart[] = [];
+  let last = 0;
+  const re = new RegExp(INLINE_MATH_RE.source, "g");
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(raw))) {
+    const text = cleanTextSeg(raw.slice(last, m.index));
+    if (text) parts.push({ kind: "text", value: text });
+    const tex = m[2].trim();
+    if (tex) parts.push({ kind: "math", value: tex, html: "" });
+    last = m.index + m[0].length;
+  }
+  const tail = cleanTextSeg(raw.slice(last));
+  if (tail) parts.push({ kind: "text", value: tail });
+
+  if (!parts.length) {
+    const v = cleanTextSeg(raw).trim();
+    return v ? [{ kind: "text", value: v }] : [];
+  }
+  // Trim only the run's outer edges; interior spaces around math stay.
+  const first = parts[0];
+  if (first.kind === "text" && first.value) {
+    parts[0] = { ...first, value: first.value.replace(/^\s+/, "") };
+  }
+  const lastPart = parts[parts.length - 1];
+  if (lastPart.kind === "text" && lastPart.value) {
+    parts[parts.length - 1] = {
+      ...lastPart,
+      value: lastPart.value.replace(/\s+$/, ""),
+    };
+  }
+  return parts.filter((p) => p.value.length > 0);
+}
+
+/** Visible prose (text segments joined) — what search matches against. */
+export function ledSearchText(parts: LedPart[]): string {
+  return parts
+    .filter((p) => p.kind === "text")
+    .map((p) => p.value)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Rough on-screen width: a math token is narrower than its TeX source. */
+function segWidth(p: LedPart): number {
+  return p.kind === "text" ? p.value.length : p.value.length * 0.6;
+}
+
+/** Trim a part list to the card budget, always keeping the first part. */
+function capParts(parts: LedPart[], budget: number): { parts: LedPart[]; cut: boolean } {
+  if (parts.reduce((a, p) => a + segWidth(p), 0) <= budget) {
+    return { parts, cut: false };
+  }
+  const out: LedPart[] = [];
+  let w = 0;
+  for (let i = 0; i < parts.length; i++) {
+    const pw = segWidth(parts[i]);
+    if (w > 0 && w + pw > budget) break;
+    out.push(parts[i]);
+    w += pw;
+  }
+  const last = out[out.length - 1];
+  if (last && last.kind === "text") {
+    const allow = Math.max(24, Math.floor(budget - (w - last.value.length)));
+    if (last.value.length > allow) {
+      let s = last.value.slice(0, allow).replace(/\s+$/, "");
+      const sp = s.lastIndexOf(" ");
+      if (sp > 0) s = s.slice(0, sp);
+      if (s) out[out.length - 1] = { kind: "text", value: s };
+    }
+  }
+  return { parts: out, cut: true };
+}
+
+/**
+ * Choose the lede run: the EARLIEST run with ≥ LEAD_MIN visible chars — a
+ * genuine sentence, even a short lead like "For optimize problem in convex
+ * set…" — before a later, longer paragraph. Only if nothing reaches the bar do
+ * we fall back to the first run with any text (formula fragments and captions
+ * stay under LEAD_MIN and are skipped).
+ */
+const LEAD_MIN = 16;
+
+function chooseRun(runs: string[]): string | null {
+  let fallback: string | null = null;
+  for (const run of runs) {
+    const parts = tokenizeInlineMath(run);
+    const len = ledSearchText(parts).length;
+    if (!fallback && len > 0) fallback = run;
+    if (len >= LEAD_MIN) return run;
+  }
+  return fallback;
+}
+
+const EXCERPT_BUDGET = 200;
+
+/** Card excerpt for a legacy post body (parts + plain text version). */
+export function excerptLed(body: string): LedeSource {
+  const run = chooseRun(proseRuns(body));
+  if (!run) return { parts: [], plain: "" };
+  const { parts, cut } = capParts(tokenizeInlineMath(run), EXCERPT_BUDGET);
+  const plain = ledSearchText(parts);
+  return { parts, plain: cut && plain ? `${plain} …` : plain };
+}
+
+/** Title segments (same tokenizer — never truncated). */
+export function titleLed(title: string): LedPart[] {
+  const parts = tokenizeInlineMath(title);
+  return parts.length ? parts : [{ kind: "text", value: title.trim() }];
+}
+
+/**
+ * Liquid `site.baseurl` in either spelling ('' in _config.yml). Every one of
+ * the 56 occurrences in `_texts` sits outside code fences and is immediately
+ * followed by `/`, so collapsing it to nothing turns the path site-root
+ * absolute (`/assets/…`) — a global replace is safe. (The unrelated
+ * `{{CONTENT}}` token in LaTeX.md is not matched.)
+ */
+const LIQUID_BASEURL_RE = /\{\{\s*site\.baseurl\s*\}\}/g;
+
+/**
+ * The single legacy image whose file exists nowhere (not even on the old site):
+ * `_texts/Replica.md`'s 4-space-indented `![](images/2022-06-25-12-16-02.png)`.
+ * The `2022-06-25-12-16-02` basename is unique across `_texts` (verified), so
+ * matching that whole line is unambiguous and cannot touch other paths.
+ */
+const MISSING_REPLICA_IMAGE_RE =
+  /^[ \t]*!\[[^\]]*\]\([^)]*2022-06-25-12-16-02\.png[^)]*\)[ \t]*(?:\r?\n|$)/gm;
+
+/** Clean a raw legacy body for rendering/excerpting (never edits `_texts`). */
+function normalizeLegacyBody(body: string): string {
+  return body
+    .replace(LIQUID_BASEURL_RE, "")
+    .replace(MISSING_REPLICA_IMAGE_RE, "");
 }
 
 function readPost(file: string): LegacyPost | null {
   const raw = fs.readFileSync(path.join(textsDir, file), "utf8");
   const { data, content } = matter(raw);
+  const body = normalizeLegacyBody(content);
   const title = typeof data.title === "string" ? data.title.trim() : file.replace(/\.md$/, "");
   const date = normalizeDate(data.date);
   const category = String(data.category ?? "").toLowerCase();
@@ -189,10 +397,10 @@ function readPost(file: string): LegacyPost | null {
     title,
     date,
     category: category as LegacyCategory,
-    lang: detectLang(content),
-    minutes: readingMinutes(content),
-    excerpt: firstParagraph(content),
-    body: content,
+    lang: detectLang(body),
+    minutes: readingMinutes(body),
+    excerpt: excerptLed(body).plain,
+    body,
     oldPath: `/texts/${base}/`,
   };
 }

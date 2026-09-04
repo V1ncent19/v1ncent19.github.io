@@ -1,0 +1,28 @@
+<svg
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- outer travel badge rings -->
+  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
+  <circle cx="50" cy="50" r="35"/>
+
+  <!-- fir cluster, staggered heights -->
+  <path d="M30 34 L23 67 L37 67 Z"/>
+  <path d="M47 58 L41 67 L53 67 Z"/>
+  <path d="M59 46 L53.5 67 L64.5 67 Z"/>
+
+  <!-- round deciduous tree -->
+  <line x1="67" y1="60" x2="67" y2="67"/>
+  <circle cx="67" cy="54" r="7"/>
+
+  <!-- ground line -->
+  <line x1="22" y1="67" x2="78" y2="67"/>
+
+  <!-- grass ticks -->
+  <path d="M24 67 L23 63 M26 67 L25.5 63.5 M28 67 L27 63"/>
+</svg>

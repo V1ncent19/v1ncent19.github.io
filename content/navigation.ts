@@ -26,7 +26,7 @@ export const navItems: NavItem[] = [
     label: { en: "Home", zh: "首页" },
     summary: { en: "Home", zh: "首页" },
     href: "/",
-    hrefZh: "/",
+    hrefZh: "/zh",
   },
   {
     id: "about",

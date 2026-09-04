@@ -27,7 +27,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
 
   return (
     <section className="shell pb-24 pt-10">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
         <ProjectDetail project={project} lang="en" />
       </div>
     </section>

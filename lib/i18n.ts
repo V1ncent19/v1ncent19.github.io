@@ -32,6 +32,7 @@ export interface Copy {
     interests: string;
     interestsLead: string;
     honors: string;
+    publications: string;
     artifacts: string;
     edition: string;
   };
@@ -124,8 +125,9 @@ export const copy: Record<Lang, Copy> = {
       now: "Now",
       interests: "Interests",
       interestsLead:
-        "Where my reading leans: theoretical statistics, statistical physics, and their intersection with machine learning.",
+        "The theory of statistics under heavy tails and shape constraints — robust, minimax-optimal, and distribution-free methods in high dimensions.",
       honors: "Honors & awards",
+      publications: "Publications",
       artifacts: "Notes & works",
       edition:
         "Web edition of the academic record — the formal, most current version is the downloadable PDF.",
@@ -224,8 +226,9 @@ export const copy: Record<Lang, Copy> = {
       from: "来自",
       now: "现在",
       interests: "研究兴趣",
-      interestsLead: "阅读与研究上的偏好：理论统计、统计物理，以及与机器学习的交叉。",
+      interestsLead: "重尾与形状约束下的统计理论——高维中的稳健、极小极大与无分布方法。",
       honors: "获奖与荣誉",
+      publications: "发表论文",
       artifacts: "笔记与作品",
       edition: "学术履历网页版——正式且最新的完整记录以 PDF 为准。",
     },

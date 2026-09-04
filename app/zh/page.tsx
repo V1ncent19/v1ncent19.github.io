@@ -15,7 +15,7 @@ export default function ZhHomePage() {
   const s = copy.zh;
   return (
     <section className="shell pb-20">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
         <header className="pt-2 sm:pt-4">
           <p className="ui-text mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand">
             {labelFor("home", "zh")}

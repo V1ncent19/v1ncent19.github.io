@@ -1,0 +1,42 @@
+<svg
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- outer badge rings -->
+  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
+  <circle cx="50" cy="50" r="35"/>
+
+  <!-- maple leaf -->
+  <path d="
+    M50 22
+    L46 34
+    L40 30
+    L42 41
+    L32 37
+    L36 48
+    L26 46
+    L36 57
+    L32 64
+    L46 61
+    L48 70
+    L52 70
+    L54 61
+    L68 64
+    L64 57
+    L74 46
+    L64 48
+    L68 37
+    L58 41
+    L60 30
+    L54 34
+    Z
+  "/>
+
+  <!-- stem -->
+  <line x1="50" y1="70" x2="50" y2="77"/>
+</svg>

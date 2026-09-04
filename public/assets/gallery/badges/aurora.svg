@@ -1,0 +1,32 @@
+<svg
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- outer badge rings -->
+  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
+  <circle cx="50" cy="50" r="35"/>
+
+  <!-- stars -->
+  <line x1="31" y1="27" x2="31" y2="31"/>
+  <line x1="29" y1="29" x2="33" y2="29"/>
+  <line x1="69" y1="24" x2="69" y2="28"/>
+  <line x1="67" y1="26" x2="71" y2="26"/>
+
+  <!-- aurora bands -->
+  <path d="M24 33 C33 24 43 24 50 31 C57 38 66 38 76 29"/>
+  <path d="M22 41 C31 35 40 35 48 41 C56 47 66 47 78 40"/>
+  <path d="M27 49 C36 44 45 44 53 49 C60 53 68 54 74 49"/>
+
+  <!-- landscape -->
+  <path d="M24 69 L34 58 L44 67 L52 60 L61 68 L70 57 L76 64"/>
+  <line x1="24" y1="69" x2="76" y2="69"/>
+
+  <!-- water / snow reflection lines -->
+  <line x1="32" y1="74" x2="44" y2="74"/>
+  <line x1="50" y1="74" x2="68" y2="74"/>
+</svg>
