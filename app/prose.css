@@ -147,7 +147,7 @@
   border-radius: var(--radius-md);
 }
 
-/* Legacy blog bodies embed <video>; preflight already caps size — this adds
+/* Blog bodies embed <video>; preflight already caps size — this adds
  * figure rhythm, rounded corners, and a letterbox tone before frames load. */
 .prose video {
   display: block;

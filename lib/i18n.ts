@@ -5,7 +5,7 @@
  * shell / component chrome that the layout renders.
  */
 import type { CvSectionId } from "@/content/cv/entries";
-import type { LegacyCategory } from "@/lib/legacy";
+import type { BlogCategory } from "@/lib/blog";
 import type { ProjectStatus, ProjectType } from "@/lib/content";
 
 export type Lang = "en" | "zh";
@@ -61,7 +61,7 @@ export interface Copy {
     minRead: string;
     /** Back-link label from a post page to the blog index. */
     allPosts: string;
-    category: Record<LegacyCategory, string>;
+    category: Record<BlogCategory, string>;
     lang: { zh: string; en: string; mix: string };
     empty: string;
   };

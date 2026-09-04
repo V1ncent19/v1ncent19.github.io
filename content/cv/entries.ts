@@ -1,13 +1,10 @@
-/** Structured CV entries, migrated from the old `Experiences.md` page plus the
- * education timeline that already appears publicly on the old site
- * (About_en.md / index.html). Source content is preserved; no facts invented.
- * The formal, complete CV remains the downloadable PDF.
- *
- * The `research` (研究经历) section mirrors the Experiences list, `education`
- * the full Education list (incl. the M.S. and the statistics minor), and
- * `publications` the Publications section of `assets/pdf/cv.tex` (2026-09-04) —
- * same entries, same order, same wording; entries the tex no longer carries
- * were dropped. */
+/** Structured CV entries for the Experience page: the `research` (研究经历)
+ * section mirrors the Experiences list, `education` the full Education list
+ * (incl. the M.S. and the statistics minor), and `publications` the
+ * Publications section of the formal CV (2026-09-04) — same entries, same
+ * order, same wording. Source content is preserved; no facts invented. The
+ * formal, complete CV remains the downloadable PDF shipped at
+ * /assets/cv/v1ncent19-cv-en.pdf (public/assets/cv/). */
 
 export interface CvEntry {
   title: string;
@@ -143,7 +140,7 @@ export interface Publication {
   href?: string;
 }
 
-/** Publications, newest first — mirrors the Publications section of cv.tex. */
+/** Publications, newest first — mirrors the Publications section of the CV. */
 export const publications: Publication[] = [
   {
     authors: "Peng, T., Prasadan, A., & Neykov, M.",

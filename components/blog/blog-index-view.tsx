@@ -3,23 +3,23 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ArrowRight, BookOpen, Search } from "lucide-react";
-import type { BlogPostCard, LegacyCategory } from "@/lib/legacy";
+import type { BlogPostCard, BlogCategory } from "@/lib/blog";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
 import { POST_TONE } from "./post-tone";
 import { LedText } from "./led-text";
 
-const CAT_ORDER: LegacyCategory[] = ["knowledge", "cuisine", "documentation"];
+const CAT_ORDER: BlogCategory[] = ["knowledge", "cuisine", "documentation"];
 
 /** `id` of the category-chip strip — the `/blog#category` scroll target. */
 const CATEGORY_ANCHOR_ID = "category";
 
 /** Turn the current `#hash` into a category, or null when it is not one. */
-function categoryFromHash(): LegacyCategory | null {
+function categoryFromHash(): BlogCategory | null {
   if (typeof window === "undefined") return null;
   const h = window.location.hash.slice(1).trim().toLowerCase();
   return (CAT_ORDER as readonly string[]).includes(h)
-    ? (h as LegacyCategory)
+    ? (h as BlogCategory)
     : null;
 }
 
@@ -59,7 +59,7 @@ export function BlogIndexView({
 }) {
   const s = copy[lang];
   const [query, setQuery] = useState("");
-  const [activeCat, setActiveCat] = useState<"all" | LegacyCategory>("all");
+  const [activeCat, setActiveCat] = useState<"all" | BlogCategory>("all");
   const [oldestFirst, setOldestFirst] = useState(false);
 
   // Deep-link support: opening /blog#cuisine (or the zh index) selects that
@@ -80,7 +80,7 @@ export function BlogIndexView({
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  function selectCategory(cat: "all" | LegacyCategory) {
+  function selectCategory(cat: "all" | BlogCategory) {
     setActiveCat(cat);
     // Mirror the choice into the hash (replace, not push) so a filtered view
     // is shareable without littering the browser history.
@@ -90,7 +90,7 @@ export function BlogIndexView({
   }
 
   const counts = useMemo(() => {
-    const map = new Map<LegacyCategory, number>();
+    const map = new Map<BlogCategory, number>();
     for (const cat of CAT_ORDER) map.set(cat, 0);
     for (const p of posts) map.set(p.category, (map.get(p.category) ?? 0) + 1);
     return map;

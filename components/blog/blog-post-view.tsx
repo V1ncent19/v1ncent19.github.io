@@ -6,8 +6,8 @@ import { POST_TONE } from "@/components/blog/post-tone";
 import { StickyBackLink } from "@/components/blog/sticky-back-link";
 import { LedText } from "@/components/blog/led-text";
 import { hydrateMath } from "@/lib/lede-math";
-import type { LegacyLang, LegacyPost } from "@/lib/legacy";
-import { blogPostPath, titleLed } from "@/lib/legacy";
+import type { BlogLang, BlogPost } from "@/lib/blog";
+import { blogPostPath, titleLed } from "@/lib/blog";
 import { copy } from "@/lib/i18n";
 
 const EN_MONTHS = [
@@ -16,7 +16,7 @@ const EN_MONTHS = [
 ];
 
 /** Deterministic day string (no locale API → identical on server & client). */
-function formatDay(iso: string, lang: LegacyLang): string {
+function formatDay(iso: string, lang: BlogLang): string {
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return iso;
   if (lang === "zh") return `${y}年${m}月${d}日`;
@@ -24,15 +24,15 @@ function formatDay(iso: string, lang: LegacyLang): string {
 }
 
 /**
- * Single legacy post page (`/blog/[year]/[slug]`). Content stays in the
- * language it was written in (posts are not translated); only this page is a
- * canonical English-interface route, mirroring the Blog index — the zh index
- * lists the same posts. Reads full markdown from the legacy `_texts` source
- * and renders it with GFM + KaTeX. The back link is sticky below the pinned
- * nav (StickyBackLink); the content column is the site-wide home width
+ * Single post page (`/blog/[year]/[slug]`). Content stays in the language it
+ * was written in (posts are not translated); only this page is a canonical
+ * English-interface route, mirroring the Blog index — the zh index lists the
+ * same posts. Reads full markdown from `content/blog/*.md` and renders it with
+ * GFM + KaTeX. The back link is sticky below the pinned nav
+ * (StickyBackLink); the content column is the site-wide home width
  * (max-w-5xl), like every other page.
  */
-export function BlogPostView({ post }: { post: LegacyPost }) {
+export function BlogPostView({ post }: { post: BlogPost }) {
   const s = copy.en;
   const tone = POST_TONE[post.category];
   const contentLang = post.lang === "zh" ? "zh" : undefined;

@@ -20,7 +20,7 @@ import type { ReactNode } from "react";
 import type { NavId, NavItem } from "@/content/navigation";
 import { homeCards } from "@/content/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
-import { getLegacyPosts, type LegacyCategory } from "@/lib/legacy";
+import { getBlogPosts, type BlogCategory } from "@/lib/blog";
 import { copy, formatMonth } from "@/lib/i18n";
 import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
@@ -104,7 +104,7 @@ const toneSeq: ToneName[] = ["brand", "accent", "brand", "tertiary", "accent"];
 /* Feed chip tones — page-local (the Blog index keeps components/blog/post-tone.ts).
    Colour carries the post's category; the group-hover fill mirrors the DocRow
    icon-chip treatment (2026-09-04): soft tone → solid tone fill on hover. */
-const POST_TONE: Record<LegacyCategory, string> = {
+const POST_TONE: Record<BlogCategory, string> = {
   knowledge:
     "bg-brand-soft text-brand transition-colors group-hover:bg-brand group-hover:text-on-brand",
   cuisine:
@@ -148,7 +148,7 @@ function recentPosts(limit = 5): FeedItem[] {
   const en = copy.en;
   const items: FeedItem[] = [];
 
-  for (const p of getLegacyPosts()) {
+  for (const p of getBlogPosts()) {
     items.push({
       key: `post-${p.slug}`,
       href: `/blog/${p.date.slice(0, 4)}/${p.slug}`,

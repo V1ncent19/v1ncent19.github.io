@@ -1,9 +1,9 @@
 import { Fragment, type ReactNode } from "react";
-import type { LedPart } from "@/lib/legacy";
+import type { LedPart } from "@/lib/blog";
 
 /**
  * Renders a card lede (text + inline-math segments) produced by
- * lib/legacy.ts. Math segments carry pre-rendered KaTeX html (filled by
+ * lib/blog.ts. Math segments carry pre-rendered KaTeX html (filled by
  * lib/lede-math.ts), so this component is client-safe and stateless. When a
  * search `query` is active, matching substrings inside TEXT segments are
  * wrapped in <mark class="led-mark"> — math segments are never split (matches

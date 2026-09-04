@@ -1,4 +1,4 @@
-import type { LegacyCategory } from "@/lib/legacy";
+import type { BlogCategory } from "@/lib/blog";
 
 /**
  * Per-category chip/dot tones shared by the Blog index cards and the single
@@ -11,7 +11,7 @@ export interface PostTone {
   value: string;
 }
 
-export const POST_TONE: Record<LegacyCategory, PostTone> = {
+export const POST_TONE: Record<BlogCategory, PostTone> = {
   knowledge: {
     chip: "bg-brand-soft text-brand",
     dot: "bg-brand",

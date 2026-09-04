@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gallery:gen": "node scripts/gallery.mjs",
-    "blog:media:sync": "node scripts/sync-blog-media.mjs"
+    "gallery:gen": "node scripts/gallery.mjs"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",

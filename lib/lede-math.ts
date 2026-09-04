@@ -1,6 +1,6 @@
 /**
  * Build-time KaTeX rendering for card ledes (blog index / search, and the
- * article-page title). The pure tokenizer in lib/legacy.ts carves a run into
+ * article-page title). The pure tokenizer in lib/blog.ts carves a run into
  * text + inline-math segments with `html` left empty; this module fills the
  * math segments with server-rendered KaTeX so client components never need to
  * bundle katex or re-run parsing. Content is the site owner's hand-authored
@@ -13,9 +13,9 @@ import {
   ledSearchText,
   titleLed,
   type BlogPostCard,
+  type BlogPost,
   type LedPart,
-  type LegacyPost,
-} from "@/lib/legacy";
+} from "@/lib/blog";
 
 function renderTex(tex: string): string {
   try {
@@ -37,8 +37,8 @@ export function hydrateMath(parts: LedPart[]): LedPart[] {
   );
 }
 
-/** Turn a legacy post into the serialisable BlogPostCard the index renders. */
-export function toBlogCard(post: LegacyPost): BlogPostCard {
+/** Turn a blog post into the serialisable BlogPostCard the index renders. */
+export function toBlogCard(post: BlogPost): BlogPostCard {
   const rawTitle = titleLed(post.title);
   const lede = excerptLed(post.body);
   return {

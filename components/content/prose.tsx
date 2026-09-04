@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 
 /**
- * Legacy blog `<video>` markup predates `controls` and `playsinline` and
+ * Blog `<video>` markup predates `controls` and `playsinline` and
  * carries attributes we don't want reaching React (lowercase boolean attrs,
  * repeated `id="video"`, vendor keys `webkit-playsinline` / `x-webkit-airplay`).
  * Every video renders with one canonical, React-cased attribute set — autoPlay +
@@ -60,7 +60,7 @@ function rehypeRecCapsule(): (tree: HNode) => void {
 /**
  * Renders an author markdown string (About/Project/Blog bodies) as
  * server-rendered HTML inside `.prose`. GFM + math (KaTeX) enabled, and
- * rehype-raw admits the legacy blog bodies' inline HTML (`<img>`, `<video>`),
+ * rehype-raw admits the blog bodies' inline HTML (`<img>`, `<video>`),
  * plus About's `<span class="heimu">` spoilers. rehype-raw runs BEFORE
  * rehype-katex (canonical order); rehypeRecCapsule folds recommendation titles
  * into hover pills anywhere in the flow. Content is solely the site owner's
