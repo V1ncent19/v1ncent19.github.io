@@ -28,6 +28,7 @@ import { MathDivider } from "@/components/home/math-divider";
 import { GatewayReveal } from "@/components/home/gateway-reveal";
 import { GatewayLink } from "@/components/home/gateway-link";
 import { SitePv } from "@/components/home/busuanzi";
+import { SiteComments } from "@/components/home/giscus-count";
 
 type SectionId = Exclude<NavId, "home">;
 
@@ -519,13 +520,14 @@ export default function HomePage() {
 
               {/* Site metadata (2026-09-05, Task D #8) — compact row card in
                   place of the old three StatTiles. Page views are LIVE via
-                  busuanzi 3.6.9 (official CDN), offset by the legacy baseline
-                  from content/profile.json; the giscus count lands once posts
-                  have live comment sections, and the license text is editable
-                  in content/profile.json. */}
+                  busuanzi 3.6.9 (official backend), offset by the legacy
+                  baseline from content/profile.json; the comment count is
+                  summed live from the repo's GitHub Discussions (same source
+                  giscus renders); the license text is editable in
+                  content/profile.json. */}
               <section className="mt-12">
                 <ModuleHeader
-                  caption="Page views (live via busuanzi + legacy baseline), giscus comments and the site license."
+                  caption="Page views (live via busuanzi + legacy baseline), comments (live from GitHub Discussions) and the site license."
                 >
                   Site Metadata
                 </ModuleHeader>
@@ -539,8 +541,8 @@ export default function HomePage() {
                   <MetaRow
                     icon={MessageSquare}
                     label="Comments"
-                    note="giscus — appears once posts go live"
-                    value="0"
+                    note="giscus — summed across all site discussions"
+                    value={<SiteComments />}
                   />
                   <MetaRow
                     icon={Scale}
