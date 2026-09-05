@@ -22,5 +22,9 @@
   "legacyStats": {
     "sitePvBaseline": 0,
     "siteUvBaseline": 0
+  },
+  "license": {
+    "label": "",
+    "href": ""
   }
 }

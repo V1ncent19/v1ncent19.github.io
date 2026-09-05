@@ -10,18 +10,24 @@
  *   2. maintains content/gallery/items.json, the gallery manifest.
  *
  * items.json is the source of truth for the HUMAN fields — the bilingual text
- * block (place / placeLocal / title / alt, each as `*_en` + `*_zh`) plus the
- * shared `country_code`, `originalUrl`, `color`, `badge`. The script never
- * overwrites those: it merges the generated fields (real EXIF capture date,
- * EXIF GPS lat/lon, oriented dimensions, asset URLs) into rows matched by the
- * original filename, appends rows for new originals, and warns (rather than
- * deletes) when a source file is gone. Delete a row from items.json to remove
- * a photo.
+ * block (place / placeLocal / title as `*_en` + `*_zh`, plus a SINGLE
+ * language-neutral `alt`), the curated `featured` flag, and the shared
+ * `country_code`, `originalUrl`, `badge`. The script never overwrites those:
+ * it merges the generated fields (real EXIF capture date, EXIF GPS lat/lon,
+ * oriented dimensions, asset URLs) into rows matched by the original filename,
+ * appends rows for new originals, and warns (rather than deletes) when a source
+ * file is gone. Delete a row from items.json to remove a photo.
  *
- * The pre-bilingual single-language keys `place` / `placeLocal` / `title` /
- * `alt` (English default) are migrated to their `*_en` equivalents and then
- * blanked on the first run over an old manifest, so no hand-written caption is
- * lost when upgrading to the 8-field model.
+ * `color` is an OUTPUT of the `featured` flag, not a hand field any more: each
+ * run derives it — featured (curated) rows get the curated orange-red accent
+ * (CURATED_HEX, matching `--curated` in the light theme), everything else ""
+ * (the default-blue site brand). The UI recolours from `featured` live, so the
+ * manifest value is refreshed for inspection / parity on every run.
+ *
+ * Older-manifest migrations: the retired bilingual `alt` (`alt_en` + `alt_zh`)
+ * and the pre-bilingual single keys `place` / `placeLocal` / `title` / `alt`
+ * are folded into the current fields and dropped, so no hand-written caption is
+ * lost when upgrading.
  *
  * EXIF extraction: orientation is applied via sharp's autoOrient() so stored
  * width/height always reflect the on-screen image; `date` comes from
@@ -47,6 +53,12 @@ const THUMB_LONG = 480; // masonry grid
 const LARGE_LONG = 1680; // lightbox
 const QUALITY = 78;
 const MAX_ORPHANS = 20; // stop before 100s of stale warnings spam
+
+/** Accent written into `color` for `featured` (curated) rows — matches the
+ * light-theme `--curated` in globals.css. Non-featured rows keep "" (default
+ * site brand). The UI derives the live accent from the `featured` flag, so this
+ * value is informational / for manifest inspection; it is refreshed each run. */
+const CURATED_HEX = "#c8441f";
 
 /* ------------------------------------------------------------------------ */
 
@@ -184,7 +196,7 @@ async function main() {
     const meta = await exifMeta(srcAbs);
     const { date, lat, lon } = meta;
 
-    rows.push({
+    const row = {
       // human fields — preserved from the previous manifest when present
       ...(prior ?? {}),
       // id/source are the join keys; source filename always wins
@@ -205,22 +217,28 @@ async function main() {
       placeLocal_zh: prior?.placeLocal_zh ?? "",
       title_en: prior?.title_en || prior?.title || "",
       title_zh: prior?.title_zh ?? "",
-      alt_en: prior?.alt_en || prior?.alt || "",
-      alt_zh: prior?.alt_zh ?? "",
+      // `alt` is single + language-neutral: keep the authored value, or fold
+      // the retired bilingual/single forms in on the first run over an old file.
+      alt: prior?.alt || prior?.alt_en || prior?.alt_zh || "",
       originalUrl: prior?.originalUrl ?? "",
-      color: prior?.color ?? "",
+      // `featured` (curated flag) is human-authored; `color` derives from it on
+      // every run — featured → curated orange-red accent, else "" (default blue).
+      featured: prior?.featured === true,
+      color: prior?.featured === true ? CURATED_HEX : "",
       badge: prior?.badge ?? "",
       thumb: `/assets/gallery/thumb/${id}.webp`,
       large: `/assets/gallery/large/${id}.webp`,
       width: largeInfo.width,
       height: largeInfo.height,
-      // blank the retired single-language keys (migrated to *_en above) so the
-      // next pass over a clean manifest carries no stale duplicate fields.
-      place: "",
-      placeLocal: "",
-      title: "",
-      alt: "",
-    });
+    };
+    // Retired key forms (single-language place/title/alt, bilingual alt_en/zh)
+    // must not ride along in the merged row forever.
+    delete row.place;
+    delete row.placeLocal;
+    delete row.title;
+    delete row.alt_en;
+    delete row.alt_zh;
+    rows.push(row);
   }
 
   // Rows whose source no longer exists: keep them (user metadata is precious)

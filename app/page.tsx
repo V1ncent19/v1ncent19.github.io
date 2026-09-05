@@ -11,9 +11,9 @@ import {
   GitBranch,
   GraduationCap,
   MessageSquare,
+  Scale,
   Sigma,
   User,
-  Users,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -216,7 +216,8 @@ export default function HomePage() {
     (p) => p.meta.slug === "high-dimensional-statistics-note-2024-2025",
   );
   const cvHref = profile.cv.en;
-  const { sitePvBaseline, siteUvBaseline } = profile.legacyStats;
+  const { sitePvBaseline } = profile.legacyStats;
+  const license = profile.license ?? { label: "", href: "" };
 
   return (
     <div className="pb-16">
@@ -470,28 +471,38 @@ export default function HomePage() {
                 ))}
               </ul>
 
-              {/* Site Statistics — static structure; PV/UV resume from the
-                  legacy busuanzi baseline, giscus counts land once posts have
-                  comment sections. Wired at deployment. */}
+              {/* Site metadata (2026-09-05, Task D #8) — compact row card in
+                  place of the old three StatTiles. Page views resume from the
+                  legacy busuanzi baseline, the giscus count lands once posts
+                  have live comment sections, and the license text is editable
+                  in content/profile.json. Wired at deployment. */}
               <section className="mt-12">
                 <ModuleHeader
-                  caption="Page views and giscus comment activity — live counters connect here at deployment."
+                  caption="Page views, giscus comments and the site license — live counters connect here at deployment."
                 >
-                  Site Statistics
+                  Site Metadata
                 </ModuleHeader>
-                <div className="grid grid-cols-3 gap-3">
-                  <StatTile
+                <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+                  <MetaRow
                     icon={Eye}
-                    value={countOf(sitePvBaseline)}
                     label="Page views"
+                    note="All-time, from the legacy baseline"
+                    value={countOf(sitePvBaseline)}
                   />
-                  <StatTile
-                    icon={Users}
-                    value={countOf(siteUvBaseline)}
-                    label="Visitors"
+                  <MetaRow
+                    icon={MessageSquare}
+                    label="Comments"
+                    note="giscus — appears once posts go live"
+                    value="0"
                   />
-                  <StatTile icon={MessageSquare} value="0" label="Comments" />
-                </div>
+                  <MetaRow
+                    icon={Scale}
+                    label="License"
+                    note="Content & code reuse terms"
+                    value={license.label.trim() || "—"}
+                    href={license.href || undefined}
+                  />
+                </ul>
               </section>
             </div>
           </div>
@@ -608,25 +619,58 @@ function RecentPostList({ items }: { items: FeedItem[] }) {
   );
 }
 
-function StatTile({
+/** One row of the Site Metadata card: icon chip + small-caps label (+ optional
+ * muted note) on the left, the value right-aligned. A linked value (license)
+ * renders as a brand link. */
+function MetaRow({
   icon: Icon,
-  value,
   label,
+  note,
+  value,
+  href,
 }: {
   icon: LucideIcon;
-  value: string;
   label: string;
+  note?: string;
+  value: string;
+  href?: string;
 }) {
+  const valueNode = href ? (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="group/value inline-flex max-w-[55%] items-center gap-1 text-right font-serif text-base font-bold tracking-tight text-brand hover:no-underline sm:text-lg"
+    >
+      <span className="truncate">{value}</span>
+      <ArrowRight
+        className="h-4 w-4 shrink-0 transition-transform group-hover/value:translate-x-0.5"
+        aria-hidden
+      />
+    </a>
+  ) : (
+    <span className="font-serif text-lg font-bold tabular-nums tracking-tight text-ink">
+      {value}
+    </span>
+  );
+
   return (
-    <div className="rounded-xl border border-line bg-surface p-3 shadow-sm">
-      <Icon className="h-4 w-4 text-brand" aria-hidden strokeWidth={1.8} />
-      <span className="mt-1.5 block font-serif text-2xl font-bold tabular-nums tracking-tight">
-        {value}
+    <li className="flex items-center gap-3.5 px-4 py-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-sink text-brand">
+        <Icon className="h-[18px] w-[18px]" aria-hidden strokeWidth={1.9} />
       </span>
-      <span className="ui-text mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
-        {label}
-      </span>
-    </div>
+      <div className="min-w-0 flex-1">
+        <span className="ui-text block text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
+          {label}
+        </span>
+        {note ? (
+          <span className="ui-text block truncate text-[11px] text-faint">
+            {note}
+          </span>
+        ) : null}
+      </div>
+      {valueNode}
+    </li>
   );
 }
 

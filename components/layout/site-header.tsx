@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { ArrowUp } from "lucide-react";
 import { navItems, type NavItem } from "@/content/navigation";
 import { site } from "@/lib/site";
 import { LangSwitch } from "@/components/layout/lang-switch";
@@ -52,9 +53,27 @@ function chipClasses(active: boolean) {
   ].join(" ");
 }
 
+/** Normalise a route for equality: "/blog/" and "/blog" are the same page. */
+function normalizePath(p: string): string {
+  return p === "/" || p === "/zh" ? p : p.replace(/\/+$/, "") || "/";
+}
+
+/**
+ * Task D #1 — clicking the nav chip for the page you are ALREADY on (the active
+ * route, exactly) scrolls back to the top instead of doing nothing. Easing is
+ * opted-in per call (smooth, unless the OS asks for reduced motion); the global
+ * html rule keeps every *automatic* Next.js scroll instant.
+ */
+function scrollTopSmooth() {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
   const lang = uiLang(pathname);
+  /** A11y label for the capsule back-to-top control (appears once pinned). */
+  const topLabel = lang === "zh" ? "回到顶部" : "Back to top";
 
   // Once the capsule has actually pinned to the top (the identity block has
   // scrolled away) it turns into white frosted glass. Detection: a sticky
@@ -136,6 +155,14 @@ export function SiteHeader() {
                     <Link
                       href={target}
                       aria-current={active ? "page" : undefined}
+                      onClick={(e) => {
+                        // Clicking the chip for the very page we are on does not
+                        // navigate — make it scroll back to the top instead.
+                        if (normalizePath(target) === normalizePath(pathname)) {
+                          e.preventDefault();
+                          scrollTopSmooth();
+                        }
+                      }}
                       className={chipClasses(active)}
                     >
                       {item.label[lang]}
@@ -147,9 +174,42 @@ export function SiteHeader() {
 
             <span aria-hidden className="mx-1 hidden h-6 w-px shrink-0 bg-line sm:block" />
 
-            <div className="ui-text flex shrink-0 items-center gap-2">
-              <LangSwitch />
-              <ThemeToggle />
+            <div className="flex shrink-0 items-center">
+              {/* Back to top (Task D #5): slides in to the LEFT of the
+                  lang/theme toggles once the capsule pins (the identity block
+                  has scrolled off). Its slot collapses to zero width at rest so
+                  the pill never reflows, and grows smoothly into place. The
+                  button matches the ThemeToggle geometry (h-10 w-10 square). */}
+              <span
+                className={[
+                  "overflow-hidden transition-[width] duration-300 ease-out",
+                  stuck ? "w-10" : "w-0",
+                ].join(" ")}
+              >
+                <button
+                  type="button"
+                  onClick={scrollTopSmooth}
+                  aria-label={topLabel}
+                  title={topLabel}
+                  aria-hidden={!stuck}
+                  tabIndex={stuck ? 0 : -1}
+                  className="ui-text inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line-strong bg-surface text-brand shadow-sm transition-colors hover:bg-surface-tint hover:text-brand-strong hover:no-underline"
+                >
+                  <ArrowUp className="h-4 w-4" aria-hidden strokeWidth={2} />
+                </button>
+              </span>
+              {/* animated gap — only while the top control is showing */}
+              <span
+                aria-hidden
+                className={[
+                  "shrink-0 overflow-hidden transition-[width] duration-300 ease-out",
+                  stuck ? "w-2" : "w-0",
+                ].join(" ")}
+              />
+              <span className="flex items-center gap-2">
+                <LangSwitch />
+                <ThemeToggle />
+              </span>
             </div>
           </div>
         </div>

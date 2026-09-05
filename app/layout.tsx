@@ -5,7 +5,7 @@ import "katex/dist/katex.min.css";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { BackToTop } from "@/components/layout/back-to-top";
+import { RouteFade } from "@/components/layout/route-fade";
 import { site } from "@/lib/site";
 
 const baseTitle = 'Tuorui "v1ncent19" Peng';
@@ -45,10 +45,12 @@ export default function RootLayout({
         </a>
         <SiteHeader />
         <main id="main" className="flex-1">
-          {children}
+          {/* Client wrapper keys on the pathname so every internal navigation
+              remounts the page content and replays the CSS content fade
+              (Task D #4); first load fades in too. */}
+          <RouteFade>{children}</RouteFade>
         </main>
         <SiteFooter />
-        <BackToTop />
       </body>
     </html>
   );

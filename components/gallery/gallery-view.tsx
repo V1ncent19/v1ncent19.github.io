@@ -8,6 +8,7 @@ import {
   LayoutGrid,
   MapPin,
   Shuffle,
+  Star,
   X,
 } from "lucide-react";
 import {
@@ -17,6 +18,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
 } from "react";
 import type { GalleryItem } from "@/lib/content";
@@ -80,7 +82,42 @@ function formatDotMonth(iso: string): string {
   return `${y}.${m}`;
 }
 
-type LocalField = "place" | "placeLocal" | "title" | "alt";
+/** Whole days from a "YYYY-MM-DD" capture date to today (0 = today; null when
+ * the date is missing). Both instants are local midnights compared as UTC so a
+ * daylight-saving shift can never make the count one day off. */
+function wholeDays(iso: string): number | null {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const today = new Date();
+  const then = new Date(y, m - 1, d);
+  const midnight = (t: Date) =>
+    Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
+  return Math.round((midnight(today) - midnight(then)) / 86400000);
+}
+
+/** Relative age for the hover card ("N days ago" / "N 天前"); null when the
+ * date is missing or in the future (caller then keeps the absolute date). */
+function daysAgoLabel(iso: string, lang: Lang): string | null {
+  const days = wholeDays(iso);
+  if (days === null || days < 0) return null;
+  if (days === 0) return lang === "zh" ? "今天" : "Today";
+  if (days === 1) return lang === "zh" ? "昨天" : "Yesterday";
+  return lang === "zh" ? `${days} 天前` : `${days} days ago`;
+}
+
+/**
+ * Stable partition that lifts curated (featured) rows to the front while
+ * keeping each group in the caller's given order. Used by the default (date)
+ * view so the featured picks lead the grid (Task D #2).
+ */
+function curatedFirst<T extends { featured: boolean }>(list: readonly T[]): T[] {
+  const curated: T[] = [];
+  const rest: T[] = [];
+  for (const item of list) (item.featured ? curated : rest).push(item);
+  return curated.concat(rest);
+}
+
+type LocalField = "place" | "placeLocal" | "title";
 
 /** Read the language-localised field, falling back to the other language. */
 function localized(
@@ -134,14 +171,57 @@ function coordsLine(item: GalleryItem): string | null {
 /**
  * Per-item theme accent as CSS variables: `--tile-accent` (the strong colour —
  * resting dot, badge + hover title) and `--tile-soft` (a translucent tint for
- * badge chips). Falls back to the site brand while `color` is still empty.
+ * badge chips). The `featured` (精选集) flag is the source of truth: featured
+ * photos always take the curated orange-red `--curated` (theme-paired like the
+ * brand, so dark mode gets its brighter shade); everything else falls back to
+ * the site brand — the default blue. `color` in items.json is derived from
+ * `featured` on each gallery:gen run, so for featured rows it is informational
+ * (the live accent keys off the flag and recolours instantly when you flip it);
+ * for non-featured rows a hand-written `color` still acts as an override.
  */
 function accentVars(item: GalleryItem): CSSProperties {
-  const accent = item.color.trim() || "var(--brand)";
+  const accent =
+    item.featured === true
+      ? "var(--curated)"
+      : item.color.trim() || "var(--brand)";
   return {
     "--tile-accent": accent,
     "--tile-soft": `color-mix(in srgb, ${accent} 13%, transparent)`,
   } as CSSProperties;
+}
+
+/**
+ * Decorative world map for the open card. The sheet is an external amCharts
+ * Mercator SVG (public/assets/gallery/worldOutlineLow.svg, kept untouched);
+ * its viewBox is "-2 168.36 964 623.29" and its path data was projected with
+ * the world centred at x = 480 (lon 0) and the equator at y = 610, at 960
+ * viewBox units per 2π radians of longitude.
+ */
+const WORLD_MAP_SRC = "/assets/gallery/worldOutlineLow.svg";
+const WORLD_VB = { x: -2, y: 168.36, w: 964, h: 623.29 } as const;
+
+/**
+ * Mercator-project one lat/lon into the world map's OWN user coordinates.
+ * Returns the raw SVG-space x/y (same coordinate system as the sheet's path,
+ * so the caller places a marker directly at these values — no viewBox-origin
+ * subtraction and no linear lat/lon normalisation). Latitude is clamped to
+ * ±85° so `ln(tan(π/4 + φ/2))` never diverges. Returns null for non-finite
+ * input or a point that projects outside the drawn sheet, so the caller just
+ * omits the marker (never shows a dot at 0,0 or at a faked location).
+ */
+function projectToWorldMap(
+  latitude: number,
+  longitude: number,
+): { x: number; y: number } | null {
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+  const lat = Math.max(-85, Math.min(85, latitude));
+  const scale = 960 / (2 * Math.PI);
+  const x = ((longitude + 180) / 360) * 960;
+  const latRad = lat * (Math.PI / 180);
+  const y = 610 - scale * Math.log(Math.tan(Math.PI / 4 + latRad / 2));
+  if (x < 0 || x > WORLD_VB.w) return null;
+  if (y < WORLD_VB.y || y > WORLD_VB.y + WORLD_VB.h) return null;
+  return { x, y };
 }
 
 /**
@@ -195,6 +275,8 @@ export function GalleryView({
   const unit = lang === "zh" ? "张" : "photos";
 
   const [mode, setMode] = useState<SortMode>("date");
+  /** Curated-collection filter (精选集): when active, only `featured` rows show. */
+  const [featuredOnly, setFeaturedOnly] = useState(false);
   const [shuffleNonce, setShuffleNonce] = useState(0);
   const [prefCols, setPrefCols] = useState<number>(DEFAULT_COLUMNS);
   const [containerW, setContainerW] = useState(0);
@@ -219,11 +301,18 @@ export function GalleryView({
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [closing, setClosing] = useState(false); // drives .gb-overlay-out
 
-  /** Photos in the current display order (default: newest first). */
+  /** Curated filter applied: everything, or only `featured` rows. */
+  const visible = useMemo(
+    () => (featuredOnly ? items.filter((i) => i.featured === true) : items),
+    [items, featuredOnly],
+  );
+
+  /** Photos in the current display order (default: curated picks first, then
+   * newest-first). */
   const ordered = useMemo(() => {
-    if (mode === "shuffle") return shuffleList(items, shuffleNonce);
+    if (mode === "shuffle") return shuffleList(visible, shuffleNonce);
     if (mode === "place") {
-      return [...items].sort((a, b) => {
+      return [...visible].sort((a, b) => {
         const pa = localized(a, "place", lang).toLowerCase();
         const pb = localized(b, "place", lang).toLowerCase();
         if (!pa && pb) return 1; // unlabelled frames sink to the end
@@ -232,11 +321,17 @@ export function GalleryView({
         return (b.date || "").localeCompare(a.date || "");
       });
     }
-    return [...items].sort(
-      (a, b) =>
-        (b.date || "").localeCompare(a.date || "") || a.id.localeCompare(b.id),
+    // Default "by date" (also the landing order): the curated (精选集) picks
+    // form a leading top band, the rest follow newest-first (Task D #2 — all
+    // photos stay visible, featured ones simply lead). Under the featured-only
+    // filter `visible` is already all curated, so the partition is a no-op.
+    return curatedFirst(
+      [...visible].sort(
+        (a, b) =>
+          (b.date || "").localeCompare(a.date || "") || a.id.localeCompare(b.id),
+      ),
     );
-  }, [items, mode, lang, shuffleNonce]);
+  }, [visible, mode, lang, shuffleNonce]);
 
   // Measure the grid once + on resize (state updates only inside rAF / events).
   useEffect(() => {
@@ -305,6 +400,94 @@ export function GalleryView({
     ordered.forEach((item, i) => cols[i % columns].push({ item, index: i }));
     return cols;
   }, [ordered, columns]);
+
+  /* FLIP reorder animation (2026-09-05, Task D #6 — user-approved). When the
+     display order or column count changes (sort chip, featured toggle, column
+     buttons), tiles glide to their new slots instead of teleporting.
+     Mechanics: the previous SETTLED rect of every tile is kept in prevRectsRef
+     (captured on each stable layout). On the first commit whose order signature
+     differs, each still-present tile is snapped back to its old rect (invert),
+     then a double-rAF releases it to rest (play) so the browser interpolates.
+     Tiles that just entered fade in; removed tiles are unmounted before the
+     effect runs. Tiles are keyed by item.id across the whole grid, so even a
+     tile that moves to a different column (React remounts it there) is matched
+     through the id → rect map. Transforms are written to the <button> elements
+     directly — React never sets `transform` on them — so no state churn. Runs
+     in a layout effect so the invert lands before the first painted frame.
+     Reduced motion skips the whole thing (the global rule would flatten it, but
+     this avoids the single-frame snap it would otherwise leave). */
+  const prevSig = useRef<string>("");
+  const prevRects = useRef<Map<string, DOMRect> | null>(null);
+  const animTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const els = Array.from(grid.querySelectorAll<HTMLElement>("[data-gid]"));
+    const now = new Map<string, DOMRect>();
+    for (const el of els) {
+      const id = el.dataset.gid;
+      if (id) now.set(id, el.getBoundingClientRect());
+    }
+    const sig = `${columns}|${ordered.map((i) => i.id).join(",")}`;
+    const prev = prevRects.current;
+    const changed = prevSig.current !== "" && prevSig.current !== sig;
+    prevSig.current = sig;
+    prevRects.current = now;
+    if (!changed || !prev) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    // Invert — snap every persistent tile back to where it just was.
+    for (const el of els) {
+      const id = el.dataset.gid;
+      if (!id) continue;
+      const nr = now.get(id);
+      if (!nr) continue;
+      el.style.transition = "none";
+      const pr = prev.get(id);
+      if (pr && (pr.left !== nr.left || pr.top !== nr.top)) {
+        el.style.transform =
+          `translate(${pr.left - nr.left}px, ${pr.top - nr.top}px)`;
+        el.style.willChange = "transform";
+      } else if (!pr) {
+        el.style.opacity = "0"; // brand-new tile — fade it in
+      }
+    }
+
+    // Play — release everything to rest on the next frames.
+    grid.style.pointerEvents = "none";
+    if (animTimer.current) clearTimeout(animTimer.current);
+    animTimer.current = setTimeout(() => {
+      grid.style.pointerEvents = "";
+      for (const el of els) {
+        el.style.transition = "";
+        el.style.transform = "";
+        el.style.willChange = "";
+        el.style.opacity = "";
+      }
+    }, 480);
+    const raf = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        for (const el of els) {
+          const id = el.dataset.gid;
+          if (!id || !now.has(id)) continue;
+          el.style.transition =
+            "transform 420ms var(--ease), opacity 240ms ease";
+          el.style.transform = "";
+          el.style.opacity = "1";
+        }
+      }),
+    );
+    return () => cancelAnimationFrame(raf);
+  }, [ordered, columns]);
+
+  // Clear a pending FLIP cleanup if the grid unmounts mid-animation.
+  useEffect(
+    () => () => {
+      if (animTimer.current) clearTimeout(animTimer.current);
+    },
+    [],
+  );
 
   function sortTo(next: SortMode) {
     if (next === "shuffle") setShuffleNonce((n) => n + 1);
@@ -521,65 +704,105 @@ export function GalleryView({
     ) : null;
 
   /**
-   * Caption content of the opened card (both layouts): title block LEFT (small
-   * bold accent place · placeLocal over the big serif title), travel-stamp
-   * badge RIGHT. The authored `alt` body (alt_en on the EN route / alt_zh on
-   * ZH, falling back to the other language) renders as a bordered info card
-   * below the header, mirroring the Stitch sample's description box, and the
-   * download button follows that card. The month/country/coords line lives in
-   * the frosted chip over the image instead. Everything sits in ONE wrapper so
-   * the aside lays it out as a top-aligned column and alt + download stay
-   * consecutive (nothing is pinned to the rail bottom any more).
+   * Caption content of the opened card (both layouts). Redesigned 2026-09-05
+   * as an editorial "exhibition card" (user brief): the travel-stamp badge is
+   * now a large emblem / "seal" left-aligned at the top of the rail, the
+   * per-language `place` / `placeLocal` sit beneath as restrained
+   * theme-coloured metadata, the authored `title` is the big serif focal
+   * point, and `alt` reads as a light italic quote under a large decorative
+   * quotation mark. The download link (shown only when the item shares an
+   * `originalUrl`) becomes a full-width CTA that settles at the bottom of the
+   * rail on the two-pane layout (`pin`) while stacked/mobile content flows
+   * naturally. As before, the accent location block is withheld while `title`
+   * is empty — then the heading itself falls back to the place line, so the
+   * two would just duplicate. `alt` is deliberately a SINGLE language-neutral
+   * caption (2026-09-05) — shown verbatim in both languages, never translated.
+   * The month/country/coords line lives in the frosted chip over the image
+   * instead.
    */
-  const captionContent = (item: GalleryItem) => {
-    const altText = localized(item, "alt", lang);
+  const captionContent = (item: GalleryItem, pin: boolean) => {
+    const title = localized(item, "title", lang);
+    const hasTitle = title.length > 0;
+    const place = localized(item, "place", lang);
+    const spot = localized(item, "placeLocal", lang);
+    const altText = item.alt.trim();
+    const heading =
+      "font-serif font-bold text-ink break-words " +
+      (pin
+        ? "text-[1.65rem] leading-[1.2]"
+        : "text-[1.8rem] leading-[1.18] sm:text-[2rem]");
+    // Metadata only beside an authored title (else it would duplicate the
+    // heading's own place fallback); each line shown when it has content.
+    const meta = hasTitle && Boolean(place || spot);
     return (
-      <div className="flex w-full flex-col gap-5">
-        <div className="flex items-start justify-between gap-5">
-          <div className="min-w-0 space-y-2 pt-0.5">
-            {/* The accent kicker only accompanies an authored title — until
-                `title` is filled it would duplicate the h2, so it is withheld
-                and the h2 shows the place by itself. */}
-            {locText(item, lang) && localized(item, "title", lang) ? (
-              <p className="ui-text flex flex-wrap items-center gap-1.5 text-[13px] font-bold text-[var(--tile-accent)] md:text-sm">
-                <MapPin
-                  className="h-4 w-4 shrink-0 text-[var(--tile-accent)]"
-                  aria-hidden
-                />
-                <span>{locText(item, lang)}</span>
-              </p>
-            ) : null}
-            <h2 className="font-serif text-2xl leading-tight font-bold break-words text-ink">
-              {bigTitle(item, lang)}
-            </h2>
-          </div>
+      <div
+        className={pin ? "flex w-full flex-1 flex-col" : "flex w-full flex-col"}
+      >
+        {/* Emblem — the entry's "seal": the stamp enlarged to ~40% of the rail
+            content width, square, on the faint theme tint. Left-aligned at the
+            top to sit flush with the metadata / title below; no heavy card. */}
+        <div className="flex w-full">
           <StampBadge
             preset={item.badge}
-            box="h-14 w-14 shrink-0 rounded-2xl md:h-16 md:w-16"
-            mark="h-9 w-9 md:h-10 md:w-10"
+            box="aspect-square w-[clamp(5rem,40%,7.5rem)] rounded-2xl"
+            mark="h-[62%] w-[62%]"
           />
         </div>
 
-        {/* Authored alt/description, Stitch-style info card. Hidden while the
-            field is empty so there is never a blank box. */}
+        {meta ? (
+          <div className="mt-7">
+            {place ? (
+              <p className="ui-text text-[11.5px] font-bold uppercase tracking-[0.16em] text-[var(--tile-accent)]">
+                {place}
+              </p>
+            ) : null}
+            {spot && spot !== place ? (
+              <p className="ui-text mt-1 text-xs font-semibold text-[var(--tile-accent)] opacity-75">
+                {spot}
+              </p>
+            ) : null}
+            <h2 className={`${heading} mt-4`}>{bigTitle(item, lang)}</h2>
+          </div>
+        ) : (
+          <h2 className={`${heading} mt-7`}>{bigTitle(item, lang)}</h2>
+        )}
+
+        {/* Location map — sits between the title block and the alt quote:
+            a subtle world outline with one breathing dot at the capture point.
+            Decorative (aria-hidden inside); place/date lines carry the info. */}
+        <div className="mt-7">
+          <WorldLocationMap lat={item.lat} lon={item.lon} />
+        </div>
+
+        {/* Alt quote — light editorial treatment, not the old bordered card:
+            a large accent quotation mark with the authored text flowing
+            italic beside/under it. Hidden while the field is empty. */}
         {altText ? (
-          <div className="rounded-xl border border-line bg-surface-tint p-5 shadow-sm">
+          <blockquote className="mt-7">
+            <span
+              aria-hidden
+              className="float-left mr-2 -mt-1 select-none font-serif text-[2.6rem] leading-[0.8] text-[var(--tile-accent)]"
+            >
+              “
+            </span>
             <p className="font-serif text-[15px] leading-relaxed text-muted italic">
               {altText}
             </p>
-          </div>
+          </blockquote>
         ) : null}
 
         {item.originalUrl ? (
-          <a
-            href={item.originalUrl}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="ui-text inline-flex items-center gap-2.5 self-start rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-on-brand shadow-sm transition hover:bg-brand-strong hover:no-underline"
-          >
-            <Download className="h-4 w-4" aria-hidden />
-            {s.gallery.downloadOriginal}
-          </a>
+          <div className={pin ? "mt-auto pt-8" : "mt-7"}>
+            <a
+              href={item.originalUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="ui-text inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-on-brand shadow-sm transition hover:bg-brand-strong hover:no-underline"
+            >
+              <Download className="h-4 w-4" aria-hidden />
+              {s.gallery.downloadOriginal}
+            </a>
+          </div>
         ) : null}
       </div>
     );
@@ -589,7 +812,9 @@ export function GalleryView({
     <section className="shell pb-20">
       <div className="mx-auto max-w-5xl">
         {/* ---- Header / intro ---- */}
-        <header className="flex flex-col justify-between gap-6 pb-8 md:flex-row md:items-end">
+        {/* pt-2 sm:pt-4 keeps the § title row aligned with every other page's
+            header (PageHeader / blog / CV use the same top padding; Task D #3). */}
+        <header className="flex flex-col justify-between gap-6 pt-2 pb-8 sm:pt-4 md:flex-row md:items-end">
           <div className="max-w-2xl space-y-3">
             <h1 className="flex items-center gap-3 text-balance text-4xl tracking-tight sm:text-5xl">
               <span
@@ -651,6 +876,27 @@ export function GalleryView({
             </div>
           </div>
 
+          {/* Curated filter (精选集): narrow the grid to `featured` rows. The
+              accent follows the same rule as the tiles — featured = orange. */}
+          <button
+            type="button"
+            onClick={() => setFeaturedOnly((v) => !v)}
+            aria-pressed={featuredOnly}
+            className={[
+              "ui-text inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors hover:no-underline",
+              featuredOnly
+                ? "border-[var(--curated)] bg-[var(--curated-soft)] text-[var(--curated)]"
+                : "border-line bg-surface text-muted shadow-sm hover:bg-surface-tint hover:text-ink",
+            ].join(" ")}
+          >
+            <Star
+              className="h-3.5 w-3.5"
+              aria-hidden
+              fill={featuredOnly ? "currentColor" : "none"}
+            />
+            {s.gallery.featured}
+          </button>
+
           {/* Column count: 3 / 4 / 5, default 4 (buttons that cannot fit are dimmed) */}
           <div className="ml-auto flex items-center gap-2.5">
             <span className="ui-text hidden items-center gap-1.5 text-xs font-medium uppercase tracking-widest text-muted sm:inline-flex">
@@ -690,21 +936,30 @@ export function GalleryView({
           </div>
         </div>
 
-        {/* ---- Masonry grid (explicit columns) ---- */}
-        <div ref={gridRef} className="mt-8 flex items-start gap-3">
-          {columnList.map((col, ci) => (
-            <div key={ci} className="flex min-w-0 flex-1 flex-col gap-3">
-              {col.map(({ item, index }) => (
-                <GalleryTile
-                  key={item.id}
-                  item={item}
-                  lang={lang}
-                  onOpen={() => openAt(index)}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+        {/* ---- Masonry grid (explicit columns); curated filter with no picks
+            yet renders a friendly empty state instead ---- */}
+        {visible.length === 0 ? (
+          <div className="mt-8 flex items-center justify-center rounded-xl border border-dashed border-line bg-surface-tint/60 px-6 py-14 text-center">
+            <p className="ui-text max-w-md text-sm leading-relaxed text-muted">
+              {s.gallery.featuredEmpty}
+            </p>
+          </div>
+        ) : (
+          <div ref={gridRef} className="mt-8 flex items-start gap-3">
+            {columnList.map((col, ci) => (
+              <div key={ci} className="flex min-w-0 flex-1 flex-col gap-3">
+                {col.map(({ item, index }) => (
+                  <GalleryTile
+                    key={item.id}
+                    item={item}
+                    lang={lang}
+                    onOpen={() => openAt(index)}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* ---- Colophon / storage note ---- */}
         <div className="mt-8 flex items-start gap-3.5 rounded-xl border border-line bg-surface-tint p-5">
@@ -783,7 +1038,7 @@ export function GalleryView({
                   <img
                     key={active.id}
                     src={active.large}
-                    alt={localized(active, "alt", lang) || describe(active, lang)}
+                    alt={active.alt.trim() || describe(active, lang)}
                     className="gb-img-in block h-full w-full select-none"
                   />
                   {stageControls()}
@@ -804,7 +1059,7 @@ export function GalleryView({
                     py-7
                   "
                 >
-                  {captionContent(active)}
+                  {captionContent(active, true)}
                 </aside>
               </figure>
             ) : (
@@ -824,7 +1079,7 @@ export function GalleryView({
                   <img
                     key={active.id}
                     src={active.large}
-                    alt={localized(active, "alt", lang) || describe(active, lang)}
+                    alt={active.alt.trim() || describe(active, lang)}
                     className="gb-img-in h-full w-full object-contain select-none"
                   />
                   {stageControls()}
@@ -833,7 +1088,7 @@ export function GalleryView({
                   style={accentVars(active)}
                   className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-surface p-6 md:p-8"
                 >
-                  {captionContent(active)}
+                  {captionContent(active, false)}
                 </div>
               </figure>
             )}
@@ -869,8 +1124,11 @@ function photoMeta(item: GalleryItem, lang: Lang): string {
 }
 
 /**
- * Tinted square chip that hosts a photo's travel-stamp badge. Colour comes
+ * Tinted square chip that hosts a photo's travel-stamp badge — small on the
+ * masonry hover card, large as the caption rail's emblem/seal. Colour comes
  * from the --tile-accent / --tile-soft CSS vars set by the nearest accentVars.
+ * The caller supplies the full box geometry (size + rounding) so the same
+ * component scales from h-7 tile chip to the ~40%-of-rail emblem.
  */
 function StampBadge({
   preset,
@@ -885,7 +1143,7 @@ function StampBadge({
     <span
       aria-hidden
       className={
-        "flex shrink-0 items-center justify-center rounded-lg bg-[var(--tile-soft)] text-[var(--tile-accent)] " +
+        "flex shrink-0 items-center justify-center bg-[var(--tile-soft)] text-[var(--tile-accent)] " +
         box
       }
     >
@@ -895,13 +1153,66 @@ function StampBadge({
 }
 
 /**
+ * Decorative one-dot location map shown in the open card's caption between the
+ * title and the alt quote. Minimal world outline (external asset, as-is) with
+ * EXACTLY ONE breathing marker at the photo's capture point — no pins, labels,
+ * grid, zoom or controls, and no map library. Purely decorative: place / date
+ * carry the information, so the whole block is aria-hidden.
+ *
+ * The dot is a <circle> in an overlay <svg> that shares the sheet's viewBox, so
+ * it is placed at the RAW projected x/y (projectToWorldMap) — SVG children
+ * already use the sheet's user coordinate system, no viewBox-origin arithmetic.
+ * The overlay box always matches the <img>'s rendered box (same aspect ratio),
+ * so the marker lands exactly on the geographic point at any size. Marker
+ * colour is the card accent via --tile-accent (set on the caption rail). The
+ * halo only animates when motion is allowed; its resting state is opacity 0, so
+ * under prefers-reduced-motion (or before the first tick) it is simply a static
+ * dot. Missing / non-finite / off-sheet coords render the map without a marker.
+ */
+function WorldLocationMap({
+  lat,
+  lon,
+}: {
+  lat: number | null;
+  lon: number | null;
+}) {
+  const pt =
+    lat !== null && lon !== null ? projectToWorldMap(lat, lon) : null;
+  return (
+    <div
+      aria-hidden
+      className="world-map pointer-events-none mx-auto w-[88%] select-none"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={WORLD_MAP_SRC}
+        alt=""
+        draggable={false}
+        className="world-map-img block w-full"
+      />
+      {pt ? (
+        <svg
+          className="world-map-marker"
+          viewBox={`${WORLD_VB.x} ${WORLD_VB.y} ${WORLD_VB.w} ${WORLD_VB.h}`}
+          focusable="false"
+        >
+          <circle className="world-map-halo" cx={pt.x} cy={pt.y} r={11} />
+          <circle className="world-map-core" cx={pt.x} cy={pt.y} r={11} />
+        </svg>
+      ) : null}
+    </div>
+  );
+}
+
+/**
  * One masonry tile. At rest a thin frosted-glass bar floats over the frame's
  * lower edge: a theme-coloured dot + per-language place · YYYY.MM. On hover the
  * frame zooms, the bottom gradient deepens, the whole tile lifts, and the bar
- * morphs into a white card: travel-stamp badge + theme-coloured place title +
- * grey placeLocal line, a divider, then month-year (left) · coordinates
- * (right). The white-card reveal grows to its own height (grid-rows 0fr→1fr),
- * so short and long captions both animate smoothly.
+ * morphs into a themed card (bg-surface, so it follows light/dark — Task D #7):
+ * travel-stamp badge + theme-coloured place title + muted placeLocal line, a
+ * divider, then a relative date — "N days ago" once mounted (left) ·
+ * coordinates (right). The card reveal grows to its own height (grid-rows
+ * 0fr→1fr), so short and long captions both animate smoothly.
  */
 function GalleryTile({
   item,
@@ -921,13 +1232,25 @@ function GalleryTile({
   const rest = base ? `${base} · ${formatDotMonth(item.date)}` : ym;
   const coord = coordsLine(item);
 
+  // Hover-card time flips from the absolute month-year to a client-computed
+  // "N days ago" (Task D #7). `client` flips true only after hydration (this
+  // uses useSyncExternalStore so there is no set-state-in-effect), keeping the
+  // first client render identical to the SSG HTML and avoiding a mismatch.
+  const client = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const ago = daysAgoLabel(item.date, lang);
+  const when = client && ago ? ago : ym;
+
   return (
     <button
       type="button"
       onClick={onOpen}
       data-gid={item.id}
       style={accentVars(item)}
-      aria-label={localized(item, "alt", lang) || describe(item, lang)}
+      aria-label={item.alt.trim() || describe(item, lang)}
       className="group relative block w-full overflow-hidden rounded-xl border border-line bg-surface text-left shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-line-strong hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <div className="relative">
@@ -954,7 +1277,7 @@ function GalleryTile({
             as the detail 0fr→1fr grows into place. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-2 bottom-2 z-10 overflow-hidden rounded-lg border border-white/15 bg-black/45 shadow-sm backdrop-blur-md transition-all duration-500 ease-out group-hover:rounded-xl group-hover:border-white/40 group-hover:bg-white/95 group-hover:shadow-lg"
+          className="pointer-events-none absolute inset-x-2 bottom-2 z-10 overflow-hidden rounded-lg border border-white/15 bg-black/45 shadow-sm backdrop-blur-md transition-all duration-500 ease-out group-hover:rounded-xl group-hover:border-line group-hover:bg-surface group-hover:shadow-lg"
         >
           {/* Resting frosted line */}
           <div className="grid grid-rows-[1fr] transition-all duration-500 ease-out group-hover:grid-rows-[0fr] group-focus-visible:grid-rows-[0fr]">
@@ -992,18 +1315,18 @@ function GalleryTile({
                       {big}
                     </p>
                     {sub ? (
-                      <p className="mt-0.5 truncate text-[10.5px] font-medium text-[#46545c]">
+                      <p className="mt-0.5 truncate text-[10.5px] font-medium text-muted">
                         {sub}
                       </p>
                     ) : null}
                   </div>
                 </div>
-                <div className="mt-1.5 flex items-center justify-between gap-3 border-t border-black/10 pt-1">
-                  <span className="text-[10.5px] font-semibold text-[#161a1c] tabular-nums">
-                    {ym}
+                <div className="mt-1.5 flex items-center justify-between gap-3 border-t border-line pt-1">
+                  <span className="text-[10.5px] font-semibold text-ink tabular-nums">
+                    {when}
                   </span>
                   {coord ? (
-                    <span className="truncate text-[10px] tracking-wide text-[#46545c]/80 tabular-nums">
+                    <span className="truncate text-[10px] tracking-wide text-muted/80 tabular-nums">
                       {coord}
                     </span>
                   ) : null}

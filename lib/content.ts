@@ -34,6 +34,10 @@ export interface Profile {
   links: ProfileLink[];
   /** PV/UV baselines to be filled in at final migration (legacy busuanzi). */
   legacyStats: { sitePvBaseline: number; siteUvBaseline: number };
+  /** Site content license, shown on the home metadata card. `href` optional
+   * (a bare label like "CC BY-NC-SA 4.0" is common). Optional so older
+   * profile.json files without it keep type-checking. */
+  license?: { label: string; href: string };
 }
 
 const profilePath = path.join(contentRoot, "profile.json");
@@ -184,25 +188,29 @@ export function projectSummary(project: Project, lang: ContentLang): string {
  * ------------------------------------------------------------------------- */
 
 /**
- * One gallery item. HUMAN fields — the bilingual text block (place / placeLocal
- * / title / alt, each as `*_en` + `*_zh`), plus `country_code`, `originalUrl`,
- * `color`, `badge` — are yours to fill in items.json; `npm run gallery:gen`
- * preserves whatever you write there and only refreshes id / source / date /
- * lat / lon / dimensions / asset URLs. Deleting a row removes a photo.
+ * One gallery item. HUMAN fields are yours to fill in items.json; `npm run
+ * gallery:gen` preserves whatever you write and only refreshes id / source /
+ * date / lat / lon / dimensions / asset URLs. Deleting a row removes a photo.
  *
- * Bilingual content model (both languages carry all four text fields):
+ * Most text is bilingual — place / placeLocal / title as `*_en` + `*_zh`; the
+ * EN page reads the `*_en` set, the ZH page the `*_zh`, each falling back to
+ * the other language while empty. `alt` is deliberately SINGLE: one
+ * language-neutral caption, shown in both languages, never translated.
  *   - `place_*`   — country + city (e.g. "Kaohsiung, Taiwan"); shown as the
  *     accent big title on the hover card and as the resting-bar place.
  *   - `placeLocal_*` — the specific spot / scenic name (e.g. "Shoushan
  *     Lookout" / 柴山); shown as the small grey line on the hover card.
  *   - `title_*`   — main heading of the opened (lightbox) card.
- *   - `alt_*`     — body copy / description inside the opened card.
- * The EN page reads the `*_en` set, the ZH page the `*_zh` set (each falls
- * back to the other language while empty).
+ *   - `alt`       — single caption / body copy of the opened card.
  *
- * Shared fields: `country_code` (ISO 3166-1 alpha-2, e.g. "TW"), `color`
- * (per-item theme accent hex, "" → site brand), `badge` (travel-stamp preset
- * key, "" → generic placeholder stamp), `originalUrl` (optional full-res link).
+ * Theme colour is CONTROLLED by `featured` — the curated collection (精选集):
+ * `gallery:gen` derives `color` from it (featured → the curated orange-red
+ * accent, otherwise "" → the default-blue site brand), and the UI follows the
+ * same rule live, so flipping `featured` recolours the photo immediately.
+ *
+ * Other shared fields: `country_code` (ISO 3166-1 alpha-2, e.g. "TW"), `badge`
+ * (travel-stamp preset key, "" → generic placeholder stamp), `originalUrl`
+ * (optional full-res link).
  */
 export interface GalleryItem {
   /** Stable key derived from the original filename; also the asset basename. */
@@ -223,19 +231,21 @@ export interface GalleryItem {
   title_en: string;
   /** ZH: 打开卡片的大标题。 */
   title_zh: string;
-  /** EN: description / body copy of the opened card. */
-  alt_en: string;
-  /** ZH: 打开卡片的内容介绍。 */
-  alt_zh: string;
+  /** Single, language-neutral caption shown in the opened card (never split). */
+  alt: string;
   /** ISO 3166-1 alpha-2 country code (e.g. "TW"); "" while unknown. */
   country_code: string;
   /** Optional external link to the full-resolution original (shared drive). */
   originalUrl: string;
+  /** Curated-collection flag (精选集). Controls the theme accent (see header):
+   * featured → curated orange-red, else the default-blue site brand. */
+  featured: boolean;
   /** Decimal-degree latitude (EXIF GPS, script-extracted); null when unknown. */
   lat: number | null;
   /** Decimal-degree longitude (EXIF GPS, script-extracted); null when unknown. */
   lon: number | null;
-  /** Theme accent hex like "#a4633a"; "" → site brand fallback. */
+  /** Theme accent hex like "#c8441f"; "" → site brand fallback. Derived from
+   * `featured` by `gallery:gen` each run (kept in the manifest for inspection). */
   color: string;
   /** Travel-stamp badge preset key; "" → generic placeholder stamp. */
   badge: string;
@@ -283,10 +293,10 @@ function parseGalleryRow(row: unknown, i: number): GalleryItem {
     placeLocal_zh: str("placeLocal_zh"),
     title_en: str("title_en"),
     title_zh: str("title_zh"),
-    alt_en: str("alt_en"),
-    alt_zh: str("alt_zh"),
+    alt: str("alt"),
     country_code: str("country_code"),
     originalUrl: str("originalUrl"),
+    featured: o.featured === true,
     lat: maybeNum("lat"),
     lon: maybeNum("lon"),
     color: str("color"),

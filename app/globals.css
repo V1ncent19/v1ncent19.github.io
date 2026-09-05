@@ -55,6 +55,11 @@
   --tertiary: #825500; /* warm accent, used for chips/variety */
   --tertiary-soft: color-mix(in srgb, var(--tertiary) 10%, transparent);
   --on-tertiary: #ffffff; /* added 2026-09-04 for card hover-fill */
+  /* curated accent — orange-red, the gallery's featured-collection colour.
+     Mirrors --brand (theme-paired): items marked `featured` in items.json use
+     this in place of the default blue. */
+  --curated: #c8441f;
+  --curated-soft: color-mix(in srgb, var(--curated) 13%, transparent);
 
   /* typography stacks */
   --font-serif-latin: "Palatino Linotype", "Book Antiqua", Palatino, Georgia,
@@ -116,6 +121,10 @@
   --tertiary: #ffb952; /* warm amber accent on dark */
   --tertiary-soft: color-mix(in srgb, var(--tertiary) 14%, transparent);
   --on-tertiary: #2a1c00; /* near-black on amber (added 2026-09-04) */
+  /* curated (gallery featured) accent on dark — brighter orange-red so it stays
+     legible on the slate navy. Same hue family as the light --curated. */
+  --curated: #ff7b45;
+  --curated-soft: color-mix(in srgb, var(--curated) 15%, transparent);
 
   /* elevation */
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 20px rgb(0 0 0 / 0.25);
@@ -171,8 +180,9 @@
        page-wide smooth would turn that instant reset into a visible "fly back
        to top" from wherever the previous page was scrolled (reported on blog
        posts, 2026-09-04). Animations that want easing pass `behavior:
-       "smooth"` explicitly (BackToTop button). This offset keeps anchor
-       targets (#main, blog #category tags, …) clear of the pinned capsule nav. */
+       "smooth"` explicitly (the capsule nav's back-to-top control). This offset
+       keeps anchor targets (#main, blog #category tags, …) clear of the pinned
+       capsule nav. */
     scroll-padding-top: 5.5rem;
   }
 
@@ -329,6 +339,98 @@ html:not([data-theme]) .ti-system {
 }
 .gb-img-in {
   animation: gb-stage-in 0.22s ease-out both;
+}
+
+/* ---------------------------------------------------------------------------
+ * Route-content fade (2026-09-05, Task D #4).
+ * The whole <main> page content is remounted per pathname by a keyed client
+ * wrapper (components/layout/route-fade.tsx); each mount replays this short
+ * ease — opacity 0→1 with a 4px rise — so internal navigation feels like the
+ * new page "渗透" (bleeds in) over the canvas instead of snapping. Only a small
+ * translateY is animated and the final frame is `transform: none`, so no fixed
+ * descendant (gallery lightbox overlay) is given a containing block after the
+ * run. Reduced motion is flattened by the global `*` rule in @layer base.
+ * ------------------------------------------------------------------------- */
+@keyframes route-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.route-fade {
+  /* `both`/`forwards` would keep the (identity-matrix) transform of the last
+     keyframe applied after the run ends, and an applied transform — even the
+     identity — makes `.route-fade` a containing block for `position: fixed`
+     descendants (the gallery lightbox overlay). That pinned the overlay to the
+     whole page column instead of the viewport, so the opened card rendered
+     off-position and oversized. `backwards` covers the (zero) delay before the
+     run and nothing after it, so once the fade finishes the element returns to
+     its base style (no transform) and fixed overlays are unaffected again. */
+  animation: route-in 0.26s var(--ease) backwards;
+}
+
+/* ---------------------------------------------------------------------------
+ * Gallery lightbox — decorative one-dot location map (2026-09-05).
+ * `.world-map` (components/gallery/gallery-view.tsx) sits in the open card's
+ * caption between the title and the alt quote. The sheet is kept exactly as
+ * shipped (its own #dadada land / #fff coast colours) — we only fade it so it
+ * reads as a faint engraved mark in BOTH themes, and tint the single marker
+ * with the card accent --tile-accent (set on the caption rail by accentVars).
+ * The marker lives in an overlay <svg> sharing the sheet's viewBox, so its raw
+ * projected coordinates land on the geographic point; the halo's resting state
+ * is opacity 0, so with motion reduced (global flatten + the rule below) only
+ * the static core dot shows.
+ * ------------------------------------------------------------------------- */
+.world-map {
+  position: relative;
+}
+.world-map-img {
+  opacity: 0.7;
+}
+.dark .world-map-img {
+  opacity: 0.34;
+}
+.world-map-marker {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+}
+.world-map-marker circle {
+  fill: var(--tile-accent, var(--brand));
+}
+.world-map-core {
+  stroke: var(--surface);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke; /* ring stays ~constant px at any zoom */
+  paint-order: stroke;
+}
+.world-map-halo {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: world-map-pulse 2.6s var(--ease) infinite;
+}
+@keyframes world-map-pulse {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.9);
+  }
+  55%,
+  100% {
+    opacity: 0;
+    transform: scale(2.7);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-map-halo {
+    animation: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------

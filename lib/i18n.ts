@@ -73,6 +73,10 @@ export interface Copy {
     byDate: string;
     byPlace: string;
     shuffle: string;
+    /** Label for the curated (精选集 / featured) filter chip in the sort strip. */
+    featured: string;
+    /** Empty-state note when the curated filter has no featured photos yet. */
+    featuredEmpty: string;
     /** Label for the column-count control at the right of the sort strip. */
     columns: string;
     /** Colophon / storage note at the bottom of the page. */
@@ -181,6 +185,8 @@ export const copy: Record<Lang, Copy> = {
       byDate: "By date",
       byPlace: "By place",
       shuffle: "Shuffle",
+      featured: "Featured",
+      featuredEmpty: "No featured picks here yet — photos you mark as featured in items.json will show up in this collection.",
       columns: "Columns",
       note: "The images here are compressed WebP generated from full-resolution originals that stay off GitHub. Original files download through my shared drive — a link appears under the large view when one is shared for that photo.",
       downloadOriginal: "Download original",
@@ -281,6 +287,8 @@ export const copy: Record<Lang, Copy> = {
       byDate: "按时间",
       byPlace: "按地点",
       shuffle: "随机",
+      featured: "精选集",
+      featuredEmpty: "这里还没有精选照片——在 items.json 里把想放入精选集的照片标为 featured 即可。",
       columns: "列数",
       note: "网页上的图片是由全分辨率原图生成的压缩 WebP，原图不存入 GitHub。需要原图时可从我的共享云盘下载——某张原图已公开共享时，其放大视图下会出现下载入口。",
       downloadOriginal: "下载原图",
