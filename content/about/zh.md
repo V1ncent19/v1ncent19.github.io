@@ -18,18 +18,4 @@ Hello! / 你好！/ Bonjour! / こんにちは！ / Γεια σας!
 - 游泳，羽毛球，台球，射击，骑行；都是业余半吊子水平，菜且爱玩，欢迎大家找我约运动。
 - 练字（硬笔，主要包括钢笔、铅笔、粉笔，但不包括 iPad 电容笔<span class="heimu">——因为触感和阻尼感都太垃圾了，写不来</span>）；主要 follow 的字体是 [唐小楷灵飞经](http://hanmofengya.com/works/TangDai/tangren/lingfeijing.html) 和 [董其昌信心铭](https://book.douban.com/subject/26900047/)。目前水平已经大为退化，样例[见此](/assets/photos/cal.png)。<span class="heimu">（且更为遗憾的是平时的书写水平完全是鬼画符。）</span>
 
-## 不正经爱好 & more random things
-
-- 烹饪；菜但爱玩，邀请大家前往 [博客](/blog) 的做饭标签观看本人的研发成果；喜欢的菜系是粤菜和法餐，不喜欢的菜系是美国菜。
-- LoL & CS2 赛事观众，[G2 ESPORTS](https://g2esports.com/) 队粉，[Rasmus "Caps" Winther](https://twitter.com/G2Caps) 个人粉。
-- [LEGO](https://www.lego.com/en-us) MOC 爱好者，尤其偏好机械组。
-- 喜欢的番是 [『サマーゴースト』 (Summer Ghost)](https://summerghost.jp/) 和 [『ジャストビコーズ』 (Just Because!)](https://justbecause.jp/)。<span class="heimu">（日语是个好语言，片假名地狱除外。）</span>
-- 喜欢的艺术家是 [Pierre-Auguste Renoir](https://fr.wikipedia.org/wiki/Auguste_Renoir) 和 [loundraw](https://www.pixiv.net/users/772547)。
-- 科幻小说爱好者，喜欢的作家笼统来说有 [刘慈欣](https://zh.wikipedia.org/wiki/刘慈欣)、[刘宇昆](https://zh.wikipedia.org/wiki/刘宇昆) 和 [Isaac Asimov](https://en.wikipedia.org/wiki/Isaac_Asimov)，还可以加上 [Philip K. Dick](https://en.wikipedia.org/wiki/Philip_K._Dick)。
-- 喜爱的音乐主要分布于[古典](http://163cn.tv/yazW5l0 "推荐：Glenn Gould")、[二次元](http://163cn.tv/yazVo3n "推荐：ユイカ")和[轻音乐](http://163cn.tv/yaz01aM "推荐：V.K 克")。
-- [头像](https://github.com/V1ncent19) 出处见 [Pixiv](https://www.pixiv.net/artworks/675540)。
-- 社恐(?)，ISTJ(2022/Oct) → [INTJ](https://www.16personalities.com/profiles/intj-t/m/pitr7txzh)(2024/Oct)。
-- CS2 / 农 / 戴森球计划 / KSP。
-- 博物馆爱好者，去大多数地方旅游的首要目的地是当地博物馆/美术馆。
-- incoming 的旅游爱好者，目前严重受困于签证问题 = =
-- [猫猫虫 capoo](https://www.facebook.com/capoocat) 爱好者。
+<!-- 「不正经爱好 & more random things」已迁移到封缄卡片板（components/about/facts-board.tsx），2026-09-05。 -->

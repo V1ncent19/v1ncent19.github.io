@@ -1,0 +1,17 @@
+{
+  "_readme": "人格/性格变化时间轴数据（About 页「关于我本人」信封内）。nodes 渲染时按 date 排序（正序），date 随便写不会崩，只是排到末尾。每条字段：date（必填，如 2022/Oct）、type（必填，如 ISTJ）、href（可选，类型名变成外链）、note（可选一句话备注）。",
+  "nodes": [
+    {
+      "date": "2022/Oct",
+      "type": "ISTJ",
+      "href": "",
+      "note": ""
+    },
+    {
+      "date": "2024/Oct",
+      "type": "INTJ",
+      "href": "https://www.16personalities.com/profiles/intj-t/m/pitr7txzh",
+      "note": ""
+    }
+  ]
+}

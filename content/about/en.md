@@ -16,18 +16,4 @@ This is a less formal About page. For a more formal version, please visit the [C
 - Swimming, badminton, billiards, shooting, cycling; all amateur level — you are welcome to join me.
 - Calligraphy (mostly hard tip); the main styles I follow are [唐小楷灵飞经](http://hanmofengya.com/works/TangDai/tangren/lingfeijing) and [董其昌信心铭](https://book.douban.com/subject/26900047/). The level has degraded a lot; some samples are [here](/assets/photos/cal.png).
 
-## More random things
-
-- Cooking; you are welcome to visit the cooking posts under [Blog](/blog) to see my research results; favorite cuisines are Cantonese and French, least favorite is American.
-- A fan of the [G2 ESPORTS](https://g2esports.com/) team and of [Rasmus "Caps" Winther](https://twitter.com/G2Caps).
-- [LEGO](https://www.lego.com/en-us) MOC enthusiast, especially mechanical sets.
-- Favorite anime: [『サマーゴースト』 (Summer Ghost)](https://summerghost.jp/) and [『ジャストビコーズ』 (Just Because!)](https://justbecause.jp/).
-- Favorite artists: [Pierre-Auguste Renoir](https://fr.wikipedia.org/wiki/Auguste_Renoir) and [loundraw](https://www.pixiv.net/users/772547).
-- Science fiction novel enthusiast; favorite authors include [Cixin Liu](https://zh.wikipedia.org/wiki/刘慈欣), [Ken Liu](https://zh.wikipedia.org/wiki/刘宇昆) and [Isaac Asimov](https://en.wikipedia.org/wiki/Isaac_Asimov).
-- Favorite music mainly ranges in [classical](http://163cn.tv/yazW5l0 "Recommendation: Glenn Gould"), [j-pop](http://163cn.tv/yazVo3n "Recommendation: ユイカ") and [light music](http://163cn.tv/yaz01aM "Recommendation: V.K 克").
-- My avatar is from [Pixiv](https://www.pixiv.net/artworks/675540).
-- Social phobia (?), ISTJ (2022/Oct) → [INTJ](https://www.16personalities.com/profiles/intj-t/m/pitr7txzh) (2024/Oct).
-- CS2 / HoK / DSP / KSP.
-- A museum enthusiast; the primary destination of most travel is the local museum or art gallery.
-- An incoming traveller, currently seriously troubled by visa issues = =
-- A [Bugcat Capoo](https://www.facebook.com/capoocat) fan.
+<!-- "More random things" moved to the sealed-facts board (components/about/facts-board.tsx), 2026-09-05. -->

@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+ * Global page scale (2026-09-05)
+ * Mimics ~90% browser zoom: the root font-size drives every rem-based length
+ * (all Tailwind spacing / text / max-width utilities, .shell, prose), so the
+ * whole layout renders ~10% narrower with natural side whitespace — without
+ * the fixed-positioning and pointer-coordinate quirks of CSS `zoom`.
+ * PX-sized details (1px borders, the spacetime grid) intentionally keep
+ * their size. Tune --page-scale to retune the whole site's density.
+ * ------------------------------------------------------------------------- */
+:root {
+  --page-scale: 0.9;
+}
+
+html {
+  font-size: calc(16px * var(--page-scale));
+}
+
 /*
  * Theme switching is class-based: `.dark` on <html> enables the dark palette.
  * A no-FOUC inline script (components/theme/theme-script.tsx) sets the class
@@ -433,6 +450,77 @@ html:not([data-theme]) .ti-system {
   }
 }
 
+/* About travel board markers (2026-09-05) — soft glow base + the breathing
+   halo above, plus hover states shared with the checklist via one hoverId in
+   travel-board.tsx. Everything animated here is transform/opacity only
+   (compositor-driven, no layout/paint per frame); the glow's blur filter is
+   static, so it is rasterised once and never repainted. The hotspot ring and
+   the core scale-up are pure transitions on the `.travel-map-hot` group set
+   from React. Reduced motion kills the breathing halo (rule above); the
+   hover states are transitions, which the global flatten leaves instant.
+   Kind colours (2026-09-05, user request): visited = brand blue, wishlist =
+   orange-red — the map dots AND the checklist icons both read these vars,
+   so the two stay in sync by construction. */
+.travel-board {
+  --travel-visited: var(--brand);
+  --travel-wish: #e8590c;
+}
+.dark .travel-board {
+  --travel-wish: #ff8a5c; /* brighter orange-red for the dark canvas */
+}
+.travel-pt-glow {
+  opacity: 0.16;
+  /* blur is set inline in travel-board.tsx (MARKER.glow / 3) so it scales
+     with the radius knob — no separate CSS value to keep in sync. */
+  transition: opacity 250ms var(--ease);
+}
+.dark .travel-pt-glow {
+  opacity: 0.24;
+}
+.travel-map-hot .travel-pt-glow {
+  opacity: 0.42;
+}
+.travel-pt-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 250ms var(--ease);
+}
+.travel-map-hot .travel-pt-core {
+  transform: scale(1.3);
+}
+.travel-pt-ring-hot {
+  opacity: 0;
+  transition: opacity 250ms var(--ease);
+}
+.travel-map-hot .travel-pt-ring-hot {
+  opacity: 0.9;
+}
+/* Invisible oversized target re-enabling pointer events inside the
+   otherwise pointer-transparent map layer (img + svg root stay inert). */
+.travel-map-hit {
+  pointer-events: auto;
+  cursor: default;
+}
+/* Place-name tooltip anchored at the hot marker's projected coordinates
+   (position comes from travel-board.tsx as % of the sheet box). Sits above
+   the point; `.map-tip-below` flips it underneath near the sheet's top edge. */
+.map-tip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 12px));
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 5;
+  animation: map-tip-in 160ms var(--ease) backwards;
+}
+.map-tip-below {
+  transform: translate(-50%, 14px);
+}
+@keyframes map-tip-in {
+  from {
+    opacity: 0;
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Homepage "email-copy" button — stacked three-state micro-interaction
  * (reference 2026-09-04). Three text states occupy the same grid cell and
@@ -528,18 +616,265 @@ html:not([data-theme]) .ti-system {
  *    sits under an ink bar and lights up only on hover; About's tiny client
  *    wrapper adds a tap/click toggle (.is-open) for touch & keyboard. Style
  *    mirrors the legacy Jekyll rule (bar stays, text turns light), theme-aware:
- *    near-black bar on light, a slate bar that still reads against the deep
- *    navy canvas in dark mode. Reveal text is a fixed near-white so it stays
- *    legible on the bar in both themes.
+ *    a soft gray-black bar on light, a soft slate bar on the deep navy canvas
+ *    in dark mode. Reveal text is a fixed near-white so it stays legible on
+ *    the bar in both themes.
  *  • a.rec — a markdown link whose title begins with "推荐：" / "Recommendation:"
  *    is turned into a capsule trigger by a rehype plugin in prose.tsx; hovering
  *    (or keyboard focus) pops a little pill just above the text via ::after
  *    reading the data-rec attribute. No layout shift — it overlays.
  * ------------------------------------------------------------------------- */
 
+/* ---- facts counter chip completion ----
+ * When every sealed envelope on the About board is unsealed, the counter chip
+ * pops once (scale bounce) and settles into the site's locked success green
+ * #20a05a — the same green as the email-copy button — with a scale-in
+ * checkmark. The class stays applied, so the green background persists; the
+ * one-shot animations run only on the moment the class is added. */
+@keyframes facts-chip-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes facts-chip-check-in {
+  0% {
+    transform: scale(0) rotate(-30deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.3) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.facts-chip-done {
+  background: #20a05a;
+  border-color: #20a05a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgb(32 160 90 / 0.22);
+  animation: facts-chip-pop 0.45s var(--ease);
+}
+.facts-chip-done .facts-chip-check {
+  animation: facts-chip-check-in 0.4s var(--ease) 0.12s backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .facts-chip-done,
+  .facts-chip-done .facts-chip-check {
+    animation: none;
+  }
+}
+
+/* ---- Site Navigation gateway scroll-reveal (2026-09-05) ----
+ * The home gateway grid arms (via the GatewayReveal client component) only
+ * after JS mounts, so no-JS/SSR visitors always see the cards. When armed and
+ * the grid first intersects, `.is-in` lands once and each `.gw-item` fades
+ * and rises in, staggered 80ms per card via its inline `--gw-i` index. The
+ * component never arms under prefers-reduced-motion; the media query below is
+ * a belt-and-braces guard. Hover lift lives on the inner card div, so these
+ * transforms never fight it. */
+.gw-reveal .gw-item {
+  transition:
+    opacity 0.5s var(--ease),
+    transform 0.5s var(--ease);
+  transition-delay: calc(var(--gw-i, 0) * 80ms);
+}
+.gw-armed:not(.is-in) .gw-item {
+  opacity: 0;
+  transform: translateY(14px);
+}
+.gw-reveal.is-in .gw-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gw-reveal .gw-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---- gateway circle reveal (2026-09-05) ----
+ * Each Site Navigation card keeps its photo *behind* the content; on
+ * hover-capable pointers (and keyboard focus) an expanding circle anchored at
+ * the watermark's corner uncovers it — an iris/spotlight reveal rather than a
+ * prop flying out. The circle never overhangs the card, so the layout stays
+ * strictly inside the rounded corners. A surface-toned veil between photo and
+ * text keeps copy readable (theme-aware via --surface). The image still
+ * lazy-swaps from data-peek-src on first hover/focus (delegated in
+ * GatewayReveal), so page load carries zero photo bytes. The watermark icon
+ * yields while the reveal is open. Touch pointers simply get the unchanged
+ * card (pure progressive enhancement). */
+.gateway-orb {
+  position: absolute;
+  inset: 0;
+  clip-path: circle(0% at calc(100% - 36px) calc(100% - 36px));
+  transition: clip-path 0.55s var(--ease);
+}
+.gateway-orb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* inline style may override with contain for the CV strip */
+  background: #eceae4; /* placeholder tone until the lazy swap lands */
+}
+.gateway-orb-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--surface) 88%, transparent),
+    color-mix(in srgb, var(--surface) 62%, transparent) 52%,
+    color-mix(in srgb, var(--surface) 74%, transparent)
+  );
+}
+@media (hover: hover) {
+  .group:hover .gateway-orb,
+  .group:focus-within .gateway-orb {
+    clip-path: circle(142% at calc(100% - 36px) calc(100% - 36px));
+  }
+  .group:hover .gateway-watermark,
+  .group:focus-within .gateway-watermark {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gateway-orb {
+    transition: none;
+  }
+}
+
+/* ---- gateway title glass capsule (2026-09-05) ----
+ * Frosted pill behind the card title ("Blog" & co.). The pill's LEFT edge is
+ * aligned with the number chip above it (no negative left margin — the label
+ * text sits padded inside, so pill and chip read as one aligned column); the
+ * remaining padding is offset by negative margins so the resting layout is
+ * unchanged. At rest it is fully transparent; on hover-capable pointers /
+ * keyboard focus it frosts over (surface glass + blur) with the tone tint
+ * fading in — same soft → vivid colour story as the number chip, and the
+ * same 150ms timing so chip text and pill shift colour in lockstep. Touch
+ * pointers never reveal the photo, so the pill stays transparent there too. */
+.gw-title-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.32rem 0.85rem;
+  margin: -0.32rem -0.85rem -0.32rem 0;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  transition:
+    background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gw-title-pill-tint {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (hover: hover) {
+  .group:hover .gw-title-pill,
+  .group:focus-within .gw-title-pill {
+    background-color: color-mix(in srgb, var(--surface) 64%, transparent);
+    border-color: color-mix(in srgb, var(--line) 75%, transparent);
+    box-shadow: 0 2px 12px rgb(28 37 48 / 0.1);
+    -webkit-backdrop-filter: blur(9px) saturate(1.1);
+    backdrop-filter: blur(9px) saturate(1.1);
+  }
+  .group:hover .gw-title-pill-tint,
+  .group:focus-within .gw-title-pill-tint {
+    opacity: 0.42;
+  }
+}
+
+/* Anchored headings land below the pinned capsule nav, not underneath it. */
+.prose :is(h2, h3, h4) {
+  scroll-margin-top: 7rem;
+}
+
+/* ---- gateway launch confirm (2026-09-05) ----
+ * GatewayLink holds a click for one beat; the `.is-launching` class it adds
+ * plays this ack: the card presses down a touch and a tone-coloured chip
+ * pops in with a drawn launch arrow — visible proof the click registered —
+ * before the route changes (~360ms). Native click semantics are untouched:
+ * modifier/middle clicks navigate immediately, no-JS visitors never see the
+ * stamp, reduced-motion users navigate with no delay. */
+.gateway-stamp {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.gateway-stamp-chip {
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  box-shadow:
+    0 6px 18px rgb(0 0 0 / 0.14),
+    0 0 0 4px color-mix(in srgb, var(--surface) 55%, transparent);
+  opacity: 0;
+  transform: scale(0.4);
+}
+.gateway-stamp-chip svg path {
+  stroke-dasharray: 32;
+  stroke-dashoffset: 32;
+}
+.gw-item.is-launching .gateway-card {
+  /* overrides the resting hover lift — a deliberate "pressed" settle */
+  transform: scale(0.985);
+  transition-duration: 0.18s;
+}
+.gw-item.is-launching .gateway-stamp-chip {
+  animation: gw-stamp-pop 0.28s var(--ease) forwards;
+}
+.gw-item.is-launching .gateway-stamp-chip svg path {
+  animation: gw-arrow-draw 0.24s 0.08s var(--ease) forwards;
+}
+@keyframes gw-stamp-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes gw-arrow-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gw-item.is-launching .gateway-card,
+  .gw-item.is-launching .gateway-stamp-chip svg path {
+    animation: none;
+    transition: none;
+  }
+}
+
 /* ---- spoiler: concealed until hover / tap ---- */
 .heimu {
-  --heimu-bar: #171c1f; /* light: near-black ink bar */
+  --heimu-bar: #454b52; /* light: soft gray-black ink bar (softer than pure ink) */
   background-color: var(--heimu-bar);
   color: transparent;
   border-radius: 0.16em;
@@ -549,7 +884,7 @@ html:not([data-theme]) .ti-system {
   transition: color 120ms ease;
 }
 .dark .heimu {
-  --heimu-bar: #3a4c61; /* slate "black" that shows on the #0c1219 canvas */
+  --heimu-bar: #46586e; /* soft slate that reads gently on the #0c1219 canvas */
 }
 .heimu a {
   color: inherit;

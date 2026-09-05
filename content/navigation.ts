@@ -1,14 +1,25 @@
 /**
  * Data-driven navigation. Order is significant and follows the "Home – Desktop
  * Layout Variant 3" Stitch direction: the homepage itself appears as the first
- * nav item ("Home"), followed by About, CV, Gallery, Blog, Project.
+ * nav item ("Home"), followed by About, CV, Gallery, Blog, Project, Guestbook.
+ *
+ * The Guestbook IS a nav item (user decision 2026-09-05, revised same day) but
+ * deliberately has NO homepage gateway card — its only home entry point is the
+ * "Direct access" row card, and the standalone page lives at /guestbook.
  *
  * English is the default interface; Chinese pages live under nested /zh
  * routes. Homepage section cards (app/page.tsx) intentionally exclude `home`
- * and only render the five real sections.
+ * and `guestbook`, and only render the real sections.
  */
 
-export type NavId = "home" | "about" | "cv" | "gallery" | "blog" | "project";
+export type NavId =
+  | "home"
+  | "about"
+  | "cv"
+  | "gallery"
+  | "blog"
+  | "project"
+  | "guestbook";
 
 export interface NavItem {
   id: NavId;
@@ -83,10 +94,25 @@ export const navItems: NavItem[] = [
     href: "/project",
     hrefZh: "/project/zh",
   },
+  {
+    id: "guestbook",
+    order: 6,
+    label: { en: "Guestbook", zh: "留言板" },
+    summary: {
+      en: "Say hi, leave a note, or report a bug.",
+      zh: "打个招呼、留下杂谈，或反馈 bug。",
+    },
+    href: "/guestbook",
+    hrefZh: "/guestbook/zh",
+  },
 ];
 
-/** Sections shown as homepage cards (everything except the home page itself). */
-export const homeCards: NavItem[] = navItems.filter((n) => n.id !== "home");
+/** Sections shown as homepage gateway cards — the real content sections.
+ *  Guestbook is reachable from the top nav and the "Direct access" card,
+ *  but does not take a slot in the gateway grid. */
+export const homeCards: NavItem[] = navItems.filter(
+  (n) => n.id !== "home" && n.id !== "guestbook",
+);
 
 /** Top-level routes that have an English + Chinese (nested /zh) pair. */
 export const bilingualBases = new Set<string>(

@@ -13,6 +13,23 @@ export type Lang = "en" | "zh";
 export interface Copy {
   about: {
     title: string;
+    factsTitle: string;
+    factsLead: string;
+    factsSealed: string;
+    factsOpened: string;
+    factsDiscovered: string;
+    /** Heading of the standalone travel-log § section (TravelSection). */
+    travelSectionTitle: string;
+    travelVisited: string;
+    travelWishlist: string;
+    travelEmpty: string;
+    timelineEmpty: string;
+    /** General Information block (GeneralInfo): section title + row labels. */
+    generalTitle: string;
+    generalName: string;
+    generalDob: string;
+    generalLangs: string;
+    generalHome: string;
   };
   cv: {
     title: string;
@@ -58,6 +75,9 @@ export interface Copy {
     resultsTemplate: string;
     newest: string;
     oldest: string;
+    /** Sort-key chip labels (direction reuses newest/oldest or A→Z/Z→A). */
+    sortDate: string;
+    sortTitle: string;
     minRead: string;
     /** Back-link label from a post page to the blog index. */
     allPosts: string;
@@ -79,6 +99,11 @@ export interface Copy {
     featuredEmpty: string;
     /** Label for the column-count control at the right of the sort strip. */
     columns: string;
+    /** Accessible label for the sort-direction toggle button. */
+    sortDir: string;
+    /** Direction labels for the date key (place uses neutral A→Z / Z→A). */
+    dirNew: string;
+    dirOld: string;
     /** Colophon / storage note at the bottom of the page. */
     note: string;
     /** Link on an original full-res copy (shown only when the item has one). */
@@ -97,6 +122,26 @@ export interface Copy {
     resume: string;
     email: string;
   };
+  /** Mobile FAB navigation chrome (site-header). */
+  nav: {
+    /** Accessible labels for the floating action button + panel. */
+    menuOpen: string;
+    menuClose: string;
+    menuLabel: string;
+  };
+  /** Guestbook page (/guestbook, /guestbook/zh) — nav item, no gateway card. */
+  guestbook: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    /** The two discussion streams (dual-tab giscus embeds). */
+    tabNotes: string;
+    tabBugs: string;
+    tabNotesLead: string;
+    tabBugsLead: string;
+    /** a11y label for the tab switcher group. */
+    tabsLabel: string;
+  };
   placeholder: {
     label: string;
     note: string;
@@ -107,9 +152,24 @@ export const copy: Record<Lang, Copy> = {
   en: {
     about: {
       title: "About",
+      factsTitle: "More random things",
+      factsLead: "Sealed by default — break a stamp to unfold a whole category at once.",
+      factsSealed: "Sealed — click to break",
+      factsOpened: "Unsealed",
+      factsDiscovered: "Discovered",
+      travelSectionTitle: "Travel log",
+      travelVisited: "Stops visited",
+      travelWishlist: "On the wishlist",
+      travelEmpty: "Checklist in progress — stops being unlocked one by one.",
+      timelineEmpty: "Timeline in progress.",
+      generalTitle: "General Information",
+      generalName: "Full Name",
+      generalDob: "Date of Birth",
+      generalLangs: "Languages",
+      generalHome: "Hometown",
     },
     cv: {
-      title: "Experience",
+      title: "Curriculum Vitæ",
       lead: "A web version of my academic record. The formal, most up-to-date CV is the downloadable PDF — contact me for a full reference list.",
       download: "Download CV (PDF)",
       nameHeading: "At a glance",
@@ -167,6 +227,8 @@ export const copy: Record<Lang, Copy> = {
       resultsTemplate: "Showing {shown} of {total} posts",
       newest: "Newest first",
       oldest: "Oldest first",
+      sortDate: "By date",
+      sortTitle: "By title",
       minRead: "min read",
       allPosts: "All posts",
       category: {
@@ -188,6 +250,9 @@ export const copy: Record<Lang, Copy> = {
       featured: "Featured",
       featuredEmpty: "No featured picks here yet — photos you mark as featured in items.json will show up in this collection.",
       columns: "Columns",
+      sortDir: "Toggle sort direction",
+      dirNew: "Newest first",
+      dirOld: "Oldest first",
       note: "The images here are compressed WebP generated from full-resolution originals that stay off GitHub. Original files download through my shared drive — a link appears under the large view when one is shared for that photo.",
       downloadOriginal: "Download original",
       close: "Close",
@@ -202,6 +267,23 @@ export const copy: Record<Lang, Copy> = {
       resume: "See CV",
       email: "Email",
     },
+    nav: {
+      menuOpen: "Open navigation",
+      menuClose: "Close navigation",
+      menuLabel: "Site sections",
+    },
+    guestbook: {
+      eyebrow: "Say hi · report a bug",
+      title: "Guestbook",
+      lead: "One shared board for everything — greetings, half-formed thoughts, and bug reports alike. Comments run on giscus backed by GitHub Discussions; signing in with a GitHub account is all it takes to post.",
+      tabNotes: "Messages",
+      tabBugs: "Bug reports",
+      tabNotesLead:
+        "Open board — greetings, notes and everything in between. Comments here land in one shared thread.",
+      tabBugsLead:
+        "Found something broken? Drop it here with the page and what you expected — short and rough is fine.",
+      tabsLabel: "Comment streams",
+    },
     placeholder: {
       label: "Under construction",
       note: "This section is being migrated as part of the site rebuild; content lands in a later phase.",
@@ -211,6 +293,21 @@ export const copy: Record<Lang, Copy> = {
   zh: {
     about: {
       title: "关于",
+      factsTitle: "不正经爱好 & more random things",
+      factsLead: "默认封存——拆开一枚邮票，整组内容一起展开。",
+      factsSealed: "已封存——点击拆封",
+      factsOpened: "已拆封",
+      factsDiscovered: "已拆开",
+      travelSectionTitle: "旅行足迹",
+      travelVisited: "已解锁足迹",
+      travelWishlist: "待解锁心愿",
+      travelEmpty: "清单整理中——目的地正在逐个解锁。",
+      timelineEmpty: "时间轴整理中。",
+      generalTitle: "基本信息",
+      generalName: "姓名",
+      generalDob: "出生日期",
+      generalLangs: "语言",
+      generalHome: "家乡",
     },
     cv: {
       title: "经历",
@@ -269,6 +366,8 @@ export const copy: Record<Lang, Copy> = {
       resultsTemplate: "显示 {shown} 篇，共 {total} 篇",
       newest: "最新优先",
       oldest: "最早优先",
+      sortDate: "按时间",
+      sortTitle: "按标题",
       minRead: "分钟",
       allPosts: "全部文章",
       category: {
@@ -290,6 +389,9 @@ export const copy: Record<Lang, Copy> = {
       featured: "精选集",
       featuredEmpty: "这里还没有精选照片——在 items.json 里把想放入精选集的照片标为 featured 即可。",
       columns: "列数",
+      sortDir: "切换正逆序",
+      dirNew: "从新到旧",
+      dirOld: "从旧到新",
       note: "网页上的图片是由全分辨率原图生成的压缩 WebP，原图不存入 GitHub。需要原图时可从我的共享云盘下载——某张原图已公开共享时，其放大视图下会出现下载入口。",
       downloadOriginal: "下载原图",
       close: "关闭",
@@ -303,6 +405,21 @@ export const copy: Record<Lang, Copy> = {
       current: "目前",
       resume: "查看简历",
       email: "邮件",
+    },
+    nav: {
+      menuOpen: "打开导航菜单",
+      menuClose: "关闭导航菜单",
+      menuLabel: "站点板块",
+    },
+    guestbook: {
+      eyebrow: "打个招呼 · 反馈 bug",
+      title: "留言板",
+      lead: "一块共享的留言板——问候、闲谈、bug 反馈都写在这里。评论由 giscus 提供，数据存在 GitHub Discussions 上，用 GitHub 账号登录即可发言。",
+      tabNotes: "留言",
+      tabBugs: "Bug 反馈",
+      tabNotesLead: "开放留言区——问候、杂谈、想到什么写什么。所有留言汇入同一条时间线。",
+      tabBugsLead: "发现了哪里坏掉了？写上页面和你的预期即可，不用讲究格式。",
+      tabsLabel: "留言分区",
     },
     placeholder: {
       label: "建设中",

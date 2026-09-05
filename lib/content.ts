@@ -317,3 +317,121 @@ export function getGalleryItems(): GalleryItem[] {
   }
   return rows.map(parseGalleryRow);
 }
+
+/* ---------------------------------------------------------------------------
+ * About records: travel checklist + personality timeline (content/about/*.json)
+ * Loaded on the server page and passed down as props into the client
+ * FactsBoard (client components must never import this module — node:fs).
+ * ------------------------------------------------------------------------- */
+
+/** One place on the About travel checklist. `name` is the default (zh-facing)
+ * display name; `nameEn` is optional and falls back to `name`. lat/lon are
+ * optional WGS84 decimal degrees — BOTH must be present for the place to get
+ * a marker dot on the About world map; absent coords simply omit the dot
+ * (never a faked location at 0,0). */
+export interface TravelPlace {
+  name: string;
+  nameEn?: string;
+  /** Visit year (visited rows only), e.g. 2025. */
+  year?: number;
+  note?: string;
+  lat: number | null;
+  lon: number | null;
+}
+
+export interface TravelData {
+  visited: TravelPlace[];
+  wishlist: TravelPlace[];
+}
+
+const travelPath = path.join(contentRoot, "about", "travel.json");
+
+export function getTravel(): TravelData {
+  const raw = JSON.parse(fs.readFileSync(travelPath, "utf8")) as Record<
+    string,
+    unknown
+  >;
+  const parsePlaces = (key: "visited" | "wishlist"): TravelPlace[] => {
+    const rows = raw[key];
+    if (rows === undefined) return [];
+    if (!Array.isArray(rows)) {
+      throw new Error(`[content/about/travel.json] \`${key}\` must be an array`);
+    }
+    return rows.map((row, i) => {
+      const o = row as Record<string, unknown>;
+      const name = typeof o.name === "string" ? o.name.trim() : "";
+      if (!name) {
+        throw new Error(
+          `[content/about/travel.json] ${key}[${i}]: missing \`name\``,
+        );
+      }
+      return {
+        name,
+        nameEn:
+          typeof o.nameEn === "string" && o.nameEn.trim()
+            ? o.nameEn.trim()
+            : undefined,
+        year:
+          typeof o.year === "number" && Number.isFinite(o.year)
+            ? o.year
+            : undefined,
+        note:
+          typeof o.note === "string" && o.note.trim()
+            ? o.note.trim()
+            : undefined,
+        lat: typeof o.lat === "number" && Number.isFinite(o.lat) ? o.lat : null,
+        lon: typeof o.lon === "number" && Number.isFinite(o.lon) ? o.lon : null,
+      };
+    });
+  };
+  return { visited: parsePlaces("visited"), wishlist: parsePlaces("wishlist") };
+}
+
+/** One node on the About personality timeline (e.g. ISTJ 2022/Oct → INTJ). */
+export interface PersonalityNode {
+  date: string;
+  type: string;
+  /** Optional external link attached to the type label. */
+  href?: string;
+  note?: string;
+}
+
+export interface PersonalityData {
+  nodes: PersonalityNode[];
+}
+
+const personalityPath = path.join(contentRoot, "about", "personality.json");
+
+export function getPersonality(): PersonalityData {
+  const raw = JSON.parse(fs.readFileSync(personalityPath, "utf8")) as Record<
+    string,
+    unknown
+  >;
+  const rows = raw.nodes;
+  if (!Array.isArray(rows)) {
+    throw new Error(
+      "[content/about/personality.json] `nodes` must be an array",
+    );
+  }
+  const nodes = rows.map((row, i) => {
+    const o = row as Record<string, unknown>;
+    const date = typeof o.date === "string" ? o.date.trim() : "";
+    const type = typeof o.type === "string" ? o.type.trim() : "";
+    if (!date || !type) {
+      throw new Error(
+        `[content/about/personality.json] nodes[${i}]: \`date\` and \`type\` are required`,
+      );
+    }
+    return {
+      date,
+      type,
+      href:
+        typeof o.href === "string" && o.href.trim() ? o.href.trim() : undefined,
+      note:
+        typeof o.note === "string" && o.note.trim()
+          ? o.note.trim()
+          : undefined,
+    };
+  });
+  return { nodes };
+}

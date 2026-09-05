@@ -26,6 +26,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# WorkBuddy agent workspace (local notes, memory, probes) — never pushed.
+/.workbuddy/
+
 # env files
 .env*
 

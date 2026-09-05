@@ -2,11 +2,19 @@
 
 import Giscus from "@giscus/react";
 import { useEffect, useState } from "react";
+import type { Lang } from "@/lib/i18n";
 
 /**
  * Per-post comment thread (giscus), wired to the SAME discussion instance the
  * old homepage used (index.html) so continuity is preserved:
  * repo v1ncent19/v1ncent19.github.io, Discussions category "Announcements".
+ *
+ * Two mount modes (2026-09-05):
+ *  - default (no `term`): mapping="pathname" — one thread per blog post;
+ *  - `term` given: mapping="specific" — every page passing the SAME term
+ *    shares ONE thread (guestbook messages tab, bug stream). This is how
+ *    the guestboard keeps a single comment timeline across /guestbook and
+ *    /guestbook/zh.
  *
  * This is a deploy-time feature by nature — giscus refuses localhost / static
  * preview origins, so the embed only becomes live once the site is served from
@@ -31,7 +39,21 @@ function currentGiscusTheme(): string {
   return "preferred_color_scheme";
 }
 
-export function GiscusComments() {
+export function GiscusComments({
+  term,
+  lang: uiLang = "zh",
+  emitMetadata = false,
+  className,
+}: {
+  /** Shared-thread mode: all pages passing the same term see one thread. */
+  term?: string;
+  /** giscus UI language — blog posts keep the historical zh-CN default. */
+  lang?: Lang;
+  /** Broadcast discussion metadata (comment counts) via postMessage — used by
+      the home note window to detect "a comment was just sent". */
+  emitMetadata?: boolean;
+  className?: string;
+} = {}) {
   const [theme, setTheme] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,21 +77,25 @@ export function GiscusComments() {
   if (theme === null) return null;
 
   return (
-    <Giscus
-      // Re-mount on theme change so the iframe reloads with the new theme.
-      key={theme}
-      repo={GISCUS.repo}
-      repoId={GISCUS.repoId}
-      category={GISCUS.category}
-      categoryId={GISCUS.categoryId}
-      mapping="pathname"
-      strict="0"
-      reactionsEnabled="1"
-      emitMetadata="0"
-      inputPosition="top"
-      theme={theme}
-      lang="zh-CN"
-      loading="lazy"
-    />
+    <div className={className}>
+      <Giscus
+        // Re-mount on theme change (and term switch) so the iframe reloads
+        // with the new theme / the other discussion thread.
+        key={`${theme}-${term ?? "pathname"}`}
+        repo={GISCUS.repo}
+        repoId={GISCUS.repoId}
+        category={GISCUS.category}
+        categoryId={GISCUS.categoryId}
+        mapping={term ? "specific" : "pathname"}
+        term={term}
+        strict="0"
+        reactionsEnabled="1"
+        emitMetadata={emitMetadata ? "1" : "0"}
+        inputPosition="top"
+        theme={theme}
+        lang={uiLang === "zh" ? "zh-CN" : "en"}
+        loading="lazy"
+      />
+    </div>
   );
 }

@@ -11,12 +11,13 @@ import {
   GitBranch,
   GraduationCap,
   MessageSquare,
+  MessagesSquare,
   Scale,
   Sigma,
   User,
   type LucideIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { NavId, NavItem } from "@/content/navigation";
 import { homeCards } from "@/content/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
@@ -24,6 +25,8 @@ import { getBlogPosts, type BlogCategory } from "@/lib/blog";
 import { copy, formatMonth } from "@/lib/i18n";
 import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
+import { GatewayReveal } from "@/components/home/gateway-reveal";
+import { GatewayLink } from "@/components/home/gateway-link";
 
 type SectionId = Exclude<NavId, "home">;
 
@@ -33,6 +36,7 @@ const sectionIcons: Record<SectionId, LucideIcon> = {
   gallery: Camera,
   blog: BookOpen,
   project: FolderOpen,
+  guestbook: MessagesSquare,
 };
 
 /** Short section descriptor shown under each gateway card title. */
@@ -57,6 +61,10 @@ const sectionBlurbs: Record<SectionId, { sub: string; desc: string }> = {
     sub: "Notes & small works",
     desc: "Long-running study notes, compilations and things that outgrew a post.",
   },
+  guestbook: {
+    sub: "Say hi · report a bug",
+    desc: "One shared board for greetings, stray thoughts and bug reports — comments land in a single guestbook thread.",
+  },
 };
 
 /**
@@ -78,6 +86,8 @@ const tones = {
     hover: "group-hover:text-brand",
     fill: "group-hover:bg-brand group-hover:text-on-brand",
     waterHover: "group-hover:text-brand/30",
+    line: "bg-brand",
+    arrow: "text-brand",
   },
   accent: {
     fg: "text-accent",
@@ -87,6 +97,8 @@ const tones = {
     hover: "group-hover:text-accent",
     fill: "group-hover:bg-accent group-hover:text-on-accent",
     waterHover: "group-hover:text-accent/30",
+    line: "bg-accent",
+    arrow: "text-accent",
   },
   tertiary: {
     fg: "text-tertiary",
@@ -96,10 +108,30 @@ const tones = {
     hover: "group-hover:text-tertiary",
     fill: "group-hover:bg-tertiary group-hover:text-on-tertiary",
     waterHover: "group-hover:text-tertiary/30",
+    line: "bg-tertiary",
+    arrow: "text-tertiary",
   },
 } as const;
 type ToneName = keyof typeof tones;
+/** Cycle of card accents across the gateway grid (index → tone). */
 const toneSeq: ToneName[] = ["brand", "accent", "brand", "tertiary", "accent"];
+
+/**
+ * Framing for each card's hover circle-reveal: `pos` is the object-position
+ * slice and `fit` picks cover (fill the frame) vs contain (letterbox — used
+ * for the extra-wide CV comic so it shows whole, with white bars above/below,
+ * like a panorama print). Images live at /assets/navigation/web/ (compressed
+ * copies; originals stay in /assets/navigation/).
+ */
+const PEEK_FRAME: Record<SectionId, { pos: string; fit: "cover" | "contain" }> =
+  {
+    about: { pos: "50% 20%", fit: "cover" },
+    cv: { pos: "50% 50%", fit: "contain" },
+    gallery: { pos: "50% 50%", fit: "cover" },
+    blog: { pos: "50% 50%", fit: "cover" },
+    project: { pos: "50% 10%", fit: "cover" },
+    guestbook: { pos: "50% 50%", fit: "cover" },
+  };
 
 /* Feed chip tones — page-local (the Blog index keeps components/blog/post-tone.ts).
    Colour carries the post's category; the group-hover fill mirrors the DocRow
@@ -371,31 +403,33 @@ export default function HomePage() {
               </span>
             }
           >
-            Sections
+            Site Navigation
           </ModuleHeader>
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+          <GatewayReveal className="grid grid-cols-1 gap-5 lg:grid-cols-12">
             {/* Featured: About (5 cols, matches the 2×2 height) */}
-            <Link
+            <GatewayLink
               href={homeCards[0].href}
-              className="group block h-full no-underline hover:no-underline lg:col-span-5"
+              style={{ "--gw-i": 0 } as CSSProperties}
+              className="gw-item group block h-full no-underline hover:no-underline lg:col-span-5"
             >
               <GatewayCard item={homeCards[0]} index={0} featured />
-            </Link>
+            </GatewayLink>
 
             {/* Remaining four (7 cols → 2×2) */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:col-span-7">
               {homeCards.slice(1).map((item, j) => (
-                <Link
+                <GatewayLink
                   key={item.id}
                   href={item.href}
-                  className="group block h-full no-underline hover:no-underline"
+                  style={{ "--gw-i": j + 1 } as CSSProperties}
+                  className="gw-item group block h-full no-underline hover:no-underline"
                 >
                   <GatewayCard item={item} index={j + 1} />
-                </Link>
+                </GatewayLink>
               ))}
             </div>
-          </div>
+          </GatewayReveal>
         </div>
       </section>
 
@@ -469,6 +503,17 @@ export default function HomePage() {
                     action="Visit"
                   />
                 ))}
+                {/* Guestbook card (2026-09-05): the only home entry point —
+                    no nav item, no gateway card, no embedded editor. */}
+                <DocRow
+                  icon={MessageSquare}
+                  tone="brand"
+                  title="Guestbook"
+                  subtitle="Say hi, leave a note, or report a bug"
+                  href="/guestbook"
+                  action="Visit"
+                  nav
+                />
               </ul>
 
               {/* Site metadata (2026-09-05, Task D #8) — compact row card in
@@ -537,19 +582,48 @@ function GatewayCard({
     <div
       className={
         featured
-          ? "relative flex h-full min-h-[18rem] flex-col overflow-hidden rounded-2xl border border-line bg-surface p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-line-strong hover:shadow-lift sm:p-8"
-          : "relative flex h-full min-h-[12.5rem] flex-col overflow-hidden rounded-xl border border-line bg-surface p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-line-strong hover:shadow-lift"
+          ? "gateway-card relative flex h-full min-h-[18rem] flex-col rounded-2xl border border-line bg-surface p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-line-strong hover:shadow-lift sm:p-8"
+          : "gateway-card relative flex h-full min-h-[12.5rem] flex-col rounded-xl border border-line bg-surface p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-line-strong hover:shadow-lift"
       }
     >
+      {/* Tone hairline: rests faint & pulled back, sweeps across on hover */}
       <span
         aria-hidden
-        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tone.wash}`}
+        className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-[2.5px] origin-left scale-x-[0.35] opacity-20 transition-all duration-500 ease-out group-hover:scale-x-100 group-hover:opacity-100 ${tone.line}`}
       />
-      <Icon
+      {/* Clipped decor layer: keeps the bleed of wash + reveal + watermark
+          inside the rounded corners */}
+      <span
         aria-hidden
-        className={`pointer-events-none absolute -bottom-4 -right-4 ${featured ? "h-40 w-40" : "h-24 w-24"} transition-colors ${tone.water} ${tone.waterHover}`}
-        strokeWidth={1}
-      />
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"
+      >
+        <span
+          className={`absolute inset-0 bg-gradient-to-br ${tone.wash}`}
+        />
+        {/* Circle reveal: the photo sits behind the card content and is
+            uncovered by an expanding circle anchored at the watermark corner
+            on hover-capable pointers / keyboard focus (CSS-gated). A
+            surface-toned veil keeps the text readable over the photo. The
+            image lazy-swaps from data-peek-src on first hover (GatewayReveal). */}
+        <span className="gateway-orb">
+          {/* eslint-disable-next-line @next/next/no-img-element -- hover-time data-src swap is incompatible with next/image; never part of LCP */}
+          <img
+            alt=""
+            data-peek-src={`/assets/navigation/web/${id}.webp`}
+            decoding="async"
+            style={{
+              objectPosition: PEEK_FRAME[id].pos,
+              objectFit: PEEK_FRAME[id].fit,
+              backgroundColor: PEEK_FRAME[id].fit === "contain" ? "#fff" : undefined,
+            }}
+          />
+          <span className="gateway-orb-veil" />
+        </span>
+        <Icon
+          className={`gateway-watermark pointer-events-none absolute -bottom-4 -right-4 ${featured ? "h-40 w-40" : "h-24 w-24"} transition-all duration-500 group-hover:-rotate-2 group-hover:scale-105 ${tone.water} ${tone.waterHover}`}
+          strokeWidth={1}
+        />
+      </span>
       <div className="relative flex items-center gap-2">
         <span
           className={`ui-text inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${tone.soft} ${tone.fg} ${tone.fill}`}
@@ -561,15 +635,43 @@ function GatewayCard({
         </span>
       </div>
       <div className="relative mt-auto pt-6">
-        <h3
-          className={`tracking-tight transition-colors ${featured ? "text-2xl sm:text-3xl" : "text-xl"} ${tone.hover}`}
-        >
-          {item.label.en}
-        </h3>
+        {/* Title glass capsule: at rest the pill is fully transparent (its
+            padding is offset by negative margins, so layout is identical to
+            the bare title). On hover-capable pointers / keyboard focus it
+            frosts over (surface glass + blur) and its tone tint fades in,
+            keeping "Blog" readable above the revealed photo — same soft →
+            solid colour story as the number chip. */}
+        <span className={`gw-title-pill ${tone.fg}`}>
+          <span aria-hidden className={`gw-title-pill-tint ${tone.soft}`} />
+          <h3
+            className={`tracking-tight transition-colors ${featured ? "text-2xl sm:text-3xl" : "text-xl"} ${tone.hover}`}
+          >
+            {item.label.en}
+          </h3>
+        </span>
         <p className="mt-1 text-[0.95rem] leading-relaxed text-muted">
           {sectionBlurbs[id].desc}
         </p>
+        {/* Hover arrow: rests hidden, slides in with the card's tone */}
+        <div aria-hidden className="relative mt-3 flex justify-end">
+          <ArrowRight
+            className={`-translate-x-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 ${tone.arrow} ${featured ? "h-[22px] w-[22px]" : "h-5 w-5"}`}
+          />
+        </div>
       </div>
+      {/* Launch stamp: pop-in arrow that plays while GatewayLink holds the
+          click for a beat — the "click registered, launching" ack before
+          navigating (user request: arrow instead of the old checkmark). */}
+      <span aria-hidden className="gateway-stamp">
+        <span
+          className={`gateway-stamp-chip ${tone.soft} ${tone.fg} ${featured ? "h-16 w-16" : "h-14 w-14"}`}
+        >
+          <ArrowRight
+            className={featured ? "h-8 w-8" : "h-7 w-7"}
+            strokeWidth={2.5}
+          />
+        </span>
+      </span>
     </div>
   );
 }
@@ -683,6 +785,9 @@ interface DocRowProps {
   action: string;
   download?: boolean;
   external?: boolean;
+  /** Internal in-site navigation: the action chip shows an arrow instead of
+   *  the download/external-link glyph (guestbook card). */
+  nav?: boolean;
 }
 
 function DocRow({
@@ -694,6 +799,7 @@ function DocRow({
   action,
   download,
   external,
+  nav,
 }: DocRowProps) {
   const t = tones[tone];
   if (!href) return null;
@@ -724,6 +830,8 @@ function DocRow({
         >
           {external ? (
             <ExternalLink className="h-4 w-4" aria-hidden />
+          ) : nav ? (
+            <ArrowRight className="h-4 w-4" aria-hidden />
           ) : (
             <Download className="h-4 w-4" aria-hidden />
           )}

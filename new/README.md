@@ -6,6 +6,8 @@ This folder contains planning drafts for the Next.js rebuild of the Jekyll-based
 
 - `IMPLEMENTATION_STATUS.md`: authoritative current-state report (2026-09-04) — what is built route-by-route, the **user-locked v1 design baseline**, the resume checkpoint, and what a fresh agent should do next. Start here.
 
+> **Operations, not design** — `GALLERY_ADDING_PHOTOS.md` is a practical how-to (not one of the planning drafts below): it documents the routine for adding gallery photos (drop originals in `GalleryPhoto/` → `npm run gallery:gen` → fill human fields in `content/gallery/items.json`) plus edge cases (no-GPS dots, removal, filenames-as-identity) and the GPS-assisted place/placeLocal drafting procedure. Consult it whenever a gallery batch lands or the user asks how to add photos.
+
 ## Draft Files
 
 - `SITE_ARCHITECTURE.md`: overall product direction, site goals, confirmed decisions, and open questions.

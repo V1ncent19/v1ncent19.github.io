@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ArrowRight, BookOpen, Search } from "lucide-react";
+import { ArrowRight, ArrowDownWideNarrow, ArrowUpNarrowWide, BookOpen, Search } from "lucide-react";
 import type { BlogPostCard, BlogCategory } from "@/lib/blog";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
@@ -60,7 +60,11 @@ export function BlogIndexView({
   const s = copy[lang];
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<"all" | BlogCategory>("all");
-  const [oldestFirst, setOldestFirst] = useState(false);
+  /** Sort key + direction. Each key carries its natural default: newest-first
+   *  for dates, A→Z for titles (codepoint order — deterministic on server and
+   *  client, unlike localeCompare). */
+  const [sortKey, setSortKey] = useState<"date" | "title">("date");
+  const [dir, setDir] = useState<"asc" | "desc">("desc");
 
   // Deep-link support: opening /blog#cuisine (or the zh index) selects that
   // category on arrival and scrolls the chip strip into view. The bare
@@ -107,10 +111,23 @@ export function BlogIndexView({
         p.category.includes(q)
       );
     });
-    return [...list].sort((a, b) =>
-      oldestFirst ? (a.date < b.date ? -1 : 1) : a.date > b.date ? -1 : 1,
-    );
-  }, [posts, query, activeCat, oldestFirst]);
+    const flip = dir === "asc" ? 1 : -1;
+    return [...list].sort((a, b) => {
+      if (sortKey === "title") {
+        const byTitle =
+          a.titleText < b.titleText ? -1 : a.titleText > b.titleText ? 1 : 0;
+        // Ties fall back to date within the same direction.
+        return (
+          byTitle * flip ||
+          (a.date < b.date ? -1 : a.date > b.date ? 1 : 0) * flip
+        );
+      }
+      return (
+        (a.date < b.date ? -1 : a.date > b.date ? 1 : 0) * flip ||
+        (a.titleText < b.titleText ? -1 : 1)
+      );
+    });
+  }, [posts, query, activeCat, sortKey, dir]);
 
   const themeCount = [...counts.values()].filter((n) => n > 0).length;
   const latest = posts[0];
@@ -156,10 +173,13 @@ export function BlogIndexView({
           />
         </div>
 
-        {/* ---- Category chips (real counts) ---- */}
+        {/* ---- Category chips (real counts) ----
+            Stacked (wrapping) layout instead of a horizontal scroll strip:
+            tags flow onto as many rows as needed and everything stays visible
+            without dragging, on mobile included. */}
         <div
           id={CATEGORY_ANCHOR_ID}
-          className="no-scrollbar -mx-1 mt-5 flex items-center gap-2 overflow-x-auto px-1 pb-2"
+          className="-mx-1 mt-5 flex flex-wrap items-center gap-2 px-1 py-1"
         >
           <Chip active={activeCat === "all"} onClick={() => selectCategory("all")}>
             <span>{s.blog.allLabel}</span>
@@ -177,14 +197,44 @@ export function BlogIndexView({
         <div className="ui-text mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-tint px-4 py-3">
           <div className="flex flex-wrap items-center gap-2">
             <SortChip
-              active={!oldestFirst}
-              onClick={() => setOldestFirst(false)}
+              active={sortKey === "date"}
+              onClick={() => {
+                setSortKey("date");
+                setDir("desc"); // date's natural default: newest first
+              }}
             >
-              {s.blog.newest}
+              {s.blog.sortDate}
             </SortChip>
-            <SortChip active={oldestFirst} onClick={() => setOldestFirst(true)}>
-              {s.blog.oldest}
+            <SortChip
+              active={sortKey === "title"}
+              onClick={() => {
+                setSortKey("title");
+                setDir("asc"); // title's natural default: A→Z
+              }}
+            >
+              {s.blog.sortTitle}
             </SortChip>
+            {/* Direction toggle; label adapts to the active key. */}
+            <button
+              type="button"
+              onClick={() => setDir((d) => (d === "desc" ? "asc" : "desc"))}
+              aria-label={sortKey === "date" ? s.blog.sortDate : s.blog.sortTitle}
+              title={sortKey === "date" ? s.blog.sortDate : s.blog.sortTitle}
+              className="ui-text inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-muted shadow-sm transition-colors hover:text-ink"
+            >
+              {dir === "desc" ? (
+                <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden />
+              ) : (
+                <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden />
+              )}
+              {sortKey === "title"
+                ? dir === "asc"
+                  ? "A→Z"
+                  : "Z→A"
+                : dir === "desc"
+                  ? s.blog.newest
+                  : s.blog.oldest}
+            </button>
           </div>
           <span className="text-xs font-medium text-faint">
             {fmt(s.blog.resultsTemplate, { shown: filtered.length, total: posts.length })}

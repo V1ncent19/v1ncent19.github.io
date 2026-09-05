@@ -2,6 +2,8 @@
 
 import {
   ArrowDownUp,
+  ArrowDownWideNarrow,
+  ArrowUpNarrowWide,
   Camera,
   ChevronUp,
   Download,
@@ -21,6 +23,7 @@ import {
   useSyncExternalStore,
   type CSSProperties,
 } from "react";
+import { createPortal } from "react-dom";
 import type { GalleryItem } from "@/lib/content";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
@@ -103,18 +106,6 @@ function daysAgoLabel(iso: string, lang: Lang): string | null {
   if (days === 0) return lang === "zh" ? "今天" : "Today";
   if (days === 1) return lang === "zh" ? "昨天" : "Yesterday";
   return lang === "zh" ? `${days} 天前` : `${days} days ago`;
-}
-
-/**
- * Stable partition that lifts curated (featured) rows to the front while
- * keeping each group in the caller's given order. Used by the default (date)
- * view so the featured picks lead the grid (Task D #2).
- */
-function curatedFirst<T extends { featured: boolean }>(list: readonly T[]): T[] {
-  const curated: T[] = [];
-  const rest: T[] = [];
-  for (const item of list) (item.featured ? curated : rest).push(item);
-  return curated.concat(rest);
 }
 
 type LocalField = "place" | "placeLocal" | "title";
@@ -275,8 +266,11 @@ export function GalleryView({
   const unit = lang === "zh" ? "张" : "photos";
 
   const [mode, setMode] = useState<SortMode>("date");
+  /** Sort direction for the date/place keys ("shuffle" ignores it). Each key
+   *  carries its own natural default: newest-first for dates, A→Z for places. */
+  const [dir, setDir] = useState<"asc" | "desc">("desc");
   /** Curated-collection filter (精选集): when active, only `featured` rows show. */
-  const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [featuredOnly, setFeaturedOnly] = useState(true);
   const [shuffleNonce, setShuffleNonce] = useState(0);
   const [prefCols, setPrefCols] = useState<number>(DEFAULT_COLUMNS);
   const [containerW, setContainerW] = useState(0);
@@ -307,31 +301,29 @@ export function GalleryView({
     [items, featuredOnly],
   );
 
-  /** Photos in the current display order (default: curated picks first, then
-   * newest-first). */
+  /** Photos in the current display order. Date = newest/oldest by `dir`;
+   *  place = alphabetical by `dir` (unlabelled frames always sink); the
+   *  tiebreaker follows the same direction. Featured rows no longer lead
+   *  (2026-09-05 user decision, supersedes Task D #2's curated-first band). */
   const ordered = useMemo(() => {
     if (mode === "shuffle") return shuffleList(visible, shuffleNonce);
+    const flip = dir === "asc" ? 1 : -1; // asc: natural order; desc: reversed
     if (mode === "place") {
       return [...visible].sort((a, b) => {
         const pa = localized(a, "place", lang).toLowerCase();
         const pb = localized(b, "place", lang).toLowerCase();
         if (!pa && pb) return 1; // unlabelled frames sink to the end
         if (pa && !pb) return -1;
-        if (pa !== pb) return pa < pb ? -1 : 1;
-        return (b.date || "").localeCompare(a.date || "");
+        if (pa !== pb) return (pa < pb ? -1 : 1) * flip;
+        return (a.date || "").localeCompare(b.date || "") * flip;
       });
     }
-    // Default "by date" (also the landing order): the curated (精选集) picks
-    // form a leading top band, the rest follow newest-first (Task D #2 — all
-    // photos stay visible, featured ones simply lead). Under the featured-only
-    // filter `visible` is already all curated, so the partition is a no-op.
-    return curatedFirst(
-      [...visible].sort(
-        (a, b) =>
-          (b.date || "").localeCompare(a.date || "") || a.id.localeCompare(b.id),
-      ),
+    return [...visible].sort(
+      (a, b) =>
+        ((a.date || "").localeCompare(b.date || "") ||
+          a.id.localeCompare(b.id)) * flip,
     );
-  }, [visible, mode, lang, shuffleNonce]);
+  }, [visible, mode, dir, lang, shuffleNonce]);
 
   // Measure the grid once + on resize (state updates only inside rAF / events).
   useEffect(() => {
@@ -491,6 +483,9 @@ export function GalleryView({
 
   function sortTo(next: SortMode) {
     if (next === "shuffle") setShuffleNonce((n) => n + 1);
+    // Each sort key carries its natural default direction: newest-first for
+    // dates, A→Z for places. The toggle then flips from there.
+    setDir(next === "place" ? "asc" : "desc");
     setMode(next);
   }
 
@@ -540,9 +535,22 @@ export function GalleryView({
     closingRef.current = true;
     setClosing(true);
     const panel = dialogRef.current;
-    const T = tileRect.current;
+    // Re-measure the trigger tile NOW instead of reusing the rect captured at
+    // open time: the tile was hovered when clicked (its -4px hover lift shifts
+    // the rect up), and by close the pointer is over the overlay, so the
+    // resting rect is the correct collapse target — reusing the stale one made
+    // the panel land ~4px high and pop on unmount.
+    const r = triggerRef.current?.getBoundingClientRect();
+    const T =
+      r && r.width > 0 && r.height > 0
+        ? { x: r.x, y: r.y, w: r.width, h: r.height }
+        : tileRect.current;
     const unmount = () => {
-      triggerRef.current?.focus();
+      // preventScroll: plain focus() scrolls a not-fully-visible tile into
+      // view (honouring scroll-padding-top) WHILE the scrollbar is hidden by
+      // the scroll lock — the viewport then sits at a different offset when
+      // the overlay unmounts, which reads as a vertical page jump on close.
+      triggerRef.current?.focus({ preventScroll: true });
       setOpenIdx(null);
     };
     if (!panel || !T || T.w <= 0 || T.h <= 0) {
@@ -681,7 +689,7 @@ export function GalleryView({
    * Photo overlays of the image stage: frosted meta chip bottom-left, position
    * counter bottom-right. Both track the photo's own corners (they annotate the
    * image), so they move with it across aspect changes — that is intended. The
-   * Close button is NOT here: it is pinned to the overlay so it never drifts.
+   * Close button lives here too (2026-09-05 mobile review, see `closeButton`).
    */
   const stageControls = () =>
     active ? (
@@ -702,6 +710,27 @@ export function GalleryView({
         </span>
       </>
     ) : null;
+
+  /**
+   * Close button of the opened card (2026-09-05 mobile review): lives INSIDE
+   * the image stage at the photo's top-right corner — on a phone the card
+   * spans nearly the full viewport, so a viewport-fixed ✕ visually fused with
+   * the card's corner while floating over the dimmed page behind it. Anchored
+   * to the stage it reads as part of the photo viewer (and rides the FLIP
+   * entrance with the panel). Rendered right after `stageControls()` in both
+   * branches; the stage chips are pointer-events-none, this one is interactive.
+   */
+  const closeButton = (
+    <button
+      type="button"
+      aria-label={s.gallery.close}
+      title={s.gallery.close}
+      onClick={requestClose}
+      className="absolute top-3 right-3 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/55 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+    >
+      <X className="h-5 w-5" aria-hidden />
+    </button>
+  );
 
   /**
    * Caption content of the opened card (both layouts). Redesigned 2026-09-05
@@ -851,6 +880,27 @@ export function GalleryView({
 
         {/* ---- Sort strip + column chooser ---- */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border border-line bg-surface-tint px-4 py-3">
+          {/* Curated filter (精选集) — pinned to the very front of the strip.
+              The accent follows the same rule as the tiles — featured = orange. */}
+          <button
+            type="button"
+            onClick={() => setFeaturedOnly((v) => !v)}
+            aria-pressed={featuredOnly}
+            className={[
+              "ui-text inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors hover:no-underline",
+              featuredOnly
+                ? "border-[var(--curated)] bg-[var(--curated-soft)] text-[var(--curated)]"
+                : "border-line bg-surface text-muted shadow-sm hover:bg-surface-tint hover:text-ink",
+            ].join(" ")}
+          >
+            <Star
+              className="h-3.5 w-3.5"
+              aria-hidden
+              fill={featuredOnly ? "currentColor" : "none"}
+            />
+            {s.gallery.featured}
+          </button>
+
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <span className="ui-text text-xs font-medium uppercase tracking-widest text-muted">
               {s.gallery.filterLabel}
@@ -873,32 +923,41 @@ export function GalleryView({
                   {label}
                 </button>
               ))}
+              {/* Direction toggle (date/place only — shuffle has no order).
+                  Icon + label mirror the current direction; place uses the
+                  neutral A→Z / Z→A shorthand. */}
+              {mode !== "shuffle" ? (
+                <button
+                  type="button"
+                  onClick={() => setDir((d) => (d === "desc" ? "asc" : "desc"))}
+                  aria-label={s.gallery.sortDir}
+                  title={s.gallery.sortDir}
+                  className="ui-text inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted shadow-sm transition-colors hover:text-ink"
+                >
+                  {dir === "desc" ? (
+                    <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden />
+                  ) : (
+                    <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden />
+                  )}
+                  <span className="text-xs font-semibold">
+                    {mode === "place"
+                      ? dir === "asc"
+                        ? "A→Z"
+                        : "Z→A"
+                      : dir === "desc"
+                        ? s.gallery.dirNew
+                        : s.gallery.dirOld}
+                  </span>
+                </button>
+              ) : null}
             </div>
           </div>
 
-          {/* Curated filter (精选集): narrow the grid to `featured` rows. The
-              accent follows the same rule as the tiles — featured = orange. */}
-          <button
-            type="button"
-            onClick={() => setFeaturedOnly((v) => !v)}
-            aria-pressed={featuredOnly}
-            className={[
-              "ui-text inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors hover:no-underline",
-              featuredOnly
-                ? "border-[var(--curated)] bg-[var(--curated-soft)] text-[var(--curated)]"
-                : "border-line bg-surface text-muted shadow-sm hover:bg-surface-tint hover:text-ink",
-            ].join(" ")}
-          >
-            <Star
-              className="h-3.5 w-3.5"
-              aria-hidden
-              fill={featuredOnly ? "currentColor" : "none"}
-            />
-            {s.gallery.featured}
-          </button>
-
-          {/* Column count: 3 / 4 / 5, default 4 (buttons that cannot fit are dimmed) */}
-          <div className="ml-auto flex items-center gap-2.5">
+          {/* Column count: 3 / 4 / 5, default 4 (buttons that cannot fit are
+              dimmed). Mobile-only decision 2026-09-05: hidden below md — the
+              width clamp alone decides 1/2 columns there, freeing the strip's
+              right side for the sort controls. Desktop keeps manual control. */}
+          <div className="ml-auto hidden items-center gap-2.5 md:flex">
             <span className="ui-text hidden items-center gap-1.5 text-xs font-medium uppercase tracking-widest text-muted sm:inline-flex">
               <LayoutGrid className="h-3.5 w-3.5 text-brand" aria-hidden />
               {s.gallery.columns}
@@ -971,9 +1030,15 @@ export function GalleryView({
           </p>
         </div>
 
-        {/* ---- Lightbox ---- */}
-        {openIdx !== null && active ? (
-          <div
+        {/* ---- Lightbox ----
+            Portalled to <body> (same trick as the blog TOC): rendered inline
+            it lives inside <main>'s `relative z-10` stacking context, so even
+            at z-50 the whole overlay painted BELOW the sticky z-40 capsule
+            nav — on mobile the photo's top edge was covered by the nav bar.
+            Outside of main it also stays clear of the route-fade transform. */}
+        {openIdx !== null && active
+          ? createPortal(
+              <div
             ref={overlayRef}
             className={
               (closing ? "gb-overlay-out " : "gb-overlay-in ") +
@@ -999,18 +1064,6 @@ export function GalleryView({
               className="absolute inset-0 bg-black/70 backdrop-blur-sm"
               aria-hidden
             />
-
-            {/* Close is pinned to the overlay (viewport-fixed), NOT the image
-                stage, so it never drifts between photos of different aspect. */}
-            <button
-              type="button"
-              aria-label={s.gallery.close}
-              title={s.gallery.close}
-              onClick={requestClose}
-              className="fixed top-3 right-3 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/40 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:top-4 sm:right-4"
-            >
-              <X className="h-5 w-5" aria-hidden />
-            </button>
 
             {wide && paneImage ? (
               /* Desktop / two-pane: the left image column is EXACTLY as large as
@@ -1039,10 +1092,11 @@ export function GalleryView({
                     key={active.id}
                     src={active.large}
                     alt={active.alt.trim() || describe(active, lang)}
-                    className="gb-img-in block h-full w-full select-none"
-                  />
-                  {stageControls()}
-                </div>
+                  className="gb-img-in block h-full w-full select-none"
+                />
+                {stageControls()}
+                {closeButton}
+              </div>
                 <aside
                   style={{
                     ...accentVars(active),
@@ -1083,6 +1137,7 @@ export function GalleryView({
                     className="gb-img-in h-full w-full object-contain select-none"
                   />
                   {stageControls()}
+                  {closeButton}
                 </div>
                 <div
                   style={accentVars(active)}
@@ -1092,8 +1147,10 @@ export function GalleryView({
                 </div>
               </figure>
             )}
-          </div>
-        ) : null}
+              </div>,
+              document.body,
+            )
+          : null}
       </div>
     </section>
   );

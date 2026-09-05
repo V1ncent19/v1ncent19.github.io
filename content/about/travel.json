@@ -1,0 +1,181 @@
+{
+  "_readme": "旅行清单数据（About 页「在路上」信封内）。visited = 已解锁足迹；wishlist = 待解锁心愿。每条字段：name（必填，中文/默认显示名）、nameEn（可选，英文页显示，缺省回退到 name）、year（visited 可选，如 2025）、note（可选一句话备注）、lat / lon（可选，十进制度 WGS84——两个都填了才会在下方地图上落点；不填只出现在清单里，不填不会虚构位置）。",
+  "visited": [
+    {
+      "nameEn": "France/Netherlands",
+      "name": "髪/荷",
+      "lat": 48.8566,
+      "lon": 2.3522
+    },
+    {
+      "nameEn": "Portugal/Spain",
+      "name": "葡/西",
+      "lat": 40.4168,
+      "lon": -3.7038
+    },
+    {
+      "nameEn": "Cambodia",
+      "name": "寮国",
+      "lat": 13.3611,
+      "lon": 103.8594
+    },
+    {
+      "nameEn": "Thailand",
+      "name": "泰国",
+      "lat": 15.8700,
+      "lon": 100.9925
+    },
+    {
+      "nameEn": "Japan",
+      "name": "日本",
+      "lat": 36.2048,
+      "lon": 138.2529
+    },
+    {
+      "nameEn": "Guatemala",
+      "name": "危地马拉",
+      "lat": 15.7835,
+      "lon": -90.2308
+    },
+    {
+      "nameEn": "Austria",
+      "name": "奥地利",
+      "lat": 47.5162,
+      "lon": 14.5501
+    },
+    {
+      "nameEn": "Taiwan",
+      "name": "台湾",
+      "lat": 23.6978,
+      "lon": 120.9605
+    },
+    {
+      "nameEn": "St.Louis, MO, USA",
+      "name": "美国圣路易斯",
+      "lat": 38.6270,
+      "lon": -90.1994
+    },
+    {
+      "nameEn": "New York, NY, USA",
+      "name": "美国纽约",
+      "lat": 40.7128,
+      "lon": -74.0060
+    },
+    {
+      "nameEn": "Boston, MA, USA",
+      "name": "美国波士顿",
+      "lat": 42.3601,
+      "lon": -71.0589
+    },
+    {
+      "nameEn": "Alaska, USA",
+      "name": "美国阿拉斯加",
+      "lat": 64.2008,
+      "lon": -149.4937
+    },
+    {
+      "nameEn": "Nanjing, China",
+      "name": "中国南京",
+      "lat": 32.0603,
+      "lon": 118.7969
+    },
+    {
+      "nameEn": "Xinjiang, China",
+      "name": "中国新疆",
+      "lat": 41.2971,
+      "lon": 86.9226
+    },
+    {
+      "nameEn": "Hefei, China",
+      "name": "中国合肥",
+      "lat": 31.8206,
+      "lon": 117.2272
+    },
+    {
+      "nameEn": "Tianjin, China",
+      "name": "中国天津",
+      "lat": 39.3434,
+      "lon": 117.3616
+    },
+    {
+      "nameEn": "South Korea",
+      "name": "韩国",
+      "lat": 35.9078,
+      "lon": 127.7669
+    },
+    {
+      "nameEn": "Singapore/Malaysia",
+      "name": "新加坡/马来西亚",
+      "lat": 1.3521,
+      "lon": 103.8198
+    }
+  ],
+  "wishlist": [
+    {
+      "nameEn": "Brazil/Argentina",
+      "name": "巴西/阿根廷",
+      "lat": -14.2350,
+      "lon": -51.9253
+    },
+    {
+      "name": "日本北陆",
+      "nameEn": "Japan (Hokuriku)",
+      "lat": 36.2048,
+      "lon": 138.2529
+    },
+    {
+      "name": "日本九州",
+      "nameEn": "Japan (Kyushu)",
+      "lat": 32.7503,
+      "lon": 130.0000
+    },
+    {
+      "name": "Mexico",
+      "nameEn": "Mexico",
+      "lat": 23.6345,
+      "lon": -102.5528
+    },
+    {
+      "name": "秘鲁",
+      "nameEn": "Peru",
+      "lat": -9.1900,
+      "lon": -75.0152
+    },
+    {
+      "name": "中亚五国",
+      "nameEn": "Central Asia",
+      "lat": 41.2044,
+      "lon": 74.7661
+    },
+    {
+      "name": "俄罗斯",
+      "nameEn": "Russia",
+      "lat": 55.7558,
+      "lon": 37.6173
+    },
+    {
+      "name": "大不列颠",
+      "nameEn": "Great Britain",
+      "lat": 51.5074,
+      "lon": -0.1278
+    },
+    {
+      "name": "埃及",
+      "nameEn": "Egypt",
+      "lat": 26.8206,
+      "lon": 30.8025
+    },
+    {
+      "name": "希腊",
+      "nameEn": "Greece",
+      "lat": 39.0742,
+      "lon": 21.8243
+    },
+    {
+      "name": "肯尼亚",
+      "nameEn": "Kenya",
+      "lat": -0.0236,
+      "lon": 37.9062
+    }
+  ]
+}

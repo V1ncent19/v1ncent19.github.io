@@ -18,7 +18,10 @@ import type { ReactNode } from "react";
  *  - Reduced motion is flattened by the global `*` media rule in globals.css.
  *  - Only opacity + a 4px translateY are animated and the final keyframe is
  *    `transform: none`, so no persistent containing block is created for fixed
- *    descendants (the gallery lightbox overlay) after the run.
+ *    descendants (the gallery lightbox overlay) after the run. DURING the
+ *    260ms run, though, the transform does hijack fixed descendants — which
+ *    is why anything fixed that paints on mount (the blog post TOC) portals
+ *    itself to <body> instead of living in the page tree.
  */
 export function RouteFade({ children }: { children: ReactNode }) {
   const pathname = usePathname();
