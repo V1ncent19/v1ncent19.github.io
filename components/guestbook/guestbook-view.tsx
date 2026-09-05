@@ -4,8 +4,8 @@
  * Guestbook view (2026-09-05) — the site's single comment area.
  *
  * Two giscus streams live here, switched by tabs (user-confirmed design):
- *  - "guestbook"    — the open message board;
- *  - "bug-reports"  — the bug-report stream.
+ *  - "index"       — the open message board (legacy Discussion #1);
+ *  - "bug-reports" — the bug-report stream.
  * Both use mapping="specific" with a FIXED term, so every language variant of
  * this page (/guestbook and /guestbook/zh) reads and writes the very same
  * GitHub Discussion. Reached from the homepage's "Direct access" card —
@@ -20,8 +20,11 @@ import { Bug, MessageCircle } from "lucide-react";
 import { GiscusComments } from "@/components/blog/giscus-comments";
 import { copy, type Lang } from "@/lib/i18n";
 
-/** Fixed giscus terms — changing either orphans the existing discussion. */
-const TERM_MESSAGES = "guestbook";
+/** Fixed giscus terms — changing either orphans the existing discussion.
+ *  Messages term MUST stay "index": that is the title of the legacy
+ *  Discussion (#1, created by the old site's pathname mapping in 2023) that
+ *  holds all historical guestbook comments. Renaming it strands them. */
+const TERM_MESSAGES = "index";
 const TERM_BUGS = "bug-reports";
 
 export function GuestbookView({ lang }: { lang: Lang }) {
