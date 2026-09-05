@@ -27,6 +27,7 @@ import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
 import { GatewayReveal } from "@/components/home/gateway-reveal";
 import { GatewayLink } from "@/components/home/gateway-link";
+import { BusuanziScript, SitePv } from "@/components/home/busuanzi";
 
 type SectionId = Exclude<NavId, "home">;
 
@@ -253,6 +254,8 @@ export default function HomePage() {
 
   return (
     <div className="pb-16">
+      {/* Official busuanzi script (deferred, once per page, skipped on dev). */}
+      <BusuanziScript />
       {/* ---- Hero: intro text on the canvas (no card), portrait floated ---- */}
       <section className="shell pt-2 sm:pt-4">
         <div className="mx-auto max-w-5xl">
@@ -517,13 +520,14 @@ export default function HomePage() {
               </ul>
 
               {/* Site metadata (2026-09-05, Task D #8) — compact row card in
-                  place of the old three StatTiles. Page views resume from the
-                  legacy busuanzi baseline, the giscus count lands once posts
+                  place of the old three StatTiles. Page views are LIVE via
+                  busuanzi 3.6.9 (official CDN), offset by the legacy baseline
+                  from content/profile.json; the giscus count lands once posts
                   have live comment sections, and the license text is editable
-                  in content/profile.json. Wired at deployment. */}
+                  in content/profile.json. */}
               <section className="mt-12">
                 <ModuleHeader
-                  caption="Page views, giscus comments and the site license — live counters connect here at deployment."
+                  caption="Page views (live via busuanzi + legacy baseline), giscus comments and the site license."
                 >
                   Site Metadata
                 </ModuleHeader>
@@ -531,8 +535,8 @@ export default function HomePage() {
                   <MetaRow
                     icon={Eye}
                     label="Page views"
-                    note="All-time, from the legacy baseline"
-                    value={countOf(sitePvBaseline)}
+                    note="All-time — live count + legacy baseline"
+                    value={<SitePv baseline={sitePvBaseline} />}
                   />
                   <MetaRow
                     icon={MessageSquare}
@@ -555,10 +559,6 @@ export default function HomePage() {
       </section>
     </div>
   );
-}
-
-function countOf(n: number): string {
-  return n.toLocaleString("en-US");
 }
 
 /* ---------------------------------------------------------------------------
@@ -734,7 +734,8 @@ function MetaRow({
   icon: LucideIcon;
   label: string;
   note?: string;
-  value: string;
+  /** Plain string, or a client component (e.g. the live SitePv counter). */
+  value: ReactNode;
   href?: string;
 }) {
   const valueNode = href ? (
