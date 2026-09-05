@@ -1,73 +1,74 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
- * busuanzi page-view counter (2026-09-05, official 3.6.9 CDN).
+ * busuanzi page-view counter (2026-09-06, official 3.x backend).
  *
- * `BusuanziScript` injects the official deferred script once per document
- * (skipped on localhost so dev sessions never inflate the real count).
- * `SitePv` renders the span the script fills (`#busuanzi_site_pv`) and, via a
- * MutationObserver, re-displays the value OFFSET BY the legacy baseline from
- * content/profile.json (`legacyStats.sitePvBaseline`) — busuanzi starts from
- * zero on the new domain, the baseline keeps the old site's history.
+ * Why a direct fetch instead of the official <script> tag: the script is
+ * one-shot per document (`window.busuanziRequestSent` guard) and only fills
+ * spans present at execution time. In an SPA, a visitor who lands on any
+ * other page and client-navigates to Home afterwards would never see a
+ * value — the span would sit on its placeholder forever. So SitePv calls
+ * the very same official endpoint the script uses (cdn.busuanzi.cc/api.php,
+ * same POST body) on every Home mount; a fresh Home view counts as a view,
+ * which matches what the script would have done anyway.
  *
- * `sessionPv` caches the last value at module scope: on client-side
- * navigation back to the home page the script has already run, so the span
- * would stay on its placeholder forever — we just re-render the cached
- * number instead (no double counting).
+ * The displayed value is the live count OFFSET BY the legacy baseline from
+ * content/profile.json (`legacyStats.sitePvBaseline`) — busuanzi restarted
+ * from zero on the new domain, the baseline keeps the old site's history.
+ *
+ * `sessionPv` caches the last value at module scope so remounts within one
+ * browsing session don't re-count.
  */
+
+const API = "https://cdn.busuanzi.cc/api.php";
 
 /** Last busuanzi value seen in this browsing session (client-only module state). */
 let sessionPv: number | null = null;
 
-export function BusuanziScript() {
-  useEffect(() => {
-    const host = window.location.hostname;
-    if (host === "localhost" || host === "127.0.0.1") return;
-    if (document.getElementById("busuanzi-script")) return;
-    const s = document.createElement("script");
-    s.id = "busuanzi-script";
-    s.src = "//cdn.busuanzi.cc/busuanzi/3.6.9/busuanzi.min.js";
-    s.defer = true;
-    document.body.appendChild(s);
-  }, []);
-  return null;
-}
-
 export function SitePv({ baseline }: { baseline: number }) {
-  const ref = useRef<HTMLSpanElement>(null);
+  const [pv, setPv] = useState<number | null>(sessionPv);
+  const alive = useRef(true);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const fmt = (n: number) => n.toLocaleString("en-US");
-    const apply = (n: number) => {
-      el.textContent = fmt(n + baseline);
+    alive.current = true;
+    const host = window.location.hostname;
+    // Skip on dev origins so local sessions never inflate the real count.
+    if (host === "localhost" || host === "127.0.0.1") return;
+    if (sessionPv !== null) return;
+
+    fetch(API, {
+      method: "POST",
+      body: JSON.stringify({
+        url: window.location.href,
+        referrer: document.referrer,
+      }),
+    })
+      .then((r) => r.json())
+      .then((r) => {
+        if (!alive.current) return;
+        const raw = Number(r?.busuanzi_site_pv);
+        if (Number.isFinite(raw)) {
+          sessionPv = raw;
+          setPv(raw);
+        }
+      })
+      .catch(() => {
+        /* counter is decorative — stay on the placeholder silently */
+      });
+    return () => {
+      alive.current = false;
     };
-
-    // Session cache: script already ran earlier — show the known value.
-    if (sessionPv !== null) {
-      apply(sessionPv);
-      return;
-    }
-
-    // First mount: wait for busuanzi to overwrite the span, then offset it.
-    const mo = new MutationObserver(() => {
-      const raw = parseInt(el.textContent?.replace(/[^\d]/g, "") ?? "", 10);
-      if (Number.isFinite(raw)) {
-        mo.disconnect();
-        sessionPv = raw;
-        apply(raw);
-      }
-    });
-    mo.observe(el, { childList: true, characterData: true, subtree: true });
-    return () => mo.disconnect();
-  }, [baseline]);
+  }, []);
 
   return (
-    <span ref={ref} id="busuanzi_site_pv">
-      {baseline > 0 ? baseline.toLocaleString("en-US") : "Loading…"}
+    <span id="busuanzi_site_pv">
+      {pv !== null
+        ? (pv + baseline).toLocaleString("en-US")
+        : baseline > 0
+          ? baseline.toLocaleString("en-US")
+          : "Loading…"}
     </span>
   );
 }

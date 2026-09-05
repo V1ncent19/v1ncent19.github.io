@@ -27,7 +27,7 @@ import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
 import { GatewayReveal } from "@/components/home/gateway-reveal";
 import { GatewayLink } from "@/components/home/gateway-link";
-import { BusuanziScript, SitePv } from "@/components/home/busuanzi";
+import { SitePv } from "@/components/home/busuanzi";
 
 type SectionId = Exclude<NavId, "home">;
 
@@ -254,8 +254,6 @@ export default function HomePage() {
 
   return (
     <div className="pb-16">
-      {/* Official busuanzi script (deferred, once per page, skipped on dev). */}
-      <BusuanziScript />
       {/* ---- Hero: intro text on the canvas (no card), portrait floated ---- */}
       <section className="shell pt-2 sm:pt-4">
         <div className="mx-auto max-w-5xl">
