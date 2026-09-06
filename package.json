@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",
+    "d3-geo": "^3.1.1",
     "gray-matter": "^4.0.3",
     "katex": "^0.18.5",
     "lucide-react": "^1.40.0",
@@ -24,13 +25,16 @@
     "rehype-katex": "^7.0.1",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
-    "remark-math": "^6.0.0"
+    "remark-math": "^6.0.0",
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/d3-geo": "^3.1.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/topojson-client": "^3.1.5",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "exifr": "^7.1.3",

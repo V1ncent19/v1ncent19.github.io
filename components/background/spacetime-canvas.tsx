@@ -3,25 +3,62 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Site-wide spacetime backdrop (2026-09-05).
+ * Site-wide spacetime backdrop (2026-09-05, mass-registry rework 2026-09-07).
  *
  * A faint square grid — spacetime — rendered on a fixed full-viewport canvas
- * behind all content. The pointer acts as a mass: grid vertices are pulled
- * toward it with a (1 − d/R)² falloff, so lines bend and densify near the
- * cursor like an embedding diagram of a gravity well. The mass follows the
- * cursor on a damped spring, giving it "inertia" through curved spacetime.
+ * behind all content. Masses pull grid vertices toward them with a
+ * (1 − d/R)² falloff, so lines bend and densify near each mass like an
+ * embedding diagram of gravity wells.
+ *
+ * Two kinds of mass:
+ * - The pointer: a dynamic mass on a damped spring (gives the cursor
+ *   "inertia" through curved spacetime).
+ * - Static wells registered by page widgets via `registerStaticMass` —
+ *   e.g. the About travel globe presses a deeper well into the grid so the
+ *   mesh visibly bends around the planet. Registration/unregistration is
+ *   reactive; wells are re-read every frame from getBoundingClientRect, so
+ *   they follow layout and scroll for free.
  *
  * Everything tunable lives in CONFIG below — strength, radius, spring, grid
  * density, line colours per theme. Adjust there; no other file needs touching.
  *
  * Performance & accessibility contract:
- * - ~400–900 vertices, per-frame warp cost ≪ 1ms; DPR capped to avoid 4K
- *   overdraw; the rAF loop stops entirely once the spring settles and wakes
- *   on the next pointer move (demo-verified idle behaviour).
- * - Touch / prefers-reduced-motion: draws the flat grid once, no loop, no
- *   warp — pure static backdrop.
+ * - ~400–900 vertices; per-frame warp cost is O(vertices × masses) but each
+ *   mass has a radius early-out, so 2–3 masses stay ≪ 1ms; DPR capped to
+ *   avoid 4K overdraw; the rAF loop stops entirely once the spring settles
+ *   and wakes on the next pointer move / scroll (static wells move during
+ *   scroll even though the pointer doesn't).
+ * - Touch / prefers-reduced-motion: draws the flat grid + current wells once,
+ *   no loop, no pointer warp — pure static backdrop.
  * - No mass dot, no fill, no extra ornament: only the grid itself.
  */
+
+/** ──────────────── 静态质量注册表 ────────────────
+ * Page widgets (travel globe etc.) register an element as a fixed gravity
+ * well. The well's centre is the element's centre, re-read every rendered
+ * frame — it tracks layout, scroll and resize automatically. Keep wells few
+ * (one per decorative widget); each adds one O(vertices) warp pass with a
+ * radius early-out. */
+export type StaticMass = {
+  el: HTMLElement;
+  strength: number;
+  radius: number;
+  softening: number;
+};
+
+const staticMasses = new Set<StaticMass>();
+let onRegistryChange: (() => void) | null = null;
+
+/** Register `el` as a static gravity well. Returns the unregister function
+ * (call in the widget's effect cleanup). */
+export function registerStaticMass(mass: StaticMass): () => void {
+  staticMasses.add(mass);
+  onRegistryChange?.();
+  return () => {
+    staticMasses.delete(mass);
+    onRegistryChange?.();
+  };
+}
 
 /** ──────────────── 维护接口：调整效果改这里 ──────────────── */
 const CONFIG = {
@@ -32,7 +69,7 @@ const CONFIG = {
   },
   /** 质量（鼠标）行为 */
   MASS: {
-    strength: 40, // 引力强度：顶点被拉向质量的最大位移（px）
+    strength: 25, // 引力强度：顶点被拉向质量的最大位移（px）
     radius: 220, // 影响半径（px）：只扭曲质量周围这个范围内的网格
     softening: 48, // 软化长度（px）：质心附近位移 → 0，防止网格折叠出尖角
     spring: 0.2, // 弹性跟随系数 0~1：越小越"沉重"、跟随越慢
@@ -117,31 +154,79 @@ export function SpacetimeCanvas() {
       }
     }
 
+    type ActiveMass = {
+      x: number;
+      y: number;
+      strength: number;
+      radius: number;
+      r2: number;
+      softening: number;
+    };
+
+    /* Pointer mass (if placed) + every registered static well whose element
+       is on screen. The canvas is fixed inset-0, so client coordinates ARE
+       canvas coordinates — no offset arithmetic needed. */
+    function gatherMasses(): ActiveMass[] {
+      const out: ActiveMass[] = [];
+      if (mx > -1e4)
+        out.push({
+          x: mx,
+          y: my,
+          strength: CONFIG.MASS.strength,
+          radius: CONFIG.MASS.radius,
+          r2: CONFIG.MASS.radius * CONFIG.MASS.radius,
+          softening: CONFIG.MASS.softening,
+        });
+      for (const m of staticMasses) {
+        const r = m.el.getBoundingClientRect();
+        if (r.width < 4 || r.height < 4) continue;
+        if (
+          r.bottom < -64 ||
+          r.top > h + 64 ||
+          r.right < -64 ||
+          r.left > w + 64
+        )
+          continue;
+        out.push({
+          x: r.left + r.width / 2,
+          y: r.top + r.height / 2,
+          strength: m.strength,
+          radius: m.radius,
+          r2: m.radius * m.radius,
+          softening: m.softening,
+        });
+      }
+      return out;
+    }
+
     function render() {
       const c = ctx!;
-      const { strength, radius } = CONFIG.MASS;
-      const R2 = radius * radius;
-      // Warp pass: pull each vertex toward the mass. Regularised potential:
+      const masses = gatherMasses();
+      // Warp pass: pull each vertex toward every mass. Regularised potential:
       // d/√(d²+ε²) ramps displacement in smoothly from 0 at the centre (no
       // fold-over spikes), (1 − d/R)² decays it to 0 at the influence edge.
-      // The hard cap pull ≤ 0.8·d guarantees a vertex can never cross the
-      // mass even if the config is tuned aggressively.
+      // The hard cap pull ≤ 0.8·d guarantees a vertex can never cross a mass
+      // even if the config is tuned aggressively.
       for (let k = 0; k < baseX.length; k++) {
         let x = baseX[k];
         let y = baseY[k];
-        const vx = mx - x;
-        const vy = my - y;
-        const d2 = vx * vx + vy * vy;
-        if (d2 < R2 && d2 > 1e-4) {
-          const d = Math.sqrt(d2);
-          const fall = 1 - d / radius;
-          let pull =
-            strength *
-            (d / Math.sqrt(d2 + CONFIG.MASS.softening * CONFIG.MASS.softening)) *
-            fall * fall;
-          if (pull > d * 0.8) pull = d * 0.8;
-          x += (vx / d) * pull;
-          y += (vy / d) * pull;
+        for (let mi = 0; mi < masses.length; mi++) {
+          const m = masses[mi];
+          const vx = m.x - x;
+          const vy = m.y - y;
+          const d2 = vx * vx + vy * vy;
+          if (d2 < m.r2 && d2 > 1e-4) {
+            const d = Math.sqrt(d2);
+            const fall = 1 - d / m.radius;
+            let pull =
+              m.strength *
+              (d / Math.sqrt(d2 + m.softening * m.softening)) *
+              fall *
+              fall;
+            if (pull > d * 0.8) pull = d * 0.8;
+            x += (vx / d) * pull;
+            y += (vy / d) * pull;
+          }
         }
         warpX[k] = x;
         warpY[k] = y;
@@ -219,6 +304,25 @@ export function SpacetimeCanvas() {
       }, 120);
     };
 
+    /* Static wells ride with the content during scroll even though the
+       pointer mass doesn't — re-render (or wake the loop) while scrolling.
+       Coalesced to one render per frame. */
+    let renderScheduled = false;
+    const scheduleRender = () => {
+      if (renderScheduled) return;
+      renderScheduled = true;
+      requestAnimationFrame(() => {
+        renderScheduled = false;
+        if (staticOnly()) render();
+        else wake();
+      });
+    };
+    const onScroll = () => {
+      if (staticMasses.size > 0) scheduleRender();
+    };
+    /* Widgets may register/unregister wells at any time — refresh once. */
+    onRegistryChange = scheduleRender;
+
     // Theme flips (.dark on <html>) repaint once with the new palette.
     const themeObserver = new MutationObserver(render);
     themeObserver.observe(document.documentElement, {
@@ -227,6 +331,7 @@ export function SpacetimeCanvas() {
     });
 
     window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
 
     layout();
@@ -238,7 +343,9 @@ export function SpacetimeCanvas() {
       window.clearTimeout(resizeTimer);
       themeObserver.disconnect();
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      if (onRegistryChange === scheduleRender) onRegistryChange = null;
     };
   }, []);
 
