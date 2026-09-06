@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gallery:gen": "node scripts/gallery.mjs"
+    "gallery:gen": "node scripts/gallery.mjs",
+    "badges": "node scripts/build-badges.mjs",
+    "prebuild": "npm run badges",
+    "predev": "npm run badges"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",

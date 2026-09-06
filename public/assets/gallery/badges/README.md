@@ -1,28 +1,41 @@
 # Gallery badges (travel stamps)
 
-Drop-in folder for the travel-stamp artwork shown on each gallery photo.
-A badge appears when BOTH halves are in place:
+Each gallery photo can show a composed travel-stamp badge: a **shared frame**
+(two rings) plus a **per-key icon**, inlined into a single `<svg>` at build
+time. A badge appears when BOTH halves are in place:
 
 1. An SVG file here named after the badge key, e.g. `taipei.svg`
-   → served at `/assets/gallery/badges/taipei.svg`.
+   → served conceptually at `/assets/gallery/badges/taipei.svg`.
 2. The same key set on the photo in `content/gallery/items.json`
    → `"badge": "taipei"`.
 
-No code change is needed: `components/gallery/travel-stamps.tsx` renders
-`<img src="/assets/gallery/badges/<key>.svg">` optimistically, and if a key has
-no matching `.svg` yet, the dashed placeholder is shown instead (never a broken
-image). Remove the `"badge"` key (or leave it `""`) to keep the placeholder.
+No component code changes are needed. After adding or editing artwork, run
+`npm run badges` (also runs automatically before `npm run build` and
+`npm run dev`) — it regenerates `components/gallery/badge-art.generated.ts`
+and **warns about items.json keys with no matching file**.
 
-Conventions:
+## How rendering works
 
-- **Square viewBox** (e.g. `viewBox="0 0 48 48"`), artwork centred. A stamp
-  renders at three sizes — 20px (photo-tile hover card), 36–40px (lightbox
-  caption), larger still on a future stamp-passport page — so keep the drawing
-  bold and legible at 20px. `object-fit: contain` is applied.
-- Real multi-colour stamps are fine as-is. Inline fallback stamps use
-  `currentColor` so they can be recoloured per theme; file SVGs don't inherit it.
-- A stamp that will also appear on the real stamp-passport page should be drawn
-  without baked-in text (it renders at two very different sizes), matching the
-  passport design in `new/CONTENT_MODEL.md`.
-- Name files with the exact key used in `items.json` (lowercase, `-` between
-  words); the `<img>` URL is case-sensitive.
+`components/gallery/travel-stamps.tsx` composes ONE inline `<svg>`:
+`badge-frame.svg` + `<key>.svg`, both flattened by the build script. Because
+the SVG is inline (not `<img>`), the artwork's `stroke="currentColor"`
+inherits the chip's CSS colour — tile accent tint, hover recolour and dark
+mode all work. An unknown/empty key renders the dashed postmark placeholder
+(decided at build time; no runtime 404).
+
+## Icon file conventions
+
+- **Icon only — do NOT bake in the two rings.** The frame lives solely in
+  `badge-frame.svg` (the single source of truth) and is added at build time.
+- Square `viewBox="0 0 100 100"`, artwork centred inside the inner ring
+  (r = 38, i.e. roughly the 12–88 box), so it clears the frame.
+- `fill="none"` + `stroke="currentColor"`, rounded joins, stroke-width
+  3.5–5 on the 100 × 100 viewBox — bold enough to stay legible at 20px,
+  where the badge renders on masonry hover cards.
+- Root presentation attributes (stroke-width, linecap, linejoin, …) are
+  preserved onto a wrapping `<g>` by the build script.
+- Mirror-symmetric silhouettes for landmarks/architecture when the subject
+  allows; avoid exposed line endings (projecting eaves are the exception).
+- No baked-in text (stamps render at very different sizes, and a future
+  stamp-passport page reuses the same artwork).
+- Name files with the exact items.json key: lowercase, `-` between words.

@@ -774,7 +774,7 @@ export function GalleryView({
           <StampBadge
             preset={item.badge}
             box="aspect-square w-[clamp(5rem,40%,7.5rem)] rounded-2xl"
-            mark="h-[70%] w-[70%]"
+            mark="h-full w-full"
           />
         </div>
 
@@ -1186,6 +1186,10 @@ function photoMeta(item: GalleryItem, lang: Lang): string {
  * from the --tile-accent / --tile-soft CSS vars set by the nearest accentVars.
  * The caller supplies the full box geometry (size + rounding) so the same
  * component scales from h-7 tile chip to the ~40%-of-rail emblem.
+ *
+ * Since 2026-09-06 the badge SVG itself carries the two-ring frame (inlined
+ * from badge-frame.svg at build time), so no CSS rings are drawn here and the
+ * mark fills the whole box — the frame's own r=45 leaves the margin.
  */
 function StampBadge({
   preset,
@@ -1204,9 +1208,7 @@ function StampBadge({
         box
       }
     >
-      <span className="pointer-events-none absolute inset-[3%] rounded-full border-[1.5px] border-dashed border-current opacity-90" />
-      <span className="pointer-events-none absolute inset-[12%] rounded-full border border-current opacity-45" />
-      <TravelStamp preset={preset} className={`relative z-10 ${mark}`} />
+      <TravelStamp preset={preset} className={mark} />
     </span>
   );
 }
@@ -1367,7 +1369,7 @@ function GalleryTile({
                   <StampBadge
                     preset={item.badge}
                     box="mt-0.5 h-7 w-7 rounded-md"
-                    mark="h-5.5 w-5.5"
+                    mark="h-full w-full"
                   />
                   <div className="min-w-0">
                     <p className="font-serif line-clamp-2 text-[13px] leading-snug font-bold text-[var(--tile-accent)]">

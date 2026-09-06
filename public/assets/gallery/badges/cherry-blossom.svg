@@ -1,0 +1,5 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+  <defs><path id="petal" d="M50 49c-8-4-13-11-12-18 1-6 5-11 10-13l2 6 3-6c6 3 9 8 9 14 0 7-5 14-12 17Z"/></defs>
+  <use href="#petal"/><use href="#petal" transform="rotate(72 50 50)"/><use href="#petal" transform="rotate(144 50 50)"/><use href="#petal" transform="rotate(216 50 50)"/><use href="#petal" transform="rotate(288 50 50)"/>
+  <circle cx="50" cy="50" r="7"/>
+</svg>

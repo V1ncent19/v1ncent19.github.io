@@ -1,40 +1,34 @@
-import { useState } from "react";
-import type { ComponentType } from "react";
+import type { CSSProperties } from "react";
+import { BADGE_ART, BADGE_FRAME } from "./badge-art.generated";
 
 /**
- * Travel-stamp "badges" for the gallery. Each photo's `badge` value in
- * content/gallery/items.json names a stamp. Two sources, in priority order:
+ * Travel-stamp badges for the gallery — composed INLINE at build time
+ * (user-confirmed plan B, 2026-09-06).
  *
- *  1. A drop-in SVG file at `public/assets/gallery/badges/<badge>.svg`
- *     (served at `/assets/gallery/badges/<badge>.svg`). Put your real artwork
- *     there, square, and it renders as-is — no code changes needed.
- *  2. The React `STAMP_PRESETS` registry below (used as a fallback while a
- *     badge is set but its .svg has not been added yet, or for stamps that
- *     live inline instead of as files).
+ * A badge is ONE inline <svg>: the shared two-ring frame from
+ * `public/assets/gallery/badges/badge-frame.svg` plus the per-key icon from
+ * `badges/<key>.svg`, both flattened into `badge-art.generated.ts` by
+ * `scripts/build-badges.mjs` (rerun via `npm run badges`, wired as prebuild).
  *
- * When neither exists, every item renders the generic dashed placeholder
- * (postmark ring + pin). `onError` makes the file lookup safe: a badge key
- * with no matching .svg still shows the placeholder, never a broken image.
+ * Why inline instead of <img>: the artwork is drawn with
+ * stroke="currentColor", and SVG loaded through <img> is a separate document
+ * that CANNOT inherit CSS colour — every badge would render black and lose
+ * the tile-accent tint, hover recolour and dark-mode adaptation. Inlined,
+ * the whole badge inherits `color` from the chip that hosts it.
  *
- * All inline stamps inherit `currentColor`, so callers colour them (tiles use
- * the item's theme accent); a real multi-colour .svg is exempt. Keep the
- * drawing square and centred so it scales with the className the caller
- * passes (the mark boxes are h-9..h-10).
+ * An unknown/empty key (no entry in the generated table — decided at build
+ * time, no runtime 404 dance) renders the dashed postmark placeholder.
  */
 
 export interface StampProps {
   className?: string;
+  style?: CSSProperties;
 }
 
-/** Registry of real per-place React stamps (added when the vector files are ready). */
-const STAMP_PRESETS: Record<string, ComponentType<StampProps>> = {
-  // kaohsiung: () => <svg viewBox="0 0 48 48" …/>,
-};
-
-/** Generic dashed postmark + location pin — the pre-badge placeholder. */
-function PlaceholderStamp({ className }: StampProps) {
+/** Generic dashed postmark + location pin — for empty/unknown badge keys. */
+function PlaceholderStamp({ className, style }: StampProps) {
   return (
-    <svg viewBox="0 0 48 48" fill="none" aria-hidden className={className}>
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden className={className} style={style}>
       <circle
         cx="24"
         cy="24"
@@ -62,31 +56,27 @@ function PlaceholderStamp({ className }: StampProps) {
   );
 }
 
-/** Render the stamp for a `badge` preset (file → registry → placeholder). */
+/** Frame + icon composed badge (see module doc). One DOM node, zero requests. */
 export function TravelStamp({
   preset,
   className,
+  style,
 }: {
   preset?: string;
   className?: string;
+  style?: CSSProperties;
 }) {
-  // File-backed artwork wins. Start optimistic and fall back on a 404 so a
-  // badge key without its .svg yet still shows the placeholder.
-  const [missing, setMissing] = useState(false);
-  const Registered = (preset && STAMP_PRESETS[preset]) || PlaceholderStamp;
-  const fileUrl = preset ? `/assets/gallery/badges/${preset}.svg` : null;
-  if (fileUrl && !missing) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={fileUrl}
-        alt=""
-        draggable={false}
-        style={{ objectFit: "contain" }}
-        onError={() => setMissing(true)}
-        className={className}
-      />
-    );
-  }
-  return <Registered className={className} />;
+  const art = preset ? BADGE_ART[preset] : undefined;
+  if (!art) return <PlaceholderStamp className={className} style={style} />;
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden
+      className={className}
+      style={style}
+      dangerouslySetInnerHTML={{ __html: BADGE_FRAME + art }}
+    />
+  );
 }
