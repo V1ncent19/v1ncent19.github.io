@@ -774,7 +774,7 @@ export function GalleryView({
           <StampBadge
             preset={item.badge}
             box="aspect-square w-[clamp(5rem,40%,7.5rem)] rounded-2xl"
-            mark="h-[62%] w-[62%]"
+            mark="h-[70%] w-[70%]"
           />
         </div>
 
@@ -1200,11 +1200,13 @@ function StampBadge({
     <span
       aria-hidden
       className={
-        "flex shrink-0 items-center justify-center bg-[var(--tile-soft)] text-[var(--tile-accent)] " +
+        "relative flex shrink-0 items-center justify-center bg-[var(--tile-soft)] text-[var(--tile-accent)] " +
         box
       }
     >
-      <TravelStamp preset={preset} className={mark} />
+      <span className="pointer-events-none absolute inset-[3%] rounded-full border-[1.5px] border-dashed border-current opacity-90" />
+      <span className="pointer-events-none absolute inset-[12%] rounded-full border border-current opacity-45" />
+      <TravelStamp preset={preset} className={`relative z-10 ${mark}`} />
     </span>
   );
 }
@@ -1365,7 +1367,7 @@ function GalleryTile({
                   <StampBadge
                     preset={item.badge}
                     box="mt-0.5 h-7 w-7 rounded-md"
-                    mark="h-5 w-5"
+                    mark="h-5.5 w-5.5"
                   />
                   <div className="min-w-0">
                     <p className="font-serif line-clamp-2 text-[13px] leading-snug font-bold text-[var(--tile-accent)]">

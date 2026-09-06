@@ -1,24 +1,4 @@
-<svg
-  viewBox="0 0 100 100"
-  xmlns="http://www.w3.org/2000/svg"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2.6"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
-  <circle cx="50" cy="50" r="35"/>
-
-  <circle cx="50" cy="31" r="5"/>
-
-  <line x1="28" y1="39" x2="72" y2="39"/>
-  <line x1="34" y1="43" x2="66" y2="43"/>
-
-  <line x1="38" y1="39" x2="36" y2="69"/>
-  <line x1="62" y1="39" x2="64" y2="69"/>
-
-  <line x1="47" y1="39" x2="47" y2="50"/>
-  <line x1="53" y1="39" x2="53" y2="50"/>
-  <line x1="47" y1="50" x2="53" y2="50"/>
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M19 32c16 3 46 3 62 0M25 39h50M31 45h38M34 39l-3 39M66 39l3 39"/>
+  <path d="M45 39v15h10V39M23 78h54M50 19v13"/>
 </svg>

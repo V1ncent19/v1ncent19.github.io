@@ -35,6 +35,9 @@ import { copy } from "@/lib/i18n";
 interface Honor {
   title: string;
   sub: string;
+  /** Chinese draft rendering (auto-translated; user-reviewed later). */
+  titleZh?: string;
+  subZh?: string;
   year: string;
   dot: string;
 }
@@ -42,19 +45,25 @@ interface Honor {
 const HONORS: Honor[] = [
   {
     title: "Five-star Zijing Volunteer",
+    titleZh: "五星级紫荆志愿者",
     sub: "五星级紫荆志愿者 · Tsinghua University Volunteer Association",
+    subZh: "清华大学学生志愿服务协会",
     year: "2023",
     dot: "bg-tertiary",
   },
   {
     title: "Honorable Mention — MCM/ICM",
+    titleZh: "美国大学生数学建模竞赛（MCM/ICM）荣誉提名",
     sub: "Mathematical Contest in Modeling (COMAP), track A",
+    subZh: "COMAP 数学建模竞赛 · A 题 · H 奖",
     year: "2022",
     dot: "bg-brand",
   },
   {
     title: "Ma Yuehan Cup — Shooting",
+    titleZh: "马约翰杯 · 射击",
     sub: "第64届马约翰杯 · 10 m air rifle 4th & air gun 5th",
+    subZh: "第64届马约翰杯 · 10 米气步枪第 4 名 & 气手枪第 5 名",
     year: "2021",
     dot: "bg-accent",
   },
@@ -66,6 +75,14 @@ const INTERESTS = [
   "High-dimensional statistical inference",
   "Distribution-free & conformal inference",
   "Statistical learning theory",
+];
+
+const INTERESTS_ZH = [
+  "稳健统计",
+  "重尾极小极大理论",
+  "高维统计推断",
+  "免分布与 conformal 推断",
+  "统计学习理论",
 ];
 
 function pdfSizeLabel(href: string | null): string | null {
@@ -85,6 +102,9 @@ export function CvFolio({ lang }: { lang: Lang }) {
   const fullName = `${profile.givenName} ${profile.familyName}`;
   const cvHref = profile.cv[lang] ?? profile.cv.en ?? null;
   const pdfSize = pdfSizeLabel(cvHref);
+  const isZh = lang === "zh";
+  /** Chinese draft first when lang is zh, English otherwise. */
+  const pick = (en: string, zh?: string) => (isZh && zh ? zh : en);
 
   const statNote = getProjects().find((p) => p.meta.slug === "stat-summary-note");
   const highDim = getProjects().find(
@@ -93,6 +113,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
   const readLabel = lang === "zh" ? "阅读" : "Read";
   const aboutSummary =
     navItems.find((n) => n.id === "about")?.summary[lang] ?? "";
+  const interests = isZh ? INTERESTS_ZH : INTERESTS;
 
   return (
     <div className="pb-20">
@@ -171,7 +192,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
                 <FactRow icon={MapPin} label={s.cvFolio.from}>
                   Shenzhen, Guangdong, China
                 </FactRow>
-                <FactRow icon={GraduationCap} label="Route">
+                <FactRow icon={GraduationCap} label={isZh ? "路线" : "Route"}>
                   SZSHS · 2013 → Tsinghua · 2019 → Northwestern · 2023
                 </FactRow>
               </ul>
@@ -217,7 +238,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
                 {s.cvFolio.interestsLead}
               </p>
               <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {INTERESTS.map((item) => (
+                {interests.map((item) => (
                   <li
                     key={item}
                     className="flex items-center gap-2.5 rounded-lg bg-surface-tint px-3 py-2.5 text-[0.95rem] text-ink"
@@ -268,7 +289,9 @@ export function CvFolio({ lang }: { lang: Lang }) {
             >
               {cvSections
                 .find((sec) => sec.id === "education")
-                ?.entries.map((entry) => <TimelineEntry key={entry.title} entry={entry} />) ??
+                ?.entries.map((entry) => (
+                  <TimelineEntry key={entry.title} entry={entry} lang={lang} />
+                )) ??
                 null}
             </ModuleCard>
 
@@ -283,7 +306,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
                 {cvSections
                   .find((sec) => sec.id === "research")
                   ?.entries.map((entry, i) => (
-                    <RecordEntry key={`${entry.title}-${i}`} entry={entry} />
+                    <RecordEntry key={`${entry.title}-${i}`} entry={entry} lang={lang} />
                   ))}
               </ul>
             </ModuleCard>
@@ -349,8 +372,12 @@ export function CvFolio({ lang }: { lang: Lang }) {
                         className={`mt-2 h-2 w-2 shrink-0 rounded-full ${h.dot}`}
                       />
                       <div>
-                        <h4 className="text-lg font-semibold tracking-tight">{h.title}</h4>
-                        <p className="mt-0.5 text-sm italic text-muted">{h.sub}</p>
+                        <h4 className="text-lg font-semibold tracking-tight">
+                          {pick(h.title, h.titleZh)}
+                        </h4>
+                        <p className="mt-0.5 text-sm italic text-muted">
+                          {pick(h.sub, h.subZh)}
+                        </p>
                       </div>
                     </div>
                     <span className="ui-text shrink-0 rounded bg-surface-tint px-2 py-0.5 text-xs font-semibold text-muted">
@@ -374,10 +401,11 @@ export function CvFolio({ lang }: { lang: Lang }) {
                     const note = p!;
                     // Always navigate to the project page (2026-09-05 user
                     // request) — the PDF stays reachable from there; no direct
-                    // download from the CV anymore.
+                    // download from the CV anymore. zh detail pages live at
+                    // /project/zh/<slug> (nested /zh under the base route).
                     const href =
                       lang === "zh"
-                        ? `/zh/project/${note.meta.slug}`
+                        ? `/project/zh/${note.meta.slug}`
                         : `/project/${note.meta.slug}`;
                     return (
                       <li key={note.meta.slug}>
@@ -503,9 +531,16 @@ function ModuleCard({
 
 function TimelineEntry({
   entry,
+  lang,
 }: {
   entry: (typeof cvSections)[number]["entries"][number];
+  lang: Lang;
 }) {
+  const isZh = lang === "zh";
+  const title = isZh && entry.titleZh ? entry.titleZh : entry.title;
+  const institution =
+    isZh && entry.institutionZh ? entry.institutionZh : entry.institution;
+  const lines = isZh && entry.linesZh?.length ? entry.linesZh : entry.lines;
   const now = entry.period?.includes("—");
   return (
     <div className="relative flex gap-4 pb-6 pl-1 last:pb-0 sm:gap-5">
@@ -527,9 +562,9 @@ function TimelineEntry({
           </span>
         </div>
         <h4 className="mt-2 text-lg font-semibold tracking-tight text-ink">
-          {entry.title}
+          {title}
         </h4>
-        {entry.institution ? (
+        {institution ? (
           entry.institutionHref ? (
             <a
               href={entry.institutionHref}
@@ -537,17 +572,17 @@ function TimelineEntry({
               rel="noreferrer noopener"
               className="ui-text mt-0.5 inline-flex items-center gap-1 text-sm font-medium text-accent hover:text-brand"
             >
-              {entry.institution}
+              {institution}
               <ExternalLink className="h-3 w-3" aria-hidden />
             </a>
           ) : (
             <p className="ui-text mt-0.5 text-sm font-medium text-accent">
-              {entry.institution}
+              {institution}
             </p>
           )
         ) : null}
-        {entry.lines.length ? (
-          <p className="mt-2 text-sm leading-relaxed text-muted">{entry.lines[0]}</p>
+        {lines.length ? (
+          <p className="mt-2 text-sm leading-relaxed text-muted">{lines[0]}</p>
         ) : null}
       </div>
     </div>
@@ -556,14 +591,21 @@ function TimelineEntry({
 
 function RecordEntry({
   entry,
+  lang,
 }: {
   entry: (typeof cvSections)[number]["entries"][number];
+  lang: Lang;
 }) {
+  const isZh = lang === "zh";
+  const title = isZh && entry.titleZh ? entry.titleZh : entry.title;
+  const institution =
+    isZh && entry.institutionZh ? entry.institutionZh : entry.institution;
+  const lines = isZh && entry.linesZh?.length ? entry.linesZh : entry.lines;
   return (
     <li className="rounded-xl bg-surface-tint/70 px-4 py-4">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h4 className="text-lg font-semibold leading-snug tracking-tight text-ink">
-          {entry.title}
+          {title}
         </h4>
         {entry.period ? (
           <span className="ui-text rounded bg-surface px-2 py-0.5 text-xs font-semibold text-muted">
@@ -571,7 +613,7 @@ function RecordEntry({
           </span>
         ) : null}
       </div>
-      {entry.institution ? (
+      {institution ? (
         <p className="mt-1 text-sm font-medium text-brand">
           {entry.institutionHref ? (
             <a
@@ -580,17 +622,17 @@ function RecordEntry({
               rel="noreferrer noopener"
               className="inline-flex items-center gap-1 hover:no-underline"
             >
-              {entry.institution}
+              {institution}
               <ExternalLink className="h-3 w-3" aria-hidden />
             </a>
           ) : (
-            entry.institution
+            institution
           )}
         </p>
       ) : null}
-      {entry.lines.length ? (
+      {lines.length ? (
         <ul className="mt-2.5 space-y-1.5 text-sm leading-relaxed text-muted">
-          {entry.lines.map((line) => (
+          {lines.map((line) => (
             <li key={line}>— {line}</li>
           ))}
         </ul>

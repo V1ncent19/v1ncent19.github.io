@@ -1,48 +1,5 @@
-<svg
-  viewBox="0 0 100 100"
-  xmlns="http://www.w3.org/2000/svg"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2.6"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <!-- outer badge rings -->
-  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
-  <circle cx="50" cy="50" r="35"/>
-
-  <!-- lantern crown -->
-  <path d="M46 29 L50 23 L54 29"/>
-  <line x1="44" y1="30" x2="56" y2="30"/>
-
-  <!-- lantern -->
-  <path d="M43 34 L46 30 H54 L57 34"/>
-  <path d="M43 34 L45 48 H55 L57 34 Z"/>
-
-  <!-- lantern glass divisions -->
-  <line x1="50" y1="34" x2="50" y2="48"/>
-  <line x1="43" y1="34" x2="57" y2="34"/>
-
-  <!-- lantern base -->
-  <line x1="43" y1="49" x2="57" y2="49"/>
-  <path d="M46 49 L50 53 L54 49"/>
-
-  <!-- decorative neck -->
-  <line x1="50" y1="53" x2="50" y2="59"/>
-  <path d="M50 57 C44 56 41 53 41 49"/>
-  <path d="M50 57 C56 56 59 53 59 49"/>
-
-  <!-- central pole -->
-  <line x1="50" y1="59" x2="50" y2="74"/>
-
-  <!-- ornamental side curls -->
-  <path d="M50 62 C44 61 40 63 39 67 C38 70 40 72 43 71"/>
-  <path d="M50 62 C56 61 60 63 61 67 C62 70 60 72 57 71"/>
-
-  <!-- lower collar -->
-  <line x1="46" y1="68" x2="54" y2="68"/>
-  <line x1="45" y1="74" x2="55" y2="74"/>
-
-  <!-- base -->
-  <path d="M47 74 L44 78 H56 L53 74"/>
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M44 82h24M56 82V48c0-14 7-22 19-22M75 26h7"/>
+  <path d="M68 31h15l-3 19H71l-3-19ZM56 48h15M51 82l5-8 5 8M56 59h-8"/>
+  <path d="M75 31v19M68 39h15"/>
 </svg>

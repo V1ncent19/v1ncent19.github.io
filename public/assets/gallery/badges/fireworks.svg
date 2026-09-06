@@ -1,45 +1,6 @@
-<svg
-  viewBox="0 0 100 100"
-  xmlns="http://www.w3.org/2000/svg"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2.6"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <!-- outer badge rings -->
-  <circle cx="50" cy="50" r="41" stroke-dasharray="1.4 4.2"/>
-  <circle cx="50" cy="50" r="35"/>
-
-  <!-- firework core -->
-  <circle cx="50" cy="42" r="2"/>
-
-  <!-- upper burst -->
-  <path d="M50 40 C49 34 49 28 50 22"/>
-  <path d="M47 40 C43 34 40 29 37 25"/>
-  <path d="M53 40 C57 34 60 29 63 25"/>
-
-  <!-- upper side burst -->
-  <path d="M46 42 C39 38 33 35 27 34"/>
-  <path d="M54 42 C61 38 67 35 73 34"/>
-
-  <!-- middle side burst -->
-  <path d="M46 44 C38 44 31 46 25 49"/>
-  <path d="M54 44 C62 44 69 46 75 49"/>
-
-  <!-- lower sweeping trails -->
-  <path d="M47 45 C40 49 35 55 33 62"/>
-  <path d="M53 45 C60 49 65 55 67 62"/>
-
-  <path d="M49 46 C45 52 43 59 44 67"/>
-  <path d="M51 46 C55 52 57 59 56 67"/>
-
-  <!-- central falling trail -->
-  <path d="M50 46 C50 53 50 61 50 72"/>
-
-  <!-- detached sparks -->
-  <circle cx="30" cy="58" r="1"/>
-  <circle cx="70" cy="58" r="1"/>
-  <circle cx="40" cy="71" r="1"/>
-  <circle cx="60" cy="71" r="1"/>
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M50 24v17M50 41 31 26M50 41 24 42M50 41 31 57M50 41v28M50 41l19 16M50 41l26 1M50 41l19-15"/>
+  <path d="M41 47c-8 11-9 21-7 31M48 50c-4 13-3 23 1 33M56 49c6 10 8 19 7 29M63 46c10 7 14 15 15 24"/>
+  <path d="m22 61 2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5ZM76 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z"/>
+  <circle cx="50" cy="41" r="3" fill="currentColor" stroke="none"/>
 </svg>

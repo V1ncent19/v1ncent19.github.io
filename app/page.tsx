@@ -505,12 +505,12 @@ export default function HomePage() {
                     action="Visit"
                   />
                 ))}
-                {/* Guestbook card (2026-09-05): the only home entry point —
-                    no nav item, no gateway card, no embedded editor. */}
+                {/* Guestbook card (2026-09-05): a home entry point alongside
+                    the nav item — named after the board's dual purpose. */}
                 <DocRow
                   icon={MessageSquare}
                   tone="brand"
-                  title="Guestbook"
+                  title="Messages & Bug Reports"
                   subtitle="Say hi, leave a note, or report a bug"
                   href="/guestbook"
                   action="Visit"

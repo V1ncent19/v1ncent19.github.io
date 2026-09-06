@@ -129,18 +129,12 @@ export interface Copy {
     menuClose: string;
     menuLabel: string;
   };
-  /** Guestbook page (/guestbook, /guestbook/zh) — nav item, no gateway card. */
+  /** Guestbook page (/guestbook, /guestbook/zh) — nav item, no gateway card.
+   *  Single giscus stream described as messages & bug reports (2026-09-06). */
   guestbook: {
     eyebrow: string;
     title: string;
     lead: string;
-    /** The two discussion streams (dual-tab giscus embeds). */
-    tabNotes: string;
-    tabBugs: string;
-    tabNotesLead: string;
-    tabBugsLead: string;
-    /** a11y label for the tab switcher group. */
-    tabsLabel: string;
   };
   placeholder: {
     label: string;
@@ -273,16 +267,9 @@ export const copy: Record<Lang, Copy> = {
       menuLabel: "Site sections",
     },
     guestbook: {
-      eyebrow: "Say hi · report a bug",
+      eyebrow: "Messages & bug reports",
       title: "Guestbook",
-      lead: "One shared board for everything — greetings, half-formed thoughts, and bug reports alike. Comments run on giscus backed by GitHub Discussions; signing in with a GitHub account is all it takes to post.",
-      tabNotes: "Messages",
-      tabBugs: "Bug reports",
-      tabNotesLead:
-        "Open board — greetings, notes and everything in between. Comments here land in one shared thread.",
-      tabBugsLead:
-        "Found something broken? Drop it here with the page and what you expected — short and rough is fine.",
-      tabsLabel: "Comment streams",
+      lead: "One shared board for everything — greetings, half-formed thoughts, and bug reports alike. Comments run on giscus backed by GitHub Discussions; signing in with a GitHub account is all it takes to post. Found something broken? Mention the page and what you expected — short and rough is fine.",
     },
     placeholder: {
       label: "Under construction",
@@ -412,14 +399,9 @@ export const copy: Record<Lang, Copy> = {
       menuLabel: "站点板块",
     },
     guestbook: {
-      eyebrow: "打个招呼 · 反馈 bug",
+      eyebrow: "留言 & Bug 反馈",
       title: "留言板",
-      lead: "一块共享的留言板——问候、闲谈、bug 反馈都写在这里。评论由 giscus 提供，数据存在 GitHub Discussions 上，用 GitHub 账号登录即可发言。",
-      tabNotes: "留言",
-      tabBugs: "Bug 反馈",
-      tabNotesLead: "开放留言区——问候、杂谈、想到什么写什么。所有留言汇入同一条时间线。",
-      tabBugsLead: "发现了哪里坏掉了？写上页面和你的预期即可，不用讲究格式。",
-      tabsLabel: "留言分区",
+      lead: "一块共享的留言板——问候、闲谈、bug 反馈都写在这里。评论由 giscus 提供，数据存在 GitHub Discussions 上，用 GitHub 账号登录即可发言。发现了哪里坏掉了？写上页面和你的预期即可，不用讲究格式。",
     },
     placeholder: {
       label: "建设中",
