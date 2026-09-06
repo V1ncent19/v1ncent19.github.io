@@ -16,9 +16,15 @@
  * sampling incl. arcs, circle/rect/polygon shapes, rotate/matrix transforms)
  * and, when any ink falls outside the inner solid ring (r = 38, minus the
  * ring stroke and a small gap), the icon is scaled about (50,50) to fit.
- * Stroke width is divided by the scale so the authored ink WEIGHT stays
- * uniform across the whole set. Icons already inside the ring are untouched
- * (never upscaled).
+ * Stroke width is divided by the scale so the authored ink WEIGHT survives
+ * the scaling. Icons already inside the ring are untouched (never upscaled).
+ *
+ * STROKE NORMALIZATION (2026-09-06 user request): authored icon strokes vary
+ * (3.5–5) while the frame rings are thinner, so every icon's strokes are
+ * scaled by k = TARGET_STROKE / maxStroke(icon) — the heaviest line lands
+ * exactly on TARGET_STROKE, detail lines keep their relative hierarchy.
+ * Only-downscale (k ≤ 1). The frame's inner ring is authored at the same
+ * target so frame and artwork share one line weight.
  *
  * Output: `components/gallery/badge-art.generated.ts` — committed to the repo;
  * rerun via `npm run badges` (also wired as a `prebuild`/`predev` hook).
@@ -33,11 +39,16 @@ const ITEMS_JSON = "content/gallery/items.json";
 const OUT_FILE = "components/gallery/badge-art.generated.ts";
 const FRAME_KEY = "badge-frame.svg";
 
-/* Ring geometry: inner circle r=38 stroke 2.4 → ink inner edge 36.8.
+/* Ring geometry: inner circle r=38 stroke 2.45 → ink inner edge ≈36.78.
  * Fit target keeps the icon's ink OUTER edge (incl. half stroke) inside
- * 36.8 with a 1.2 gap. */
-const RING_INNER_EDGE = 36.8;
+ * 36.78 with a 1.2 gap. */
+const RING_INNER_EDGE = 36.78;
 const FIT_GAP = 1.2;
+
+/** Unified line weight for the heaviest stroke of every icon and the frame's
+ * inner ring. 2026-09-06: 3.5 → 2.45 (user: thin everything ~30%).
+ * Keep in sync with badge-frame.svg (inner 2.45 / outer dashed 2.1). */
+const TARGET_STROKE = 2.45;
 
 /** Root attributes worth carrying onto the wrapping <g>. */
 const KEEP_ATTRS = [
@@ -348,22 +359,36 @@ function rootAttrs(svgText) {
   return kept.join(" ");
 }
 
+/** Heaviest stroke-width authored anywhere in the file (root or elements).
+ *  Returns the default weight when the file declares none. */
+function maxStrokeWidth(svgText) {
+  let max = -Infinity;
+  for (const m of svgText.matchAll(/\bstroke-width="([\d.]+)"/g))
+    max = Math.max(max, parseFloat(m[1]));
+  return Number.isFinite(max) ? max : 4;
+}
+
+/** Per-icon normalization factor: heaviest line → TARGET_STROKE, never up. */
+function weightFactor(svgText) {
+  return Math.min(1, TARGET_STROKE / maxStrokeWidth(svgText));
+}
+
 /**
  * Auto-fit: scale about (50,50) so every ink point (plus half the rendered
  * stroke) stays inside the inner ring with a small gap. Returns null when the
  * icon already fits. Stroke width is compensated by the caller.
  */
-function fitScale(svgText) {
+function fitScale(svgText, k) {
   const pts = collectPoints(innerMarkup(svgText));
   if (!pts.length) return null;
   let maxR = 0;
-  for (let k = 0; k < pts.length; k += 2)
-    maxR = Math.max(maxR, Math.hypot(pts[k] - 50, pts[k + 1] - 50));
-  const w = parseFloat(rootAttrValue(svgText, "stroke-width")) || 4;
+  for (let k2 = 0; k2 < pts.length; k2 += 2)
+    maxR = Math.max(maxR, Math.hypot(pts[k2] - 50, pts[k2 + 1] - 50));
+  const w = maxStrokeWidth(svgText) * k;
   const budget = RING_INNER_EDGE - FIT_GAP;
   // s·maxR + w/2 ≤ budget  →  iterate (w is divided by s for compensation)
   let s = Math.min(1, budget / maxR);
-  for (let k = 0; k < 4; k++) s = Math.min(1, (budget - w / (2 * s)) / maxR);
+  for (let k2 = 0; k2 < 4; k2++) s = Math.min(1, (budget - w / (2 * s)) / maxR);
   if (!Number.isFinite(s) || s >= 0.999) return null;
   return { s, maxR };
 }
@@ -396,8 +421,15 @@ for (const file of files) {
     continue;
   }
   const text = readFileSync(join(BADGES_DIR, file), "utf8");
-  const fit = fitScale(text);
+  const k = weightFactor(text);
+  const fit = fitScale(text, k);
   let group = wrapGroup(text);
+  // normalize every stroke to the unified weight (×k), then compensate the
+  // fit scaling (÷s) so the authored-after-normalization weight survives
+  group = group.replace(/\bstroke-width="([\d.]+)"/g, (_, v) => {
+    const target = parseFloat(v) * k * (fit ? 1 / fit.s : 1);
+    return `stroke-width="${target.toFixed(2)}"`;
+  });
   if (fit) {
     const { s } = fit;
     const off = 50 * (1 - s);
@@ -405,11 +437,12 @@ for (const file of files) {
       /^<g /,
       `<g transform="translate(${off.toFixed(3)} ${off.toFixed(3)}) scale(${s.toFixed(4)})" `,
     );
-    // compensate stroke so the authored ink weight survives the scaling
-    group = group.replace(/\bstroke-width="([\d.]+)"/, (_, v) =>
-      `stroke-width="${(parseFloat(v) / s).toFixed(2)}"`,
+    report.push(
+      `  ${key.padEnd(20)} scale ${s.toFixed(2)}  weight ×${k.toFixed(2)}` +
+        `  (ink radius ${fit.maxR.toFixed(1)} → ${(fit.maxR * s).toFixed(1)})`,
     );
-    report.push(`  ${key.padEnd(20)} scale ${s.toFixed(2)}  (ink radius ${fit.maxR.toFixed(1)} → ${(fit.maxR * s).toFixed(1)})`);
+  } else if (k < 1) {
+    report.push(`  ${key.padEnd(20)} scale 1.00  weight ×${k.toFixed(2)}  (already fits)`);
   }
   art[key] = group;
 }

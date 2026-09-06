@@ -1,6 +1,6 @@
 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round">
   <g id="badge-frame">
-    <circle cx="50" cy="50" r="45" stroke-width="3" stroke-dasharray="7 6"/>
-    <circle cx="50" cy="50" r="38" stroke-width="2.4"/>
+    <circle cx="50" cy="50" r="45" stroke-width="2.1" stroke-dasharray="7 6"/>
+    <circle cx="50" cy="50" r="38" stroke-width="2.45"/>
   </g>
 </svg>

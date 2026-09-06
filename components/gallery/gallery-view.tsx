@@ -738,8 +738,11 @@ export function GalleryView({
    * now a large emblem / "seal" left-aligned at the top of the rail, the
    * per-language `place` / `placeLocal` sit beneath as restrained
    * theme-coloured metadata, the authored `title` is the big serif focal
-   * point, and `alt` reads as a light italic quote under a large decorative
-   * quotation mark. The download link (shown only when the item shares an
+   * point, then `alt` reads as a boxed "Thoughts / 随想" card (2026-09-06
+   * user brief: thin border on a faint accent wash, first line is a small
+   * accent label with a graphic backtick glyph, the text flows italic
+   * beneath), followed by the location map. The download link (shown only
+   * when the item shares an
    * `originalUrl`) becomes a full-width CTA that settles at the bottom of the
    * rail on the two-pane layout (`pin`) while stacked/mobile content flows
    * naturally. As before, the accent location block is withheld while `title`
@@ -796,29 +799,42 @@ export function GalleryView({
           <h2 className={`${heading} mt-7`}>{bigTitle(item, lang)}</h2>
         )}
 
-        {/* Location map — sits between the title block and the alt quote:
-            a subtle world outline with one breathing dot at the capture point.
-            Decorative (aria-hidden inside); place/date lines carry the info. */}
+        {/* Alt quote — boxed "Thoughts" card (2026-09-06 user brief), now
+            between the title block and the location map. A thin bordered
+            frame on a faint accent wash; line 1 is the small accent label
+            (a graphic backtick glyph + "Thoughts" / "随想"), the authored
+            alt text flows italic beneath it. Hidden while empty. */}
+        {altText ? (
+          <figure className="mt-7 rounded-xl border border-line bg-[var(--tile-soft)]/45 px-5 py-4">
+            <figcaption className="ui-text flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] text-[var(--tile-accent)] uppercase">
+              {/* Material Icons "format_quote" (filled, Apache 2.0) —
+                  reproduces the user's reference sample exactly; inlined as
+                  raw SVG instead of loading the icon font. Inherits the
+                  accent colour via currentColor. */}
+              <svg
+                aria-hidden
+                viewBox="0 0 24 24"
+                className="h-[18px] w-[18px]"
+                fill="currentColor"
+              >
+                <path d="M7.17 17c.51 0 .98-.29 1.2-.74l1.42-2.84c.14-.28.21-.58.21-.89V8c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h2.5l-1.46 2.93c-.32.63.14 1.37.84 1.37H7.17zM17.17 17c.51 0 .98-.29 1.2-.74l1.42-2.84c.14-.28.21-.58.21-.89V8c0-.55-.45-1-1-1h-5c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h2.5l-1.46 2.93c-.32.63.14 1.37.84 1.37h1.29z" />
+              </svg>
+              {lang === "zh" ? "随想" : "Thoughts"}
+            </figcaption>
+            <blockquote className="mt-2.5">
+              <p className="font-serif text-[15px] leading-relaxed text-muted italic">
+                {altText}
+              </p>
+            </blockquote>
+          </figure>
+        ) : null}
+
+        {/* Location map — follows the quote box: a subtle world outline with
+            one breathing dot at the capture point. Decorative (aria-hidden
+            inside); place/date lines carry the info. */}
         <div className="mt-7">
           <WorldLocationMap lat={item.lat} lon={item.lon} />
         </div>
-
-        {/* Alt quote — light editorial treatment, not the old bordered card:
-            a large accent quotation mark with the authored text flowing
-            italic beside/under it. Hidden while the field is empty. */}
-        {altText ? (
-          <blockquote className="mt-7">
-            <span
-              aria-hidden
-              className="float-left mr-2 -mt-1 select-none font-serif text-[2.6rem] leading-[0.8] text-[var(--tile-accent)]"
-            >
-              “
-            </span>
-            <p className="font-serif text-[15px] leading-relaxed text-muted italic">
-              {altText}
-            </p>
-          </blockquote>
-        ) : null}
 
         {item.originalUrl ? (
           <div className={pin ? "mt-auto pt-8" : "mt-7"}>
