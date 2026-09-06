@@ -1,5 +1,64 @@
 @import "tailwindcss";
 
+/* Self-hosted 源雲明體丹 GenWanMin2 TC, per-weight subset webfonts
+   (2026-09-07). Sources: assets-src/fonts/GenWanMin2TC/*.otf (22 MB each —
+   never deploy raw); subsets → public/fonts/genwanmin2tc-{r,m,sb}.woff2
+   (~640 KB each) via scripts/subset-cjk-fonts.py. R/M/SB map to the site's
+   used weights 400/500/600 (bold-700 requests resolve to SB). `local()`
+   first: visitors with the font installed use their full local copy and
+   skip the download. */
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-R"),
+    url("/fonts/genwanmin2tc-r.woff2")
+      format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-M"),
+    url("/fonts/genwanmin2tc-m.woff2")
+      format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-SB"),
+    url("/fonts/genwanmin2tc-sb.woff2")
+      format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Cactus Classical Serif (仙人掌明體) — kept as the deep fallback behind
+   GenWanMin2 TC (subset webfont, 2026-09-07).
+   The full TTF is 28 MB — never put it in public/. scripts/subset-cactus.py
+   shrinks it to the chars the site actually uses → public/fonts/cactus-subset.woff2
+   (~316 KB); re-run it after adding substantial new content (managed venv:
+   C:/Users/V1nce/.workbuddy/binaries/python/envs/default/Scripts/python.exe
+   scripts/subset-cactus.py). `local()` first: visitors with the font
+   installed use their full local copy and skip the download entirely.
+   Chars missing from the subset fall through the stack to Noto Serif SC. */
+@font-face {
+  font-family: "Cactus Classical Serif";
+  src:
+    local("Cactus Classical Serif"),
+    local("CactusClassicalSerif-Regular"),
+    url("/fonts/cactus-subset.woff2")
+      format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ---------------------------------------------------------------------------
  * Global page scale (2026-09-05)
  * Mimics ~90% browser zoom: the root font-size drives every rem-based length
@@ -79,10 +138,24 @@ html {
   --curated-soft: color-mix(in srgb, var(--curated) 13%, transparent);
 
   /* typography stacks */
+  /* No trailing generic `serif` here ON PURPOSE. Every use site appends
+     var(--font-serif-zh/-ja), which already ends with one. A generic family
+     in the middle of the combined list sits AHEAD of the CJK families and
+     swallows all CJK text — Chinese silently rendered in the platform's
+     default serif and the self-hosted webfonts never even loaded
+     (document.fonts status stayed "unloaded"; found 2026-09-07). */
   --font-serif-latin: "Palatino Linotype", "Book Antiqua", Palatino, Georgia,
-    "Times New Roman", serif;
-  --font-serif-zh: "Noto Serif SC", "Source Han Serif SC", SimSun,
-    "Songti SC", "Songti TC", serif;
+    "Times New Roman";
+  /* "GenWanMin2 TC" (源雲明體丹) leads the zh stack (2026-09-07, user
+     choice): Source-Han-based, so simplified codepoints are fully covered —
+     no per-glyph mixing. Self-hosted as per-weight subset woff2 (see the
+     @font-face block at the top of this file; regenerate via
+     scripts/subset-cjk-fonts.py). Cactus Classical Serif stays behind it as
+     a deep fallback for the few chars GenWanMin lacks (rarely reached, so
+     its woff2 is only downloaded if actually needed). */
+  --font-serif-zh: "GenWanMin2 TC", "Cactus Classical Serif",
+    "Noto Serif SC", "Source Han Serif SC", SimSun, "Songti SC", "Songti TC",
+    serif;
   --font-serif-ja: "Noto Serif JP", "Yu Mincho", "YuMincho", serif;
   --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;

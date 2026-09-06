@@ -15,10 +15,11 @@
  *   no reverse-overshoot after a hard throw.
  * - Hovering (a dot or a checklist row via the shared hoverId) pauses the
  *   drift; leaving lets ω ease back in.
- * - prefers-reduced-motion: no auto drift, no breathing dots — the globe
+ * - prefers-reduced-motion: no auto drift, no breathing halos — the globe
  *   only moves when dragged.
  * - IntersectionObserver: the rAF loop keeps ticking only while the globe is
- *   on screen (renders are dirty-flag gated, so a parked frame costs ~0).
+ *   on screen; while visible it re-renders every frame (the breathing halos
+ *   are a continuous animation — ~29 small arcs, well under 0.5ms).
  *
  * Spacetime fusion: the wrapper registers itself with the site backdrop
  * (registerStaticMass) as a second, heavier gravity well — the warped grid
@@ -57,12 +58,36 @@ const CONFIG = {
   /** ocean translucency 0–1 — lower = more spacetime grid shows through */
   SEA_ALPHA: 0.75,
   /** gravity well this globe presses into the spacetime backdrop */
-  WELL: { strength: 300, radius: 330, softening: 56 },
+  WELL: { strength: 120, radius: 800, softening: 100 },
   /** pointer hit radius for dot tooltips (px) */
   HIT_PX: 18,
   /** gap between sphere edge and canvas edge (px) */
   PAD: 8,
   MAX_DPR: 2,
+  /** marker halo treatment — ports the old flat sheet's world-map-pulse
+   *  keyframes verbatim (2.6s, scale 0.9→2.7, opacity 0.55→0 within the
+   *  first 55%, points staggered ~17% of a period) */
+  BREATH: {
+    /** soft glow base radius / centre alpha (under every marker) */
+    GLOW_R: 7,
+    GLOW_A: 0.2,
+    /** breathing halo: base radius, max scale, start alpha */
+    HALO_R0: 5.5,
+    HALO_SCALE: 2.7,
+    HALO_A: 0.55,
+    /** period (ms), fade-out end (fraction of period), per-point stagger */
+    PERIOD: 2600,
+    FADE_END: 0.55,
+    STAGGER: 0.173,
+  },
+  /** hover ring — instead of popping in, the ring slips onto the marker:
+   *  it starts at FROM (larger) and eases down to R while fading in
+   *  (IN_MS), and reverses outward on leave (OUT_MS) */
+  HOT: { R: 6.5, FROM: 15, LINE: 1.6, IN_MS: 240, OUT_MS: 200 },
+  /** wishlist pulse — the wish counterpart of the visited ping: a soft
+   *  dashed ring expands out of the marker and fades, same period/stagger
+   *  family as BREATH (shares its clock so pings interleave) */
+  WISH_PULSE: { R0: 5.5, R1: 13, A: 0.4, FADE_END: 0.6 },
 } as const;
 
 export type GlobePoint = {
@@ -165,6 +190,8 @@ export function TravelGlobe({
     let dirty = true;
     let palette = readPalette();
     let landFc: FeatureCollection<MultiPolygon> | null = null;
+    /* hover-ring animation progress per point id: 0 = absent, 1 = settled */
+    const hotProg = new Map<string, number>();
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const graticule = geoGraticule10();
@@ -222,54 +249,131 @@ export function TravelGlobe({
       c.stroke();
 
       /* markers — backside dots fade out near the horizon instead of
-         vanishing; wishlist = dashed ring, visited = solid dot (the same
-         symbols as the checklist legend) */
+         vanishing. Layer stack mirrors the old flat sheet exactly:
+         soft glow base → breathing halo (visited; expand & fade, phases
+         staggered so the pings don't flash in unison) / expanding dashed
+         pulse (wish, same clock) → core symbol (visited solid dot /
+         wishlist dashed ring) → hover ring (animated: slips onto the
+         marker from outside, eases back out on leave).
+         Per-frame cost: ~29 gradients+arcs, well under 0.5ms. */
       const { points: pts, hotId: hot } = propsRef.current;
       const centre: [number, number] = [-rotation[0], -rotation[1]];
       const now = performance.now();
-      const breathe = reduced.matches ? 0 : 0.35;
+      const B = CONFIG.BREATH;
       let tipX = 0;
       let tipY = 0;
       let tipOn = false;
-      for (const p of pts) {
+      pts.forEach((p, i) => {
         const ang = geoDistance([p.lon, p.lat], centre);
-        if (ang > Math.PI / 2 + 0.05) continue;
+        if (ang > Math.PI / 2 + 0.05) return;
         const xy = projection([p.lon, p.lat]);
-        if (!xy) continue;
+        if (!xy) return;
         const fade =
           ang > Math.PI / 2 - 0.35
             ? Math.max(0, 1 - (ang - (Math.PI / 2 - 0.35)) / 0.4)
             : 1;
-        c.globalAlpha = fade;
         const accent = p.kind === "visited" ? palette.visited : palette.wish;
-        const rr =
-          p.kind === "visited" ? 3.1 + breathe * Math.sin(now / 700) : 3.1;
-        if (p.kind === "visited") {
+        const rgb = hexRgb(accent);
+        /* soft static glow base — a radial gradient gives the old blurred
+           circle's feathered look without a per-frame canvas filter */
+        if (rgb) {
+          const g = c.createRadialGradient(xy[0], xy[1], 0, xy[0], xy[1], B.GLOW_R);
+          g.addColorStop(0, `rgba(${rgb}, ${B.GLOW_A * fade})`);
+          g.addColorStop(1, `rgba(${rgb}, 0)`);
+          c.fillStyle = g;
           c.beginPath();
-          c.arc(xy[0], xy[1], rr, 0, Math.PI * 2);
+          c.arc(xy[0], xy[1], B.GLOW_R, 0, Math.PI * 2);
+          c.fill();
+        }
+        if (p.kind === "visited") {
+          /* breathing halo — the old world-map-pulse: expand 0.9×→2.7×
+             while fading 0.55→0 inside the first 55% of the period, then
+             rest; `i * STAGGER` reproduces the old negative delays */
+          if (!reduced.matches) {
+            const ph = (now / B.PERIOD + i * B.STAGGER) % 1;
+            if (ph < B.FADE_END) {
+              const k = ph / B.FADE_END;
+              c.beginPath();
+              c.arc(
+                xy[0],
+                xy[1],
+                B.HALO_R0 * (0.9 + (B.HALO_SCALE - 0.9) * k),
+                0,
+                Math.PI * 2,
+              );
+              c.fillStyle = `rgba(${rgb ?? "27,167,201"}, ${B.HALO_A * (1 - k) * fade})`;
+              c.fill();
+            }
+          }
+          c.globalAlpha = fade;
+          c.beginPath();
+          c.arc(xy[0], xy[1], 3.1, 0, Math.PI * 2);
           c.fillStyle = accent;
           c.fill();
         } else {
+          /* wishlist symbol: static dashed halo + dashed core, plus a soft
+             expanding dashed pulse — the wish counterpart of the visited
+             ping, sharing the BREATH clock (and stagger) so the pings
+             interleave instead of flashing in unison */
+          c.globalAlpha = 0.45 * fade;
           c.beginPath();
-          c.arc(xy[0], xy[1], rr, 0, Math.PI * 2);
+          c.arc(xy[0], xy[1], 5.2, 0, Math.PI * 2);
           c.strokeStyle = accent;
-          c.lineWidth = 1.4;
-          c.setLineDash([2.5, 1.8]);
+          c.lineWidth = 1;
+          c.setLineDash([2.2, 1.8]);
           c.stroke();
+          c.globalAlpha = fade;
+          c.beginPath();
+          c.arc(xy[0], xy[1], 3.1, 0, Math.PI * 2);
+          c.lineWidth = 1.4;
+          c.stroke();
+          if (!reduced.matches) {
+            const W = CONFIG.WISH_PULSE;
+            const ph = (now / B.PERIOD + i * B.STAGGER) % 1;
+            if (ph < W.FADE_END) {
+              const k = ph / W.FADE_END;
+              c.globalAlpha = W.A * (1 - k) * fade;
+              c.beginPath();
+              c.arc(
+                xy[0],
+                xy[1],
+                W.R0 + (W.R1 - W.R0) * k,
+                0,
+                Math.PI * 2,
+              );
+              c.lineWidth = 1;
+              c.stroke();
+            }
+          }
           c.setLineDash([]);
         }
-        if (p.id === hot) {
+        /* hover ring — animated "slips onto the marker": starts at FROM and
+           eases down to R (easeOutCubic) while fading in; on leave it
+           reverses outward. The tooltip lands as the ring settles. */
+        const prog = hotProg.get(p.id) ?? 0;
+        if (prog > 0.002) {
+          const e = 1 - Math.pow(1 - prog, 3);
+          c.globalAlpha = fade * e;
           c.beginPath();
-          c.arc(xy[0], xy[1], 6.5, 0, Math.PI * 2);
+          c.arc(
+            xy[0],
+            xy[1],
+            CONFIG.HOT.FROM + (CONFIG.HOT.R - CONFIG.HOT.FROM) * e,
+            0,
+            Math.PI * 2,
+          );
           c.strokeStyle = accent;
-          c.lineWidth = 1.6;
+          c.lineWidth = CONFIG.HOT.LINE;
           c.stroke();
+          c.globalAlpha = 1;
+        }
+        if (p.id === hot && prog > 0.55) {
           tipX = xy[0];
           tipY = xy[1];
           tipOn = true;
         }
         c.globalAlpha = 1;
-      }
+      });
       tipEl.style.opacity = tipOn ? "1" : "0";
       if (tipOn) {
         tipEl.style.left = `${tipX}px`;
@@ -294,6 +398,31 @@ export function TravelGlobe({
         omega += (target - omega) * (1 - Math.exp(-dt / CONFIG.SPIN_TAU));
         if (Math.abs(omega) > 0.005) {
           rotation[0] += (omega * dt) / 1000;
+          dirty = true;
+        }
+      }
+      /* breathing halos animate per-frame, so while the globe is on screen
+         and motion is allowed the canvas stays alive (the drift above is a
+         no-op while hovering; halos alone keep it ticking) */
+      if (!reduced.matches && inView) dirty = true;
+      /* hover-ring progress: ease toward the target each frame (instant
+         under reduced motion). Runs even when out of view? No — frozen
+         off-screen is fine, it resumes on return. */
+      if (inView) {
+        const { points: pts, hotId: hot } = propsRef.current;
+        for (const p of pts) {
+          const target = p.id === hot ? 1 : 0;
+          const cur = hotProg.get(p.id) ?? 0;
+          if (cur === target) continue;
+          if (reduced.matches) {
+            hotProg.set(p.id, target);
+          } else {
+            const step = dt / (target ? CONFIG.HOT.IN_MS : CONFIG.HOT.OUT_MS);
+            hotProg.set(
+              p.id,
+              target ? Math.min(1, cur + step) : Math.max(0, cur - step),
+            );
+          }
           dirty = true;
         }
       }

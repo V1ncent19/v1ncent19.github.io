@@ -28,6 +28,8 @@ import { GatewayReveal } from "@/components/home/gateway-reveal";
 import { GatewayLink } from "@/components/home/gateway-link";
 import { SitePv } from "@/components/home/busuanzi";
 import { SiteComments } from "@/components/home/giscus-count";
+import { ConstructionBanner } from "@/components/home/construction-banner";
+import { TranslationNotice } from "@/components/translation-notice";
 
 /**
  * Chinese homepage (2026-09-06) — auto-translated draft mirroring the English
@@ -242,6 +244,12 @@ export default function ZhHomePage() {
 
   return (
     <div className="pb-16">
+      {/* ---- 机翻草稿声明（人工重写本页后删除） ---- */}
+      <TranslationNotice href="/" />
+
+      {/* ---- 建设中横幅（可关闭，临时） ---- */}
+      <ConstructionBanner lang="zh" />
+
       {/* ---- Hero：画布上的自我介绍（无卡片），头像右侧浮动 ---- */}
       <section className="shell pt-2 sm:pt-4">
         <div className="mx-auto max-w-5xl">

@@ -23,6 +23,7 @@ import { navItems } from "@/content/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
+import { TranslationNotice } from "@/components/translation-notice";
 
 /**
  * CV page body, mirroring the Stitch "CV — experience unified" content area in
@@ -117,6 +118,9 @@ export function CvFolio({ lang }: { lang: Lang }) {
 
   return (
     <div className="pb-20">
+      {/* ---- 机翻草稿声明（仅 zh 草稿；人工重写后删除此挂载） ---- */}
+      {isZh ? <TranslationNotice href="/cv" /> : null}
+
       {/* ---- Header + action cluster (cv mock, unified) ---- */}
       <header className="shell">
         <div className="mx-auto flex max-w-5xl flex-col justify-between gap-6 py-2 lg:flex-row lg:items-end sm:pt-4">

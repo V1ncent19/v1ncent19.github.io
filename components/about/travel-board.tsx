@@ -130,7 +130,11 @@ function ChecklistColumn({
             : "grid-rows-[0fr] opacity-0"
         }`}
       >
-        <div className="min-h-0 overflow-hidden">
+        {/* -mx-2/px-2: shift the clip boundary 8px out on each side. The
+            rows use -mx-2 hover backgrounds and their icons scale up on
+            hover — without the offset the scaled icon crossed the
+            overflow-hidden edge and got its left sliver clipped. */}
+        <div className="-mx-2 min-h-0 overflow-hidden px-2">
           <ul className="space-y-1">
             {places.map((p, i) => {
               const rowId = `${kind === "visited" ? "v" : "w"}${i}`;
