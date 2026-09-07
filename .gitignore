@@ -35,7 +35,9 @@ yarn-error.log*
 # vercel
 .vercel
 
-# full-resolution gallery originals — stay local, never pushed.
-# The committed web tiers live under public/assets/gallery/{thumb,large} and are
-# produced by `npm run gallery:gen` (scripts/gallery.mjs).
+# full-resolution gallery originals — local MASTER copy, still never edited in
+# place. The pipeline (npm run gallery:gen) mirrors each file byte-for-byte
+# into public/assets/gallery/original/ for the same-origin download button;
+# those copies ARE committed. Web tiers live under
+# public/assets/gallery/{thumb,large} and are produced by the same script.
 /GalleryPhoto/

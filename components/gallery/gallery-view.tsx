@@ -838,10 +838,14 @@ export function GalleryView({
 
         {item.originalUrl ? (
           <div className={pin ? "mt-auto pt-8" : "mt-7"}>
+            {/* download attribute: same-origin originals save straight to disk
+                with the camera filename (IMG_xxxx.jpeg) instead of opening in
+                a tab; target=_blank stays as the fallback for external URLs */}
             <a
               href={item.originalUrl}
               target="_blank"
               rel="noreferrer noopener"
+              download={item.source}
               className="ui-text inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-on-brand shadow-sm transition hover:bg-brand-strong hover:no-underline"
             >
               <Download className="h-4 w-4" aria-hidden />

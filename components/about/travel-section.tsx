@@ -9,6 +9,7 @@
 
 import { copy, type Lang } from "@/lib/i18n";
 import type { TravelData } from "@/lib/content";
+import { SectionMark } from "@/components/layout/section-mark";
 import { TravelBoard } from "@/components/about/travel-board";
 
 export function TravelSection({
@@ -23,13 +24,11 @@ export function TravelSection({
   return (
     <section className="mt-14" aria-label={s.travelSectionTitle}>
       <div className="mb-5 border-b border-line pb-3">
-        <h2 className="flex items-center gap-2.5 text-2xl font-semibold tracking-tight">
-          <span
-            aria-hidden
-            className="font-serif text-xl italic font-normal leading-none text-brand"
-          >
-            §
-          </span>
+        <h2
+          id="travel"
+          className="flex scroll-mt-28 items-center gap-3.5 text-2xl font-semibold tracking-tight"
+        >
+          <SectionMark id="travel" />
           {s.travelSectionTitle}
         </h2>
       </div>

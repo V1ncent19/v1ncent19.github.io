@@ -785,8 +785,8 @@ html:not([data-theme]) .ti-system {
  * text keeps copy readable (theme-aware via --surface). The image still
  * lazy-swaps from data-peek-src on first hover/focus (delegated in
  * GatewayReveal), so page load carries zero photo bytes. The watermark icon
- * yields while the reveal is open. Touch pointers simply get the unchanged
- * card (pure progressive enhancement). */
+ * yields while the reveal is open. Touch pointers get the same reveal driven
+ * by scroll position — the midline `.is-live` block below. */
 .gateway-orb {
   position: absolute;
   inset: 0;
@@ -799,6 +799,16 @@ html:not([data-theme]) .ti-system {
   height: 100%;
   object-fit: cover; /* inline style may override with contain for the CV strip */
   background: #eceae4; /* placeholder tone until the lazy swap lands */
+  /* Decode gate (GatewayReveal.arm): the orb's circle reveal is pure CSS on
+     :hover and cannot wait for the image, so the photo itself stays hidden
+     until `.peek-ready` lands (img.decode() resolved, ≤1.5s fallback). On a
+     slow network the circle uncovers a soft veil wash first and the photo
+     fades in once whole — never a half-downloaded scanline mess. */
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+}
+.gateway-orb img.peek-ready {
+  opacity: 1;
 }
 .gateway-orb-veil {
   position: absolute;
@@ -823,6 +833,9 @@ html:not([data-theme]) .ti-system {
 }
 @media (prefers-reduced-motion: reduce) {
   .gateway-orb {
+    transition: none;
+  }
+  .gateway-orb img {
     transition: none;
   }
 }
@@ -869,6 +882,34 @@ html:not([data-theme]) .ti-system {
   }
   .group:hover .gw-title-pill-tint,
   .group:focus-within .gw-title-pill-tint {
+    opacity: 0.42;
+  }
+}
+
+/* ---- touch midline activation (2026-09-07) ----
+ * On touch-only pointers (hover: none) a real :hover can never fire, so
+ * GatewayReveal drives the same reveal from scroll position: while a card's
+ * box covers the viewport midline it carries `.is-live` (closest-to-centre
+ * card only), and these rules replay the exact hover visuals — orb open,
+ * watermark yields, title pill frosts. Card lift/shadow stays desktop-only
+ * on purpose. Desktop pointers never match hover: none, so this is inert
+ * there even if the class somehow landed. */
+@media (hover: none) {
+  .gw-item.is-live .gateway-orb {
+    clip-path: circle(142% at calc(100% - 36px) calc(100% - 36px));
+  }
+  .gw-item.is-live .gateway-watermark {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  .gw-item.is-live .gw-title-pill {
+    background-color: color-mix(in srgb, var(--surface) 64%, transparent);
+    border-color: color-mix(in srgb, var(--line) 75%, transparent);
+    box-shadow: 0 2px 12px rgb(28 37 48 / 0.1);
+    -webkit-backdrop-filter: blur(9px) saturate(1.1);
+    backdrop-filter: blur(9px) saturate(1.1);
+  }
+  .gw-item.is-live .gw-title-pill-tint {
     opacity: 0.42;
   }
 }
@@ -1026,6 +1067,97 @@ html:not([data-theme]) .ti-system {
 .led-math {
   line-height: inherit;
   vertical-align: baseline;
+}
+
+/* ---- Clickable § section mark (SectionMark, 2026-09-07) ----
+   The glyph scales with its heading via font-size, so the hit-area is sized
+   in em too (padding + matching negative margin = no layout shift). The
+   anchor itself stays visually invisible when idle — the glow lives on the
+   inner .section-mark-glyph span, which hugs only the § character, so the
+   hover halo blooms from the glyph's own outline instead of reading as a
+   capsule around the whole hit-area (user direction 2026-09-07).
+   Click: the § never changes glyph — it flashes to the accent colour with a
+   small pop pulse (user direction 2026-09-07, replacing the old ✓ swap). */
+.section-mark {
+  color: var(--brand);
+  cursor: pointer;
+  padding: 0.18em 0.3em;
+  margin: -0.18em -0.3em;
+  transition:
+    color 0.2s var(--ease),
+    transform 0.18s var(--ease);
+}
+.section-mark:hover {
+  color: var(--brand-strong);
+}
+.section-mark:active {
+  transform: scale(0.85);
+}
+.section-mark.is-copied {
+  color: var(--accent);
+}
+.section-mark-glyph {
+  display: inline-block;
+  /* "Bolder" glow (user direction 2026-09-07): stacked close-radius
+     text-shadows hug the glyph's own strokes — the inner layer is nearly
+     opaque, so the § reads as if the strokes thicken and light up, with no
+     halo box at all. */
+  text-shadow:
+    0 0 2px transparent,
+    0 0 7px transparent,
+    0 0 16px transparent;
+  transition: text-shadow 0.25s var(--ease);
+}
+.section-mark:hover .section-mark-glyph {
+  text-shadow:
+    0 0 2px color-mix(in srgb, var(--brand) 90%, transparent),
+    0 0 7px color-mix(in srgb, var(--brand) 55%, transparent),
+    0 0 16px color-mix(in srgb, var(--brand) 28%, transparent);
+}
+.section-mark.is-copied .section-mark-glyph {
+  text-shadow:
+    0 0 2px color-mix(in srgb, var(--accent) 90%, transparent),
+    0 0 7px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 0 16px color-mix(in srgb, var(--accent) 28%, transparent);
+  animation: section-mark-pop 0.4s var(--ease);
+}
+@keyframes section-mark-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.section-mark:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Prose headings are plain inline contexts (not flex-with-gap), so the §
+   needs its own trailing gap before the title text. Declared here — after
+   and unlayered like .section-mark — because the negative hit-area margin
+   above would cancel any layered Tailwind mr-* utility. */
+.prose :is(h2, h3) > a.section-mark {
+  margin-right: 0.875rem;
+}
+@keyframes section-mark-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.section-mark:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
 /* Reduced motion is already flattened by the global `*` rule in @layer base. */

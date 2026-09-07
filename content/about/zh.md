@@ -2,15 +2,6 @@ Hello! / 你好！/ Bonjour! / こんにちは！ / Γεια σας!
 
 本页面是一个没有那么正式的 About 页面，正式版本见 [Curriculum Vitae](/cv) 页面。
 
-## 个人信息
-
-- 本人目前基本处于半实名上网状态，姓名的写法和发音请见 [CV](/cv)；在绝大多数地方的马甲是 v1ncent19，其中 v**1**n 用于避免重名，cent**19** 继承自本科入学年份，念法直接采用 "Vincent" 或 "Vincent 幺九" 等即可。
-- 可能有些人会以为本人英文名的来源是 Vincent van Gogh，但实际上是来自于小说/电影《[火星救援](https://en.wikipedia.org/wiki/The_Martian_(film))》中的火星任务 Director, Vincent Kapoor。
-  - 极少数情况为了消歧我会使用 Ventresca 的后缀，来源于《[Angels & Demons](https://en.wikipedia.org/wiki/Angels_%26_Demons_(film))》中的总务枢机 Patrick McKenna Ventresca。
-- 半土著深圳人，另有相当长的幼年时期在湛江生活；所以你要问我"你觉得你是粤语母语者吗"，我会说"我觉得我是"。
-- [SZSHS](https://www.cn-school.com/swkz/index/index.html) @ 2013 → [THU](https://www.tsinghua.edu.cn/en/) @ 2019 → [NU](https://www.northwestern.edu/) @ 2023。<span class="heimu">（共同特点：学校的 theme color 都是紫色。）</span>
-- 物理学跑路统计学学生。
-
 ## 正经爱好
 
 - 躺平型钢琴爱好者；近期曲目：[*The People United Will Never Be Defeated!*](https://en.wikipedia.org/wiki/The_People_United_Will_Never_Be_Defeated!) by [Frederic Rzewski](https://en.wikipedia.org/wiki/Frederic_Rzewski)。

@@ -29,6 +29,7 @@ import { GatewayLink } from "@/components/home/gateway-link";
 import { SitePv } from "@/components/home/busuanzi";
 import { SiteComments } from "@/components/home/giscus-count";
 import { ConstructionBanner } from "@/components/home/construction-banner";
+import { SectionMark } from "@/components/layout/section-mark";
 import { TranslationNotice } from "@/components/translation-notice";
 
 /**
@@ -199,13 +200,16 @@ function recentPostsZh(limit = 5): FeedItem[] {
 }
 
 /* ---------------------------------------------------------------------------
- * 模块标题 — 与全站一致的 § 字形。
+ * 模块标题 — 与全站一致的 § 字形。§ 为 SectionMark 锚点（点击复制 #id 链接）。
  * ------------------------------------------------------------------------- */
 function ModuleHeader({
+  id,
   children,
   caption,
   aside,
 }: {
+  /** § 复制链接锚点的 id */
+  id: string;
   children: ReactNode;
   caption?: string;
   aside?: ReactNode;
@@ -213,13 +217,11 @@ function ModuleHeader({
   return (
     <div className="mb-5 border-b border-line pb-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2.5 text-2xl font-semibold tracking-tight">
-          <span
-            aria-hidden
-            className="font-serif text-xl italic font-normal leading-none text-brand"
-          >
-            §
-          </span>
+        <h2
+          id={id}
+          className="flex scroll-mt-28 items-center gap-3.5 text-2xl font-semibold tracking-tight"
+        >
+          <SectionMark id={id} />
           {children}
         </h2>
         {aside}
@@ -272,13 +274,11 @@ export default function ZhHomePage() {
 
           <div className="text-[1.02rem] leading-relaxed text-ink sm:text-lg">
             <div className="mb-4 flex items-center gap-2.5">
-              <span
-                aria-hidden
-                className="font-serif text-xl italic leading-none text-brand"
+              <h2
+                id="hello"
+                className="flex scroll-mt-28 items-center gap-3.5 text-2xl font-semibold tracking-tight sm:text-3xl"
               >
-                §
-              </span>
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                <SectionMark id="hello" />
                 你好。
               </h2>
             </div>
@@ -385,6 +385,7 @@ export default function ZhHomePage() {
       <section className="shell mt-4">
         <div className="mx-auto max-w-5xl">
           <ModuleHeader
+            id="navigation"
             aside={
               <span className="font-serif text-sm text-muted">
                 {homeCards.length} 个起点
@@ -425,6 +426,7 @@ export default function ZhHomePage() {
           <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
             <div className="lg:col-span-7">
               <ModuleHeader
+                id="posts"
                 aside={
                   <Link
                     href="/blog/zh"
@@ -444,7 +446,7 @@ export default function ZhHomePage() {
             </div>
 
             <div className="lg:col-span-5">
-              <ModuleHeader>直达入口</ModuleHeader>
+              <ModuleHeader id="access">直达入口</ModuleHeader>
               <ul className="space-y-3.5">
                 {cvHref ? (
                   <DocRow
@@ -508,7 +510,7 @@ export default function ZhHomePage() {
               {/* 站点数据：浏览量（不倒翁 + 旧站基线）、评论数（GitHub
                   Discussions 汇总）与许可协议。 */}
               <section className="mt-12">
-                <ModuleHeader caption="页面浏览量（busuanzi 实时 + 旧站基线）、评论数（GitHub Discussions 汇总）与许可协议。">
+                <ModuleHeader id="meta" caption="页面浏览量（busuanzi 实时 + 旧站基线）、评论数（GitHub Discussions 汇总）与许可协议。">
                   站点数据
                 </ModuleHeader>
                 <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface shadow-sm">

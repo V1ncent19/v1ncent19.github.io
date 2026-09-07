@@ -6,6 +6,7 @@ import { ArrowRight, ArrowDownWideNarrow, ArrowUpNarrowWide, BookOpen, Search } 
 import type { BlogPostCard, BlogCategory } from "@/lib/blog";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
+import { SectionMark } from "@/components/layout/section-mark";
 import { POST_TONE } from "./post-tone";
 import { LedText } from "./led-text";
 
@@ -138,12 +139,7 @@ export function BlogIndexView({
         {/* ---- Page header (unified § title + grey lead) ---- */}
         <header className="pt-2 sm:pt-4">
           <h1 className="flex items-center gap-3 text-balance text-4xl tracking-tight sm:text-5xl">
-            <span
-              aria-hidden
-              className="font-serif text-xl italic font-normal leading-none text-brand"
-            >
-              §
-            </span>
+            <SectionMark id="blog" size="1.5rem" />
             {s.blog.title}
           </h1>
           <p className="mt-4 max-w-[62ch] text-[1.05rem] leading-relaxed text-muted">

@@ -13,7 +13,7 @@ export default function ProjectPage() {
   return (
     <section className="shell pb-24">
       <div className="mx-auto max-w-5xl">
-        <PageHeader title={s.project.title} lead={s.project.lead} />
+        <PageHeader title={s.project.title} markId="project" lead={s.project.lead} />
         <ProjectGrid projects={getProjects()} lang="en" basePath="/project" />
       </div>
     </section>

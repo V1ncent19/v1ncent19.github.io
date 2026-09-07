@@ -293,8 +293,13 @@ export function CvFolio({ lang }: { lang: Lang }) {
             >
               {cvSections
                 .find((sec) => sec.id === "education")
-                ?.entries.map((entry) => (
-                  <TimelineEntry key={entry.title} entry={entry} lang={lang} />
+                ?.entries.map((entry, i) => (
+                  <TimelineEntry
+                    key={entry.title}
+                    entry={entry}
+                    lang={lang}
+                    first={i === 0}
+                  />
                 )) ??
                 null}
             </ModuleCard>
@@ -536,9 +541,14 @@ function ModuleCard({
 function TimelineEntry({
   entry,
   lang,
+  first = false,
 }: {
   entry: (typeof cvSections)[number]["entries"][number];
   lang: Lang;
+  /** first entry in its timeline: the rail starts at the dot centre instead
+      of the container top (every later rail must start at top-0 so segments
+      join across entries; the dots hide the overlap) */
+  first?: boolean;
 }) {
   const isZh = lang === "zh";
   const title = isZh && entry.titleZh ? entry.titleZh : entry.title;
@@ -548,8 +558,16 @@ function TimelineEntry({
   const now = entry.period?.includes("—");
   return (
     <div className="relative flex gap-4 pb-6 pl-1 last:pb-0 sm:gap-5">
-      {/* timeline rail */}
-      <span aria-hidden className="absolute left-[13px] top-8 bottom-0 w-px bg-line" />
+      {/* timeline rail — runs the full entry height so segments meet across
+          entries; the opaque z-10 dot covers it. left = pl-1 + half dot. NOTE:
+          rem, not px — the dot is rem-sized and the whole site scales via
+          --page-scale, so a px offset drifts (18px ≠ 1.125rem at 0.9).
+          The first entry's rail starts at the dot centre; later ones start at
+          the container top so the previous segment reaches them. */}
+      <span
+        aria-hidden
+        className={`absolute bottom-0 left-[1.125rem] w-px bg-line ${first ? "top-5" : "top-0"}`}
+      />
       <span className="relative z-10 mt-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line bg-surface shadow-sm">
         <span
           className={`h-2.5 w-2.5 rounded-full ${now ? "bg-brand" : "bg-line-strong"}`}

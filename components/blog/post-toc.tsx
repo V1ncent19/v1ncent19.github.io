@@ -73,6 +73,18 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/**
+ * Heading text as the TOC should show it: the clickable `§` anchor injected
+ * into every prose heading would otherwise prefix each entry (prose.tsx's
+ * rehype pass adds a SectionMark <a> inside h2/h3), so clone the heading and
+ * strip those anchors before reading textContent.
+ */
+function tocText(h: HTMLHeadingElement): string {
+  const clone = h.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll("a.section-mark").forEach((a) => a.remove());
+  return (clone.textContent ?? "").trim();
+}
+
 export function PostToc() {
   const [items, setItems] = useState<TocItem[]>([]);
   const [activeIdx, setActiveIdx] = useState(-1);
@@ -143,10 +155,10 @@ export function PostToc() {
       headingsRef.current = headings;
       setItems(
         headings.map((h) => {
-          if (!h.id) h.id = slugify(h.textContent ?? "", used);
+          if (!h.id) h.id = slugify(tocText(h), used);
           return {
             id: h.id,
-            text: (h.textContent ?? "").trim(),
+            text: tocText(h),
             level: h.tagName === "H2" ? 2 : 3,
           };
         }),

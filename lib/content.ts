@@ -58,6 +58,23 @@ export function getAbout(lang: ContentLang): string {
   return fs.readFileSync(file, "utf8");
 }
 
+/**
+ * About markdown split at the FIRST `## ` heading (2026-09-07 merge): the
+ * pre-heading part is the page intro (greeting + CV pointer) and renders
+ * above the General Information block; everything from the first heading on
+ * (Hobbies …) renders below it. Keeps one source file while letting the
+ * structured 基本信息 section sit between the two prose halves.
+ */
+export function getAboutParts(lang: ContentLang): {
+  intro: string;
+  body: string;
+} {
+  const md = getAbout(lang);
+  const idx = md.search(/^## /m);
+  if (idx === -1) return { intro: md, body: "" };
+  return { intro: md.slice(0, idx), body: md.slice(idx) };
+}
+
 /* ---------------------------------------------------------------------------
  * Project index (markdown + front-matter, one file per project)
  * ------------------------------------------------------------------------- */

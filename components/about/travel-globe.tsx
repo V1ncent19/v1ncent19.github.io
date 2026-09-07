@@ -15,6 +15,10 @@
  *   no reverse-overshoot after a hard throw.
  * - Hovering (a dot or a checklist row via the shared hoverId) pauses the
  *   drift; leaving lets ω ease back in.
+ * - Touch (2026-09-07): no hover — a still tap selects the marker under the
+ *   finger (same visual: ring + tooltip + paused drift), tapping it again or
+ *   the empty sea clears, and a selection auto-clears after TAP.AUTO_CLEAR_MS
+ *   so the globe resumes spinning. Touch drags never fire tooltips.
  * - prefers-reduced-motion: no auto drift, no breathing halos — the globe
  *   only moves when dragged.
  * - IntersectionObserver: the rAF loop keeps ticking only while the globe is
@@ -84,6 +88,10 @@ const CONFIG = {
    *  it starts at FROM (larger) and eases down to R while fading in
    *  (IN_MS), and reverses outward on leave (OUT_MS) */
   HOT: { R: 6.5, FROM: 15, LINE: 1.6, IN_MS: 240, OUT_MS: 200 },
+  /** touch tap-to-select (no hover on touch): a tap is a pointerup that
+   *  moved ≤ MAX_PX within MAX_MS; a selected marker auto-clears after
+   *  AUTO_CLEAR_MS unless re-tapped (tap again toggles off) */
+  TAP: { MAX_PX: 10, MAX_MS: 500, AUTO_CLEAR_MS: 3000 },
   /** wishlist pulse — the wish counterpart of the visited ping: a soft
    *  dashed ring expands out of the marker and fades, same period/stagger
    *  family as BREATH (shares its clock so pings interleave) */
@@ -158,6 +166,12 @@ export function TravelGlobe({
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tipRef = useRef<HTMLSpanElement>(null);
+  /* Latched once a touch pointer is seen: touch devices emit compatibility
+     mouse events after every tap, and the wrapper's onMouseLeave would then
+     clear a tap-selection the moment the (emulated) mouse "moves away".
+     While latched, that leave handler is a no-op — real pointer-leave
+     semantics for touch are handled by the pointerType guards instead. */
+  const touchModeRef = useRef(false);
   /* latest props for the imperative loop (no re-subscribe on hover churn);
      synced in an effect — React forbids ref writes during render */
   const propsRef = useRef({ points, hotId, onHover });
@@ -432,11 +446,24 @@ export function TravelGlobe({
       }
     }
 
-    /* ---- pointer: drag / fling / hover hit-test ---- */
+    /* ---- pointer: drag / fling / hover hit-test / touch tap-select ---- */
     let lastX = 0;
     let lastY = 0;
     let samples: { t: number; dx: number }[] = [];
     let globeHover: string | null = null;
+    /* tap detection (touch): where and when the current gesture started */
+    let downX = 0;
+    let downY = 0;
+    let downT = 0;
+    /* auto-clear timer for a touch-selected marker */
+    let tapTimer = 0;
+
+    const clearTapTimer = () => {
+      if (tapTimer) {
+        window.clearTimeout(tapTimer);
+        tapTimer = 0;
+      }
+    };
 
     const setGlobeHover = (id: string | null) => {
       if (globeHover === id) return;
@@ -444,10 +471,11 @@ export function TravelGlobe({
       propsRef.current.onHover(id);
     };
 
-    const hitTest = (e: PointerEvent) => {
+    /** Nearest front-side marker within HIT_PX of the viewport point. */
+    const pickAt = (clientX: number, clientY: number): string | null => {
       const rect = canvas!.getBoundingClientRect();
-      const px = e.clientX - rect.left;
-      const py = e.clientY - rect.top;
+      const px = clientX - rect.left;
+      const py = clientY - rect.top;
       const centre: [number, number] = [-rotation[0], -rotation[1]];
       let best: string | null = null;
       let bestD: number = CONFIG.HIT_PX;
@@ -461,14 +489,25 @@ export function TravelGlobe({
           best = p.id;
         }
       }
-      setGlobeHover(best);
+      return best;
+    };
+
+    /* Mouse-only: move = hover preview (touch does NOT hit-test mid-drag —
+       rotating the globe would otherwise fire tooltips along the way). */
+    const hitTest = (e: PointerEvent) => {
+      setGlobeHover(pickAt(e.clientX, e.clientY));
     };
 
     const onPointerDown = (e: PointerEvent) => {
-      if (e.button !== 0) return;
+      if (e.pointerType === "touch") touchModeRef.current = true;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      clearTapTimer(); // any new gesture cancels a pending auto-clear
       dragging = true;
       omega = 0;
       samples = [];
+      downX = e.clientX;
+      downY = e.clientY;
+      downT = performance.now();
       lastX = e.clientX;
       lastY = e.clientY;
       canvas!.setPointerCapture(e.pointerId);
@@ -487,7 +526,7 @@ export function TravelGlobe({
         samples.push({ t: now, dx });
         while (samples.length > 1 && now - samples[0].t > 110) samples.shift();
         dirty = true;
-      } else {
+      } else if (e.pointerType !== "touch") {
         hitTest(e);
       }
     };
@@ -509,8 +548,30 @@ export function TravelGlobe({
       if (canvas!.hasPointerCapture(e.pointerId))
         canvas!.releasePointerCapture(e.pointerId);
       endDrag();
+      /* touch tap-to-select: a still, short pointerup picks the marker under
+         the finger — same id toggles off, empty sea clears, a fresh pick
+         arms the auto-clear. (Desktop hover semantics are untouched.) */
+      if (e.pointerType === "touch") {
+        const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
+        if (moved <= CONFIG.TAP.MAX_PX && performance.now() - downT <= CONFIG.TAP.MAX_MS) {
+          const id = pickAt(e.clientX, e.clientY);
+          const cur = propsRef.current.hotId;
+          const next = id && id !== cur ? id : null;
+          setGlobeHover(next);
+          clearTapTimer();
+          if (next) {
+            tapTimer = window.setTimeout(
+              () => setGlobeHover(null),
+              CONFIG.TAP.AUTO_CLEAR_MS,
+            );
+          }
+        }
+      }
     };
-    const onPointerLeave = () => {
+    const onPointerLeave = (e: PointerEvent) => {
+      /* touch fires a synthetic pointerleave right after pointerup — it must
+         NOT clear a tap-selection (mouse leave genuinely ends the hover) */
+      if (e.pointerType === "touch") return;
       if (!dragging) setGlobeHover(null);
     };
 
@@ -571,6 +632,7 @@ export function TravelGlobe({
 
     return () => {
       alive = false;
+      clearTapTimer();
       cancelAnimationFrame(raf);
       unregister();
       ro.disconnect();
@@ -587,7 +649,9 @@ export function TravelGlobe({
   return (
     <div
       ref={wrapRef}
-      onMouseLeave={() => onHover(null)}
+      onMouseLeave={() => {
+        if (!touchModeRef.current) onHover(null);
+      }}
       className="relative mx-auto aspect-square w-[min(80%,26rem)] select-none"
     >
       <canvas

@@ -30,6 +30,7 @@ import { GatewayLink } from "@/components/home/gateway-link";
 import { SitePv } from "@/components/home/busuanzi";
 import { SiteComments } from "@/components/home/giscus-count";
 import { ConstructionBanner } from "@/components/home/construction-banner";
+import { SectionMark } from "@/components/layout/section-mark";
 
 type SectionId = Exclude<NavId, "home">;
 
@@ -213,13 +214,17 @@ function recentPosts(limit = 5): FeedItem[] {
 }
 
 /* ---------------------------------------------------------------------------
- * Section title — uniform `§` glyph + plain black heading site-wide.
+ * Section title — uniform `§` glyph + plain black heading site-wide. The §
+ * is a SectionMark anchor: clicking copies the section URL (#id below).
  * ------------------------------------------------------------------------- */
 function ModuleHeader({
+  id,
   children,
   caption,
   aside,
 }: {
+  /** anchor id for the § copy-link marker */
+  id: string;
   children: ReactNode;
   caption?: string;
   aside?: ReactNode;
@@ -227,13 +232,11 @@ function ModuleHeader({
   return (
     <div className="mb-5 border-b border-line pb-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2.5 text-2xl font-semibold tracking-tight">
-          <span
-            aria-hidden
-            className="font-serif text-xl italic font-normal leading-none text-brand"
-          >
-            §
-          </span>
+        <h2
+          id={id}
+          className="flex scroll-mt-28 items-center gap-3.5 text-2xl font-semibold tracking-tight"
+        >
+          <SectionMark id={id} />
           {children}
         </h2>
         {aside}
@@ -281,13 +284,11 @@ export default function HomePage() {
 
           <div className="text-[1.02rem] leading-relaxed text-ink sm:text-lg">
             <div className="mb-4 flex items-center gap-2.5">
-              <span
-                aria-hidden
-                className="font-serif text-xl italic leading-none text-brand"
+              <h2
+                id="hello"
+                className="flex scroll-mt-28 items-center gap-3.5 text-2xl font-semibold tracking-tight sm:text-3xl"
               >
-                §
-              </span>
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                <SectionMark id="hello" />
                 hi, there.
               </h2>
             </div>
@@ -403,6 +404,7 @@ export default function HomePage() {
       <section className="shell mt-4">
         <div className="mx-auto max-w-5xl">
           <ModuleHeader
+            id="navigation"
             aside={
               <span className="font-serif text-sm text-muted">
                 {homeCards.length} places to start
@@ -445,6 +447,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
             <div className="lg:col-span-7">
               <ModuleHeader
+                id="posts"
                 aside={
                   <Link
                     href="/blog"
@@ -464,7 +467,7 @@ export default function HomePage() {
             </div>
 
             <div className="lg:col-span-5">
-              <ModuleHeader>Direct access</ModuleHeader>
+              <ModuleHeader id="access">Direct access</ModuleHeader>
               <ul className="space-y-3.5">
                 {cvHref ? (
                   <DocRow
@@ -531,6 +534,7 @@ export default function HomePage() {
                   content/profile.json. */}
               <section className="mt-12">
                 <ModuleHeader
+                  id="meta"
                   caption="Page views (live via busuanzi + legacy baseline), comments (live from GitHub Discussions) and the site license."
                 >
                   Site Metadata

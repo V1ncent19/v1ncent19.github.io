@@ -2,13 +2,6 @@ Hello! / 你好！/ Bonjour! / こんにちは！ / Γεια σας!
 
 This is a less formal About page. For a more formal version, please visit the [CV](/cv).
 
-## Personal Information
-
-- For the spelling and pronunciation of my name, please refer to the [CV](/cv); my online pseudonym is v1ncent19 on most sites, where v**1**n is used to avoid duplication, and cent**19** comes from the year of my undergraduate enrollment. You can call me "Vincent" or "Vincent nineteen".
-- I am from Shenzhen, a city close to Hong Kong.
-- [SZSHS](https://www.cn-school.com/swkz/index/index.html) @ 2013 → [THU](https://www.tsinghua.edu.cn/en/) @ 2019 → [NU](https://www.northwestern.edu/) @ 2023. <span class="heimu">(Shared feature: the theme colors of the schools are all purple.)</span>
-- Previously a physics student, now a statistics student.
-
 ## Hobbies
 
 - Piano; recently practising: [*The People United Will Never Be Defeated!*](https://en.wikipedia.org/wiki/The_People_United_Will_Never_Be_Defeated!) by [Frederic Rzewski](https://en.wikipedia.org/wiki/Frederic_Rzewski).

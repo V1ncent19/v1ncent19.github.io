@@ -13,7 +13,7 @@ export default function ProjectZhPage() {
   return (
     <section className="shell pb-24">
       <div className="mx-auto max-w-5xl" lang="zh">
-        <PageHeader title={s.project.title} lead={s.project.lead} />
+        <PageHeader title={s.project.title} markId="project" lead={s.project.lead} />
         <ProjectGrid projects={getProjects()} lang="zh" basePath="/project/zh" />
       </div>
     </section>

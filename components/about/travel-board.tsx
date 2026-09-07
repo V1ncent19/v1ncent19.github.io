@@ -142,9 +142,19 @@ function ChecklistColumn({
               return (
                 <li
                   key={i}
-                  onMouseEnter={() => onHover(rowId)}
-                  onMouseLeave={() => onHover(null)}
-                  className={`-mx-2 flex items-baseline gap-2 rounded-md px-2 py-0.5 text-[14px] leading-relaxed transition-colors duration-200 ${
+                  /* Hover sync is mouse-only; touch taps toggle the highlight
+                     on pointerup (emulated mouse events after a tap would
+                     otherwise fight the toggle). */
+                  onPointerEnter={(e) => {
+                    if (e.pointerType !== "touch") onHover(rowId);
+                  }}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType !== "touch") onHover(null);
+                  }}
+                  onPointerUp={(e) => {
+                    if (e.pointerType === "touch") onHover(hot ? null : rowId);
+                  }}
+                  className={`-mx-2 flex cursor-pointer items-baseline gap-2 rounded-md px-2 py-0.5 text-[14px] leading-relaxed transition-colors duration-200 ${
                     hot ? "bg-surface-tint" : ""
                   } ${dashed ? "text-muted" : "text-ink"}`}
                 >

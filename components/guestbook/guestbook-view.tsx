@@ -12,6 +12,7 @@
  */
 
 import { GiscusComments } from "@/components/blog/giscus-comments";
+import { SectionMark } from "@/components/layout/section-mark";
 import { copy, type Lang } from "@/lib/i18n";
 
 /** MUST stay "index" — see the doc comment above. */
@@ -27,7 +28,8 @@ export function GuestbookView({ lang }: { lang: Lang }) {
           <p className="ui-text mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand">
             {s.eyebrow}
           </p>
-          <h1 className="text-balance text-4xl tracking-tight sm:text-5xl">
+          <h1 className="flex items-center gap-3 text-balance text-4xl tracking-tight sm:text-5xl">
+            <SectionMark id="guestbook" size="1.5rem" />
             {s.title}
           </h1>
           <p className="mt-4 max-w-[62ch] text-[1.05rem] leading-relaxed text-muted">
