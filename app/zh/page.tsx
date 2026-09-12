@@ -11,6 +11,7 @@ import {
   GitBranch,
   GraduationCap,
   MessageSquare,
+  Rocket,
   Scale,
   Sigma,
   User,
@@ -235,9 +236,6 @@ export default function ZhHomePage() {
   const profile = getProfile();
   const feed = recentPostsZh();
   const statNote = getProjects().find((p) => p.meta.slug === "stat-summary-note");
-  const highDim = getProjects().find(
-    (p) => p.meta.slug === "high-dimensional-statistics-note-2024-2025",
-  );
   // 中文版 CV PDF 尚未制作，草稿阶段回落到英文版并标注。
   const cvHref = profile.cv.zh ?? profile.cv.en;
   const cvIsEn = !profile.cv.zh;
@@ -296,7 +294,16 @@ export default function ZhHomePage() {
               <strong className="font-semibold text-brand">
                 统计学与数据科学系
               </strong>{" "}
-              的统计学博士生。此前于 2023 年在清华大学{" "}
+              的统计学博士生，导师是{" "}
+              <a
+                href="https://mateyneykov.com/"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
+              >
+                Matey Neykov
+              </a>{" "}
+              教授。此前于 2023 年在清华大学{" "}
               <a
                 href="https://www.phys.tsinghua.edu.cn/"
                 target="_blank"
@@ -305,7 +312,7 @@ export default function ZhHomePage() {
               >
                 物理系
               </a>{" "}
-              取得数学物理学士学位，辅修统计学。
+              取得数理基础科学学士学位，辅修统计学。
             </p>
 
             <p className="mb-4">
@@ -473,16 +480,18 @@ export default function ZhHomePage() {
                     action="PDF"
                   />
                 ) : null}
-                {highDim ? (
-                  <DocRow
-                    icon={BookOpen}
-                    tone="tertiary"
-                    title="高维统计学笔记"
-                    subtitle="Wainwright · Vershynin · Rigollet–Hütter · van Handel"
-                    href={`/project/zh/${highDim.meta.slug}`}
-                    action="阅读"
-                  />
-                ) : null}
+                {/* 清华飞跃手册（2026-09-10）：替换原「高维统计学笔记」位——
+                    用户参与建设的外部社区项目，Rocket 呼应「飞跃」，
+                    tertiary 维持直达入口的色调节奏。 */}
+                <DocRow
+                  icon={Rocket}
+                  tone="tertiary"
+                  title="清华大学飞跃手册"
+                  subtitle="清华学生社区项目 · 我参与建设"
+                  href="https://feiyue.online"
+                  external
+                  action="访问"
+                />
                 {profile.links.map((link) => (
                   <DocRow
                     key={link.href}
@@ -529,7 +538,7 @@ export default function ZhHomePage() {
                   <MetaRow
                     icon={Scale}
                     label="许可协议"
-                    note="内容与代码转载条款"
+                    note="鸣谢 chatgpt & glm 的 vibecoding"
                     value={license.label.trim() || "—"}
                     href={license.href || undefined}
                   />
@@ -570,14 +579,14 @@ function GatewayCard({
     >
       <span
         aria-hidden
-        className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-[2.5px] origin-left scale-x-[0.35] opacity-20 transition-all duration-500 ease-out group-hover:scale-x-100 group-hover:opacity-100 ${tone.line}`}
-      />
-      <span
-        aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"
       >
         <span
           className={`absolute inset-0 bg-gradient-to-br ${tone.wash}`}
+        />
+        <span
+          aria-hidden
+          className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-[2.5px] origin-left scale-x-[0.35] opacity-20 transition-all duration-500 ease-out group-hover:scale-x-100 group-hover:opacity-100 ${tone.line}`}
         />
         <span className="gateway-orb">
           {/* eslint-disable-next-line @next/next/no-img-element -- hover-time data-src swap is incompatible with next/image; never part of LCP */}

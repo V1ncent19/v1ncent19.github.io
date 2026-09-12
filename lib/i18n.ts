@@ -27,7 +27,6 @@ export interface Copy {
     /** General Information block (GeneralInfo): section title + row labels. */
     generalTitle: string;
     generalName: string;
-    generalDob: string;
     generalLangs: string;
     generalHome: string;
   };
@@ -158,7 +157,6 @@ export const copy: Record<Lang, Copy> = {
       timelineEmpty: "Timeline in progress.",
       generalTitle: "General Information",
       generalName: "Full Name",
-      generalDob: "Date of Birth",
       generalLangs: "Languages",
       generalHome: "Hometown",
     },
@@ -183,7 +181,7 @@ export const copy: Record<Lang, Copy> = {
       now: "Now",
       interests: "Interests",
       interestsLead:
-        "The theory of statistics under heavy tails and shape constraints — robust, minimax-optimal, and distribution-free methods in high dimensions.",
+        "Statistical theory under heavy tails and shape constraints — robust, minimax, and distribution-free methods in high dimensions.",
       honors: "Honors & awards",
       publications: "Publications",
       artifacts: "Notes & works",
@@ -192,7 +190,7 @@ export const copy: Record<Lang, Copy> = {
     },
     project: {
       title: "Project",
-      lead: "Long-running notes and small works — some of which outgrew their original format.",
+      lead: "Long-running notes and projects.",
       allProjects: "All projects",
       openPdf: "Open PDF",
       updatedAt: "Updated",
@@ -235,7 +233,7 @@ export const copy: Record<Lang, Copy> = {
     },
     gallery: {
       title: "Gallery",
-      lead: "Photographs taken on trips and in the field, captioned with place and date where they are known. Click any frame to view it large — where the original is shared, a download link sits beneath it.",
+      lead: "Photographs taken on trips and in the field. Click on the images to view details; use the `Featured` filter to see curated picks. ",
       statLabel: "Photographs",
       filterLabel: "Sort",
       byDate: "By date",
@@ -281,24 +279,23 @@ export const copy: Record<Lang, Copy> = {
     about: {
       title: "关于",
       factsTitle: "不正经爱好 & more random things",
-      factsLead: "默认封存——拆开一枚邮票，整组内容一起展开。",
+      factsLead: "点击信封拆封",
       factsSealed: "已封存——点击拆封",
       factsOpened: "已拆封",
       factsDiscovered: "已拆开",
       travelSectionTitle: "旅行足迹",
-      travelVisited: "已解锁足迹",
+      travelVisited: "已解锁地点",
       travelWishlist: "待解锁心愿",
       travelEmpty: "清单整理中——目的地正在逐个解锁。",
       timelineEmpty: "时间轴整理中。",
       generalTitle: "基本信息",
       generalName: "姓名",
-      generalDob: "出生日期",
       generalLangs: "语言",
       generalHome: "家乡",
     },
     cv: {
       title: "经历",
-      lead: "学术履历的网页版。正式且最新的 CV 请以 PDF 为准——如需完整论文/引用列表欢迎来信索取。",
+      lead: "学术履历的网页版。正式且最新的 CV 请以 PDF 为准。",
       download: "下载 CV（PDF）",
       nameHeading: "概况",
       facts: "教育经历",
@@ -324,7 +321,7 @@ export const copy: Record<Lang, Copy> = {
     },
     project: {
       title: "项目",
-      lead: "长期笔记与小作品——其中一些已经超出了它们最初的形式。",
+      lead: "长期笔记与项目。",
       allProjects: "全部项目",
       openPdf: "打开 PDF",
       updatedAt: "更新于",
@@ -367,7 +364,7 @@ export const copy: Record<Lang, Copy> = {
     },
     gallery: {
       title: "影集",
-      lead: "旅途与野外拍下的照片，凡已知的地点与日期都标注在图上。点击任一照片可放大查看；若某张原图已共享，放大视图下方会有下载入口。",
+      lead: "hint：点击图片可查看细节，点选“精选集”可改变 filter",
       statLabel: "照片",
       filterLabel: "排序",
       byDate: "按时间",

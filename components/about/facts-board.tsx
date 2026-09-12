@@ -59,24 +59,25 @@ const FACT_GROUPS: Record<Lang, FactGroup[]> = {
   en: [
     {
       id: "esports",
-      tag: "esports & games",
+      tag: "Esports & Games",
       items: [
         <>
-          An esports viewer — a fan of <L href="https://g2esports.com/">G2 ESPORTS</L>{" "}
+          An esports audience — a fan of <L href="https://g2esports.com/">G2 ESPORTS</L>{" "}
           and of <L href="https://twitter.com/G2Caps">Rasmus &quot;Caps&quot; Winther</L>.
         </>,
-        <>Also a gamer: CS2 / HoK / DSP / KSP.</>,
+        <>Also a player: CS2 / HoK / DSP / KSP / Civilization 6 / CoD.</>,
+        <>Recently: The Artisan of Glimmith / Iron Nest. </>
       ],
     },
     {
       id: "screens",
-      tag: "screens & pages",
+      tag: "Media & Art",
       items: [
         <>
           Favourite anime:{" "}
           <L href="https://summerghost.jp/">『サマーゴースト』 (Summer Ghost)</L>{" "}
           and{" "}
-          <L href="https://justbecause.jp/">『ジャストビコーズ』 (Just Because!)</L>.
+          <L href="https://justbecause.jp/">『ジャストビコーズ』 (Just Because!)</L>. See my <L href="https://bangumi.tv/user/925364">Bangumi</L> for more. 
         </>,
         <>
           Favourite artists:{" "}
@@ -97,7 +98,7 @@ const FACT_GROUPS: Record<Lang, FactGroup[]> = {
             classical
           </L>
           ,{" "}
-          <L href="http://163cn.tv/yazVo3n" title="Recommendation: ユイカ">
+          <L href="http://163cn.tv/yazVo3n" title="Recommendation: ユイカ & あたらよ">
             j-pop
           </L>{" "}
           and{" "}
@@ -111,7 +112,7 @@ const FACT_GROUPS: Record<Lang, FactGroup[]> = {
           <L href="https://www.pixiv.net/artworks/675540">Pixiv</L>.
         </>,
         <>
-          A fan of a certain small creature:{" "}
+          A fan of {" "}
           <L href="https://www.facebook.com/capoocat">Bugcat Capoo</L>.
         </>,
       ],
@@ -122,30 +123,30 @@ const FACT_GROUPS: Record<Lang, FactGroup[]> = {
       items: [
         <>
           Cooking; you are welcome to visit the cooking posts under{" "}
-          <L href="/blog">Blog</L> to see my research results; favourite
+          <L href="/blog/#cuisine">Blog</L> to see my research results (cuisine is more of science insteadof arts.); favourite
           cuisines are Cantonese and French, least favourite is American.
         </>,
         <>
           <L href="https://www.lego.com/en-us">LEGO</L> MOC enthusiast,
-          especially mechanical sets.
+          especially mechanical sets. An example see <L href="blog/2023/other-activity/#lego-moc">blog post</L>.
         </>,
       ],
     },
-    {
-      id: "roads",
-      tag: "on the road",
-      items: [
-        <>
-          A museum enthusiast; the primary destination of most travel is the
-          local museum or art gallery.
-        </>,
-        <>An incoming traveller, currently seriously troubled by visa issues = =</>,
-      ],
-    },
+    // {
+    //   id: "roads",
+    //   tag: "on the road",
+    //   items: [
+    //     <>
+    //       A museum enthusiast; the primary destination of most travel is the
+    //       local museum or art gallery.
+    //     </>,
+    //     <>An incoming traveller, currently seriously troubled by visa issues = =</>,
+    //   ],
+    // },
     {
       id: "myself",
       tag: "myself",
-      items: [<>Social phobia (?).</>],
+      items: [<>Social phobia (?lol).</>],
     },
   ],
   zh: [
@@ -158,7 +159,8 @@ const FACT_GROUPS: Record<Lang, FactGroup[]> = {
           队粉，<L href="https://twitter.com/G2Caps">Rasmus &quot;Caps&quot; Winther</L>{" "}
           个人粉。
         </>,
-        <>游戏也打：CS2 / 农 / 戴森球计划 / KSP。</>,
+        <>游戏也打：CS2 / 农 / 戴森球计划 / KSP / 文明6 / 使命召唤。 </>,
+        <>近期：The Artisan of Glimmith / 铁巢重炮。</>
       ],
     },
     {
@@ -170,7 +172,7 @@ const FACT_GROUPS: Record<Lang, FactGroup[]> = {
           <L href="https://summerghost.jp/">『サマーゴースト』 (Summer Ghost)</L>{" "}
           和{" "}
           <L href="https://justbecause.jp/">『ジャストビコーズ』 (Just Because!)</L>
-          。<span className="heimu">（日语是个好语言，片假名地狱除外。）</span>
+          。<span className="heimu">（日语是个好语言，片假名地狱除外。）</span>欢迎来访我的 <L href="https://bangumi.tv/user/925364">Bangumi</L>。
         </>,
         <>
           喜欢的艺术家是{" "}
@@ -190,7 +192,7 @@ const FACT_GROUPS: Record<Lang, FactGroup[]> = {
         <>
           喜爱的音乐主要分布于{" "}
           <L href="http://163cn.tv/yazW5l0" title="推荐：Glenn Gould">古典</L>
-          、<L href="http://163cn.tv/yazVo3n" title="推荐：ユイカ">二次元</L>
+          、<L href="http://163cn.tv/yazVo3n" title="推荐：ユイカ & あたらよ">二次元</L>
           和<L href="http://163cn.tv/yaz01aM" title="推荐：V.K 克">轻音乐</L>。
         </>,
         <>
@@ -207,22 +209,22 @@ const FACT_GROUPS: Record<Lang, FactGroup[]> = {
       tag: "烟火气",
       items: [
         <>
-          烹饪；菜但爱玩，邀请大家前往 <L href="/blog">博客</L>{" "}
+          烹饪；菜但爱玩，邀请大家前往 <L href="/blog/#cuisine">博客</L>{" "}
           的做饭标签观看本人的研发成果；喜欢的菜系是粤菜和法餐，不喜欢的菜系是美国菜。
         </>,
         <>
-          <L href="https://www.lego.com/en-us">LEGO</L> MOC 爱好者，尤其偏好机械组。
+          <L href="https://www.lego.com/en-us">LEGO</L> MOC 爱好者，尤其偏好机械组。样例见 <L href="blog/2023/other-activity/#lego-moc">博客帖子</L> 
         </>,
       ],
     },
-    {
-      id: "roads",
-      tag: "在路上",
-      items: [
-        <>博物馆爱好者，去大多数地方旅游的首要目的地是当地博物馆/美术馆。</>,
-        <>incoming 的旅游爱好者，目前严重受困于签证问题 = =</>,
-      ],
-    },
+    // {
+    //   id: "roads",
+    //   tag: "在路上",
+    //   items: [
+    //     <>博物馆爱好者，去大多数地方旅游的首要目的地是当地博物馆/美术馆。</>,
+    //     <>incoming 的旅游爱好者，目前严重受困于签证问题 = =</>,
+    //   ],
+    // },
     {
       id: "myself",
       tag: "关于我本人",

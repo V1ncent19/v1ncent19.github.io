@@ -1,5 +1,3 @@
-Hello! / 你好！/ Bonjour! / こんにちは！ / Γεια σας!
-
 This is a less formal About page. For a more formal version, please visit the [CV](/cv).
 
 ## Hobbies

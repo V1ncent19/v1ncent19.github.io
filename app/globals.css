@@ -1160,4 +1160,29 @@ html:not([data-theme]) .ti-system {
   outline-offset: 2px;
 }
 
+/* ---- Scroll-driven greeting (GreetingCycle, 2026-09-08) ----
+   SSR renders the full "a / b / c" list (the old markdown line). After
+   hydration the component rewrites the node into typewriter mode and flips
+   data-mode to "cycle", which lights the caret; text is driven by scroll
+   segments (see components/about/greeting-cycle.tsx). */
+.greeting-cycle {
+  min-height: 1.6em;
+  font-size: 1.0625rem;
+}
+.greeting-cycle[data-mode="cycle"]::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.16em;
+  background: var(--brand);
+  animation: greeting-caret 1.05s steps(1) infinite;
+}
+@keyframes greeting-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
 /* Reduced motion is already flattened by the global `*` rule in @layer base. */

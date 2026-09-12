@@ -12,6 +12,7 @@ import {
   GraduationCap,
   MessageSquare,
   MessagesSquare,
+  Rocket,
   Scale,
   Sigma,
   User,
@@ -47,23 +48,23 @@ const sectionIcons: Record<SectionId, LucideIcon> = {
 const sectionBlurbs: Record<SectionId, { sub: string; desc: string }> = {
   about: {
     sub: "A short introduction",
-    desc: "Who I am — studies, research taste, and what keeps this site ticking.",
+    desc: "Who I am & what I do, plus a few fun facts.",
   },
   cv: {
     sub: "Education · research · activities",
-    desc: "The academic record so far, plus the formal CV as a downloadable PDF.",
+    desc: "The academic record so far, a formal CV attached.",
   },
   gallery: {
-    sub: "Travel & field notes",
+    sub: "Travel & Photography",
     desc: "Selected travel photographs and visual notes from the road.",
   },
   blog: {
-    sub: "Essays & recipes",
-    desc: "Longer writing — statistics notes, cooking experiments, language.",
+    sub: "Fun daily writing",
+    desc: "Short writing — statistics notes, cooking experiments, linguistics, and other miscellany.",
   },
   project: {
     sub: "Notes & small works",
-    desc: "Long-running study notes, compilations and things that outgrew a post.",
+    desc: "Long-running study notes and digests.",
   },
   guestbook: {
     sub: "Say hi · report a bug",
@@ -250,9 +251,6 @@ export default function HomePage() {
   const profile = getProfile();
   const feed = recentPosts();
   const statNote = getProjects().find((p) => p.meta.slug === "stat-summary-note");
-  const highDim = getProjects().find(
-    (p) => p.meta.slug === "high-dimensional-statistics-note-2024-2025",
-  );
   const cvHref = profile.cv.en;
   const { sitePvBaseline } = profile.legacyStats;
   const license = profile.license ?? { label: "", href: "" };
@@ -294,10 +292,8 @@ export default function HomePage() {
             </div>
 
             <p className="mb-4">
-              I am a{" "}
-              <strong className="font-semibold text-brand">
-                Ph.D. student in Statistics
-              </strong>{" "}
+              I am a
+                Ph.D. candidate in Statistics
               at the{" "}
               <a
                 href="https://statistics.northwestern.edu/"
@@ -307,7 +303,25 @@ export default function HomePage() {
               >
                 Department of Statistics and Data Science
               </a>{" "}
-              at Northwestern University. Prior to this, I received my B.S.
+              at 
+              {" "}
+              <a
+                href="https://www.northwestern.edu/"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
+              >
+                Northwestern University
+              </a>, where I am advised by Prof.{" "}
+              <a
+                href="https://mateyneykov.com/"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
+              >
+                Matey Neykov
+              </a>
+              . Prior to this, I received my B.S.
               degree in Mathematics and Physics from the{" "}
               <a
                 href="https://www.phys.tsinghua.edu.cn/phyen/"
@@ -317,35 +331,66 @@ export default function HomePage() {
               >
                 Department of Physics
               </a>{" "}
-              at Tsinghua University in 2023, together with a minor in
+              at
+              {" "}
+              <a
+                href="https://www.tsinghua.edu.cn/en/"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
+              >
+                Tsinghua University
+              </a>{" "}  in 2023, together with a minor in
               Statistics.
             </p>
 
             <p className="mb-4">
-              Both theoretical physics and high-dimensional statistics
-              captivate me. Here I record long-running study notes and course
-              digests — such as the{" "}
+              Both disciplines of Physics and Statistics attract me a lot and you are welcome to discuss any interesting topics with me. I record my thoughts and ideas at{" "}
               <Link
-                href="/project/stat-summary-note"
+                href="/blog"
                 className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
               >
-                Statistics summary notes
+                my blog pages
               </Link>{" "}
-              and the{" "}
+              , either academic or non-academic,
+              and some longer running notes at{" "}
               <Link
-                href="/project/high-dimensional-statistics-note-2024-2025"
+                href="/project"
                 className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
               >
-                high-dimensional statistics note
+                projects
               </Link>{" "}
-              — as well as essays and the occasional photograph.
+              . I also log some leisure things at {" "}
+              <a
+                href="/about"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
+              >
+                About page
+              </a>{" "}
+              and{" "}
+              <a
+                href="/gallery"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
+              >
+                Gallery
+              </a>{" "}
+              . 
             </p>
 
-            <p className="mb-6 text-muted">
-              This site mixes formats on purpose: blog posts for ideas that
-              are still finding their shape, notes for the ones that survived
-              contact with reality, and a gallery for everything else. Use
-              the index below to jump straight in.
+            <p className="mb-4">
+              Feel free to discover different aspects of my life and work using the navigation cards below, and you are welcome to leave me a message at{" "}
+              <a
+                href="/guestbook"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
+              >
+                Guestbook
+              </a>{" "}!
             </p>
           </div>
 
@@ -473,7 +518,7 @@ export default function HomePage() {
                   <DocRow
                     icon={GraduationCap}
                     tone="brand"
-                    title="Curriculum Vitae (Academic)"
+                    title="Curriculum Vitae"
                     subtitle="Northwestern Statistics · Tsinghua University"
                     href={cvHref}
                     download
@@ -490,16 +535,19 @@ export default function HomePage() {
                     action="PDF"
                   />
                 ) : null}
-                {highDim ? (
-                  <DocRow
-                    icon={BookOpen}
-                    tone="tertiary"
-                    title="High Dimensional Statistics Note"
-                    subtitle="Wainwright · Vershynin · Rigollet–Hütter · van Handel"
-                    href={highDim.meta.pdf ?? `/project/${highDim.meta.slug}`}
-                    action="Read"
-                  />
-                ) : null}
+                {/* Tsinghua Feiyue Handbook (2026-09-10): replaces the
+                    high-dim note slot — external community project the site
+                    owner helps build. Rocket echoes "飞跃"; tertiary keeps
+                    the Direct access colour rhythm (brand/accent/tertiary). */}
+                <DocRow
+                  icon={Rocket}
+                  tone="tertiary"
+                  title="Tsinghua Feiyue Handbook"
+                  subtitle="A Tsinghua community project · I help build it"
+                  href="https://feiyue.online"
+                  external
+                  action="Visit"
+                />
                 {profile.links.map((link) => (
                   <DocRow
                     key={link.href}
@@ -535,7 +583,7 @@ export default function HomePage() {
               <section className="mt-12">
                 <ModuleHeader
                   id="meta"
-                  caption="Page views (live via busuanzi + legacy baseline), comments (live from GitHub Discussions) and the site license."
+                  caption="Site statistics and license."
                 >
                   Site Metadata
                 </ModuleHeader>
@@ -543,19 +591,19 @@ export default function HomePage() {
                   <MetaRow
                     icon={Eye}
                     label="Page views"
-                    note="All-time — live count + legacy baseline"
+                    // note="All-time — live count + legacy baseline"
                     value={<SitePv baseline={sitePvBaseline} />}
                   />
                   <MetaRow
                     icon={MessageSquare}
                     label="Comments"
-                    note="giscus — summed across all site discussions"
+                    // note="giscus — summed across all site discussions"
                     value={<SiteComments />}
                   />
                   <MetaRow
                     icon={Scale}
                     label="License"
-                    note="Content & code reuse terms"
+                    note="Thanks chatgpt & glm for vibing ^_^."
                     value={license.label.trim() || "—"}
                     href={license.href || undefined}
                   />
@@ -594,19 +642,21 @@ function GatewayCard({
           : "gateway-card relative flex h-full min-h-[12.5rem] flex-col rounded-xl border border-line bg-surface p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-line-strong hover:shadow-lift"
       }
     >
-      {/* Tone hairline: rests faint & pulled back, sweeps across on hover */}
-      <span
-        aria-hidden
-        className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-[2.5px] origin-left scale-x-[0.35] opacity-20 transition-all duration-500 ease-out group-hover:scale-x-100 group-hover:opacity-100 ${tone.line}`}
-      />
       {/* Clipped decor layer: keeps the bleed of wash + reveal + watermark
-          inside the rounded corners */}
+          inside the rounded corners. The tone hairline lives in here too, so
+          its ends get clipped along the corner arcs and stay flush with the
+          rounded border instead of overrunning it (rest + hover). */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"
       >
         <span
           className={`absolute inset-0 bg-gradient-to-br ${tone.wash}`}
+        />
+        {/* Tone hairline: rests faint & pulled back, sweeps across on hover */}
+        <span
+          aria-hidden
+          className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-[2.5px] origin-left scale-x-[0.35] opacity-20 transition-all duration-500 ease-out group-hover:scale-x-100 group-hover:opacity-100 ${tone.line}`}
         />
         {/* Circle reveal: the photo sits behind the card content and is
             uncovered by an expanding circle anchored at the watermark corner

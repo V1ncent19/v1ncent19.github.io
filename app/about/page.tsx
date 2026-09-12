@@ -5,6 +5,7 @@ import { ProseBehavior } from "@/components/content/prose-behavior";
 import { FactsBoard } from "@/components/about/facts-board";
 import { GeneralInfo } from "@/components/about/general-info";
 import { TravelSection } from "@/components/about/travel-section";
+import { GreetingCycle } from "@/components/about/greeting-cycle";
 import { getAboutParts, getPersonality, getTravel } from "@/lib/content";
 import { copy } from "@/lib/i18n";
 
@@ -23,6 +24,7 @@ export default function AboutPage() {
     <section className="shell pb-20">
       <div className="mx-auto max-w-5xl">
         <PageHeader title={copy.en.about.title} markId="about" />
+        <GreetingCycle />
         <Prose source={intro} />
         <ProseBehavior />
         <GeneralInfo lang="en" />

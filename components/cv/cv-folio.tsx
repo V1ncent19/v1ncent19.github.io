@@ -52,14 +52,14 @@ const HONORS: Honor[] = [
     year: "2023",
     dot: "bg-tertiary",
   },
-  {
-    title: "Honorable Mention — MCM/ICM",
-    titleZh: "美国大学生数学建模竞赛（MCM/ICM）荣誉提名",
-    sub: "Mathematical Contest in Modeling (COMAP), track A",
-    subZh: "COMAP 数学建模竞赛 · A 题 · H 奖",
-    year: "2022",
-    dot: "bg-brand",
-  },
+  // {
+  //   title: "Honorable Mention — MCM/ICM",
+  //   titleZh: "美国大学生数学建模竞赛（MCM/ICM）荣誉提名",
+  //   sub: "Mathematical Contest in Modeling (COMAP), track A",
+  //   subZh: "COMAP 数学建模竞赛 · A 题 · H 奖",
+  //   year: "2022",
+  //   dot: "bg-brand",
+  // },
   {
     title: "Ma Yuehan Cup — Shooting",
     titleZh: "马约翰杯 · 射击",
@@ -72,17 +72,17 @@ const HONORS: Honor[] = [
 
 const INTERESTS = [
   "Robust statistics",
-  "Heavy-tailed minimax theory",
+  "Minimax theory",
   "High-dimensional statistical inference",
-  "Distribution-free & conformal inference",
+  // "Distribution-free & conformal inference",
   "Statistical learning theory",
 ];
 
 const INTERESTS_ZH = [
   "稳健统计",
-  "重尾极小极大理论",
+  "Minimax 理论",
   "高维统计推断",
-  "免分布与 conformal 推断",
+  // "免分布与 conformal 推断",
   "统计学习理论",
 ];
 
@@ -197,7 +197,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
                   Shenzhen, Guangdong, China
                 </FactRow>
                 <FactRow icon={GraduationCap} label={isZh ? "路线" : "Route"}>
-                  SZSHS · 2013 → Tsinghua · 2019 → Northwestern · 2023
+                  SZSHS · 2013 & 2016 → Tsinghua · 2019 → Northwestern · 2023
                 </FactRow>
               </ul>
 
@@ -228,6 +228,19 @@ export function CvFolio({ lang }: { lang: Lang }) {
                       </a>
                     </li>
                   ))}
+                  {profile.linkedin ? (
+                    <li>
+                      <a
+                        href={profile.linkedin}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex items-center gap-2 text-ink no-underline hover:text-brand"
+                      >
+                        <LinkedinGlyph className="h-4 w-4 text-accent" />
+                        LinkedIn
+                      </a>
+                    </li>
+                  ) : null}
                 </ul>
               </div>
             </Card>
@@ -469,6 +482,39 @@ export function CvFolio({ lang }: { lang: Lang }) {
  * Small building blocks (full-literal class strings only)
  * ------------------------------------------------------------------------- */
 
+/** Render a plain-text line, linking known names to their homepages (the
+ *  advisor mention in the Ph.D. education entry; works in EN and ZH lines
+ *  alike since the name itself is Latin in both). */
+const NAME_LINKS: Array<[RegExp, string]> = [
+  [/(Matey Neykov)/g, "https://mateyneykov.com/"],
+];
+
+function withNameLinks(line: string): Array<ReactNode> {
+  let parts: Array<ReactNode> = [line];
+  for (const [re, href] of NAME_LINKS) {
+    parts = parts.flatMap((part): ReactNode[] => {
+      if (typeof part !== "string") return [part];
+      return part.split(re).map((seg, i) => {
+        if (i % 2 === 1) {
+          return (
+            <a
+              key={`${href}-${i}`}
+              href={href}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="underline decoration-line-strong underline-offset-2 transition hover:text-brand hover:no-underline"
+            >
+              {seg}
+            </a>
+          );
+        }
+        return seg;
+      });
+    });
+  }
+  return parts;
+}
+
 function Card({ children }: { children: ReactNode }) {
   return (
     <section className="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
@@ -479,6 +525,16 @@ function Card({ children }: { children: ReactNode }) {
 
 function SectionDot({ tone }: { tone: string }) {
   return <span aria-hidden className={`h-2 w-2 rounded-full ${tone}`} />;
+}
+
+/** LinkedIn brand glyph (lucide dropped brand icons in v1.x, so this is an
+ *  inline path — the classic "in" mark, filled to keep it legible at 16px). */
+function LinkedinGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z" />
+    </svg>
+  );
 }
 
 function FactRow({
@@ -604,7 +660,9 @@ function TimelineEntry({
           )
         ) : null}
         {lines.length ? (
-          <p className="mt-2 text-sm leading-relaxed text-muted">{lines[0]}</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted">
+            {withNameLinks(lines[0])}
+          </p>
         ) : null}
       </div>
     </div>
@@ -655,7 +713,7 @@ function RecordEntry({
       {lines.length ? (
         <ul className="mt-2.5 space-y-1.5 text-sm leading-relaxed text-muted">
           {lines.map((line) => (
-            <li key={line}>— {line}</li>
+            <li key={line}>— {withNameLinks(line)}</li>
           ))}
         </ul>
       ) : null}

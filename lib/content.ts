@@ -31,6 +31,9 @@ export interface Profile {
   avatar: string;
   cv: { en: string | null; zh: string | null };
   email: string;
+  /** Optional LinkedIn profile URL — currently shown only on the CV contact
+   *  card (home intentionally lists GitHub-only links). */
+  linkedin?: string;
   links: ProfileLink[];
   /** PV/UV baselines to be filled in at final migration (legacy busuanzi). */
   legacyStats: { sitePvBaseline: number; siteUvBaseline: number };

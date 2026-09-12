@@ -29,11 +29,6 @@ const LANGS = [
   "Français, 日本語 (Beginner)",
 ];
 
-const DOB: Record<Lang, string> = {
-  en: "29th November 2001",
-  zh: "2001年11月29日",
-};
-
 /** Narrative bullets formerly under the prose `## Personal Information`. */
 const NARRATIVE: Record<Lang, string> = {
   en: `- I keep a semi-real-name presence online; my usual pseudonym is v1ncent19, where v**1**n is used to avoid duplication, and cent**19** comes from the year of my undergraduate enrollment (the name spellings and romanizations are in the table above). You can call me "Vincent" or "Vincent nineteen".
@@ -51,7 +46,6 @@ export function GeneralInfo({ lang }: { lang: Lang }) {
   const s = copy[lang].about;
   const rows: Array<[string, ReactNode]> = [
     [s.generalName, NAME],
-    [s.generalDob, DOB[lang]],
     [
       s.generalLangs,
       <ul key="langs" className="space-y-0.5">

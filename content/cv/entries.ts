@@ -61,7 +61,7 @@ export const cvSections: CvSection[] = [
       },
       {
         title: "B.S. in Mathematics and Physics",
-        titleZh: "数学物理 学士",
+        titleZh: "数理基础科学 学士",
         institution: "Tsinghua University",
         institutionZh: "清华大学",
         institutionHref: "https://www.phys.tsinghua.edu.cn/phyen/",
