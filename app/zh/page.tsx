@@ -2,7 +2,7 @@ import Link from "next/link";
 import {
   ArrowRight,
   BookOpen,
-  Camera,
+  Map,
   Download,
   ExternalLink,
   Eye,
@@ -47,7 +47,7 @@ type SectionId = Exclude<NavId, "home">;
 const sectionIcons: Record<SectionId, LucideIcon> = {
   about: User,
   cv: FileText,
-  gallery: Camera,
+  travel: Map,
   blog: BookOpen,
   project: FolderOpen,
   guestbook: MessageSquare,
@@ -63,9 +63,9 @@ const sectionBlurbs: Record<SectionId, { sub: string; desc: string }> = {
     sub: "教育 · 科研 · 活动",
     desc: "至今的学术履历，附可下载的正式简历 PDF。",
   },
-  gallery: {
-    sub: "旅行与野外记录",
-    desc: "旅途上拍下的精选照片与视觉笔记。",
+  travel: {
+    sub: "旅行志 · 地图 · 摄影",
+    desc: "交互式 GPS 叙事旅行志（Beta），以及旅途影集。",
   },
   blog: {
     sub: "随笔与食谱",
@@ -124,7 +124,7 @@ const PEEK_FRAME: Record<SectionId, { pos: string; fit: "cover" | "contain" }> =
   {
     about: { pos: "50% 20%", fit: "cover" },
     cv: { pos: "50% 50%", fit: "contain" },
-    gallery: { pos: "50% 50%", fit: "cover" },
+    travel: { pos: "50% 50%", fit: "cover" },
     blog: { pos: "50% 50%", fit: "cover" },
     project: { pos: "50% 10%", fit: "cover" },
     guestbook: { pos: "50% 50%", fit: "cover" },
@@ -615,6 +615,13 @@ function GatewayCard({
         </span>
         <span className="ui-text text-xs tracking-wider text-muted">
           {sectionBlurbs[id].sub}
+          {/* Travel is the interactive trip-log hub — flagged Beta until the
+              owner declares it stable (2026-09-25). */}
+          {id === "travel" ? (
+            <span className="ui-text ml-auto rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand">
+              Beta
+            </span>
+          ) : null}
         </span>
       </div>
       <div className="relative mt-auto pt-6">

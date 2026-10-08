@@ -3,12 +3,14 @@
 import {
   ArrowDownUp,
   ArrowDownWideNarrow,
+  ArrowRight,
   ArrowUpNarrowWide,
   Camera,
   ChevronUp,
   Download,
   LayoutGrid,
   MapPin,
+  Pin,
   Shuffle,
   Star,
   X,
@@ -30,6 +32,65 @@ import { copy } from "@/lib/i18n";
 import { TravelStamp } from "./travel-stamps";
 
 type SortMode = "date" | "place" | "shuffle";
+
+/**
+ * A non-photo "story" card pinned to the front of the masonry flow (2026-09-25
+ * travel hub): trip logs and blog posts rendered as tiles that look native in
+ * the waterfall but navigate to their post instead of opening the lightbox.
+ * Deliberately image-less (user decision): a typographic card — big index
+ * numeral + serif title + meta + call-to-action on a tinted surface — reads as
+ * something other than a photo at a glance. All strings are pre-localised by
+ * the host page — this component stays i18n-free.
+ */
+export interface GalleryStoryTile {
+  /** Stable DOM/FLIP key; must not collide with any GalleryItem id. */
+  id: string;
+  href: string;
+  /** Large ghost numeral at the card's top, e.g. "01". */
+  index?: string;
+  title: string;
+  /** One-line context, e.g. "Interactive map log · 18 days". */
+  meta: string;
+  /** Call-to-action line at the card's bottom, e.g. "Read". */
+  cta?: string;
+  /** Small pill under the title, e.g. "Beta". */
+  badge?: string;
+  /**
+   * Pin the tile to the very front of the flow (2026-09-25 user request) and
+   * stamp a "pinned" marker on the card. Pinned tiles ignore sort/filter.
+   */
+  pinned?: boolean;
+  /**
+   * YYYY-MM-DD anchor for unpinned tiles: in date-sorted mode they are merged
+   * into the photo stream at this date (2026-09-25 user request — the Paris
+   * food diary sits at 2024-03-20 in the timeline, not on top). In other sort
+   * modes (place/shuffle) unpinned tiles ride up front after the pinned ones.
+   */
+  date?: string;
+  /**
+   * 2–3 line summary clamped under the title. Retired from rendering
+   * (2026-09-26 user request: tiles carry basic metainfo only) — the field
+   * stays for backwards compatibility but StoryTile no longer shows it.
+   */
+  excerpt?: string;
+  /** Small place/topic chips between title and excerpt. */
+  tags?: string[];
+  /** Bottom stat line under a hairline divider, joined with "·". */
+  facts?: string[];
+  /**
+   * Cover photo for the hover circle-reveal (2026-09-26, mirroring the home
+   * gateway cards): a gallery thumb URL revealed by a clip-path circle
+   * anchored at the card's bottom-right corner on hover/focus.
+   */
+  cover?: string;
+  /** object-position for the cover image, e.g. "center 40%". */
+  coverPos?: string;
+  /**
+   * Label of the "latest post" tag cell rendered beside the index numeral
+   * (2026-09-26) — pre-localised by the host, e.g. "Latest".
+   */
+  latest?: string;
+}
 
 /* ----------------------------------------------------------------------------
  * Column layout
@@ -258,9 +319,27 @@ function shuffleList<T>(list: readonly T[], seed: number): T[] {
 export function GalleryView({
   lang,
   items,
+  embedded = false,
+  storyTiles = [],
 }: {
   lang: Lang;
   items: GalleryItem[];
+  /**
+   * Embedded mode (2026-09-25, travel hub): the same grid + toolbar + lightbox,
+   * but without this component's own page header / census tile / colophon and
+   * without the outer `shell` section — the host page supplies the section
+   * heading, container width and vertical rhythm. Nothing else changes: sort
+   * chips, curated filter, column chooser and the lightbox behave exactly
+   * like the /gallery page.
+   */
+  embedded?: boolean;
+  /**
+   * Story cards pinned ahead of the photos in the flow (2026-09-25, travel
+   * hub). Deliberately NOT affected by the sort chips / curated filter /
+   * shuffle: they are navigation, not part of the browsable collection, and
+   * must keep their lead position however the photos are rearranged.
+   */
+  storyTiles?: GalleryStoryTile[];
 }) {
   const s = copy[lang];
   const unit = lang === "zh" ? "张" : "photos";
@@ -383,15 +462,66 @@ export function GalleryView({
     return { columns: Math.max(1, Math.min(prefCols, fits)), fits };
   }, [containerW, prefCols]);
 
-  /** Round-robin split of the ordered photos into columns (see header note). */
-  const columnList = useMemo(() => {
-    const cols: { item: GalleryItem; index: number }[][] = Array.from(
-      { length: columns },
-      () => [],
+  /**
+   * The full tile flow. Pinned story cards always lead (regardless of sort/
+   * filter — they are navigation); unpinned stories carry a `date` and are
+   * merged into the photo stream at that date in date-sorted mode (2026-09-25
+   * user request: the Paris food diary sits at its 2024-03-20 spot in the
+   * timeline). In place/shuffle modes unpinned stories ride up front right
+   * after the pinned ones. Photos keep their index INTO `ordered` so the
+   * lightbox (which indexes `ordered`) stays untouched by the story inserts.
+   */
+  type FlowEntry =
+    | { kind: "story"; story: GalleryStoryTile }
+    | { kind: "photo"; item: GalleryItem; photoIndex: number };
+
+  const flow = useMemo<FlowEntry[]>(() => {
+    const pinned = storyTiles.filter((s) => s.pinned);
+    const loose = storyTiles.filter((s) => !s.pinned);
+    if (mode !== "date" || loose.length === 0) {
+      return [
+        ...storyTiles.map((story) => ({ kind: "story" as const, story })),
+        ...ordered.map((item, photoIndex) => ({
+          kind: "photo" as const,
+          item,
+          photoIndex,
+        })),
+      ];
+    }
+    const flip = dir === "asc" ? 1 : -1;
+    // Stories keep the same chronological direction as the photos around them.
+    const stories = [...loose].sort(
+      (a, b) => (a.date || "").localeCompare(b.date || "") * flip,
     );
-    ordered.forEach((item, i) => cols[i % columns].push({ item, index: i }));
+    const flow: FlowEntry[] = pinned.map((story) => ({
+      kind: "story" as const,
+      story,
+    }));
+    let s = 0;
+    ordered.forEach((item, photoIndex) => {
+      // desc: a story leads every photo strictly older than it (equal dates:
+      // the photo of that day stays first). asc mirrors the comparison.
+      while (
+        s < stories.length &&
+        (flip === -1
+          ? (item.date || "") <= (stories[s].date || "")
+          : (item.date || "") >= (stories[s].date || ""))
+      ) {
+        flow.push({ kind: "story", story: stories[s] });
+        s += 1;
+      }
+      flow.push({ kind: "photo", item, photoIndex });
+    });
+    stories.slice(s).forEach((story) => flow.push({ kind: "story", story }));
+    return flow;
+  }, [storyTiles, ordered, mode, dir]);
+
+  /** Round-robin split of the flow into columns (see header note). */
+  const columnList = useMemo(() => {
+    const cols: FlowEntry[][] = Array.from({ length: columns }, () => []);
+    flow.forEach((entry, i) => cols[i % columns].push(entry));
     return cols;
-  }, [ordered, columns]);
+  }, [flow, columns]);
 
   /* FLIP reorder animation (2026-09-05, Task D #6 — user-approved). When the
      display order or column count changes (sort chip, featured toggle, column
@@ -421,7 +551,9 @@ export function GalleryView({
       const id = el.dataset.gid;
       if (id) now.set(id, el.getBoundingClientRect());
     }
-    const sig = `${columns}|${ordered.map((i) => i.id).join(",")}`;
+    const sig = `${columns}|${flow
+      .map((e) => (e.kind === "story" ? e.story.id : e.item.id))
+      .join(",")}`;
     const prev = prevRects.current;
     const changed = prevSig.current !== "" && prevSig.current !== sig;
     prevSig.current = sig;
@@ -471,7 +603,7 @@ export function GalleryView({
       }),
     );
     return () => cancelAnimationFrame(raf);
-  }, [ordered, columns]);
+  }, [flow, columns]);
 
   // Clear a pending FLIP cleanup if the grid unmounts mid-animation.
   useEffect(
@@ -857,9 +989,10 @@ export function GalleryView({
     );
   };
 
-  return (
-    <section className="shell pb-20">
-      <div className="mx-auto max-w-5xl">
+  const body = (
+    <div className="mx-auto max-w-5xl">
+        {!embedded && (
+        <>
         {/* ---- Header / intro ---- */}
         {/* pt-2 sm:pt-4 keeps the § title row aligned with every other page's
             header (PageHeader / blog / CV use the same top padding; Task D #3). */}
@@ -897,6 +1030,8 @@ export function GalleryView({
             </div>
           </div>
         </header>
+        </>
+        )}
 
         {/* ---- Sort strip + column chooser ---- */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border border-line bg-surface-tint px-4 py-3">
@@ -921,10 +1056,9 @@ export function GalleryView({
             {s.gallery.featured}
           </button>
 
+          {/* v14 (2026-09-28 user request): the SORT/排序 word removed — the
+              bare chips can't drift out of alignment with Featured above. */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span className="ui-text text-xs font-medium uppercase tracking-widest text-muted">
-              {s.gallery.filterLabel}
-            </span>
             <div className="flex flex-wrap items-center gap-2">
               {chips.map(({ key, label, icon: Icon }) => (
                 <button
@@ -943,32 +1077,56 @@ export function GalleryView({
                   {label}
                 </button>
               ))}
+              {/* Dimension divider (2026-09-26 user request): the sort KEY
+                  (date/place/shuffle) and the DIRECTION (newest/oldest first)
+                  are two separate axes — a hairline separates them so the
+                  direction toggle reads as its own control group, not a
+                  fourth sort key. */}
+              {mode !== "shuffle" ? (
+                <span
+                  aria-hidden
+                  className="mx-0.5 hidden h-5 w-px shrink-0 bg-line sm:block"
+                />
+              ) : null}
               {/* Direction toggle (date/place only — shuffle has no order).
                   Icon + label mirror the current direction; place uses the
-                  neutral A→Z / Z→A shorthand. */}
+                  neutral A→Z / Z→A shorthand.
+                  v13 (2026-09-28 user report): when the sort KEY switched
+                  (bydate ↔ shuffle), this button mounted/unmounted inside the
+                  same flex-wrap as the chips, so the wrap point drifted and
+                  the cell "ran around". Below sm it now always owns the LAST
+                  full-width row (w-full): switching to shuffle removes the
+                  whole row and nothing else moves. sm:contents dissolves the
+                  wrapper so desktop keeps the original inline layout. */}
               {mode !== "shuffle" ? (
-                <button
-                  type="button"
-                  onClick={() => setDir((d) => (d === "desc" ? "asc" : "desc"))}
-                  aria-label={s.gallery.sortDir}
-                  title={s.gallery.sortDir}
-                  className="ui-text inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted shadow-sm transition-colors hover:text-ink"
-                >
-                  {dir === "desc" ? (
-                    <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden />
-                  ) : (
-                    <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden />
-                  )}
-                  <span className="text-xs font-semibold">
-                    {mode === "place"
-                      ? dir === "asc"
-                        ? "A→Z"
-                        : "Z→A"
-                      : dir === "desc"
-                        ? s.gallery.dirNew
-                        : s.gallery.dirOld}
-                  </span>
-                </button>
+                <div className="flex w-full items-center gap-2 sm:contents">
+                  <span
+                    aria-hidden
+                    className="mx-0.5 hidden h-5 w-px shrink-0 bg-line sm:block"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setDir((d) => (d === "desc" ? "asc" : "desc"))}
+                    aria-label={s.gallery.sortDir}
+                    title={s.gallery.sortDir}
+                    className="ui-text inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted shadow-sm transition-colors hover:text-ink"
+                  >
+                    {dir === "desc" ? (
+                      <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden />
+                    ) : (
+                      <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden />
+                    )}
+                    <span className="text-xs font-semibold">
+                      {mode === "place"
+                        ? dir === "asc"
+                          ? "A→Z"
+                          : "Z→A"
+                        : dir === "desc"
+                          ? s.gallery.dirNew
+                          : s.gallery.dirOld}
+                    </span>
+                  </button>
+                </div>
               ) : null}
             </div>
           </div>
@@ -1015,9 +1173,10 @@ export function GalleryView({
           </div>
         </div>
 
-        {/* ---- Masonry grid (explicit columns); curated filter with no picks
-            yet renders a friendly empty state instead ---- */}
-        {visible.length === 0 ? (
+        {/* ---- Masonry grid (explicit columns); story cards lead the flow,
+            then the curated-filtered / sorted photos. A filter with no picks
+            AND no story cards renders a friendly empty state instead ---- */}
+        {visible.length === 0 && storyTiles.length === 0 ? (
           <div className="mt-8 flex items-center justify-center rounded-xl border border-dashed border-line bg-surface-tint/60 px-6 py-14 text-center">
             <p className="ui-text max-w-md text-sm leading-relaxed text-muted">
               {s.gallery.featuredEmpty}
@@ -1027,20 +1186,25 @@ export function GalleryView({
           <div ref={gridRef} className="mt-8 flex items-start gap-3">
             {columnList.map((col, ci) => (
               <div key={ci} className="flex min-w-0 flex-1 flex-col gap-3">
-                {col.map(({ item, index }) => (
-                  <GalleryTile
-                    key={item.id}
-                    item={item}
-                    lang={lang}
-                    onOpen={() => openAt(index)}
-                  />
-                ))}
+                {col.map((entry) =>
+                  entry.kind === "story" ? (
+                    <StoryTile key={entry.story.id} story={entry.story} />
+                  ) : (
+                    <GalleryTile
+                      key={entry.item.id}
+                      item={entry.item}
+                      lang={lang}
+                      onOpen={() => openAt(entry.photoIndex)}
+                    />
+                  ),
+                )}
               </div>
             ))}
           </div>
         )}
 
-        {/* ---- Colophon / storage note ---- */}
+        {/* ---- Colophon / storage note (page mode only) ---- */}
+        {!embedded && (
         <div className="mt-8 flex items-start gap-3.5 rounded-xl border border-line bg-surface-tint p-5">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand text-on-brand">
             <Camera className="h-5 w-5" aria-hidden />
@@ -1049,6 +1213,7 @@ export function GalleryView({
             {s.gallery.note}
           </p>
         </div>
+        )}
 
         {/* ---- Lightbox ----
             Portalled to <body> (same trick as the blog TOC): rendered inline
@@ -1171,8 +1336,12 @@ export function GalleryView({
               document.body,
             )
           : null}
-      </div>
-    </section>
+    </div>
+  );
+  return embedded ? (
+    body
+  ) : (
+    <section className="shell pb-20">{body}</section>
   );
 }
 
@@ -1282,6 +1451,140 @@ function WorldLocationMap({
         </svg>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * A story card in the masonry flow (2026-09-25, travel hub): an image-less
+ * typographic card (user decision — "一眼就能看出这不是照片") on the tinted
+ * surface with the site's serif title language. The 4/5 aspect keeps its
+ * masonry footprint in rhythm with the surrounding photo tiles. Same tile
+ * shell (rounded-xl, hover lift) as GalleryTile, but an <a> that navigates to
+ * the post instead of opening the lightbox.
+ */
+/**
+ * One non-photo story card (2026-09-26 v2). Basic metainfo only — the
+ * explanatory excerpt is gone (user request); what remains is index numeral
+ * (+ optional "latest post" tag cell), serif title, badge, place chips, stat
+ * line and CTA. Hover mirrors the home gateway cards: a cover photo (when the
+ * host provides one) is uncovered by a clip-path circle anchored at the
+ * card's bottom-right corner, under a surface veil that keeps the type
+ * readable. Click plays the gateway's "launching" confirmation — the card
+ * settles (scale 0.985) and the CTA arrow nudges — before navigation.
+ */
+function StoryTile({ story }: { story: GalleryStoryTile }) {
+  function launch(e: React.MouseEvent<HTMLAnchorElement>) {
+    const el = e.currentTarget;
+    if (el.classList.contains("is-launching")) return;
+    e.preventDefault();
+    el.classList.add("is-launching");
+    window.setTimeout(() => {
+      window.location.href = story.href;
+    }, 320);
+  }
+  return (
+    <a
+      href={story.href}
+      data-gid={story.id}
+      onClick={launch}
+      className="story-tile no-underline hover:no-underline relative flex aspect-[4/5] w-full flex-col overflow-hidden rounded-xl border border-line bg-surface-tint p-4 text-left shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-line-strong hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:p-5"
+    >
+      {/* Hover circle-reveal cover (home gateway effect, 2026-09-26). Sits
+          under the type; the veil keeps the card readable while open. */}
+      {story.cover ? (
+        <span aria-hidden className="story-orb">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={story.cover}
+            alt=""
+            style={story.coverPos ? { objectPosition: story.coverPos } : undefined}
+          />
+          <span className="story-orb-veil" />
+        </span>
+      ) : null}
+
+      {story.pinned ? (
+        <span
+          aria-hidden
+          className="absolute right-3.5 top-3.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft text-brand sm:right-4 sm:top-4"
+        >
+          <Pin size={13} strokeWidth={2.5} />
+        </span>
+      ) : null}
+
+      {story.index ? (
+        <span className="z-10 flex items-start gap-2">
+          <span
+            aria-hidden
+            className="font-serif text-3xl leading-none text-brand/45"
+          >
+            {story.index}
+          </span>
+          {story.latest ? (
+            <span
+              data-latest
+              className="ui-text mt-0.5 rounded-full border border-brand/30 bg-brand-soft px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-brand"
+            >
+              {story.latest}
+            </span>
+          ) : null}
+        </span>
+      ) : null}
+
+      {/* No text/icon hover effects (user 2026-09-27): hovering a story tile
+          only plays the .story-orb background reveal — the type stays put. */}
+      <span className="z-10 mt-2 line-clamp-2 font-serif text-lg font-semibold leading-snug text-ink">
+        {story.title}
+      </span>
+
+      {story.badge ? (
+        <span className="ui-text z-10 mt-2.5 self-start rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand">
+          {story.badge}
+        </span>
+      ) : null}
+
+      {/* v13 (2026-09-28 user pick: 极简): below sm the tile keeps only the
+          index + title + badges — the chips / facts / meta / CTA stack was
+          unreadable clutter at two-column widths. Desktop is unchanged. */}
+      {story.tags?.length ? (
+        <span className="z-10 mt-3 hidden flex-wrap gap-1.5 sm:flex">
+          {story.tags.map((t) => (
+            <span
+              key={t}
+              className="rounded-full border border-line bg-surface px-2 py-0.5 text-[10.5px] font-medium leading-4 text-muted"
+            >
+              {t}
+            </span>
+          ))}
+        </span>
+      ) : null}
+
+      <span className="z-10 mt-auto">
+        {story.facts?.length ? (
+          <span className="mb-1.5 hidden border-t border-line pt-2 text-[10.5px] font-medium tabular-nums text-muted sm:block">
+            {story.facts.join(" · ")}
+          </span>
+        ) : null}
+        <span className="hidden truncate text-xs text-muted sm:block">{story.meta}</span>
+        {story.cta ? (
+          <span className="mt-1.5 hidden items-center gap-1 text-sm font-medium text-brand sm:inline-flex">
+            {story.cta}
+            <span aria-hidden>→</span>
+          </span>
+        ) : null}
+      </span>
+
+      {/* Launch stamp (user 2026-09-28, mirrors the home navigation pane):
+          while .is-launching holds the click for one beat, a brand circle
+          pops in around a drawn right arrow — visible "click registered"
+          proof before the page navigates. Animation lives in globals.css
+          (reuses the gateway's gw-stamp-pop / gw-arrow-draw keyframes). */}
+      <span aria-hidden className="gateway-stamp">
+        <span className="gateway-stamp-chip h-14 w-14 bg-brand-soft text-brand">
+          <ArrowRight className="h-7 w-7" strokeWidth={2.5} />
+        </span>
+      </span>
+    </a>
   );
 }
 

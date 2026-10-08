@@ -60,6 +60,18 @@ function chipClasses(active: boolean) {
   ].join(" ");
 }
 
+/** Tiny "Beta" flag for nav items still in preview (currently Travel). */
+function NavBetaTag() {
+  return (
+    <sup
+      aria-label="Beta"
+      className="ml-1 rounded-full bg-brand-soft px-1.5 py-px text-[9px] font-bold uppercase leading-[1.4] tracking-wider text-brand"
+    >
+      Beta
+    </sup>
+  );
+}
+
 /** Normalise a route for equality: "/blog/" and "/blog" are the same page. */
 function normalizePath(p: string): string {
   return p === "/" || p === "/zh" ? p : p.replace(/\/+$/, "") || "/";
@@ -234,6 +246,8 @@ export function SiteHeader() {
                       className={chipClasses(active)}
                     >
                       {item.label[lang]}
+                      {/* Travel trip-log hub is Beta (2026-09-25) */}
+                      {item.id === "travel" ? <NavBetaTag /> : null}
                     </Link>
                   </li>
                 );
@@ -249,22 +263,23 @@ export function SiteHeader() {
               </span>
             </span>
 
-            <span aria-hidden className="mx-1 hidden h-6 w-px shrink-0 bg-line sm:block" />
-
             <div className="flex shrink-0 items-center">
-              {/* Back to top (Task D #5): slides in to the LEFT of the
-                  lang/theme toggles once the capsule pins (the identity block
-                  has scrolled off). On mobile it is ALWAYS visible (2026-09-05
-                  user decision) — the top three controls stay constant, so the
-                  pill never reflows on scroll. The slot collapses to zero
-                  width at desktop rest and grows smoothly into place. The
-                  button matches the ThemeToggle geometry (h-10 w-10 square). */}
-              <span
-                className={[
-                  "overflow-hidden transition-[width] duration-300 ease-out",
-                  stuck ? "w-10" : "w-10 md:w-0",
-                ].join(" ")}
-              >
+              {/* Back to top (Task D #5): sits LEFT of the lang/theme toggles
+                  once the capsule pins (the identity block has scrolled off).
+                  On mobile it is ALWAYS visible (2026-09-05 user decision).
+                  v2 (2026-09-26 user feedback): the old width 0→40px growth
+                  read as the button "growing out of" the divider — the slot
+                  now keeps its full width at all times (the header layout is
+                  scroll-invariant, no reflow at all) and the button itself
+                  fades in while dropping from slightly above. The button
+                  matches the ThemeToggle geometry (h-10 w-10 square).
+                  v3 (2026-09-28 user feedback): the divider moved from the
+                  left edge of this cluster to sit immediately before the
+                  lang/theme pair — before, the invisible 40px slot sat
+                  between the divider and the toggles and read as a strange
+                  blank region whenever the button was hidden. The slot itself
+                  stays constant (no reflow either way). */}
+              <span className="w-10 shrink-0">
                 <button
                   type="button"
                   onClick={scrollTopSmooth}
@@ -272,19 +287,27 @@ export function SiteHeader() {
                   title={topLabel}
                   aria-hidden={!stuck && !isMobile}
                   tabIndex={!stuck && !isMobile ? -1 : 0}
-                  className="ui-text inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line-strong bg-surface text-brand shadow-sm transition-colors hover:bg-surface-tint hover:text-brand-strong hover:no-underline"
+                  className={[
+                    "ui-text inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line-strong bg-surface text-brand shadow-sm hover:bg-surface-tint hover:text-brand-strong hover:no-underline",
+                    /* one transition list for colour + reveal (two competing
+                       transition-property utilities would resolve by
+                       stylesheet order, not class order) */
+                    "transition-[opacity,transform,visibility,background-color,border-color,color,box-shadow] duration-300 ease-out",
+                    stuck || isMobile
+                      ? "translate-y-0 opacity-100"
+                      : "pointer-events-none invisible -translate-y-1.5 opacity-0",
+                  ].join(" ")}
                 >
                   <ArrowUp className="h-4 w-4" aria-hidden strokeWidth={2} />
                 </button>
               </span>
-              {/* animated gap — only while the top control is showing */}
-              <span
-                aria-hidden
-                className={[
-                  "shrink-0 overflow-hidden transition-[width] duration-300 ease-out",
-                  stuck ? "w-2" : "w-2 md:w-0",
-                ].join(" ")}
-              />
+              {/* gap between the top control and the lang/theme pair — the
+                  slot is constant now, so this gap is constant too */}
+              <span aria-hidden className="w-2 shrink-0" />
+              {/* divider (v3 2026-09-28): hugs the lang/theme pair so the
+                  hidden back-to-top slot no longer leaves a blank region on
+                  the divider's left side (old position removed above) */}
+              <span aria-hidden className="mr-2 hidden h-6 w-px shrink-0 bg-line sm:block" />
               <span className="flex items-center gap-2">
                 <LangSwitch />
                 <ThemeToggle />
@@ -369,6 +392,7 @@ export function SiteHeader() {
                         ].join(" ")}
                       />
                       {item.label[lang]}
+                      {item.id === "travel" ? <NavBetaTag /> : null}
                     </Link>
                   </li>
                 );

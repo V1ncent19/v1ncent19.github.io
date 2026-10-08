@@ -35,6 +35,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# raw trip GPS (home-address-level) — never push; only sanitized copies in
+# public/data/travel/ (produced by scripts/sanitize-trip-gps.py) go online.
+/assets-src/travel-data/
+
 # full-resolution gallery originals — local MASTER copy, still never edited in
 # place. The pipeline (npm run gallery:gen) mirrors each file byte-for-byte
 # into public/assets/gallery/original/ for the same-origin download button;

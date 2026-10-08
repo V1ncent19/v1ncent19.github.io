@@ -1,7 +1,14 @@
 /**
  * Data-driven navigation. Order is significant and follows the "Home – Desktop
  * Layout Variant 3" Stitch direction: the homepage itself appears as the first
- * nav item ("Home"), followed by About, CV, Gallery, Blog, Project, Guestbook.
+ * nav item ("Home"), followed by About, CV, Travel, Blog, Project, Guestbook.
+ *
+ * 2026-09-25: the former Gallery slot became Travel (user decision — same
+ * gateway tile, no grid re-layout). Travel is the interactive trip-log hub
+ * (/travel, MapLibre narrative maps — Beta). The standalone /gallery pages
+ * were removed on 2026-09-28 (user decision — the full gallery experience
+ * lives inside the /travel hub flow), so `gallery` is gone from
+ * `bilingualBases` too.
  *
  * The Guestbook IS a nav item (user decision 2026-09-05, revised same day) but
  * deliberately has NO homepage gateway card — its only home entry point is the
@@ -16,7 +23,7 @@ export type NavId =
   | "home"
   | "about"
   | "cv"
-  | "gallery"
+  | "travel"
   | "blog"
   | "project"
   | "guestbook";
@@ -62,15 +69,15 @@ export const navItems: NavItem[] = [
     hrefZh: "/cv/zh",
   },
   {
-    id: "gallery",
+    id: "travel",
     order: 3,
-    label: { en: "Gallery", zh: "影集" },
+    label: { en: "Travel", zh: "旅行" },
     summary: {
-      en: "Selected travel photography.",
-      zh: "精选旅行摄影。",
+      en: "Interactive trip logs with GPS maps (Beta).",
+      zh: "交互式旅行志与 GPS 地图（Beta）。",
     },
-    href: "/gallery",
-    hrefZh: "/gallery/zh",
+    href: "/travel",
+    hrefZh: "/travel/zh",
   },
   {
     id: "blog",
@@ -115,9 +122,9 @@ export const homeCards: NavItem[] = navItems.filter(
 );
 
 /** Top-level routes that have an English + Chinese (nested /zh) pair. */
-export const bilingualBases = new Set<string>(
-  navItems.filter((n) => n.id !== "home").map((n) => n.id),
-);
+export const bilingualBases = new Set<string>([
+  ...navItems.filter((n) => n.id !== "home").map((n) => n.id),
+]);
 
 export function labelFor(id: NavId, lang: "en" | "zh"): string {
   const item = navItems.find((n) => n.id === id);

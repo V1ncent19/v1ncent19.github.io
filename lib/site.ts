@@ -1,24 +1,30 @@
 /** Central site identity constants.
- * Personal/config data is later consolidated into content/profile.json
- * (see CONTENT_MODEL.md); this module is the interim single source used by the
- * layout shell until then. */
+ * Single source of truth is content/profile.json (consolidated 2026-09-28 —
+ * this module used to duplicate the values inline). The layout shell and
+ * components keep importing `site`; the shape below is derived, not authored.
+ */
+import profile from "@/content/profile.json";
+
+const github =
+  profile.links.find((l) => l.label.toLowerCase() === "github")?.href ?? "";
+
 export const site = {
-  givenName: "Tuorui",
-  familyName: "Peng",
-  handle: "v1ncent19",
+  givenName: profile.givenName,
+  familyName: profile.familyName,
+  handle: profile.handle,
   /**
    * header identity: `Tuorui "v1ncent19" Peng`
    * (the ASCII quotes are rendered around the handle by site-header.tsx so
    * they can sit inside the sky-blue region per the LaTeX mock)
    */
   nameParts: {
-    before: "Tuorui ",
-    handle: "v1ncent19",
-    after: " Peng",
+    before: `${profile.givenName} `,
+    handle: profile.handle,
+    after: ` ${profile.familyName}`,
   },
-  tagline: "En voyage dans l'espace de Hilbert.",
-  github: "https://github.com/V1ncent19",
-};
+  tagline: profile.tagline,
+  github,
+} as const;
 
 export type Theme = "light" | "dark" | "system";
 

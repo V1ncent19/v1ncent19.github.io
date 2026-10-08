@@ -113,6 +113,13 @@ export function SpacetimeCanvas() {
     let tx = -1e5;
     let ty = -1e5;
     let idle = 0;
+    /* v14 (2026-09-28): masses pull vertices INWARD, so the grid's outer
+       boundary gets dragged into the viewport and shows as an empty band
+       (user report: the travel globe's strong well revealed the grid edge).
+       Fix: extend the base grid `gridPad` px beyond every viewport edge,
+       where gridPad ≥ the strongest mass's max displacement. The boundary
+       then always sits offscreen no matter how hard vertices are pulled. */
+    let gridPad = 0;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const coarse = window.matchMedia("(hover: none)");
@@ -137,8 +144,8 @@ export function SpacetimeCanvas() {
       canvas!.height = Math.round(h * dpr);
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
       const s = CONFIG.GRID.spacing;
-      cols = Math.ceil(w / s) + 2;
-      rows = Math.ceil(h / s) + 2;
+      cols = Math.ceil((w + 2 * gridPad) / s) + 2;
+      rows = Math.ceil((h + 2 * gridPad) / s) + 2;
       const n = cols * rows;
       baseX = new Float32Array(n);
       baseY = new Float32Array(n);
@@ -147,10 +154,22 @@ export function SpacetimeCanvas() {
       let k = 0;
       for (let j = 0; j < rows; j++) {
         for (let i = 0; i < cols; i++) {
-          baseX[k] = (i - 0.5) * s;
-          baseY[k] = (j - 0.5) * s;
+          baseX[k] = (i - 0.5) * s - gridPad;
+          baseY[k] = (j - 0.5) * s - gridPad;
           k++;
         }
+      }
+    }
+
+    /* Strongest possible inward displacement across the pointer mass and all
+       registered wells (a vertex's pull is capped by `strength` itself). */
+    function syncPad() {
+      let max: number = CONFIG.MASS.strength;
+      for (const m of staticMasses) max = Math.max(max, m.strength);
+      const need = Math.ceil(max + CONFIG.GRID.spacing);
+      if (need !== gridPad) {
+        gridPad = need;
+        layout();
       }
     }
 
@@ -320,8 +339,13 @@ export function SpacetimeCanvas() {
     const onScroll = () => {
       if (staticMasses.size > 0) scheduleRender();
     };
-    /* Widgets may register/unregister wells at any time — refresh once. */
-    onRegistryChange = scheduleRender;
+    /* Widgets may register/unregister wells at any time — re-derive the grid
+       padding (a new well can be stronger than the current pad) and refresh. */
+    const registryCb = () => {
+      syncPad();
+      scheduleRender();
+    };
+    onRegistryChange = registryCb;
 
     // Theme flips (.dark on <html>) repaint once with the new palette.
     const themeObserver = new MutationObserver(render);
@@ -334,7 +358,7 @@ export function SpacetimeCanvas() {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
 
-    layout();
+    syncPad(); // derives gridPad, calls layout()
     render(); // flat grid visible immediately, even before any pointer move
 
     return () => {
@@ -345,7 +369,7 @@ export function SpacetimeCanvas() {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      if (onRegistryChange === scheduleRender) onRegistryChange = null;
+      if (onRegistryChange === registryCb) onRegistryChange = null;
     };
   }, []);
 

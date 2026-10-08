@@ -2,7 +2,6 @@ import Link from "next/link";
 import {
   ArrowRight,
   BookOpen,
-  Camera,
   Download,
   Eye,
   ExternalLink,
@@ -10,6 +9,7 @@ import {
   FolderOpen,
   GitBranch,
   GraduationCap,
+  Map,
   MessageSquare,
   MessagesSquare,
   Rocket,
@@ -38,7 +38,7 @@ type SectionId = Exclude<NavId, "home">;
 const sectionIcons: Record<SectionId, LucideIcon> = {
   about: User,
   cv: FileText,
-  gallery: Camera,
+  travel: Map,
   blog: BookOpen,
   project: FolderOpen,
   guestbook: MessagesSquare,
@@ -54,9 +54,9 @@ const sectionBlurbs: Record<SectionId, { sub: string; desc: string }> = {
     sub: "Education · research · activities",
     desc: "The academic record so far, a formal CV attached.",
   },
-  gallery: {
-    sub: "Travel & Photography",
-    desc: "Selected travel photographs and visual notes from the road.",
+  travel: {
+    sub: "Trips · maps · photography",
+    desc: "Interactive GPS trip logs (Beta) and the travel photo gallery.",
   },
   blog: {
     sub: "Fun daily writing",
@@ -132,7 +132,7 @@ const PEEK_FRAME: Record<SectionId, { pos: string; fit: "cover" | "contain" }> =
   {
     about: { pos: "50% 20%", fit: "cover" },
     cv: { pos: "50% 50%", fit: "contain" },
-    gallery: { pos: "50% 50%", fit: "cover" },
+    travel: { pos: "50% 50%", fit: "cover" },
     blog: { pos: "50% 50%", fit: "cover" },
     project: { pos: "50% 10%", fit: "cover" },
     guestbook: { pos: "50% 50%", fit: "cover" },
@@ -371,12 +371,12 @@ export default function HomePage() {
               </a>{" "}
               and{" "}
               <a
-                href="/gallery"
+                href="/travel"
                 target="_blank"
                 rel="noreferrer noopener"
                 className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
               >
-                Gallery
+                Travel
               </a>{" "}
               . 
             </p>
@@ -691,6 +691,13 @@ function GatewayCard({
         <span className="ui-text text-xs tracking-wider text-muted">
           {sectionBlurbs[id].sub}
         </span>
+        {/* Travel is the interactive trip-log hub — flagged Beta until the
+            owner declares it stable (2026-09-25). */}
+        {id === "travel" ? (
+          <span className="ui-text ml-auto rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand">
+            Beta
+          </span>
+        ) : null}
       </div>
       <div className="relative mt-auto pt-6">
         {/* Title glass capsule: at rest the pill is fully transparent (its

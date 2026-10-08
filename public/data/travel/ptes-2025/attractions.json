@@ -1,0 +1,94 @@
+{
+  "tripId": "ptes-2025",
+  "_schema": "attractions: {id, name, lon, lat, dayNo(叙事日0-16), rating?, tags?, excerpt?, visited?}; 只渲染当前激活窗格当天的景点(dayNo 匹配 scenes 的 dayNo); visited:false = 计划但没进(地图上空心点 + 图例 planned only)。2026-10-07 按游记.docx 重新提取对齐; 同日 v16: 标点为纯视觉标记，取消点击弹窗(rating/tags/excerpt 不再上屏，字段保留)。v17(2026-10-07): 按 OSM Nominatim 全量核查坐标并修正 21 处(塞维利亚/塞戈维亚/巴塞罗那/马德里/里斯本/格拉纳达/波尔图，判据 ≥250m 偏差)，删除 阿泽尼亚什-杜马尔/卡斯凯什海湾/铁桥，'卡尔梅尔碉堡观景台'改名'焦糖山'，新增 day7 塞维利亚市政厅 + 圣特尔莫宫。OSM 已知误配不作改动: acueducto-segovia(取 Azoguejo 段)、camp-nou(Wikipedia 与现值一致)。v18(2026-10-07): 删除 里贝拉广场/维多利亚观景台; 圣本笃车站从 day3 移到 day1 且坐标归位到主站房; 按 OSM/Wikipedia 重订 路易一世大桥(桥面中心)/波尔图主教座堂/圣弗朗西斯科教堂/证券交易所宫/圣卡塔琳娜教堂(=Capela das Almas)/皇家礼拜堂/拉卡尔图哈/巴塞罗那凯旋门; 海军博物馆北移到海军总部大楼; '圣家堂（内部参观）'改名'圣家堂'; 焦糖山改标到 GPS 实测长时间停留点(OSM 无名观景点 41.4182,2.1666)。",
+  "attractions": [
+    { "id": "ponte-luis-i", "name": "路易一世大桥", "lon": -8.6095, "lat": 41.1401, "dayNo": 1, "tags": ["桥梁", "观景"] },
+    { "id": "serra-pilar", "name": "皮拉尔山观景台", "lon": -8.6086, "lat": 41.1383, "dayNo": 1, "tags": ["观景台"] },
+    { "id": "igreja-carmo", "name": "卡尔莫教堂", "lon": -8.6162, "lat": 41.1473, "dayNo": 1, "tags": ["教堂", "瓷砖"] },
+    { "id": "sao-bento", "name": "圣本笃车站", "lon": -8.6105, "lat": 41.1456, "dayNo": 1, "tags": ["车站", "瓷砖"] },
+
+    { "id": "sao-francisco-porto", "name": "圣弗朗西斯科教堂", "lon": -8.6157, "lat": 41.1410, "dayNo": 2, "tags": ["教堂", "巴洛克"] },
+    { "id": "palacio-bolsa", "name": "证券交易所宫", "lon": -8.6154, "lat": 41.1414, "dayNo": 2, "tags": ["府邸", "伊斯兰厅"] },
+    { "id": "camara-porto", "name": "波尔图市政厅", "lon": -8.6109, "lat": 41.1500, "dayNo": 2, "tags": ["市政厅"] },
+    { "id": "santa-catarina", "name": "圣卡塔琳娜教堂", "lon": -8.6056, "lat": 41.1498, "dayNo": 2, "tags": ["教堂", "青花瓷"] },
+    { "id": "se-porto", "name": "波尔图主教座堂", "lon": -8.6113, "lat": 41.1428, "dayNo": 2, "tags": ["教堂"] },
+    { "id": "clerigos", "name": "牧师塔", "lon": -8.6147, "lat": 41.1459, "dayNo": 2, "tags": ["教堂", "登高", "灯光秀"] },
+
+    { "id": "praca-comercio", "name": "商业广场", "lon": -9.1366, "lat": 38.7075, "dayNo": 3, "tags": ["广场", "海滨"] },
+    { "id": "arco-rua-augusta", "name": "奥古斯塔街凯旋门", "lon": -9.1366, "lat": 38.7082, "dayNo": 3, "tags": ["地标"] },
+    { "id": "se-lisboa", "name": "里斯本主教座堂", "lon": -9.1326, "lat": 38.7098, "dayNo": 3, "tags": ["教堂"] },
+    { "id": "jeronimos", "name": "热罗尼莫斯修道院", "lon": -9.2066, "lat": 38.6978, "dayNo": 3, "tags": ["修道院", "世界遗产"] },
+    { "id": "padrao-descobrimentos", "name": "发现者纪念碑", "lon": -9.2057, "lat": 38.6935, "dayNo": 3, "tags": ["纪念碑", "海滨"] },
+    { "id": "sao-jorge", "name": "圣若热城堡", "lon": -9.1332, "lat": 38.7139, "dayNo": 3, "tags": ["城堡", "观景", "孔雀"] },
+    { "id": "torre-belem", "name": "贝伦塔", "lon": -9.2159, "lat": 38.6915, "dayNo": 3, "tags": ["世界遗产"], "visited": false },
+    { "id": "palacio-ajuda", "name": "阿依达宫", "lon": -9.1984, "lat": 38.7083, "dayNo": 3, "tags": ["宫殿"], "visited": false },
+
+    { "id": "pena-palace", "name": "佩纳宫", "lon": -9.3905, "lat": 38.7876, "dayNo": 4, "tags": ["宫殿", "世界遗产"] },
+    { "id": "castelo-mouros", "name": "摩尔人城堡", "lon": -9.3905, "lat": 38.7929, "dayNo": 4, "tags": ["城堡", "观景"] },
+    { "id": "cabo-roca", "name": "罗卡角", "lon": -9.4995, "lat": 38.7804, "dayNo": 4, "tags": ["海角", "大陆最西端"] },
+    { "id": "boca-inferno", "name": "地狱之口", "lon": -9.4308, "lat": 38.6911, "dayNo": 4, "tags": ["海蚀洞", "海浪"] },
+
+    { "id": "cartuja-granada", "name": "拉卡尔图哈修道院", "lon": -3.5995, "lat": 37.1919, "dayNo": 5, "tags": ["修道院", "巴洛克"] },
+    { "id": "catedral-granada", "name": "格拉纳达主教座堂", "lon": -3.5986, "lat": 37.1764, "dayNo": 5, "tags": ["教堂"] },
+    { "id": "capilla-real", "name": "皇家礼拜堂", "lon": -3.5990, "lat": 37.1760, "dayNo": 5, "tags": ["礼拜堂", "双王陵寝"] },
+    { "id": "san-jeronimo-granada", "name": "圣赫罗尼莫修道院", "lon": -3.6046, "lat": 37.1792, "dayNo": 5, "tags": ["修道院"] },
+    { "id": "alcaiceria", "name": "阿尔卡塞里亚集市", "lon": -3.5965, "lat": 37.1753, "dayNo": 5, "tags": ["集市"] },
+
+    { "id": "alhambra", "name": "阿尔罕布拉宫", "lon": -3.5881, "lat": 37.1761, "dayNo": 6, "tags": ["宫殿", "世界遗产"] },
+    { "id": "sacromonte", "name": "圣山修道院", "lon": -3.5770, "lat": 37.1831, "dayNo": 6, "tags": ["修道院", "雕塑"] },
+    { "id": "mirador-san-nicolas", "name": "圣尼古拉斯观景台", "lon": -3.5940, "lat": 37.1799, "dayNo": 6, "tags": ["观景台", "远眺阿宫"] },
+
+    { "id": "metropol-parasol", "name": "都市阳伞", "lon": -5.9919, "lat": 37.3931, "dayNo": 7, "tags": ["地标"] },
+    { "id": "condesa-lebrija", "name": "勒布里哈伯爵夫人府", "lon": -5.9933, "lat": 37.3925, "dayNo": 7, "tags": ["府邸", "马赛克"] },
+    { "id": "ayuntamiento-sevilla", "name": "塞维利亚市政厅", "lon": -5.9945, "lat": 37.3887, "dayNo": 7, "tags": ["市政厅", "文艺复兴"] },
+    { "id": "san-telmo", "name": "圣特尔莫宫", "lon": -5.9934, "lat": 37.3802, "dayNo": 7, "tags": ["宫殿", "巴洛克"] },
+    { "id": "plaza-espana", "name": "西班牙广场", "lon": -5.9869, "lat": 37.3772, "dayNo": 7, "tags": ["广场", "瓷砖", "日落"] },
+
+    { "id": "catedral-sevilla", "name": "塞维利亚主教座堂", "lon": -5.9931, "lat": 37.3859, "dayNo": 8, "tags": ["教堂", "哥特", "吉拉达塔"] },
+    { "id": "real-alcazar", "name": "塞维利亚王宫", "lon": -5.9903, "lat": 37.3832, "dayNo": 8, "tags": ["王宫", "伊斯兰风格"] },
+
+    { "id": "museo-prado", "name": "普拉多美术馆", "lon": -3.6921, "lat": 40.4138, "dayNo": 9, "tags": ["美术馆", "戈雅"] },
+    { "id": "puerta-sol", "name": "太阳门广场", "lon": -3.7038, "lat": 40.4169, "dayNo": 9, "tags": ["广场", "圣诞树"] },
+    { "id": "plaza-mayor-md", "name": "马约尔广场", "lon": -3.7074, "lat": 40.4158, "dayNo": 9, "tags": ["广场", "圣诞集市"] },
+    { "id": "palacio-real", "name": "马德里王宫", "lon": -3.7123, "lat": 40.4179, "dayNo": 9, "tags": ["王宫"] },
+    { "id": "plaza-espana-madrid", "name": "西班牙广场", "lon": -3.7124, "lat": 40.4238, "dayNo": 9, "tags": ["广场", "塞万提斯纪念碑"] },
+    { "id": "templo-debod", "name": "德波神庙", "lon": -3.7172, "lat": 40.4240, "dayNo": 9, "tags": ["神庙", "日落"] },
+
+    { "id": "retiro", "name": "丽池公园", "lon": -3.6840, "lat": 40.4153, "dayNo": 10, "tags": ["公园"] },
+    { "id": "palacio-cristal", "name": "水晶宫", "lon": -3.6821, "lat": 40.4145, "dayNo": 10, "tags": ["展馆", "装修中"] },
+    { "id": "jardin-botanico", "name": "皇家植物园", "lon": -3.6922, "lat": 40.4124, "dayNo": 10, "tags": ["植物园"] },
+    { "id": "basilica-san-francisco", "name": "格兰德圣殿", "lon": -3.7145, "lat": 40.4104, "dayNo": 10, "tags": ["教堂"] },
+
+    { "id": "museo-naval", "name": "海军博物馆", "lon": -3.6927, "lat": 40.4180, "dayNo": 11, "tags": ["博物馆"] },
+    { "id": "acueducto-segovia", "name": "塞戈维亚输水道", "lon": -4.1178, "lat": 40.9480, "dayNo": 11, "tags": ["罗马水道", "世界遗产"] },
+    { "id": "catedral-segovia", "name": "塞戈维亚主教座堂", "lon": -4.1255, "lat": 40.9502, "dayNo": 11, "tags": ["教堂"] },
+    { "id": "alcazar-segovia", "name": "塞戈维亚城堡", "lon": -4.1321, "lat": 40.9525, "dayNo": 11, "tags": ["城堡"] },
+
+    { "id": "reina-sofia", "name": "索菲亚王后艺术中心", "lon": -3.6946, "lat": 40.4081, "dayNo": 12, "tags": ["美术馆", "格尔尼卡"] },
+
+    { "id": "casa-mila", "name": "米拉之家", "lon": 2.1620, "lat": 41.3953, "dayNo": 13, "tags": ["高迪", "建筑"] },
+    { "id": "casa-batllo", "name": "巴特罗之家", "lon": 2.1649, "lat": 41.3915, "dayNo": 13, "tags": ["高迪"], "visited": false },
+    { "id": "palau-musica", "name": "加泰罗尼亚音乐宫", "lon": 2.1753, "lat": 41.3876, "dayNo": 13, "tags": ["建筑"] },
+    { "id": "arc-triomf", "name": "巴塞罗那凯旋门", "lon": 2.1806, "lat": 41.3910, "dayNo": 13, "tags": ["地标"] },
+    { "id": "museu-picasso", "name": "毕加索美术馆", "lon": 2.1812, "lat": 41.3852, "dayNo": 13, "tags": ["美术馆"] },
+    { "id": "catedral-bcn", "name": "巴塞罗那主教座堂", "lon": 2.1761, "lat": 41.3839, "dayNo": 13, "tags": ["教堂", "古董市场"] },
+    { "id": "palau-guell", "name": "桂尔宫", "lon": 2.1742, "lat": 41.3788, "dayNo": 13, "tags": ["高迪"] },
+    { "id": "colom-mirador", "name": "哥伦布纪念柱", "lon": 2.1780, "lat": 41.3761, "dayNo": 13, "tags": ["纪念碑", "海滨"] },
+    { "id": "barceloneta", "name": "巴塞罗内塔海滩", "lon": 2.1920, "lat": 41.3784, "dayNo": 13, "tags": ["海滨"] },
+    { "id": "sagrada-familia", "name": "圣家堂", "lon": 2.1744, "lat": 41.4036, "dayNo": 13, "tags": ["高迪", "夜景"] },
+
+    { "id": "tibidabo", "name": "蒂比达博山", "lon": 2.1187, "lat": 41.4225, "dayNo": 14, "tags": ["观景", "全城"] },
+    { "id": "sagrat-cor", "name": "蒂比达博圣心堂", "lon": 2.1193, "lat": 41.4218, "dayNo": 14, "tags": ["教堂", "山顶"] },
+    { "id": "parc-guell", "name": "古埃尔公园", "lon": 2.1527, "lat": 41.4135, "dayNo": 14, "tags": ["高迪", "公园"], "visited": false },
+    { "id": "sagrada-interior", "name": "圣家堂", "lon": 2.1744, "lat": 41.4036, "dayNo": 14, "tags": ["高迪", "花窗"] },
+    { "id": "encants", "name": "恩坎茨二手市场", "lon": 2.1862, "lat": 41.4010, "dayNo": 14, "tags": ["市场"] },
+
+    { "id": "bunkers-carmel", "name": "焦糖山", "lon": 2.1666, "lat": 41.4182, "dayNo": 15, "tags": ["观景台", "日出/日落"] },
+    { "id": "camp-nou", "name": "诺坎普球场", "lon": 2.1228, "lat": 41.3809, "dayNo": 15, "tags": ["球场"] },
+    { "id": "mnac", "name": "加泰罗尼亚国家艺术博物馆", "lon": 2.1535, "lat": 41.3686, "dayNo": 15, "tags": ["美术馆"] },
+    { "id": "sant-pau", "name": "圣十字圣保罗医院", "lon": 2.1745, "lat": 41.4126, "dayNo": 15, "tags": ["现代主义建筑"] },
+
+    { "id": "roemerberg", "name": "罗马广场", "lon": 8.6821, "lat": 50.1106, "dayNo": 16, "tags": ["老城"] },
+    { "id": "kaiserdom", "name": "法兰克福大教堂", "lon": 8.6843, "lat": 50.1112, "dayNo": 16, "tags": ["教堂"] }
+  ]
+}

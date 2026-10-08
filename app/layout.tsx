@@ -50,14 +50,24 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <SiteHeader />
+        {/* Site chrome wrappers: travel-log trip pages toggle
+            body.tl-immersive (see components/travel/TravelLog) and these
+            wrappers are what that class hides, so the 100vh map + own
+            progress bar get the full viewport. The header wrapper must not
+            create a box (globals.css gives it display:contents): the capsule
+            nav is position:sticky and can only travel within its containing
+            block — a real wrapper div would pin it to that short box and the
+            site-wide float would never reach the viewport top. */}
+        <div className="site-chrome-header">
+          <SiteHeader />
+        </div>
         <main id="main" className="relative z-10 flex-1">
           {/* Client wrapper keys on the pathname so every internal navigation
               remounts the page content and replays the CSS content fade
               (Task D #4); first load fades in too. */}
           <RouteFade>{children}</RouteFade>
         </main>
-        <div className="relative z-10">
+        <div className="site-chrome-footer relative z-10">
           <SiteFooter />
         </div>
       </body>

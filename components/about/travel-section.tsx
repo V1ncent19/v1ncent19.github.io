@@ -12,6 +12,12 @@ import type { TravelData } from "@/lib/content";
 import { SectionMark } from "@/components/layout/section-mark";
 import { TravelBoard } from "@/components/about/travel-board";
 
+/** Cross link copy for the /travel hub (2026-09-25). */
+const HUB_LINK: Record<Lang, { text: string; label: string }> = {
+  en: { text: "Interactive trip logs (beta) now live at", label: "Travel" },
+  zh: { text: "交互式旅行志（beta）已上线，见", label: "旅行志" },
+};
+
 export function TravelSection({
   lang,
   data,
@@ -20,6 +26,7 @@ export function TravelSection({
   data: TravelData;
 }) {
   const s = copy[lang].about;
+  const hub = HUB_LINK[lang];
 
   return (
     <section className="mt-14" aria-label={s.travelSectionTitle}>
@@ -31,6 +38,15 @@ export function TravelSection({
           <SectionMark id="travel" />
           {s.travelSectionTitle}
         </h2>
+        <p className="ui-text mt-2 text-sm text-muted">
+          {hub.text}{" "}
+          <a
+            href={lang === "zh" ? "/travel/zh" : "/travel"}
+            className="font-semibold text-brand hover:underline"
+          >
+            {hub.label} →
+          </a>
+        </p>
       </div>
       <TravelBoard lang={lang} data={data} />
     </section>

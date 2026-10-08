@@ -29,6 +29,13 @@ export interface Copy {
     generalName: string;
     generalLangs: string;
     generalHome: string;
+    /** Travel-board compact list expand/collapse ("{n}" = hidden count). */
+    travelShowMore: string;
+    travelShowLess: string;
+  };
+  travel: {
+    /** Latest-post badge cell beside the tile index on the travel hub. */
+    latestBadge: string;
   };
   cv: {
     title: string;
@@ -159,6 +166,11 @@ export const copy: Record<Lang, Copy> = {
       generalName: "Full Name",
       generalLangs: "Languages",
       generalHome: "Hometown",
+      travelShowMore: "Show more ({n})",
+      travelShowLess: "Show less",
+    },
+    travel: {
+      latestBadge: "Latest",
     },
     cv: {
       title: "Curriculum Vitæ",
@@ -292,6 +304,11 @@ export const copy: Record<Lang, Copy> = {
       generalName: "姓名",
       generalLangs: "语言",
       generalHome: "家乡",
+      travelShowMore: "展示更多（{n}）",
+      travelShowLess: "收起",
+    },
+    travel: {
+      latestBadge: "最新",
     },
     cv: {
       title: "经历",

@@ -840,6 +840,69 @@ html:not([data-theme]) .ti-system {
   }
 }
 
+/* ---- story tile hover orb + launching confirm (2026-09-26) ----
+ * The /travel hub's story tiles borrow the home gateway language: on
+ * hover/focus a cover photo is uncovered by a clip-path circle anchored at
+ * the card's bottom-right corner (same easing and anchor spirit as
+ * .gateway-orb), dimmed by the same surface veil so the typographic content
+ * (kept at z-10) stays readable. Click adds .is-launching — the gateway's
+ * "pressed settle" — before the host's delayed navigation. */
+.story-orb {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  clip-path: circle(0% at calc(100% - 34px) calc(100% - 34px));
+  transition: clip-path 0.5s var(--ease);
+}
+.story-orb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.story-orb-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--surface) 88%, transparent),
+    color-mix(in srgb, var(--surface) 62%, transparent) 52%,
+    color-mix(in srgb, var(--surface) 74%, transparent)
+  );
+}
+@media (hover: hover) {
+  .story-tile:hover .story-orb,
+  .story-tile:focus-within .story-orb {
+    clip-path: circle(142% at calc(100% - 34px) calc(100% - 34px));
+  }
+}
+.story-tile.is-launching {
+  transform: scale(0.985);
+  transition-duration: 0.18s;
+}
+/* Launch stamp on story tiles (2026-09-28, user request — same ack as the
+   home navigation pane): circle chip pops in around a drawn right arrow.
+   Shares the gateway's keyframes; the chip keeps the type readable because
+   the stamp only plays for the 320ms hold before navigation. */
+.story-tile.is-launching .gateway-stamp-chip {
+  animation: gw-stamp-pop 0.28s var(--ease) forwards;
+}
+.story-tile.is-launching .gateway-stamp-chip svg path {
+  animation: gw-arrow-draw 0.24s 0.08s var(--ease) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-orb {
+    transition: none;
+  }
+  .story-tile.is-launching {
+    transition: none;
+  }
+  .story-tile.is-launching .gateway-stamp-chip,
+  .story-tile.is-launching .gateway-stamp-chip svg path {
+    animation: none;
+  }
+}
+
 /* ---- gateway title glass capsule (2026-09-05) ----
  * Frosted pill behind the card title ("Blog" & co.). The pill's LEFT edge is
  * aligned with the number chip above it (no negative left margin — the label
@@ -1186,3 +1249,95 @@ html:not([data-theme]) .ti-system {
 }
 
 /* Reduced motion is already flattened by the global `*` rule in @layer base. */
+
+/* ---- Travel log immersive mode (2026-09-25) ----
+   Trip pages (/travel/<tripId>) toggle body.tl-immersive from
+   components/travel/TravelLog while mounted: the lab page is a standalone
+   full-viewport light "paper" experience (own progress bar, 100vh sticky
+   map), so the site chrome steps aside. The chrome wrappers live in
+   app/layout.tsx; a plain display:none is enough and keeps SSR/CSR markup
+   identical (no hydration risk). */
+/* The header wrapper must NOT create a box (2026-09-28): the capsule nav
+   inside SiteHeader is position:sticky, and a sticky element can only travel
+   within its containing block. While this wrapper was a real div (header +
+   nav tall ≈ 230px) the nav could never shift up at all — the site-wide
+   pin-to-top float silently died when the wrapper was introduced for
+   tl-immersive. display:contents removes the wrapper box, so the nav's
+   containing block is the body again and it rides the whole page. The
+   tl-immersive display:none below still wins (higher specificity) and keeps
+   hiding the chrome on trip pages. */
+.site-chrome-header {
+  display: contents;
+}
+body.tl-immersive .site-chrome-header,
+body.tl-immersive .site-chrome-footer {
+  display: none;
+}
+
+/* ---- Trip page entry veil (2026-09-28 v11) ----
+   The time-reverse of the trip page's exit wipe (components/travel/
+   TravelLog): the page boots UNDER a full-viewport light-blue sheet and the
+   sheet retracts toward the right edge (where the back strip lives) once
+   the trip data AND the MapLibre map have fired their ready signals.
+   Colour runs the exit fade backwards: #eef9fd while covering, deepening to
+   the strip's hover blue #cfeaf5 as it pulls away.
+
+   The sheet is a body::before PSEUDO-ELEMENT driven by classes the route
+   page's pre-paint inline script sets (tl-veil-boot) and TravelLog toggles
+   (tl-veil-open). It must NOT be a real DOM node: a node appended before
+   hydration breaks React 19 (#418 -> client re-render -> node deleted), and
+   a React-rendered fixed veil hangs off the small boot box / route-fade
+   wrapper and misses the viewport on first paint. A class + pseudo-element
+   is invisible to hydration and paints from the very first frame
+   (tl-immersive is the hydration-safety precedent). */
+body.tl-veil-boot::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: #eef9fd;
+  transform-origin: right center;
+  pointer-events: none;
+  /* v12.1 JS-dead fallback (2026-09-28): the curtain must NEVER hold the
+     page hostage. If client JS never arrives (or takes pathologically long —
+     a cold `next dev` compile measured 40s once), this delayed self-retract
+     is pure CSS and runs with or without JS. When JS opens the veil normally
+     it adds .tl-veil-open, whose rule overrides this shorthand entirely
+     (higher specificity replaces the whole animation), so the normal path is
+     unchanged. If the fallback fires while JS is merely slow, its
+     animationend still reaches the TravelLog cleanup listener and the classes
+     come down; if JS is truly dead the sheet just stays at scaleX(0) —
+     invisible and pointer-transparent. */
+  animation: tl-entry-pull 0.4s ease-in 4s forwards;
+}
+/* v13 (2026-09-28 bugfix): the open rule used to replay the SAME keyframes
+   name (tl-entry-pull). Per CSS Animations, same name = the existing
+   animation's timing updates without restarting — its start time stays the
+   page's first paint, so by the time the map finished loading (1–3s) the
+   0.4s animation was already "over" and the veil snapped away instantly
+   (user: "揭幕没有动画效果"). A DISTINCT name forces cancel + re-create, so
+   the retract always plays from 0. Direction is unchanged and already
+   correct: origin right + scaleX 1→0 reveals the page left edge first and
+   sweeps right — the time-reverse of the exit wipe (covers right→left).
+   Duration 0.4→0.5s so the sweep actually registers. */
+body.tl-veil-boot.tl-veil-open::before {
+  animation: tl-entry-open 0.5s ease-in forwards;
+}
+@keyframes tl-entry-open {
+  from {
+    transform: scaleX(1);
+    background-color: #eef9fd;
+  }
+  45% {
+    background-color: #e2f4fb;
+  }
+  to {
+    transform: scaleX(0);
+    background-color: #cfeaf5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.tl-veil-boot::before {
+    display: none;
+  }
+}
