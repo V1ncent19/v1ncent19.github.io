@@ -45,6 +45,68 @@
 - **中文衬线现为自托管 GenWanMin2 TC 子集**（`--font-serif-zh` 首位；管线见 ARCHITECTURE）。
   ⚠️ 旧决策的 Noto Serif SC/JP 方向已被取代；日文片段靠字体栈兜底渲染。
 
+### 5.1 中西文混排空格（2026-10-08 起有 linter 把关）
+
+规则：**汉字与拉丁字母/阿拉伯数字交界处必须有一个空格**（双向）。`用LaTeX排` → `用 LaTeX 排`；`第1章` → `第 1 章`；`约300g` → `约 300 g`。
+
+- 检查/自动修：`node .workbuddy/check-cjk-spacing.mjs`（`--fix` 落盘，`--json` 出机器可读报告，`--only <substr>` 限定文件）。覆盖 `content/**/*.{md,json}` + ptes 的 `scenes.json`/`trip.json`/`attractions.json`。
+- **不碰**的区域（脚本自动遮蔽）：围栏与行内代码、`<pre>`/`<code>` 里的代码（博客的 LaTeX 头文件就是这种）、行内/行间数学 `$…$`、md 链接与图片目标、HTML 标签、URL。frontmatter 只报告不自动改。
+- **已知不覆盖**：`%`、`℃`、`°` 等符号与汉字的交界（如 `70%的蛋液`）。符号不属于"英文/数字"，脚本刻意不动；要改得单独提。
+- ptes 正文在 JSON 里用 `\n` 转义，脚本对 `\n` 做遮蔽，避免把转义里的 `n` 误当拉丁字母。
+
+### 5.2 单独调整某几个字的字体
+
+**首选：同名 family + `unicode-range`**（全站生效，内容一字不改，纯文本渲染的游记正文也吃得到）：
+
+```css
+/* app/globals.css，放在 GenWanMin2 TC 的 @font-face 之后 */
+@font-face {
+  font-family: "GenWanMin2 TC";          /* 与基础字体同名 = 接管 */
+  src: url("/fonts/cactus-subset.woff2") format("woff2");
+  font-weight: 400 600;                   /* 覆盖 400/500/600 三个已用字重 */
+  unicode-range: U+9F99, U+91CC, U+65AF; /* 只认领 龙 · 里 · 斯 */
+}
+```
+
+后声明的同名 face 优先；`unicode-range` 决定它只对列出的码位生效，其余字仍走原文件。
+
+**次选：独立 family + class**（能精确到"某一次出现"，但**只对走 markdown 的正文有效**——博客/About/Project）：
+
+```css
+@font-face { font-family: "GlyphAlt"; src: url("/fonts/xxx-subset.woff2") format("woff2"); }
+.glyph-alt { font-family: "GlyphAlt", var(--font-serif-zh); }
+```
+
+正文里写 `<span class="glyph-alt">龙</span>`（`Prose` 开了 `rehype-raw`，HTML 会被渲染）。
+
+⚠️ **游记（ptes）正文是纯文本渲染**（`TravelStory.tsx` 直接 `{p}`），写标签会原样显示出来 —— 那边只能用 `unicode-range` 方案。
+⚠️ 换上的字体必须真的含目标字符，且子集脚本 `scripts/subset-cjk-fonts.py` 的字符白名单要跟着更新，否则字形会掉进 fallback。
+
+### 5.3 中日字形切换（`lang` 属性 + `:lang()` 规则）
+
+`app/globals.css` 的 `@layer base` 里有两条语言栈：
+
+```css
+:lang(zh) { font-family: var(--font-serif-latin), var(--font-serif-zh); }  /* GenWanMin2 TC 打头 */
+:lang(ja) { font-family: var(--font-serif-latin), var(--font-serif-ja); }  /* Noto Serif JP 打头 */
+```
+
+- **`lang` 属性本身不会改字形**，改写字形的是上面这两条 CSS 规则；没有匹配规则时 `lang` 只影响**回退选字**（首个 family 不含该字时才起作用）。已实测：同一 `font-family` 下 `lang=zh`/`lang=ja`/无 `lang` 三者宽度与位图完全一致；但 family 换成不含 CJK 的（如 `Palatino Linotype`）后，`lang=zh` 与 `lang=ja` 的回退字体不同（223600 px 区域里 11193 px 不同）。
+- ⚠️ **`--font-serif-ja` 全是系统字体**（`Noto Serif JP` / `Yu Mincho` / 泛型 `serif`），站点**没有**自托管日文 webfont。所以：访客机器上没装这三个，`lang="ja"` 的演示会静默塌回中文衬线 —— 中日对比会失效。要可靠，得自托管一个 JP 子集（同 §5.2 的管线）。
+- 反例：需要**故意让中日两行同字体**时（`content/blog/nihongo.md` 的汉字编码对照表），给容器加 `class="unified-serif"` 即可压掉 `:lang(ja)`：
+
+```html
+<table class="unified-serif"> … <p lang="ja">系 海 写 認</p> … </table>
+```
+```css
+/* app/prose.css —— 特异性 (0,2,0) > :lang(ja) 的 (0,1,0)，与顺序无关 */
+.prose .unified-serif,
+.prose .unified-serif :lang(zh),
+.prose .unified-serif :lang(ja) { font-family: var(--font-serif-latin), var(--font-serif-zh); }
+```
+
+验证脚本：`.workbuddy/probe-nihongo-font.mjs`（DOM 计算样式 + 裁剪位图 + canvas 字形光栅金标准 + 运行时删规则 A/B + `lang` 回退对照，12 项）。
+
 ## 六、Travel 模块细粒度定案（节选，全量见 `.workbuddy/memory/MEMORY.md`）
 
 - 新增 trip 必须走 GPS 清洗管线（隐私红线，见 ARCHITECTURE §数据管线）。

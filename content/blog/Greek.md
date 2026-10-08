@@ -168,8 +168,8 @@ Here are the words and phrases I learnt when attending a second foreign language
 | ελληνικά          | 翻译  |
 | -----------   | -----------     |
 κάνω    |do
-μένω    |live居住
-ζω      |live生活 二复ζείτε
+μένω    |live 居住
+ζω      |live 生活 二复ζείτε
 δόυλευω |work
 έχω     |have
 μιλάω   |speak/talk

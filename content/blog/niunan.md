@@ -35,4 +35,6 @@ category: Cuisine
 
 ![广式炖牛腩](/assets/photos/cuisine/niunan2.jpg)
 
+经过多轮迭代的正式版，图中是我迄今为止最满意的一次：
+
 ![广式炖牛腩](/assets/photos/cuisine/niunan3.jpeg)

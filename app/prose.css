@@ -141,6 +141,17 @@
   font-weight: 600;
 }
 
+/* nihongo.md showcase: a Han-unification demo table that must render BOTH the
+ * zh and ja rows in one and the same font. The article's whole point there is
+ * "with a single, unspecified font the glyphs collapse into one shape" — so it
+ * deliberately defeats the site-wide `:lang(ja)` JP stack (globals.css).
+ * Higher specificity than `:lang(ja)` (0,1,0) so it wins regardless of order. */
+.prose .unified-serif,
+.prose .unified-serif :lang(zh),
+.prose .unified-serif :lang(ja) {
+  font-family: var(--font-serif-latin), var(--font-serif-zh);
+}
+
 .prose img {
   max-width: 100%;
   height: auto;
