@@ -174,7 +174,7 @@ export const copy: Record<Lang, Copy> = {
     },
     cv: {
       title: "Curriculum Vitæ",
-      lead: "A web version of my academic record. The formal, most up-to-date CV is the downloadable PDF — contact me for a full reference list.",
+      lead: "A web version of my academic record. Please refer to the downloadable PDF for the formal, most up-to-date CV.",
       download: "Download CV (PDF)",
       nameHeading: "At a glance",
       facts: "Education",
@@ -279,7 +279,7 @@ export const copy: Record<Lang, Copy> = {
     guestbook: {
       eyebrow: "Messages & bug reports",
       title: "Guestbook",
-      lead: "One shared board for everything — greetings, half-formed thoughts, and bug reports alike. Comments run on giscus backed by GitHub Discussions; signing in with a GitHub account is all it takes to post. Found something broken? Mention the page and what you expected — short and rough is fine.",
+      lead: "Shared board for everything - Come say hi / ask questions / report bugs / express anything!",
     },
     placeholder: {
       label: "Under construction",

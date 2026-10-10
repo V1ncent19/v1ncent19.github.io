@@ -113,8 +113,7 @@ export default function TravelPage() {
             <div className="mt-4 max-w-[62ch] text-[1.05rem]">
               <p className="leading-relaxed text-muted">
                 The map of everywhere I have been — and the stories from the
-                road: an interactive GPS trip log (beta) and the occasional
-                food diary, followed by the curated photo wall.
+                road! You are welcome to join my adventures, and I hope you enjoy the view.
               </p>
             </div>
           </HubHoverLink>
@@ -129,11 +128,11 @@ export default function TravelPage() {
               <SectionMark id="stories-and-frames" />
               Stories &amp; frames
             </h2>
-            <p className="mt-3 max-w-[62ch] leading-relaxed text-muted">
+            {/* <p className="mt-3 max-w-[62ch] leading-relaxed text-muted">
               The pinned trip log leads; the food diary sits at its own date in
               the stream. Every frame opens its story, coordinates and
               full-resolution download.
-            </p>
+            </p> */}
           </div>
           <GalleryView
             lang="en"

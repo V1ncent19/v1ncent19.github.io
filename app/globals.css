@@ -1295,7 +1295,7 @@ body.tl-veil-boot::before {
   position: fixed;
   inset: 0;
   z-index: 95;
-  background: #eef9fd;
+  background: var(--tl-accent-soft-2, #eef9fd);
   transform-origin: right center;
   pointer-events: none;
   /* v12.1 JS-dead fallback (2026-09-28): the curtain must NEVER hold the
@@ -1326,14 +1326,14 @@ body.tl-veil-boot.tl-veil-open::before {
 @keyframes tl-entry-open {
   from {
     transform: scaleX(1);
-    background-color: #eef9fd;
+    background-color: var(--tl-accent-soft-2, #eef9fd);
   }
   45% {
-    background-color: #e2f4fb;
+    background-color: var(--tl-accent-soft-3, #e2f4fb);
   }
   to {
     transform: scaleX(0);
-    background-color: #cfeaf5;
+    background-color: var(--tl-chip, #cfeaf5);
   }
 }
 @media (prefers-reduced-motion: reduce) {

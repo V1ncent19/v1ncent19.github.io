@@ -32,7 +32,11 @@ from tempfile import NamedTemporaryFile
 REPO = Path(__file__).resolve().parent.parent
 
 # Scan targets for harvestable CJK chars (UI strings + posts + JSON copy).
-SCAN_DIRS = ["content", "app", "components"]
+# `public/data` matters: the travel/trip JSON (ptes-2025 scenes.json etc.)
+# renders as on-screen prose but lives outside content/app/components — before
+# 2026-10-10 it was never harvested, so ~26% of the journal's CJK chars fell
+# through the serif stack to a system sans font.
+SCAN_DIRS = ["content", "app", "components", "public/data"]
 SCAN_FILES = ["lib/i18n.ts", "lib/content.ts", "lib/blog.ts"]
 
 # Always kept: CJK punctuation & symbols (U+3000–303F), fullwidth forms

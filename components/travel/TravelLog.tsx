@@ -214,8 +214,8 @@ export default function TravelLog({
              own sans stack (the site body is serif). */
           --tl-top: 4.5rem;
           --tl-map-h: 60vh;
-          background: #faf9f7;
-          color: #1f2937;
+          background: var(--tl-paper);
+          color: var(--tl-ink);
           font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
             Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
           -webkit-font-smoothing: antialiased;
@@ -223,6 +223,97 @@ export default function TravelLog({
         body.tl-immersive .travel-layout {
           --tl-top: 0px;
           --tl-map-h: 100vh;
+        }
+        /* v19 (2026-10-09): trip-page theme tokens. The trip page is its own
+           opaque "paper" surface, so it carries an explicit --tl-* layer
+           instead of the site's --surface/--ink set; the .dark block below
+           flips the same names. Scope = body.tl-immersive, so the root-level
+           exit wipe (rendered OUTSIDE .travel-layout) inherits too. */
+        body.tl-immersive {
+          --tl-paper: #faf9f7;
+          --tl-paper-2: #faf9f6;
+          --tl-surface: #ffffff;
+          --tl-surface-2: #f8f6f2;
+          --tl-surface-3: #f3f0ea;
+          --tl-panel: rgba(255, 255, 255, 0.88);
+          --tl-panel-strong: rgba(255, 255, 255, 0.92);
+          --tl-ink: #1f2937;
+          --tl-ink-2: #374151;
+          --tl-ink-3: #4b5563;
+          --tl-muted: #6b7280;
+          --tl-faint: #9ca3af;
+          --tl-line: #e5e7eb;
+          --tl-line-2: #e3e0da;
+          --tl-line-3: #d1d5db;
+          --tl-line-4: #cfd4da;
+          --tl-line-5: #c9ced4;
+          --tl-hair: rgba(15, 23, 42, 0.12);
+          --tl-paper-line: #d9d4cb;
+          --tl-divider: #eee9e2;
+          --tl-accent: #1ba7c9;
+          --tl-accent-strong: #0e7d9c;
+          --tl-accent-soft: #e8f5f9;
+          --tl-accent-soft-2: #eef9fd;
+          --tl-accent-soft-3: #e2f4fb;
+          --tl-chip: #cfeaf5;
+          --tl-on-accent: #ffffff;
+          --tl-strip: #ebe8e2;
+          --tl-strip-ink: #8a8478;
+          --tl-dot-off: #b9b2a7;
+          --tl-map-bg: #e9edf0;
+          --tl-attr: #c96f2f;
+          --tl-amber: #d97706;
+          --tl-amber-ink: #b45309;
+          --tl-gold: #d9a441;
+          --tl-slate: #5b6b9e;
+          --tl-gap: #a8a196;
+          --tl-scrim: rgba(31, 41, 55, 0.28);
+          --tl-tnav-fade: rgba(250, 249, 246, 0.96);
+          --tl-tnav-fade-97: rgba(250, 249, 246, 0.97);
+          --tl-tnav-fade-0: rgba(250, 249, 246, 0);
+        }
+        .dark body.tl-immersive {
+          --tl-paper: #15130f;
+          --tl-paper-2: #15130f;
+          --tl-surface: #201d18;
+          --tl-surface-2: #1e1b16;
+          --tl-surface-3: #232019;
+          --tl-panel: rgba(30, 27, 22, 0.88);
+          --tl-panel-strong: rgba(30, 27, 22, 0.92);
+          --tl-ink: #ebe6dc;
+          --tl-ink-2: #cdc6b8;
+          --tl-ink-3: #b6afa1;
+          --tl-muted: #9b9486;
+          --tl-faint: #7c7669;
+          --tl-line: #322e28;
+          --tl-line-2: #322e28;
+          --tl-line-3: #3a352e;
+          --tl-line-4: #3a352e;
+          --tl-line-5: #443f37;
+          --tl-hair: rgba(255, 255, 255, 0.12);
+          --tl-paper-line: #322e28;
+          --tl-divider: #2b2721;
+          --tl-accent: #3ccfff;
+          --tl-accent-strong: #7fdcff;
+          --tl-accent-soft: #10262e;
+          --tl-accent-soft-2: #0e2029;
+          --tl-accent-soft-3: #0e2029;
+          --tl-chip: #143039;
+          --tl-on-accent: #0c1a20;
+          --tl-strip: #1e1b16;
+          --tl-strip-ink: #9b9486;
+          --tl-dot-off: #5b554b;
+          --tl-map-bg: #1b1b1b;
+          --tl-attr: #e0915a;
+          --tl-amber: #e0a33a;
+          --tl-amber-ink: #e8b25a;
+          --tl-gold: #d9a441;
+          --tl-slate: #8f9ede;
+          --tl-gap: #7c7669;
+          --tl-scrim: rgba(0, 0, 0, 0.5);
+          --tl-tnav-fade: rgba(21, 19, 15, 0.96);
+          --tl-tnav-fade-97: rgba(21, 19, 15, 0.97);
+          --tl-tnav-fade-0: rgba(21, 19, 15, 0);
         }
         .map-col {
           width: 46%;
@@ -233,7 +324,7 @@ export default function TravelLog({
           /* Map/story divider (2026-09-26): neutral paper gray as of v6 —
              the brand blue was reserved for interactive elements (user
              2026-09-26: "地图和文本区的分界线改成灰色"). */
-          border-right: 2px solid #d9d4cb;
+          border-right: 2px solid var(--tl-paper-line);
         }
         /* Back to hub (2026-09-26 v6). <1024px keeps the v4 small circular
            blue button. ≥1024px it is a full-height narrow strip flush with
@@ -255,8 +346,8 @@ export default function TravelLog({
           width: 46px;
           height: 46px;
           border-radius: 50%;
-          background: #1ba7c9;
-          color: #fff;
+          background: var(--tl-accent);
+          color: var(--tl-on-accent);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -266,7 +357,7 @@ export default function TravelLog({
             color 0.2s ease;
         }
         .tl-back-strip:hover {
-          background: #0e7d9c;
+          background: var(--tl-accent-strong);
           transform: scale(1.07);
           box-shadow: 0 6px 18px rgba(27, 167, 201, 0.45);
         }
@@ -299,9 +390,9 @@ export default function TravelLog({
             width: 48px;
             z-index: 25;
             border-radius: 0;
-            background: #ebe8e2;
-            color: #8a8478;
-            border-left: 1px solid rgba(15, 23, 42, 0.07);
+            background: var(--tl-strip);
+            color: var(--tl-strip-ink);
+            border-left: 1px solid var(--tl-hair);
             box-shadow: none;
             /* the label is absolutely positioned, so the flex box centres the
                triangle alone — v5's in-flow invisible label pushed the arrow
@@ -311,8 +402,8 @@ export default function TravelLog({
           }
           .tl-back-strip:hover {
             width: 58px;
-            background: #cfeaf5;
-            color: #0e7d9c;
+            background: var(--tl-chip);
+            color: var(--tl-accent-strong);
             transform: none;
             box-shadow: none;
           }
@@ -360,7 +451,7 @@ export default function TravelLog({
           position: fixed;
           inset: 0;
           z-index: 95;
-          background: #cfeaf5;
+          background: var(--tl-chip);
           transform-origin: right center;
           animation: tl-wipe 0.25s ease-in forwards;
           pointer-events: none;
@@ -368,14 +459,14 @@ export default function TravelLog({
         @keyframes tl-wipe {
           from {
             transform: scaleX(0);
-            background-color: #cfeaf5;
+            background-color: var(--tl-chip);
           }
           55% {
-            background-color: #e2f4fb;
+            background-color: var(--tl-accent-soft-3);
           }
           to {
             transform: scaleX(1);
-            background-color: #eef9fd;
+            background-color: var(--tl-accent-soft-2);
           }
         }
         /* Entry veil (v11, 2026-09-28 user request): the time-reverse of the
@@ -403,24 +494,32 @@ export default function TravelLog({
           /* v13 (2026-09-28 user request): opaque neutral ground under the
              tiles — if the basemap hasn't finished loading (fast scroll on
              mobile), the story text underneath no longer shows through. */
-          background: #e9edf0;
+          background: var(--tl-map-bg);
         }
-        /* Basemap switch (2026-09-26 v4): back at the map's top-right corner
-           for ALL viewports (the divider folder-tab column is gone), restyled
-           as one joined segmented "slider" — the four buttons are flush
-           inside a pill track and the active option fills its segment blue
-           like a knob (user 2026-09-26). */
+        /* Map's top-right control (2026-09-26 v4; split into two groups
+           v21 2026-10-09): TWO separate segmented pills so the reader sees at
+           a glance that they are independent switches. LEFT pill = 自/昼/夜,
+           the PAGE THEME (a 3-way radio, always exactly one selected) — the
+           same value as the site header toggle. RIGHT pill = 卫/地, a
+           theme-agnostic basemap OVERRIDE (a toggle: at most one, click the
+           active one to clear). Each pill is the old joined "slider" track;
+           the active segment fills blue like a knob. */
         .basemap-ctl {
           position: absolute;
           top: 14px;
           right: 14px;
           z-index: 5;
           display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .bm-group {
+          display: flex;
           align-items: stretch;
           padding: 3px;
           border-radius: 999px;
-          border: 1px solid rgba(15, 23, 42, 0.14);
-          background: rgba(255, 255, 255, 0.88);
+          border: 1px solid var(--tl-hair);
+          background: var(--tl-panel);
           backdrop-filter: blur(6px);
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
         }
@@ -430,18 +529,18 @@ export default function TravelLog({
           border: none;
           border-radius: 999px;
           background: transparent;
-          color: #374151;
+          color: var(--tl-ink-2);
           font-size: 13px;
           line-height: 1;
           cursor: pointer;
           transition: background 0.2s ease, color 0.2s ease;
         }
         .bm-btn:hover {
-          color: #0e7d9c;
+          color: var(--tl-accent-strong);
         }
         .bm-btn.on {
-          background: #1ba7c9;
-          color: #ffffff;
+          background: var(--tl-accent);
+          color: var(--tl-on-accent);
           box-shadow: 0 1px 4px rgba(14, 125, 156, 0.35);
         }
         .map-overlay-top {
@@ -451,7 +550,7 @@ export default function TravelLog({
           z-index: 4;
         }
         .timeline-indicator {
-          background: rgba(255, 255, 255, 0.92);
+          background: var(--tl-panel-strong);
           border-radius: 10px;
           padding: 8px 12px;
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
@@ -461,15 +560,15 @@ export default function TravelLog({
         }
         .timeline-day {
           font-weight: 600;
-          color: #6b7280;
+          color: var(--tl-muted);
         }
         .timeline-time {
           font-size: 16px;
           font-weight: 700;
-          color: #111827;
+          color: var(--tl-ink);
         }
         .timeline-scene {
-          color: #374151;
+          color: var(--tl-ink-2);
           margin-top: 2px;
         }
         .map-legend {
@@ -477,12 +576,12 @@ export default function TravelLog({
           left: 14px;
           bottom: 14px;
           z-index: 4;
-          background: rgba(255, 255, 255, 0.92);
+          background: var(--tl-panel-strong);
           border-radius: 10px;
           padding: 9px 12px;
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
           font-size: 11.5px;
-          color: #374151;
+          color: var(--tl-ink-2);
           /* 2026-09-26: fixed-width symbol column + label column — every
              swatch (lines and the dot) shares the same grid track, so the
              labels align (the old flex rows had ragged symbols). */
@@ -510,12 +609,12 @@ export default function TravelLog({
           margin: 0;
           font: inherit;
           font-weight: 600;
-          color: #4b5563;
+          color: var(--tl-ink-3);
           cursor: pointer;
           user-select: none;
         }
         .lg-toggle:hover {
-          color: #1f2937;
+          color: var(--tl-ink);
         }
         .lg-swatch {
           display: inline-flex;
@@ -545,24 +644,24 @@ export default function TravelLog({
           justify-self: center;
         }
         .lg-ground {
-          border-top: 2px solid #1ba7c9;
+          border-top: 2px solid var(--tl-accent);
         }
         /* v9 (2026-09-28): flight must read as an ORANGE DASHED line — the
            generic .map-legend .lg rule (0,2,0) outranked .lg-air (0,1,0)
            and forced solid. Re-declare with matching specificity so the
            later-in-sheet dashed shorthand wins. */
         .map-legend .lg-air {
-          border-top: 2px dashed #d97706;
+          border-top: 2px dashed var(--tl-amber);
         }
         .lg-gap {
-          border-top: 2px dotted #a8a196;
+          border-top: 2px dotted var(--tl-gap);
         }
         .lg-attr {
           display: inline-block;
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: #c96f2f;
+          background: var(--tl-attr);
           border: 1.5px solid #fff;
           box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
         }
@@ -570,7 +669,7 @@ export default function TravelLog({
            terracotta ring (mirrors the map's data-driven marker style) */
         .lg-attr-planned {
           background: #fff;
-          border-color: #c96f2f;
+          border-color: var(--tl-attr);
           box-shadow: 0 0 0 1px rgba(201, 111, 47, 0.25);
         }
 
@@ -654,7 +753,7 @@ export default function TravelLog({
           left: 16.5px;
           width: 3px;
           border-radius: 2px;
-          background: #1ba7c9;
+          background: var(--tl-accent);
           opacity: 0;
           /* v9 (2026-09-28 user request): fade in/out IN PLACE — the old
              left slide ("pops out right-to-left") collided with neighbouring
@@ -715,9 +814,9 @@ export default function TravelLog({
           gap: 10px;
           width: 100%;
           padding: 7px 16px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--tl-line);
           border-radius: 999px;
-          background: #faf9f6;
+          background: var(--tl-paper-2);
           overflow: hidden;
           /* width/margin animate the pinned grow (travelling capsules sit at
              text width; pinned ones overhang with or without .on — v10) */
@@ -726,7 +825,7 @@ export default function TravelLog({
           cursor: pointer;
         }
         .day-capsule:hover {
-          border-color: #cfd4da;
+          border-color: var(--tl-line-4);
         }
         .day-capsule:focus-visible {
           outline: 2px solid rgba(27, 167, 201, 0.6);
@@ -758,7 +857,7 @@ export default function TravelLog({
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: #c9ced4;
+          background: var(--tl-line-5);
           transition: background 0.35s ease, transform 0.35s ease;
         }
         .dc-label {
@@ -767,16 +866,16 @@ export default function TravelLog({
         }
         .dc-date {
           margin-left: auto;
-          color: #374151;
+          color: var(--tl-ink-2);
           font-weight: 600;
           font-size: 13px;
         }
         .dc-km {
-          color: #9ca3af;
+          color: var(--tl-faint);
           font-size: 12px;
         }
         .dc-plane {
-          color: #1ba7c9;
+          color: var(--tl-accent);
           font-size: 12px;
           margin-right: 5px;
         }
@@ -784,10 +883,10 @@ export default function TravelLog({
         .day-capsule.on {
           border-color: rgba(27, 167, 201, 0.85);
           box-shadow: 0 1px 12px rgba(27, 167, 201, 0.28);
-          background: #f4fbfd;
+          background: var(--tl-accent-soft-2);
         }
         .day-capsule.on .dc-dot {
-          background: #1ba7c9;
+          background: var(--tl-accent);
           transform: scale(1.35);
           animation: dc-breathe 2s ease-in-out infinite;
         }
@@ -823,7 +922,7 @@ export default function TravelLog({
           margin: 6px 0 12px;
         }
         .finale-line {
-          color: #4b5563;
+          color: var(--tl-ink-3);
           font-size: 15px;
           line-height: 1.8;
           max-width: 460px;
@@ -832,7 +931,7 @@ export default function TravelLog({
            caption inside the finale */
         .finale-src {
           margin: 22px 0 0;
-          color: #9ca3af;
+          color: var(--tl-faint);
           font-size: 12px;
           line-height: 1.7;
           max-width: 460px;
@@ -860,16 +959,16 @@ export default function TravelLog({
           text-transform: uppercase;
           letter-spacing: 0.14em;
           font-size: 12px;
-          color: #1ba7c9;
+          color: var(--tl-accent);
           font-weight: 700;
           margin: 0;
         }
         .intro-meta {
-          color: #4b5563;
+          color: var(--tl-ink-3);
           margin: 0 0 18px;
         }
         .intro-hint {
-          color: #6b7280;
+          color: var(--tl-muted);
           font-size: 14px;
         }
         /* v12 (2026-09-28 user request): bottom scroll cue of the boot
@@ -886,7 +985,7 @@ export default function TravelLog({
           display: flex;
           flex-direction: column;
           align-items: center;
-          color: #1ba7c9;
+          color: var(--tl-accent);
         }
         .hint-chevrons svg {
           display: block;
@@ -916,7 +1015,7 @@ export default function TravelLog({
           font-weight: 600;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-          color: #8a8478;
+          color: var(--tl-strip-ink);
         }
         @media (prefers-reduced-motion: reduce) {
           .hint-chevrons svg {
@@ -932,20 +1031,20 @@ export default function TravelLog({
           align-items: center;
           justify-content: center;
           gap: 10px;
-          color: #6b7280;
+          color: var(--tl-muted);
           font-size: 13.5px;
           letter-spacing: 0.02em;
         }
         .night-moon {
           font-size: 18px;
-          color: #5b6b9e;
+          color: var(--tl-slate);
         }
         .day-header {
           display: flex;
           align-items: baseline;
           gap: 10px;
           padding: 42px 0 0 21px;
-          border-top: 1px solid #e5e7eb;
+          border-top: 1px solid var(--tl-line);
           margin-top: 10px;
         }
         .day-label {
@@ -953,11 +1052,11 @@ export default function TravelLog({
           font-size: 18px;
         }
         .day-date {
-          color: #374151;
+          color: var(--tl-ink-2);
           font-weight: 600;
         }
         .day-distance {
-          color: #9ca3af;
+          color: var(--tl-faint);
           font-size: 13px;
           margin-left: auto;
         }
@@ -967,11 +1066,11 @@ export default function TravelLog({
           font-size: 22px;
         }
         .scene-meta {
-          color: #6b7280;
+          color: var(--tl-muted);
           font-size: 13px;
         }
         .confidence {
-          color: #b45309;
+          color: var(--tl-amber-ink);
         }
         .chip {
           font-size: 11px;
@@ -979,22 +1078,22 @@ export default function TravelLog({
           letter-spacing: 0.08em;
           padding: 2px 8px;
           border-radius: 999px;
-          color: #fff;
+          color: var(--tl-on-accent);
         }
         .chip-morning {
-          background: #d9a441;
+          background: var(--tl-gold);
         }
         .chip-afternoon {
-          background: #c96f2f;
+          background: var(--tl-attr);
         }
         .chip-evening {
-          background: #5b6b9e;
+          background: var(--tl-slate);
         }
         .chip-transit {
-          background: #6b7280;
+          background: var(--tl-muted);
         }
         .day-heading {
-          color: #4b5563;
+          color: var(--tl-ink-3);
           font-size: 13.5px;
           padding: 6px 0 0 21px;
           margin: 0;
@@ -1004,12 +1103,18 @@ export default function TravelLog({
         }
         .scene-body p {
           margin: 0 0 14px;
-          color: #1f2937;
+          color: var(--tl-ink);
           font-size: 15px;
           line-height: 1.85;
+          /* CONVENTIONS §44: 标题/正文长文用衬线，UI 控件用无衬线. The journal
+             prose is the reading surface — it must take the site serif stack
+             (GenWanMin2 TC first), not inherit .travel-layout's sans UI stack.
+             Before 2026-10-10 <p> had no rule here, so the body silently fell
+             through to a system CJK sans (Microsoft YaHei UI). */
+          font-family: var(--font-serif-latin), var(--font-serif-zh);
         }
         .scene-note {
-          color: #6b7280;
+          color: var(--tl-muted);
           font-style: italic;
           font-size: 14px;
         }
@@ -1025,20 +1130,22 @@ export default function TravelLog({
         }
         .not-visited {
           font-size: 11px;
-          color: #9ca3af;
-          border: 1px solid #d1d5db;
+          color: var(--tl-faint);
+          border: 1px solid var(--tl-line-3);
           border-radius: 999px;
           padding: 1px 8px;
           font-weight: 500;
         }
         .excerpt {
           margin: 0;
-          color: #374151;
+          color: var(--tl-ink-2);
           font-size: 14.5px;
           line-height: 1.65;
+          /* journal excerpt = body copy → serif (see .scene-body p) */
+          font-family: var(--font-serif-latin), var(--font-serif-zh);
         }
         .match-warning {
-          color: #b45309;
+          color: var(--tl-amber-ink);
           font-size: 12.5px;
           margin: 4px 0;
         }
@@ -1048,7 +1155,7 @@ export default function TravelLog({
           align-items: center;
           justify-content: center;
           min-height: 60vh;
-          color: #6b7280;
+          color: var(--tl-muted);
         }
 
         @media (max-width: 900px) {
@@ -1069,7 +1176,7 @@ export default function TravelLog({
             border-right: none;
             /* v13 (2026-09-28 user request): the map/text seam on mobile was
                a bare cut — same paper-gray rule as the desktop border-right. */
-            border-bottom: 2px solid #d9d4cb;
+            border-bottom: 2px solid var(--tl-paper-line);
           }
           .story-col {
             width: 100%;
@@ -1090,6 +1197,15 @@ export default function TravelLog({
              bottom edge and the viewport bottom. */
           .finale {
             min-height: calc(100vh - var(--tl-map-h));
+          }
+          /* v21: two pills (3 theme + 2 basemap segments) run wider than the
+             old single track — trim each segment and the gap so the pair still
+             clears the timeline pill on the map's left at 390px. */
+          .basemap-ctl {
+            gap: 6px;
+          }
+          .bm-btn {
+            width: 30px;
           }
         }
       `}      </style>

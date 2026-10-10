@@ -174,8 +174,7 @@ export default function TravelStory({
             {trip.stats.points.toLocaleString()} GPS points
           </p>
           <p className="intro-hint">
-            Scroll the journal — the map follows the story. Drag the map to explore freely;
-            the route advances as you read.
+            Scroll the journal to start the trip and read the story.
           </p>
         </div>
         {/* v12 (2026-09-28 user request): bottom scroll cue. The intro used to
@@ -348,13 +347,11 @@ export default function TravelStory({
         <h2 className="finale-title">完结撒花 🎉</h2>
         <p className="finale-line">
           {trip.days.length} days · {trip.stats.distanceKm.toLocaleString()} km ·{" "}
-          {trip.stats.points.toLocaleString()} GPS points。感谢读完这趟旅程——
-          整条路线在此汇成一线，全程无淡出。
+          {trip.stats.points.toLocaleString()} GPS points logged. </p>
+        <p className="finale-hint">
+          感谢阅读 ~ See you on the next trip!
         </p>
-        <p className="finale-src">
-          Route reconstructed from {trip.stats.points.toLocaleString()} GPS records;
-          scenes and times derived from the GPS track; journal text shown as written.
-        </p>
+
       </section>
 
     </div>

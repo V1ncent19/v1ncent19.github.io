@@ -291,7 +291,7 @@ export default function TravelNav({
           align-items: center;
           gap: 10px;
           padding: 10px 0 8px;
-          background: linear-gradient(to bottom, rgba(250, 249, 246, 0.96) 65%, rgba(250, 249, 246, 0));
+          background: linear-gradient(to bottom, var(--tl-tnav-fade) 65%, var(--tl-tnav-fade-0));
           pointer-events: none;
         }
         .tnav-track {
@@ -299,7 +299,7 @@ export default function TravelNav({
           flex: 1;
           height: 4px;
           border-radius: 2px;
-          background: #e3e0da;
+          background: var(--tl-line-2);
           pointer-events: auto;
         }
         /* Vertical progress rail (2026-09-26 user redesign): lives in the
@@ -358,7 +358,7 @@ export default function TravelNav({
           white-space: nowrap;
           font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
           font-size: 11px;
-          color: #6b7280;
+          color: var(--tl-muted);
           font-variant-numeric: tabular-nums;
         }
         .tnav-rail-track {
@@ -371,7 +371,7 @@ export default function TravelNav({
           flex: 1 1 0;
           min-height: 0;
           border-radius: 2px;
-          background: #e3e0da;
+          background: var(--tl-line-2);
           pointer-events: auto;
         }
         /* v10 (2026-09-28 user request): back-to-top at the rail's foot.
@@ -388,19 +388,19 @@ export default function TravelNav({
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid #e3e0da;
+          border: 1px solid var(--tl-line-2);
           border-radius: 50%;
-          background: #f8f6f2;
-          color: #6b7280;
+          background: var(--tl-surface-2);
+          color: var(--tl-muted);
           cursor: pointer;
           padding: 0;
           transition: color 0.2s ease, border-color 0.2s ease,
             background 0.2s ease, transform 0.25s ease;
         }
         .tnav-top-btn:hover {
-          color: #0e7d9c;
-          border-color: #1ba7c9;
-          background: #e8f5f9;
+          color: var(--tl-accent-strong);
+          border-color: var(--tl-accent);
+          background: var(--tl-accent-soft);
           transform: translateY(-2px);
         }
         /* v12 (2026-09-28 user request): lit at the finale — page essentially
@@ -408,9 +408,9 @@ export default function TravelNav({
            family as the hover, calmer: the blue reads as "you reached the
            end, ride the arrow back up". */
         .tnav-top-btn.lit {
-          color: #0e7d9c;
-          border-color: #1ba7c9;
-          background: #e8f5f9;
+          color: var(--tl-accent-strong);
+          border-color: var(--tl-accent);
+          background: var(--tl-accent-soft);
           box-shadow: 0 0 0 3px rgba(27, 167, 201, 0.16);
         }
         .tnav-top-btn:focus-visible {
@@ -451,7 +451,7 @@ export default function TravelNav({
           bottom: 0;
           width: 0%;
           border-radius: 2px;
-          background: #1ba7c9;
+          background: var(--tl-accent);
           opacity: 0.55;
           transition: width 0.1s linear;
         }
@@ -462,8 +462,8 @@ export default function TravelNav({
           height: 12px;
           transform: translate(-50%, -50%);
           border-radius: 50%;
-          border: 2px solid #f8f6f2;
-          background: #b9b2a7;
+          border: 2px solid var(--tl-surface-2);
+          background: var(--tl-dot-off);
           cursor: pointer;
           padding: 0;
           transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -471,17 +471,17 @@ export default function TravelNav({
         }
         .tnav-tick:hover {
           transform: translate(-50%, -50%) scale(1.45);
-          background: #1ba7c9;
+          background: var(--tl-accent);
           box-shadow: 0 0 0 4px rgba(27, 167, 201, 0.18);
         }
         .tnav-tick:active {
           transform: translate(-50%, -50%) scale(1.15);
         }
         .tnav-tick.read {
-          background: #1ba7c9; /* already read: blue, but no halo */
+          background: var(--tl-accent); /* already read: blue, but no halo */
         }
         .tnav-tick.active {
-          background: #1ba7c9;
+          background: var(--tl-accent);
           box-shadow: 0 0 0 3px rgba(27, 167, 201, 0.22);
         }
         .tnav-tip {
@@ -494,9 +494,9 @@ export default function TravelNav({
           transform: translateX(-50%) translateY(-4px);
           white-space: nowrap;
           font-size: 12px;
-          color: #374151;
-          background: #f8f6f2;
-          border: 1px solid #e3e0da;
+          color: var(--tl-ink-2);
+          background: var(--tl-surface-2);
+          border: 1px solid var(--tl-line-2);
           border-radius: 6px;
           padding: 3px 8px;
           pointer-events: none;
@@ -526,9 +526,9 @@ export default function TravelNav({
         }
         .tnav-toc-btn {
           pointer-events: auto;
-          border: 1px solid #e3e0da;
-          background: #f8f6f2;
-          color: #4b5563;
+          border: 1px solid var(--tl-line-2);
+          background: var(--tl-surface-2);
+          color: var(--tl-ink-3);
           border-radius: 6px;
           width: 30px;
           height: 26px;
@@ -554,26 +554,26 @@ export default function TravelNav({
             padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
             background: linear-gradient(
               to top,
-              rgba(250, 249, 246, 0.97) 62%,
-              rgba(250, 249, 246, 0)
+              var(--tl-tnav-fade-97) 62%,
+              var(--tl-tnav-fade-0)
             );
           }
         }
         .tnav-toc-btn:hover {
-          color: #1ba7c9;
-          border-color: #1ba7c9;
+          color: var(--tl-accent);
+          border-color: var(--tl-accent);
           transform: scale(1.08);
         }
         .tnav-toc-btn.is-open {
-          color: #0e7d9c;
-          border-color: #1ba7c9;
-          background: #e8f5f9;
+          color: var(--tl-accent-strong);
+          border-color: var(--tl-accent);
+          background: var(--tl-accent-soft);
         }
         .tnav-backdrop {
           position: fixed;
           inset: 0;
           z-index: 80;
-          background: rgba(31, 41, 55, 0.28);
+          background: var(--tl-scrim);
           opacity: 0;
           pointer-events: none;
           transition: opacity 0.3s ease;
@@ -589,7 +589,7 @@ export default function TravelNav({
           bottom: 0;
           width: 320px;
           max-width: 88vw;
-          background: #fdfcfa;
+          background: var(--tl-surface);
           box-shadow: -8px 0 32px rgba(0, 0, 0, 0.14);
           z-index: 90;
           display: flex;
@@ -608,20 +608,20 @@ export default function TravelNav({
           justify-content: space-between;
           padding: 16px 18px;
           font-weight: 700;
-          color: #1f2937;
-          border-bottom: 1px solid #eee9e2;
+          color: var(--tl-ink);
+          border-bottom: 1px solid var(--tl-divider);
         }
         .tnav-close {
           border: none;
           background: none;
           font-size: 22px;
-          color: #6b7280;
+          color: var(--tl-muted);
           cursor: pointer;
           line-height: 1;
           transition: color 0.2s ease, transform 0.25s ease;
         }
         .tnav-close:hover {
-          color: #1f2937;
+          color: var(--tl-ink);
           transform: rotate(90deg);
         }
         .tnav-list {
@@ -638,7 +638,7 @@ export default function TravelNav({
           background: none;
           cursor: pointer;
           text-align: left;
-          color: #374151;
+          color: var(--tl-ink-2);
           font-size: 14px;
           position: relative;
           opacity: 0;
@@ -662,20 +662,20 @@ export default function TravelNav({
           bottom: 15%;
           width: 3px;
           border-radius: 2px;
-          background: #1ba7c9;
+          background: var(--tl-accent);
           transform: scaleY(0);
           transition: transform 0.2s ease;
         }
         .tnav-row:hover {
-          background: #f3f0ea;
+          background: var(--tl-surface-3);
           padding-left: 24px;
         }
         .tnav-row:hover::before {
           transform: scaleY(1);
         }
         .tnav-row.active {
-          background: #e8f5f9;
-          color: #0e7d9c;
+          background: var(--tl-accent-soft);
+          color: var(--tl-accent-strong);
         }
         .tnav-row.active::before {
           transform: scaleY(1);
@@ -688,7 +688,7 @@ export default function TravelNav({
           flex: 1;
         }
         .tnav-row-km {
-          color: #9ca3af;
+          color: var(--tl-faint);
           font-size: 12.5px;
         }
       `}</style>

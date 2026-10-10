@@ -17,6 +17,8 @@ import type {
 } from "@/lib/travel/types";
 import { padBounds, localClockAt } from "@/lib/travel/gps";
 import type { StoryState } from "@/lib/travel/use-story-controller";
+import { applyTheme, readTheme } from "@/lib/theme";
+import type { Theme } from "@/lib/site";
 import ResumeStoryButton from "./ResumeStoryButton";
 
 // Basemap is swappable without touching travel data (roadmap §24).
@@ -57,12 +59,64 @@ const TOPO_STYLE = {
   layers: [{ id: "otm", type: "raster" as const, source: "otm" }],
 };
 
-const BASEMAPS: { id: string; label: string; icon: string; style: unknown }[] = [
-  { id: "light", label: "CARTO 亮色", icon: "昼", style: BASEMAP_STYLE },
-  { id: "dark", label: "CARTO 暗色", icon: "夜", style: DARK_STYLE },
+// v21 (2026-10-09 user request): the map's top-right control is split into TWO
+// INDEPENDENT groups so "page brightness" and "map form" stop fighting:
+//   Group 1 · 明暗 (自/昼/夜) — a 3-way RADIO, always exactly one. It IS the
+//     site theme (system/light/dark), written to the SAME key the header
+//     toggle uses, so a flip here is already in effect on the main site.
+//   Group 2 · 特殊底图 (卫/地) — a TOGGLE, at most one, click again to clear.
+//     Empty => the vector basemap follows Group 1 (light -> Positron,
+//     dark -> Dark Matter). Set => the raster OVERRIDES it, independent of
+//     the page theme (a dark page over satellite imagery is fine).
+type SpecialBasemap = "" | "sat" | "topo";
+
+const BASEMAP_KEY = "travel-basemap";
+const SPECIAL_OPTIONS: {
+  id: Exclude<SpecialBasemap, "">;
+  label: string;
+  icon: string;
+  style: unknown;
+}[] = [
   { id: "sat", label: "卫星影像", icon: "卫", style: ESRI_STYLE },
   { id: "topo", label: "地形图", icon: "地", style: TOPO_STYLE },
 ];
+const THEME_OPTIONS: { id: Theme; label: string; icon: string }[] = [
+  { id: "system", label: "跟随系统明暗", icon: "自" },
+  { id: "light", label: "浅色模式", icon: "昼" },
+  { id: "dark", label: "深色模式", icon: "夜" },
+];
+
+function isDarkTheme(): boolean {
+  return (
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark")
+  );
+}
+
+/** Resolve the maplibre style: a special raster wins, else the vector pair
+ *  follows the page theme (light -> Positron, dark -> Dark Matter). */
+function resolveStyle(special: SpecialBasemap): unknown {
+  if (special === "sat") return ESRI_STYLE;
+  if (special === "topo") return TOPO_STYLE;
+  return isDarkTheme() ? DARK_STYLE : BASEMAP_STYLE;
+}
+
+/**
+ * Stored special-basemap choice + one-time migration. The pre-v21 control
+ * stored "auto"/"light"/"dark"/"sat"/"topo" under the same key. Only sat/topo
+ * are genuine "special basemap" choices; everything else (including the old
+ * light/dark basemap locks) now reads as "" — no override — because page
+ * brightness lives in the shared theme key instead.
+ */
+function readSavedSpecial(): SpecialBasemap {
+  try {
+    const raw = localStorage.getItem(BASEMAP_KEY);
+    if (raw === "sat" || raw === "topo") return raw;
+  } catch {
+    /* storage unavailable */
+  }
+  return "";
+}
 
 const ACCENT = "#1ba7c9";
 const AIR = "#d97706";     // flights: amber dashed geodesic arcs
@@ -338,7 +392,13 @@ export default function TravelMap({
   const routeFCRef = useRef<GeoJSON.FeatureCollection | null>(null);
   const positionFRef = useRef<GeoJSON.Feature | null>(null);
   const attractionsFCRef = useRef<GeoJSON.FeatureCollection | null>(null);
-  const [basemapId, setBasemapId] = useState("light");
+  // Group 2: "" = no override (vector basemap follows the theme); sat/topo set.
+  const [specialBasemap, setSpecialBasemap] = useState<SpecialBasemap>("");
+  // mirror for the theme observer, whose closure would otherwise go stale
+  const specialRef = useRef<SpecialBasemap>("");
+  // Group 1: the chosen theme MODE (system/light/dark) — drives the radio's
+  // active segment. The resolved brightness lives on <html class="dark">.
+  const [themeMode, setThemeMode] = useState<Theme>("system");
   // v14 (2026-09-28 user request): the legend ate map space on small screens —
   // collapsible, COLLAPSED by default on every viewport.
   const [legendOpen, setLegendOpen] = useState(false);
@@ -353,26 +413,25 @@ export default function TravelMap({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
     let cancelled = false;
-    // v13 (2026-09-28 bugfix): the stored basemap used to restore the BUTTON
-    // state only — the map itself always booted on the light style, so the
-    // control showed "卫" while the map was actually on 昼 (user report).
-    // Read storage synchronously BEFORE the dynamic import and boot the map
-    // on the saved style; the UI state follows one frame later (rAF — sync
+    let themeObs: MutationObserver | null = null;
+    // v13 (2026-09-28 bugfix, kept): the stored choice used to restore the
+    // BUTTON state only — the map itself always booted on the light style, so
+    // the control showed one thing while the map showed another (user report).
+    // Read storage synchronously BEFORE the dynamic import and boot the map on
+    // the resolved style; the UI state follows one frame later (rAF — sync
     // setState inside an effect body is forbidden by the site's lint).
-    // Nothing stored (or storage unavailable) = default 昼/light.
-    let saved = "light";
-    try {
-      const bm = localStorage.getItem("travel-basemap");
-      if (bm && BASEMAPS.some((b) => b.id === bm)) saved = bm;
-    } catch {
-      /* storage unavailable */
-    }
-    const style0 = (BASEMAPS.find((b) => b.id === saved) ?? BASEMAPS[0]).style as Exclude<
+    // Nothing stored = no basemap override, so the vector pair follows the
+    // page theme that the pre-paint script already applied to <html>.
+    const savedSpecial = readSavedSpecial();
+    specialRef.current = savedSpecial;
+    const style0 = resolveStyle(savedSpecial) as Exclude<
       Parameters<MLMap["setStyle"]>[0],
       null
     >;
     const stateRaf = requestAnimationFrame(() => {
-      if (!cancelled) setBasemapId(saved);
+      if (cancelled) return;
+      setSpecialBasemap(savedSpecial);
+      setThemeMode(readTheme());
     });
     (async () => {
       const maplibregl = (await import("maplibre-gl")).default;
@@ -528,10 +587,25 @@ export default function TravelMap({
       map.on("dragstart", explore);
       map.on("wheel", explore);
       map.on("touchstart", explore);
+
+      // v21: with no special basemap chosen, the vector pair follows
+      // <html class="dark"> — the 自/昼/夜 radio, or the OS when the mode is
+      // "system", both flip that class. A satellite/terrain override makes this
+      // a no-op (the raster is theme-agnostic on purpose).
+      themeObs = new MutationObserver(() => {
+        if (specialRef.current) return;
+        map.setStyle(resolveStyle("") as Parameters<MLMap["setStyle"]>[0]);
+        setTimeout(() => remountRef.current?.(), 300);
+      });
+      themeObs.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
     })();
     return () => {
       cancelled = true;
       cancelAnimationFrame(stateRaf);
+      themeObs?.disconnect();
       mapRef.current?.remove();
       mapRef.current = null;
     };
@@ -953,17 +1027,31 @@ export default function TravelMap({
     (map.getSource("attractions") as GeoJSONSource | undefined)?.setData(fc);
   }, [attractions, activeDayNo, mapReady]);
 
-  const switchBasemap = (id: string) => {
-    const b = BASEMAPS.find((x) => x.id === id);
+  // Group 1 · 明暗 (自/昼/夜): a RADIO — always exactly one. It writes the SAME
+  // theme key as the site header; applyTheme flips <html class="dark">, which
+  // the observer above turns into a vector-basemap swap when no special basemap
+  // is set. (When the class does not actually change — e.g. "system" and the OS
+  // already agree with the previous choice — the basemap is already correct, so
+  // no swap is needed.)
+  const switchTheme = (mode: Theme) => {
+    setThemeMode(mode);
+    applyTheme(mode);
+  };
+
+  // Group 2 · 特殊底图 (卫/地): a TOGGLE — clicking the active one clears it.
+  // A special raster OVERRIDES the theme pair; "" hands control back to it.
+  const switchBasemap = (id: Exclude<SpecialBasemap, "">) => {
     const map = mapRef.current;
-    if (!b || !map) return;
-    setBasemapId(id);
+    if (!map) return;
+    const next: SpecialBasemap = specialRef.current === id ? "" : id;
+    specialRef.current = next;
+    setSpecialBasemap(next);
     try {
-      localStorage.setItem("travel-basemap", id);
+      localStorage.setItem(BASEMAP_KEY, next);
     } catch {
       /* ignore */
     }
-    map.setStyle(b.style as Parameters<MLMap["setStyle"]>[0]);
+    map.setStyle(resolveStyle(next) as Parameters<MLMap["setStyle"]>[0]);
     setTimeout(() => remountRef.current?.(), 300);
   };
 
@@ -976,17 +1064,40 @@ export default function TravelMap({
   return (
     <div className="map-pane">
       <div ref={containerRef} className="map-container" />
+      {/* v21 (2026-10-09 user request): two INDEPENDENT pills so page
+          brightness and map form stop fighting. LEFT: 自/昼/夜, a 3-way radio
+          (always one) wired to the site theme. RIGHT: 卫/地, a toggle (at most
+          one, click again to clear) that overrides the basemap. */}
       <div className="basemap-ctl">
-        {BASEMAPS.map((b) => (
-          <button
-            key={b.id}
-            className={"bm-btn" + (basemapId === b.id ? " on" : "")}
-            title={b.label}
-            onClick={() => switchBasemap(b.id)}
-          >
-            {b.icon}
-          </button>
-        ))}
+        <div className="bm-group" role="radiogroup" aria-label="页面明暗">
+          {THEME_OPTIONS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="radio"
+              aria-checked={themeMode === t.id}
+              className={"bm-btn" + (themeMode === t.id ? " on" : "")}
+              title={t.label}
+              onClick={() => switchTheme(t.id)}
+            >
+              {t.icon}
+            </button>
+          ))}
+        </div>
+        <div className="bm-group" role="group" aria-label="特殊底图">
+          {SPECIAL_OPTIONS.map((b) => (
+            <button
+              key={b.id}
+              type="button"
+              aria-pressed={specialBasemap === b.id}
+              className={"bm-btn" + (specialBasemap === b.id ? " on" : "")}
+              title={b.label}
+              onClick={() => switchBasemap(b.id)}
+            >
+              {b.icon}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="map-overlay-top">
         <div className="timeline-indicator">

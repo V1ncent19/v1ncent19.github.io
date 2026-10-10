@@ -350,7 +350,7 @@ export default function HomePage() {
                 href="/blog"
                 className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
               >
-                my blog pages
+                Blog pages
               </Link>{" "}
               , either academic or non-academic,
               and some longer running notes at{" "}
@@ -358,7 +358,7 @@ export default function HomePage() {
                 href="/project"
                 className="underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
               >
-                projects
+                Projects
               </Link>{" "}
               . I also log some leisure things at {" "}
               <a

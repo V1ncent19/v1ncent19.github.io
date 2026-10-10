@@ -1,7 +1,8 @@
 "use client";
 
 import { Monitor, Moon, Sun } from "lucide-react";
-import { themeStorageKey, type Theme } from "@/lib/site";
+import { applyTheme, nextTheme, readTheme, THEME_LABEL } from "@/lib/theme";
+import type { Theme } from "@/lib/site";
 
 /**
  * Single-button light/dark/system theme control.
@@ -14,10 +15,12 @@ import { themeStorageKey, type Theme } from "@/lib/site";
  * which icon is shown is decided in CSS by `data-theme` on <html> (set by
  * components/theme/theme-script.tsx before hydration), and clicking only
  * mutates the class/attribute + localStorage. No state → nothing to hydrate
- * twice, and no `set-state-in-effect` pitfalls.
+ * twice, and no `set-state-in-effect` pitfalls. The read/apply helpers live in
+ * lib/theme.ts so the trip pages' own 自/昼/夜 control (the map's left pill in
+ * components/travel/TravelMap.tsx) shares the exact same storage key.
  *
- * Icons are three stacked lucide glyphs (☀ system ☾ light ⇄ dark) and CSS in
- * globals.css shows exactly one via `html[data-theme="…"]`.
+ * Icons are three stacked lucide glyphs; CSS in globals.css shows exactly one
+ * via `html[data-theme="…"]` (☀ light, ☾ dark, ⛶ system).
  */
 /** Which icons map to which mode (class suffix matches globals.css rules). */
 const ICON: Record<Theme, string> = {
@@ -26,29 +29,18 @@ const ICON: Record<Theme, string> = {
   system: "ti-system",
 };
 
-const LABEL: Record<Theme, string> = {
-  light: "Light",
-  dark: "Dark",
-  system: "System",
-};
-
 export function ThemeToggle() {
-  function nextOf(current: Theme): Theme {
-    return current === "system" ? "light" : current === "light" ? "dark" : "system";
-  }
-
   function onToggle() {
-    const stored = read();
-    const next = nextOf(stored);
-    apply(next);
+    const next = nextTheme(readTheme());
+    applyTheme(next);
     // Reflect the new mode back onto the button (tooltip + label).
     const btn = document.getElementById("theme-toggle");
     if (btn) {
-      btn.setAttribute("title", `Theme: ${LABEL[next]} (click to cycle)`);
+      btn.setAttribute("title", `Theme: ${THEME_LABEL[next]} (click to cycle)`);
       btn.setAttribute(
         "aria-label",
-        `Theme: ${LABEL[next]}. Click to switch to ${
-          LABEL[nextOf(next)]
+        `Theme: ${THEME_LABEL[next]}. Click to switch to ${
+          THEME_LABEL[nextTheme(next)]
         }.`,
       );
     }
@@ -80,27 +72,4 @@ export function ThemeToggle() {
       />
     </button>
   );
-}
-
-function read(): Theme {
-  try {
-    const m = localStorage.getItem(themeStorageKey);
-    if (m === "light" || m === "dark" || m === "system") return m;
-  } catch {
-    /* storage unavailable */
-  }
-  return "system";
-}
-
-function apply(mode: Theme) {
-  const root = document.documentElement;
-  const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  const dark = mode === "dark" || (mode === "system" && mq.matches);
-  root.classList.toggle("dark", dark);
-  root.setAttribute("data-theme", mode);
-  try {
-    localStorage.setItem(themeStorageKey, mode);
-  } catch {
-    /* class + attribute already applied */
-  }
 }
