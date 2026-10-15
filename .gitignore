@@ -17,6 +17,12 @@ next-env.d.ts
 # production / build
 /build
 
+# legacy Jekyll site leftovers — the old site is kept on disk as a local
+# backup only; it is never updated and must never be committed.
+/_site/
+/.sass-cache/
+/Gemfile.lock
+
 # misc / os
 .DS_Store
 Thumbs.db
