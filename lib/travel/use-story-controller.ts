@@ -177,8 +177,23 @@ export function useStoryController(
   }, [trip, rebuildAnchors]);
 
   // ---- scene activation (IntersectionObserver over the mid viewport band)
+  //
+  // The sections are found in the DOM, NOT read from a ref registry
+  // (2026-10-17 fix). They used to be collected by a `registerSection`
+  // callback into a ref Map, and this effect observed whatever the map held.
+  // That is order-dependent: the story only mounts after track.json resolves
+  // (track is 1.6 MB and fetched; trip/scenes are synchronous imports), so the
+  // effect ran in the commit that still rendered "Loading trip data…",
+  // observed an empty map, and never ran again — `trip` was non-null from the
+  // start and `scenes` never changes identity, so no dependency ever moved.
+  // The symptom was total: no block ever got `.active`, so neither the block's
+  // opacity lift nor its accent spine appeared. Querying `[data-scene-id]`
+  // deletes the ordering assumption; `track` stays in the deps because the
+  // sections cannot exist before it lands.
   useEffect(() => {
     if (!trip) return;
+    const els = document.querySelectorAll<HTMLElement>("[data-scene-id]");
+    if (!els.length) return; // story not mounted yet — this effect re-runs
     const rootMargin = "-45% 0px -50% 0px";
     const io = new IntersectionObserver(
       (entries) => {
@@ -194,9 +209,9 @@ export function useStoryController(
       },
       { rootMargin, threshold: 0 }
     );
-    for (const el of sectionRefs.current.values()) io.observe(el);
+    els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [trip, scenes]);
+  }, [trip, track, scenes]);
 
   // ---- global scroll position -> target time (piecewise linear)
   const updateProgress = useCallback(() => {

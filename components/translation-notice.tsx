@@ -2,14 +2,34 @@ import Link from "next/link";
 import { Languages } from "lucide-react";
 
 /**
- * "Machine-translation draft" notice (2026-09-07) — mounted on the Chinese
- * pages whose copy is still a temporary auto-translation (currently the zh
- * home and the zh CV, both from the 2026-09-06 draft batch). Non-dismissible
- * by design: it is a content disclaimer for readers, not a UI nicety.
+ * "Machine-translation draft" notice (2026-09-07, rolled out to every Chinese
+ * page 2026-10-17) — a non-dismissible content disclaimer for readers, shown
+ * at the top of a zh page whose copy is still a temporary auto-translation.
  *
- * Removal is manual and per page — once the user hand-writes a page's
- * translation, delete that page's <TranslationNotice> mount (the banner
- * component itself stays for the remaining drafts).
+ * ── How to maintain this (for a future agent) ─────────────────────────────
+ * Retire ONE page (its Chinese is now hand-written / reviewed):
+ *   1. delete that page's `<TranslationNotice href="…" />` mount;
+ *   2. drop the now-unused import.
+ *   Nothing else references it — there is no registry, no config, no flag.
+ *   Both edits are one-liners in a single file.
+ *
+ * Where it is currently mounted (`grep -rn "TranslationNotice" app components`):
+ *   /zh            app/zh/page.tsx
+ *   /cv/zh         components/cv/cv-folio.tsx   (renders only when lang==="zh")
+ *   /blog/zh       app/blog/zh/page.tsx
+ *   /project/zh    app/project/zh/page.tsx
+ *   /travel/zh     app/travel/zh/page.tsx
+ *   /guestbook/zh  app/guestbook/zh/page.tsx
+ *
+ * Two hard rules:
+ *   - NEVER on /about/zh. That page's Chinese is the ORIGINAL text (owner-
+ *     written), not a translation — user 2026-10-17.
+ *   - NEVER on a zh page whose Chinese is the source language (e.g. a Chinese
+ *     blog post): the notice claims the page is a draft *of an English page*.
+ *
+ * `href` is the page's English counterpart (or "/" for the home page). The
+ * visual is plain Tailwind — no CSS class to keep in sync.
+ * ──────────────────────────────────────────────────────────────────────────
  */
 
 export function TranslationNotice({ href }: { href: string }) {

@@ -12,8 +12,9 @@ links:
   - label: "树洞帖子"
     href: "https://thuhollow.github.io/?##122635"
 pdf: "/assets/project/stat-summary-note/summary.pdf"
-summary: "Long-running course summary note for the statistics minor courses at Tsinghua, compiled in LaTeX with an indexed PDF."
-summaryZh: "清华大学统计学辅修课程的长期总结笔记，LaTeX 编写，附可检索 PDF。"
+summary:
+  en: "Long-running course summary note for the statistics minor courses at Tsinghua, compiled in LaTeX with an indexed PDF."
+  zh: "清华大学统计学辅修课程的长期总结笔记，LaTeX 编写，附可检索 PDF。"
 ---
 
 Recent version updated @ 2024/Sept/20. Fixed some typos.

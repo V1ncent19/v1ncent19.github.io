@@ -24,15 +24,11 @@
       "深沢"
     ]
   },
-  "cover": "/assets/pilgrimage/just-because/card/img-2748.webp",
+  "cover": "/assets/photos/pilgrimage/just-because/cover.png",
   "coverPos": "center 30%",
   "cardMeta": {
     "en": "Anitabi pilgrimage map",
     "zh": "圣地巡礼地图"
-  },
-  "cardCta": {
-    "en": "Ride the route",
-    "zh": "沿路线圣地巡礼"
   },
   "cardFacts": {
     "en": [

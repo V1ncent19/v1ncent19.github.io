@@ -2,15 +2,16 @@
 title: "High Dimensional Statistics Note 2024-2025"
 slug: "high-dimensional-statistics-note-2024-2025"
 type: "note"
-status: "active"
+status: "completed"
 startedAt: "2024-06"
 updatedAt: "2025-06-10"
 featured: false
 tags: ["statistics"]
 links: []
 pdf: "/assets/project/high-dimensional-statistics-note-2024/HighDimSum.pdf"
-summary: "Reading notes on high-dimensional statistics, following Wainwright, Vershynin, Rigollet–Hütter and van Handel."
-summaryZh: "高维统计阅读笔记，主要参照 Wainwright、Vershynin、Rigollet–Hütter 与 van Handel。"
+summary:
+  en: "Reading notes on high-dimensional statistics, following Wainwright, Vershynin, Rigollet–Hütter and van Handel."
+  zh: "高维统计阅读笔记，主要参照 Wainwright、Vershynin、Rigollet–Hütter 与 van Handel。"
 ---
 
 ***Still updating.***

@@ -18,8 +18,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
-import type { NavId, NavItem } from "@/content/navigation";
-import { homeCards } from "@/content/navigation";
+import type { NavId, NavItem } from "@/content/site/navigation";
+import { homeCards } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import { getBlogPosts, type BlogCategory } from "@/lib/blog";
 import { copy, formatMonth } from "@/lib/i18n";
@@ -137,6 +137,9 @@ const POST_TONE: Record<BlogCategory, string> = {
     "bg-tertiary-soft text-tertiary transition-colors group-hover:bg-tertiary group-hover:text-on-tertiary",
   documentation:
     "bg-accent-soft text-accent transition-colors group-hover:bg-accent group-hover:text-on-accent",
+  /* 游记（2026-10-17）：只在 Blog 索引出现，本 feed 用不到，但 Record 键必须齐。 */
+  travel:
+    "bg-[var(--curated-soft)] text-[var(--curated)] transition-colors group-hover:bg-[var(--curated)] group-hover:text-on-brand",
 };
 
 /** "2024-09-20" → "2024年9月20日" */
@@ -404,7 +407,7 @@ export default function ZhHomePage() {
 
           <GatewayReveal className="grid grid-cols-1 gap-5 lg:grid-cols-12">
             <GatewayLink
-              href={homeCards[0].hrefZh}
+              href={homeCards[0].href.zh}
               style={{ "--gw-i": 0 } as CSSProperties}
               className="gw-item group block h-full no-underline hover:no-underline lg:col-span-5"
             >
@@ -415,7 +418,7 @@ export default function ZhHomePage() {
               {homeCards.slice(1).map((item, j) => (
                 <GatewayLink
                   key={item.id}
-                  href={item.hrefZh}
+                  href={item.href.zh}
                   style={{ "--gw-i": j + 1 } as CSSProperties}
                   className="gw-item group block h-full no-underline hover:no-underline"
                 >
@@ -592,7 +595,7 @@ function GatewayCard({
           {/* eslint-disable-next-line @next/next/no-img-element -- hover-time data-src swap is incompatible with next/image; never part of LCP */}
           <img
             alt=""
-            data-peek-src={`/assets/navigation/web/${id}.webp`}
+            data-peek-src={`/assets/home/nav/${id}.webp`}
             decoding="async"
             style={{
               objectPosition: PEEK_FRAME[id].pos,

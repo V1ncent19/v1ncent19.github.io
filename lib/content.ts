@@ -10,6 +10,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { pick, type Lang, type Localized } from "@/lib/localized";
 
 const contentRoot = path.join(process.cwd(), "content");
 
@@ -28,6 +29,10 @@ export interface Profile {
   familyName: string;
   tagline: string;
   role: { en: string; zh: string };
+  /** Current institution, printed after the role on the CV identity card. */
+  affiliation: string;
+  /** Where I am from (city/province/country) — shown as-is in both languages. */
+  location: string;
   avatar: string;
   cv: { en: string | null; zh: string | null };
   email: string;
@@ -43,7 +48,7 @@ export interface Profile {
   license?: { label: string; href: string };
 }
 
-const profilePath = path.join(contentRoot, "profile.json");
+const profilePath = path.join(contentRoot, "site", "profile.json");
 
 export function getProfile(): Profile {
   const raw = fs.readFileSync(profilePath, "utf8");
@@ -54,7 +59,9 @@ export function getProfile(): Profile {
  * About (markdown, one file per language)
  * ------------------------------------------------------------------------- */
 
-export type ContentLang = "en" | "zh";
+/** One language. Alias of `Lang` so the content layer and the UI layer cannot
+ *  drift into two different "en" | "zh" unions. */
+export type ContentLang = Lang;
 
 export function getAbout(lang: ContentLang): string {
   const file = path.join(contentRoot, "about", `${lang}.md`);
@@ -97,9 +104,17 @@ export interface ProjectFrontmatter {
   links?: ProfileLink[];
   /** Optional PDF asset that summarises / constitutes the project. */
   pdf?: string;
-  /** Card / page summary; English preferred, Chinese via `summaryZh`. */
-  summary?: string;
-  summaryZh?: string;
+  /**
+   * Card / page summary as `{ en, zh }` (2026-10-17: was `summary` +
+   * `summaryZh`). Read it through `projectSummary()`, never directly — that is
+   * where the fallback lives.
+   *
+   * `title` stays a plain string on purpose: a project name is a proper noun
+   * ("Tsinghua Feiyue Handbook"), i.e. language-neutral under rule 3 of
+   * lib/localized.ts. If a project ever needs a real Chinese name, give it the
+   * same `{ en, zh }` treatment rather than a `titleZh` suffix.
+   */
+  summary?: Localized;
 }
 
 export interface Project {
@@ -123,10 +138,68 @@ const PROJECT_STATUSES: ReadonlySet<string> = new Set<ProjectStatus>([
 
 const projectDir = path.join(contentRoot, "project");
 
+/**
+ * Validate a `{ en, zh }` value. A bare string or a `*Zh` sibling is a build
+ * error rather than a silent in-memory migration — accepting both shapes is
+ * exactly how this repo accumulated nine of them.
+ */
+function readLocalized(
+  value: unknown,
+  field: string,
+  where: string,
+): Localized | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value === "string") {
+    throw new Error(
+      `[${where}] \`${field}\` must be an object { en, zh }; a bare string is ` +
+        `the retired single-language form.`,
+    );
+  }
+  if (typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`[${where}] \`${field}\` must be an object { en, zh }.`);
+  }
+  const o = value as Record<string, unknown>;
+  const extra = Object.keys(o).filter((k) => k !== "en" && k !== "zh");
+  if (extra.length > 0) {
+    throw new Error(
+      `[${where}] \`${field}\` has unknown key(s) ${extra.join(", ")} — only ` +
+        `"en" and "zh" are allowed.`,
+    );
+  }
+  const out: Localized = {};
+  if (typeof o.en === "string" && o.en.trim()) out.en = o.en.trim();
+  if (typeof o.zh === "string" && o.zh.trim()) out.zh = o.zh.trim();
+  if (!out.en && !out.zh) {
+    throw new Error(
+      `[${where}] \`${field}\` is empty — fill "en" (the base) or "zh".`,
+    );
+  }
+  return out;
+}
+
+/** Reject a retired `*Zh` / `*En` / `*_zh` key with a message that says the fix. */
+function rejectLegacyKeys(
+  raw: Record<string, unknown>,
+  where: string,
+  retired: string[],
+): void {
+  for (const key of retired) {
+    if (raw[key] !== undefined) {
+      throw new Error(
+        `[${where}] \`${key}\` is retired — nest it instead: ` +
+          `\`${key.replace(/(Zh|En|_[a-z]{2})$/, "")}: { en: …, zh: … }\`.`,
+      );
+    }
+  }
+}
+
 function readProjectFile(file: string): Project {
   const raw = fs.readFileSync(path.join(projectDir, file), "utf8");
   const { data, content } = matter(raw);
   const meta = data as Partial<ProjectFrontmatter>;
+  const where = `content/project/${file}`;
+
+  rejectLegacyKeys(data as Record<string, unknown>, where, ["summaryZh"]);
 
   const errors: string[] = [];
   const require = (key: keyof ProjectFrontmatter) => {
@@ -150,9 +223,7 @@ function readProjectFile(file: string): Project {
 
   if (errors.length > 0) {
     throw new Error(
-      `[content/project/${file}] invalid front-matter:\n  - ${errors.join(
-        "\n  - ",
-      )}`,
+      `[${where}] invalid front-matter:\n  - ${errors.join("\n  - ")}`,
     );
   }
 
@@ -168,8 +239,7 @@ function readProjectFile(file: string): Project {
       tags: meta.tags ?? [],
       links: meta.links ?? [],
       pdf: meta.pdf,
-      summary: meta.summary,
-      summaryZh: meta.summaryZh,
+      summary: readLocalized(meta.summary, "summary", where),
     },
     body: content,
   };
@@ -198,13 +268,39 @@ export function getProjectBySlug(slug: string): Project | undefined {
 }
 
 export function projectSummary(project: Project, lang: ContentLang): string {
-  const { summary, summaryZh } = project.meta;
-  if (lang === "zh") return summaryZh || summary || "";
-  return summary || summaryZh || "";
+  return pick(project.meta.summary, lang);
+}
+
+/**
+ * Marker that splits a project body into its English and Chinese halves.
+ *
+ * One md file, two bodies, separated by an HTML comment — invisible when the
+ * file is read as markdown on GitHub, impossible to confuse with prose, and
+ * still a single file to open and edit. Above the marker is English, below it
+ * Chinese.
+ *
+ * NO marker (the common case) means "one body for both languages": either the
+ * text is language-neutral, or the author deliberately interleaves the two
+ * (content/project/stat-summary-note.md is like that — the note is written in
+ * both languages, paragraph by paragraph, for both audiences). Splitting such
+ * a file would mean rewriting it, which is an editorial decision, not a
+ * formatting one.
+ */
+const ZH_BODY_MARKER = /^<!--\s*zh\s*-->\s*$/m;
+
+export function projectBody(project: Project, lang: ContentLang): string {
+  const body = project.body;
+  const match = ZH_BODY_MARKER.exec(body);
+  if (!match) return body.trim();
+
+  const en = body.slice(0, match.index).trim();
+  const zh = body.slice(match.index + match[0].length).trim();
+  const wanted = lang === "zh" ? zh : en;
+  return wanted || en || zh;
 }
 
 /* ---------------------------------------------------------------------------
- * Gallery manifest (content/gallery/items.json, generated by `gallery:gen`)
+ * Gallery manifest (content/travel/gallery/items.json, generated by `gallery:gen`)
  * ------------------------------------------------------------------------- */
 
 /**
@@ -212,16 +308,16 @@ export function projectSummary(project: Project, lang: ContentLang): string {
  * gallery:gen` preserves whatever you write and only refreshes id / source /
  * date / lat / lon / dimensions / asset URLs. Deleting a row removes a photo.
  *
- * Most text is bilingual — place / placeLocal / title as `*_en` + `*_zh`; the
- * EN page reads the `*_en` set, the ZH page the `*_zh`, each falling back to
- * the other language while empty. `alt` is deliberately SINGLE: one
- * language-neutral caption, shown in both languages, never translated.
- *   - `place_*`   — country + city (e.g. "Kaohsiung, Taiwan"); shown as the
- *     accent big title on the hover card and as the resting-bar place.
- *   - `placeLocal_*` — the specific spot / scenic name (e.g. "Shoushan
- *     Lookout" / 柴山); shown as the small grey line on the hover card.
- *   - `title_*`   — main heading of the opened (lightbox) card.
- *   - `alt`       — single caption / body copy of the opened card.
+ * Bilingual text is `{ en, zh }` everywhere (2026-10-17: the flat
+ * `place_en` / `place_zh` columns are retired — read through `pick()`):
+ *   - `place`      — country + city (e.g. "Kaohsiung, Taiwan" / 高雄); the
+ *     accent big title on the hover card and the resting-bar place.
+ *   - `placeLocal` — the specific spot / scenic name ("Shoushan Lookout" /
+ *     壽山觀景臺); the small grey line on the hover card.
+ *   - `title`      — main heading of the opened (lightbox) card. Sparse on
+ *     purpose: most photos have none and fall back to `place`.
+ * `alt` is deliberately SINGLE: one language-neutral caption, shown in both
+ * languages, never translated (rule 3 of lib/localized.ts).
  *
  * Theme colour is CONTROLLED by `featured` — the curated collection (精选集):
  * `gallery:gen` derives `color` from it (featured → the curated orange-red
@@ -239,18 +335,12 @@ export interface GalleryItem {
   source: string;
   /** Real capture date, YYYY-MM-DD (EXIF DateTimeOriginal); "" when unknown. */
   date: string;
-  /** EN: country + city (hover big title / resting place). */
-  place_en: string;
-  /** ZH: 国家、城市（如 台灣高雄）。 */
-  place_zh: string;
-  /** EN: specific spot / scenic name (hover small line). */
-  placeLocal_en: string;
-  /** ZH: 具体景点名（如 柴山）。 */
-  placeLocal_zh: string;
-  /** EN: heading of the opened card. */
-  title_en: string;
-  /** ZH: 打开卡片的大标题。 */
-  title_zh: string;
+  /** Country + city (hover big title / resting place). */
+  place: Localized;
+  /** The specific spot / scenic name (hover small line). */
+  placeLocal: Localized;
+  /** Heading of the opened card — sparse; falls back to `place`. */
+  title: Localized;
   /** Single, language-neutral caption shown in the opened card (never split). */
   alt: string;
   /** ISO 3166-1 alpha-2 country code (e.g. "TW"); "" while unknown. */
@@ -276,12 +366,17 @@ export interface GalleryItem {
   height: number;
 }
 
-const galleryPath = path.join(contentRoot, "gallery", "items.json");
+const galleryPath = path.join(
+  contentRoot,
+  "travel",
+  "gallery",
+  "items.json",
+);
 
 function parseGalleryRow(row: unknown, i: number): GalleryItem {
   const o = row as Record<string, unknown>;
   const err = (msg: string) =>
-    new Error(`[content/gallery/items.json] row ${i}: ${msg}`);
+    new Error(`[content/travel/gallery/items.json] row ${i}: ${msg}`);
   const str = (k: string, dflt = "") =>
     typeof o[k] === "string" ? (o[k] as string) : dflt;
   const num = (k: string): number => {
@@ -303,16 +398,35 @@ function parseGalleryRow(row: unknown, i: number): GalleryItem {
   const large = str("large");
   if (!large) throw err("missing `large`");
 
+  /* `place` / `placeLocal` / `title` are `{ en, zh }`. An empty side is fine
+     (falls back through `pick()`), but a flat `*_en` column is a hard error. */
+  const loc = (k: "place" | "placeLocal" | "title"): Localized => {
+    for (const retired of [`${k}_en`, `${k}_zh`]) {
+      if (o[retired] !== undefined) {
+        throw err(
+          `\`${retired}\` is retired — use \`${k}: { "en": …, "zh": … }\``,
+        );
+      }
+    }
+    const v = o[k];
+    if (v === undefined || v === null) return {};
+    if (typeof v !== "object" || Array.isArray(v)) {
+      throw err(`\`${k}\` must be an object { en, zh }`);
+    }
+    const rec = v as Record<string, unknown>;
+    const out: Localized = {};
+    if (typeof rec.en === "string" && rec.en.trim()) out.en = rec.en.trim();
+    if (typeof rec.zh === "string" && rec.zh.trim()) out.zh = rec.zh.trim();
+    return out;
+  };
+
   return {
     id,
     source: str("source"),
     date: str("date"),
-    place_en: str("place_en"),
-    place_zh: str("place_zh"),
-    placeLocal_en: str("placeLocal_en"),
-    placeLocal_zh: str("placeLocal_zh"),
-    title_en: str("title_en"),
-    title_zh: str("title_zh"),
+    place: loc("place"),
+    placeLocal: loc("placeLocal"),
+    title: loc("title"),
     alt: str("alt"),
     country_code: str("country_code"),
     originalUrl: str("originalUrl"),
@@ -333,7 +447,7 @@ export function getGalleryItems(): GalleryItem[] {
   const raw = fs.readFileSync(galleryPath, "utf8");
   const rows = JSON.parse(raw) as unknown;
   if (!Array.isArray(rows)) {
-    throw new Error("[content/gallery/items.json] expected an array of rows");
+    throw new Error("[content/travel/gallery/items.json] expected an array of rows");
   }
   return rows.map(parseGalleryRow);
 }
@@ -344,17 +458,17 @@ export function getGalleryItems(): GalleryItem[] {
  * FactsBoard (client components must never import this module — node:fs).
  * ------------------------------------------------------------------------- */
 
-/** One place on the About travel checklist. `name` is the default (zh-facing)
- * display name; `nameEn` is optional and falls back to `name`. lat/lon are
+/** One place on the About travel checklist. `name` and `note` are `{ en, zh }`
+ * (2026-10-17: `name` used to be the Chinese base with an optional `nameEn` —
+ * the only field in the repo whose fallback ran the other way). lat/lon are
  * optional WGS84 decimal degrees — BOTH must be present for the place to get
- * a marker dot on the About world map; absent coords simply omit the dot
- * (never a faked location at 0,0). */
+ * a marker dot on the globe; absent coords simply omit the dot (never a faked
+ * location at 0,0). */
 export interface TravelPlace {
-  name: string;
-  nameEn?: string;
+  name: Localized;
   /** Visit year (visited rows only), e.g. 2025. */
   year?: number;
-  note?: string;
+  note?: Localized;
   lat: number | null;
   lon: number | null;
 }
@@ -379,26 +493,25 @@ export function getTravel(): TravelData {
     }
     return rows.map((row, i) => {
       const o = row as Record<string, unknown>;
-      const name = typeof o.name === "string" ? o.name.trim() : "";
-      if (!name) {
+      const where = `content/about/travel.json ${key}[${i}]`;
+      rejectLegacyKeys(o, where, ["nameEn"]);
+      if (typeof o.name === "string") {
         throw new Error(
-          `[content/about/travel.json] ${key}[${i}]: missing \`name\``,
+          `[${where}] \`name\` must be { "en": …, "zh": … }; a bare string is ` +
+            `the retired Chinese-base form.`,
         );
+      }
+      const name = readLocalized(o.name, "name", where);
+      if (!name) {
+        throw new Error(`[${where}] missing \`name\``);
       }
       return {
         name,
-        nameEn:
-          typeof o.nameEn === "string" && o.nameEn.trim()
-            ? o.nameEn.trim()
-            : undefined,
         year:
           typeof o.year === "number" && Number.isFinite(o.year)
             ? o.year
             : undefined,
-        note:
-          typeof o.note === "string" && o.note.trim()
-            ? o.note.trim()
-            : undefined,
+        note: readLocalized(o.note, "note", where),
         lat: typeof o.lat === "number" && Number.isFinite(o.lat) ? o.lat : null,
         lon: typeof o.lon === "number" && Number.isFinite(o.lon) ? o.lon : null,
       };

@@ -4,7 +4,8 @@ import { HubHoverLink } from "@/components/travel/hub-hover-link";
 import { GalleryView, type GalleryStoryTile } from "@/components/gallery/gallery-view";
 import { getGalleryItems, getTravel } from "@/lib/content";
 import { blogPostPath, getBlogPosts } from "@/lib/blog";
-import { tripCards } from "@/lib/travel/trips";
+import { tripCards, tripFacts } from "@/lib/travel/trips";
+import { TranslationNotice } from "@/components/translation-notice";
 import { copy } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -40,18 +41,15 @@ export default function TravelZhPage() {
        文案描述一个上午的合成图巡礼。 */
     meta: trip.cardMeta?.zh ?? "互动地图游记",
     tags: trip.stops?.zh,
-    facts: trip.cardFacts?.zh ?? [
-      `${trip.days} 天`,
-      `${trip.distanceKm.toLocaleString("en-US", { maximumFractionDigits: 1 })} km`,
-      `${trip.gpsPoints.toLocaleString("en-US")} 轨迹点`,
-    ],
+    /* 与 Blog 索引卡共用同一份统计行（lib/travel/trips，2026-10-17）。 */
+    facts: tripFacts(trip, "zh"),
     cta: trip.cardCta?.zh ?? "阅读旅行志",
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
     coverPos: trip.coverPos,
-    /* 互动游记钉在瀑布流最前（2026-09-25 用户定案）；下面的食记改为按日期
-       落进时间线。 */
-    pinned: true,
+    /* 是否置顶由各游记自己的 card.json 声明（2026-10-17：原来是写死的
+       `true`，把巡礼页也一起钉住了）。不置顶的游记按出发日期并入时间线。 */
+    pinned: trip.pinned ?? false,
   }));
 
   const paris = getBlogPosts().find((p) => p.slug === PARIS_SLUG);
@@ -65,8 +63,9 @@ export default function TravelZhPage() {
       /* 显示用餐日期（用户指定的锚点），非发文日期——卡片在下方时间线里
          就落在 2024-03-20 处。卢浮宫日落缩略图作 hover 封面（2026-09-26）。 */
       facts: ["2024.03.20"],
-      cta: "阅读全文",
-      cover: "/assets/gallery/thumb/img-0462.webp",
+      /* 三张故事卡统一 CTA 文案（2026-10-17 用户要求）。 */
+      cta: "阅读旅行志",
+      cover: "/assets/photos/gallery/thumb/img-0462.webp",
       /* 不置顶：按日期并入照片时间线。 */
       date: "2024-03-20",
     });
@@ -86,7 +85,10 @@ export default function TravelZhPage() {
   if (latestTile) latestTile.latest = copy.zh.travel.latestBadge;
 
   return (
-    <section className="shell pb-24">
+    <>
+      {/* 机翻草稿声明（人工重写本页后删除这一行 + 上面的 import） */}
+      <TranslationNotice href="/travel" />
+      <section className="shell pb-24">
       <div className="mx-auto max-w-5xl">
         {/* ---- 页头：标题与导语在左，可拖拽地球在右（打开即见两个主元素）。
             移动端：地球落到标题下方居中。 ---- */}
@@ -136,5 +138,6 @@ export default function TravelZhPage() {
             上方「游记与照片」流内，独立 /gallery 页面一并移除。 */}
       </div>
     </section>
+    </>
   );
 }

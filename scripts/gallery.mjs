@@ -6,14 +6,14 @@
  * master, 142 MB of 14 MP JPEGs — the originals themselves are never edited in
  * place), and:
  *   1. generates the two committed web tiers under
- *      public/assets/gallery/thumb/<id>.webp  (~480px long edge) and
- *      public/assets/gallery/large/<id>.webp  (~1680px long edge),
+ *      public/assets/photos/gallery/thumb/<id>.webp  (~480px long edge) and
+ *      public/assets/photos/gallery/large/<id>.webp  (~1680px long edge),
  *   2. copies each original byte-for-byte into
- *      public/assets/gallery/original/<source>  so the lightbox download
+ *      public/assets/photos/gallery/original/<source>  so the lightbox download
  *      button can serve it same-origin (decision 2026-09-07: in-repo originals
  *      beat an external OneDrive link on simplicity and China reachability —
  *      the download is exactly as reachable as the site itself),
- *   3. maintains content/gallery/items.json, the gallery manifest.
+ *   3. maintains content/travel/gallery/items.json, the gallery manifest.
  *
  * items.json is the source of truth for the HUMAN fields — the bilingual text
  * block (place / placeLocal / title as `*_en` + `*_zh`, plus a SINGLE
@@ -50,8 +50,14 @@ import exifr from "exifr";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC_DIR = path.join(root, "GalleryPhoto");
-const MANIFEST = path.join(root, "content", "gallery", "items.json");
-const ASSET_ROOT = path.join(root, "public", "assets", "gallery");
+const MANIFEST = path.join(
+  root,
+  "content",
+  "travel",
+  "gallery",
+  "items.json",
+);
+const ASSET_ROOT = path.join(root, "public", "assets", "photos", "gallery");
 const THUMB_DIR = path.join(ASSET_ROOT, "thumb");
 const LARGE_DIR = path.join(ASSET_ROOT, "large");
 const ORIGINAL_DIR = path.join(ASSET_ROOT, "original");
@@ -148,7 +154,7 @@ function uniqueId(file, taken) {
 }
 
 /**
- * Mirror one original into public/assets/gallery/original/ (byte-for-byte so
+ * Mirror one original into public/assets/photos/gallery/original/ (byte-for-byte so
  * the download button serves the untouched file). Skips the copy when the
  * destination already matches by size — the run is incremental.
  */
@@ -170,6 +176,24 @@ async function ensureDir(dir) {
 function loadManifest() {
   if (!fs.existsSync(MANIFEST)) return [];
   return JSON.parse(fs.readFileSync(MANIFEST, "utf8"));
+}
+
+const asText = (v) => (typeof v === "string" ? v.trim() : "");
+
+/**
+ * Bilingual field → `{ en, zh }`, folding the retired flat forms on the way
+ * through: `place: { en, zh }` (current) ← `place_en` / `place_zh` ← `place`
+ * (the oldest single-language form). One run over an old manifest upgrades it.
+ */
+function loc(prior, field) {
+  const nested = prior?.[field];
+  if (nested && typeof nested === "object" && !Array.isArray(nested)) {
+    return { en: asText(nested.en), zh: asText(nested.zh) };
+  }
+  return {
+    en: asText(prior?.[`${field}_en`]) || asText(nested),
+    zh: asText(prior?.[`${field}_zh`]),
+  };
 }
 
 async function main() {
@@ -240,34 +264,39 @@ async function main() {
       // human-edited value survives only when this file has no GPS tag.
       lat: lat ?? prior?.lat ?? null,
       lon: lon ?? prior?.lon ?? null,
-      // bilingual human text — prefer the per-language key, else carry the old
-      // single-language value into the EN slot on the first upgrade run.
       country_code: prior?.country_code ?? "",
-      place_en: prior?.place_en || prior?.place || "",
-      place_zh: prior?.place_zh ?? "",
-      placeLocal_en: prior?.placeLocal_en || prior?.placeLocal || "",
-      placeLocal_zh: prior?.placeLocal_zh ?? "",
-      title_en: prior?.title_en || prior?.title || "",
-      title_zh: prior?.title_zh ?? "",
+      // Bilingual human text is `{ en, zh }` (2026-10-17). `loc()` also folds
+      // the retired flat forms (`place_en` / `place_zh`, and the even older
+      // single `place`) so one run over an old manifest upgrades it in place.
+      place: loc(prior, "place"),
+      placeLocal: loc(prior, "placeLocal"),
+      title: loc(prior, "title"),
       // `alt` is single + language-neutral: keep the authored value, or fold
       // the retired bilingual/single forms in on the first run over an old file.
       alt: prior?.alt || prior?.alt_en || prior?.alt_zh || "",
-      originalUrl: handUrl || `/assets/gallery/original/${encodeURI(file)}`,
+      originalUrl: handUrl || `/assets/photos/gallery/original/${encodeURI(file)}`,
       // `featured` (curated flag) is human-authored; `color` derives from it on
       // every run — featured → curated orange-red accent, else "" (default blue).
       featured: prior?.featured === true,
       color: prior?.featured === true ? CURATED_HEX : "",
       badge: prior?.badge ?? "",
-      thumb: `/assets/gallery/thumb/${id}.webp`,
-      large: `/assets/gallery/large/${id}.webp`,
+      thumb: `/assets/photos/gallery/thumb/${id}.webp`,
+      large: `/assets/photos/gallery/large/${id}.webp`,
       width: largeInfo.width,
       height: largeInfo.height,
     };
-    // Retired key forms (single-language place/title/alt, bilingual alt_en/zh)
-    // must not ride along in the merged row forever.
-    delete row.place;
-    delete row.placeLocal;
-    delete row.title;
+    // Retired key forms (bilingual place/title columns, bilingual alt) must not
+    // ride along in the merged row forever — `...prior` copied them over.
+    for (const field of ["place", "placeLocal", "title"]) {
+      delete row[`${field}_en`];
+      delete row[`${field}_zh`];
+      // "Empty on both sides" means "not written yet": drop the field entirely
+      // rather than ship `{ en: "", zh: "" }`. The UI already falls back to
+      // `place` when `title` is absent, so the rendered result is identical and
+      // the manifest stays readable (`check:i18n` errors on empty stubs).
+      const value = row[field];
+      if (value && !value.en && !value.zh) delete row[field];
+    }
     delete row.alt_en;
     delete row.alt_zh;
     rows.push(row);

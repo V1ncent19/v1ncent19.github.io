@@ -27,4 +27,13 @@ export const POST_TONE: Record<BlogCategory, PostTone> = {
     dot: "bg-accent",
     value: "text-accent",
   },
+  /* Travel logs (2026-10-17): the gallery's curated orange-red. It is the one
+     hue in the palette that reads as "curated collection" rather than a
+     discipline, and it is already theme-paired. `--curated` has no Tailwind
+     alias, so it is referenced the way gallery-view.tsx does. */
+  travel: {
+    chip: "bg-[var(--curated-soft)] text-[var(--curated)]",
+    dot: "bg-[var(--curated)]",
+    value: "text-[var(--curated)]",
+  },
 };

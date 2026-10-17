@@ -8,9 +8,24 @@ import type { CvSectionId } from "@/content/cv/entries";
 import type { BlogCategory } from "@/lib/blog";
 import type { ProjectStatus, ProjectType } from "@/lib/content";
 
-export type Lang = "en" | "zh";
+import type { Lang } from "@/lib/localized";
+/* `Lang` lives in lib/localized.ts together with the `pick()` resolver — the
+   interface language and the content fallback rule are the same decision, and
+   splitting them is what let the two drift apart. Re-exported here so the
+   ~30 existing `import { copy, type Lang } from "@/lib/i18n"` call sites stay
+   untouched. */
+export type { Lang };
 
 export interface Copy {
+  /** Chrome that is not tied to one section. */
+  common: {
+    /** "Read" CTA on the project cards inside the CV page. */
+    read: string;
+    /** "PDF" micro-label before the file size. */
+    pdf: string;
+    /** "SECT" micro-label before a section number. */
+    sect: string;
+  };
   about: {
     title: string;
     factsTitle: string;
@@ -52,6 +67,7 @@ export interface Copy {
     contact: string;
     from: string;
     now: string;
+    route: string;
     interests: string;
     interestsLead: string;
     honors: string;
@@ -85,6 +101,8 @@ export interface Copy {
     sortDate: string;
     sortTitle: string;
     minRead: string;
+    /** CTA verb on a card that links to a travel log instead of a post. */
+    readTravel: string;
     /** Back-link label from a post page to the blog index. */
     allPosts: string;
     category: Record<BlogCategory, string>;
@@ -150,6 +168,11 @@ export interface Copy {
 
 export const copy: Record<Lang, Copy> = {
   en: {
+    common: {
+      read: "Read",
+      pdf: "PDF",
+      sect: "SECT",
+    },
     about: {
       title: "About",
       factsTitle: "More random things",
@@ -191,6 +214,7 @@ export const copy: Record<Lang, Copy> = {
       contact: "Contact",
       from: "From",
       now: "Now",
+      route: "Route",
       interests: "Interests",
       interestsLead:
         "Statistical theory under heavy tails and shape constraints — robust, minimax, and distribution-free methods in high dimensions.",
@@ -234,11 +258,13 @@ export const copy: Record<Lang, Copy> = {
       sortDate: "By date",
       sortTitle: "By title",
       minRead: "min read",
+      readTravel: "Read the log",
       allPosts: "All posts",
       category: {
         knowledge: "Mathematics & Statistics",
         cuisine: "Cuisine",
         documentation: "Documentation",
+        travel: "Travel logs",
       },
       lang: { zh: "中文", en: "English", mix: "中文 / English" },
       empty: "Nothing matches that search — try another keyword or clear the filters.",
@@ -288,6 +314,11 @@ export const copy: Record<Lang, Copy> = {
   },
 
   zh: {
+    common: {
+      read: "阅读",
+      pdf: "PDF",
+      sect: "SECT",
+    },
     about: {
       title: "关于",
       factsTitle: "不正经爱好 & more random things",
@@ -329,6 +360,7 @@ export const copy: Record<Lang, Copy> = {
       contact: "联系",
       from: "来自",
       now: "现在",
+      route: "路线",
       interests: "研究兴趣",
       interestsLead: "重尾与形状约束下的统计理论——高维中的稳健、极小极大与无分布方法。",
       honors: "获奖与荣誉",
@@ -370,11 +402,13 @@ export const copy: Record<Lang, Copy> = {
       sortDate: "按时间",
       sortTitle: "按标题",
       minRead: "分钟",
+      readTravel: "阅读旅行志",
       allPosts: "全部文章",
       category: {
         knowledge: "数学与统计",
         cuisine: "料理",
         documentation: "文档·资料",
+        travel: "旅行志",
       },
       lang: { zh: "中文", en: "英文", mix: "中英" },
       empty: "没有匹配的笔记——换个关键词或清除筛选试试。",

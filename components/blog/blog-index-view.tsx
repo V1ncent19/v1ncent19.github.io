@@ -10,7 +10,14 @@ import { SectionMark } from "@/components/layout/section-mark";
 import { POST_TONE } from "./post-tone";
 import { LedText } from "./led-text";
 
-const CAT_ORDER: BlogCategory[] = ["knowledge", "cuisine", "documentation"];
+/** Chip order on the index. `travel` is last: the logs are the newest arrival
+ *  and belong after the three writing categories. */
+const CAT_ORDER: BlogCategory[] = [
+  "knowledge",
+  "cuisine",
+  "documentation",
+  "travel",
+];
 
 /** `id` of the category-chip strip — the `/blog#category` scroll target. */
 const CATEGORY_ANCHOR_ID = "category";
@@ -157,7 +164,7 @@ export function BlogIndexView({
         </header>
 
         {/* ---- Search ---- */}
-        <div className="mt-8 flex w-full items-center rounded-xl border border-line bg-surface shadow-sm transition hover:shadow-card">
+        <div className="mt-8 flex w-full items-center rounded-xl border border-line bg-surface shadow-sm transition hover:shadow-ctl">
           <Search className="ml-4 h-5 w-5 shrink-0 text-brand" aria-hidden />
           <input
             type="search"
@@ -345,7 +352,13 @@ function PostCard({
 }) {
   const s = copy[lang];
   const tone = POST_TONE[post.category];
-  const href = `/blog/${post.date.slice(0, 4)}/${post.slug}`;
+  /** Travel logs carry their own `href` (…/travel/<id>); a post's link is
+   *  derivable from its date + slug. */
+  const href = post.href ?? `/blog/${post.date.slice(0, 4)}/${post.slug}`;
+  /** Travel cards report days · distance; only prose has a read time. */
+  const meta =
+    post.meta ??
+    (post.minutes ? `≈ ${post.minutes} ${s.blog.minRead}` : null);
   return (
     <Link
       href={href}
@@ -359,10 +372,12 @@ function PostCard({
             <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
             {s.blog.category[post.category]}
           </span>
-          <span className="text-xs text-faint">·</span>
-          <span className="text-xs font-medium text-muted">
-            ≈ {post.minutes} {s.blog.minRead}
-          </span>
+          {meta ? (
+            <>
+              <span className="text-xs text-faint">·</span>
+              <span className="text-xs font-medium text-muted">{meta}</span>
+            </>
+          ) : null}
         </div>
         <time dateTime={post.date} className="ui-text text-xs font-medium tracking-wide text-faint">
           {formatDate(post.date, lang)}
@@ -376,14 +391,20 @@ function PostCard({
         <LedText parts={post.excerptParts} query={query} />
       </p>
 
-      <div className="ui-text mt-4 flex items-center justify-between gap-3 border-t border-line pt-3 text-xs">
-        <span className="font-medium text-faint">{s.blog.lang[post.lang]}</span>
+      {/* The dominant-language chip that used to sit on the left of this row
+          is gone (user 2026-10-17): the index now mixes hand-written posts
+          with the travel logs, all rendered in whichever language the card
+          itself is written in, so labelling each card "中文 / English" only
+          reported what the title already shows. The single post page still
+          carries the chip — there it answers "what am I about to read".
+          `post.lang` stays on the card model; it also drives date formatting. */}
+      <div className="ui-text mt-4 flex items-center justify-end gap-3 border-t border-line pt-3 text-xs">
         <span className="flex items-center gap-3">
           <span aria-hidden className="font-mono font-medium text-faint">
             #{post.category}
           </span>
           <span className="inline-flex items-center gap-1 font-semibold text-brand">
-            {lang === "zh" ? "阅读" : "Read"}
+            {post.cta ?? (lang === "zh" ? "阅读" : "Read")}
             <ArrowRight
               className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
               aria-hidden

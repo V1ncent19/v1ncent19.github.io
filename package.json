@@ -9,12 +9,15 @@
     "lint": "eslint",
     "gallery:gen": "node scripts/gallery.mjs",
     "badges": "node scripts/build-badges.mjs",
+    "check:refs": "node scripts/check-refs.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "sync:data": "node scripts/sync-trip-data.mjs",
     "anitabi:snapshot": "node scripts/anitabi-points.mjs",
     "anitabi:images": "node scripts/anitabi-images.mjs",
     "pilgrimage:photos": "node scripts/pilgrimage-photos.mjs",
     "pilgrimage:derive": "node scripts/pilgrimage-derive.mjs",
-    "prebuild": "npm run badges",
-    "predev": "npm run badges"
+    "prebuild": "npm run badges && npm run sync:data && npm run check:refs && npm run check:i18n",
+    "predev": "npm run badges && npm run sync:data && npm run check:refs && npm run check:i18n"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",

@@ -29,11 +29,12 @@
 import { useCallback, useState } from "react";
 import type { TravelData, TravelPlace } from "@/lib/content";
 import { copy, type Lang } from "@/lib/i18n";
+import { pick } from "@/lib/localized";
 import { Check, ChevronDown } from "lucide-react";
 import { TravelGlobe, type GlobePoint } from "@/components/about/travel-globe";
 
 function placeName(p: TravelPlace, lang: Lang): string {
-  return lang === "zh" ? p.name || p.nameEn || "" : p.nameEn || p.name;
+  return pick(p.name, lang);
 }
 
 /**
@@ -104,38 +105,55 @@ function ChecklistColumn({
   const previewCount = compact ? Math.min(3, places.length) : places.length;
   const restCount = places.length - previewCount;
   const rowLetter = kind === "visited" ? "v" : "w";
+  /* Legend row contents, shared by the two wrappers below. */
+  const legend = (
+    <>
+      {dashed ? (
+        <span
+          aria-hidden
+          className="h-2.5 w-2.5 flex-none rounded-full border-[1.5px] border-dashed border-[var(--travel-wish)]"
+        />
+      ) : (
+        <span
+          aria-hidden
+          className="h-2.5 w-2.5 flex-none rounded-full bg-[var(--travel-visited)]"
+        />
+      )}
+      <span>{label}</span>
+      <span className="ui-text tabular-nums text-xs text-muted">
+        {count}
+      </span>
+    </>
+  );
   return (
     <div className="min-w-0">
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        aria-controls={controlId}
-        className={`flex w-full items-center gap-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-md ${
-          open ? "text-ink" : "text-muted hover:text-ink"
-        }`}
-      >
-        {dashed ? (
-          <span
-            aria-hidden
-            className="h-2.5 w-2.5 flex-none rounded-full border-[1.5px] border-dashed border-[var(--travel-wish)]"
-          />
-        ) : (
-          <span
-            aria-hidden
-            className="h-2.5 w-2.5 flex-none rounded-full bg-[var(--travel-visited)]"
-          />
-        )}
-        <span>{label}</span>
-        <span className="ui-text tabular-nums text-xs text-muted">
-          {count}
-        </span>
-        {/* No chevron (user 2026-09-27): the whole legend row is the toggle
-            already — the old right-edge ChevronDown that signalled expand/
-            collapse is dropped. The show-more bar inside keeps its own
-            chevron, so "expand/collapse" is still communicated once the
-            list is open. */}
-      </button>
+      {compact ? (
+        /* Travel-hub legend (2026-10-17 user request): the two lists there are
+           always open (first 3 rows + "show more"), so the only thing this
+           button could still do is hide them. That toggle is gone — the row is
+           now a plain legend; expanding is the show-more bar's job. The About
+           page (globe mode) keeps the real collapse/expand button. */
+        <div className="flex w-full items-center gap-2 text-sm text-ink">
+          {legend}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={controlId}
+          className={`flex w-full items-center gap-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-md ${
+            open ? "text-ink" : "text-muted hover:text-ink"
+          }`}
+        >
+          {legend}
+          {/* No chevron (user 2026-09-27): the whole legend row is the toggle
+              already — the old right-edge ChevronDown that signalled expand/
+              collapse is dropped. The show-more bar inside keeps its own
+              chevron, so "expand/collapse" is still communicated once the
+              list is open. */}
+        </button>
+      )}
 
       <div
         id={controlId}
@@ -211,8 +229,8 @@ function ChecklistColumn({
                         {p.year}
                       </span>
                     ) : null}
-                    {p.note ? (
-                      <span className="text-muted"> — {p.note}</span>
+                    {pick(p.note, lang) ? (
+                      <span className="text-muted"> — {pick(p.note, lang)}</span>
                     ) : null}
                   </span>
                 </li>
@@ -286,8 +304,8 @@ function ChecklistColumn({
                               {p.year}
                             </span>
                           ) : null}
-                          {p.note ? (
-                            <span className="text-muted"> — {p.note}</span>
+                          {pick(p.note, lang) ? (
+                            <span className="text-muted"> — {pick(p.note, lang)}</span>
                           ) : null}
                         </span>
                       </li>

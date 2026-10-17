@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUp, ListOrdered, X } from "lucide-react";
-import { navItems, type NavItem } from "@/content/navigation";
+import { navItems, type NavItem } from "@/content/site/navigation";
 import { site } from "@/lib/site";
 import { copy } from "@/lib/i18n";
 import { LangSwitch } from "@/components/layout/lang-switch";
@@ -39,10 +39,8 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
  */
 function isActive(pathname: string, item: NavItem): boolean {
   if (item.id === "home") return pathname === "/" || pathname === "/zh";
-  return (
-    pathname === item.href ||
-    pathname.startsWith(`${item.href}/`) ||
-    pathname === item.hrefZh
+  return Object.values(item.href).some(
+    (href) => pathname === href || pathname.startsWith(`${href}/`),
   );
 }
 
@@ -229,7 +227,7 @@ export function SiteHeader() {
                 // Keep the reader in the current UI language: nav chips point
                 // at the matching /…/zh target on Chinese pages and only the
                 // LangSwitch button ever crosses languages.
-                const target = lang === "zh" ? item.hrefZh : item.href;
+                const target = item.href[lang];
                 return (
                   <li key={item.id} className="shrink-0">
                     <Link
@@ -355,7 +353,7 @@ export function SiteHeader() {
             <ul className="flex flex-col">
               {navItems.map((item, i) => {
                 const active = isActive(pathname, item);
-                const target = lang === "zh" ? item.hrefZh : item.href;
+                const target = item.href[lang];
                 return (
                   <li
                     key={item.id}

@@ -13,7 +13,11 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 
-export type BlogCategory = "knowledge" | "cuisine" | "documentation";
+export type BlogCategory =
+  | "knowledge"
+  | "cuisine"
+  | "documentation"
+  | "travel";
 
 /** Derived from the post's prose, honest about being an estimate. */
 export type BlogLang = "zh" | "en" | "mix";
@@ -44,6 +48,15 @@ export interface BlogPost {
  * Blog index. `titleParts` / `excerptParts` are hydrated with KaTeX html
  * (lib/lede-math.ts) so cards typeset inline math; `titleText` / `excerptText`
  * are the plain prose (math dropped) that search matches and highlights.
+ *
+ * 2026-10-17 — the index also lists the travel logs (lib/blog-travel.ts), which
+ * are NOT markdown posts. The three optional fields below are what an
+ * "index entry that is not a post" needs; every real post leaves them unset so
+ * the card keeps deriving them from `date` / `minutes` / `category`:
+ *
+ *   href  — link target (trips go to /travel/<id>, not /blog/<year>/<slug>)
+ *   meta  — replaces the "≈ N min read" line (a trip reports days · distance)
+ *   cta   — replaces the "Read" verb ("Read the log")
  */
 export interface BlogPostCard {
   slug: string;
@@ -51,11 +64,15 @@ export interface BlogPostCard {
   date: string; // YYYY-MM-DD
   category: BlogCategory;
   lang: BlogLang;
-  minutes: number;
+  /** Absent on entries that are not prose (travel logs). */
+  minutes?: number;
   titleParts: LedPart[];
   excerptParts: LedPart[];
   titleText: string;
   excerptText: string;
+  href?: string;
+  meta?: string;
+  cta?: string;
 }
 
 const blogDir = path.join(process.cwd(), "content", "blog");
@@ -64,6 +81,7 @@ const CATEGORIES: ReadonlySet<string> = new Set<BlogCategory>([
   "knowledge",
   "cuisine",
   "documentation",
+  "travel",
 ]);
 
 /** Filenames whose naive camel-split would read wrong (acronym words). */

@@ -18,11 +18,18 @@ import {
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
-import { cvSections, publications } from "@/content/cv/entries";
-import { navItems } from "@/content/navigation";
+import {
+  cvHonors,
+  cvInterests,
+  cvRoute,
+  cvSections,
+  publications,
+} from "@/content/cv/entries";
+import { navItems } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
+import { pick, pickList } from "@/lib/localized";
 import { TranslationNotice } from "@/components/translation-notice";
 
 /**
@@ -33,66 +40,13 @@ import { TranslationNotice } from "@/components/translation-notice";
  * the authoritative, complete record.
  */
 
-interface Honor {
-  title: string;
-  sub: string;
-  /** Chinese draft rendering (auto-translated; user-reviewed later). */
-  titleZh?: string;
-  subZh?: string;
-  year: string;
-  dot: string;
-}
-
-const HONORS: Honor[] = [
-  {
-    title: "Honorable Mention — MCM/ICM",
-    titleZh: "美国大学生数学建模竞赛（MCM/ICM）荣誉提名",
-    sub: "Mathematical Contest in Modeling (COMAP), track A",
-    subZh: "COMAP 数学建模竞赛 · A 题 · H 奖",
-    year: "2022",
-    dot: "bg-brand",
-  },
-  {
-    title: "Scholarship for Academic Advance",
-    titleZh: "学业进步奖学金",
-    sub: "Tsinghua University",
-    subZh: "清华大学",
-    year: "2020",
-    dot: "bg-accent",
-  },
-  {
-    title: "Five-star Zijing Volunteer",
-    titleZh: "五星级紫荆志愿者",
-    sub: "五星级紫荆志愿者 · Tsinghua University Volunteer Association",
-    subZh: "清华大学学生志愿服务协会",
-    year: "2023",
-    dot: "bg-tertiary",
-  },
-  {
-    title: "Ma Yuehan Cup — Shooting",
-    titleZh: "马约翰杯 · 射击",
-    sub: "第64届马约翰杯 · 10 m air rifle 4th & air gun 5th",
-    subZh: "第64届马约翰杯 · 10 米气步枪第 4 名 & 气手枪第 5 名",
-    year: "2021",
-    dot: "bg-accent",
-  },
-];
-
-const INTERESTS = [
-  "Robust statistics",
-  "Minimax theory",
-  "High-dimensional statistical inference",
-  // "Distribution-free & conformal inference",
-  "Statistical learning theory",
-];
-
-const INTERESTS_ZH = [
-  "稳健统计",
-  "Minimax 理论",
-  "高维统计推断",
-  // "免分布与 conformal 推断",
-  "统计学习理论",
-];
+/**
+ * Bullet colours for the honours list — PRESENTATION ONLY, indexed by position
+ * (the honours themselves live in content/cv/entries.ts). `% length` keeps it
+ * total: a 5th honour wraps back to the brand dot instead of rendering a
+ * colourless bullet.
+ */
+const HONOR_TONES = ["bg-brand", "bg-accent", "bg-tertiary", "bg-accent"] as const;
 
 function pdfSizeLabel(href: string | null): string | null {
   if (!href) return null;
@@ -111,18 +65,15 @@ export function CvFolio({ lang }: { lang: Lang }) {
   const fullName = `${profile.givenName} ${profile.familyName}`;
   const cvHref = profile.cv[lang] ?? profile.cv.en ?? null;
   const pdfSize = pdfSizeLabel(cvHref);
-  const isZh = lang === "zh";
-  /** Chinese draft first when lang is zh, English otherwise. */
-  const pick = (en: string, zh?: string) => (isZh && zh ? zh : en);
-
   const statNote = getProjects().find((p) => p.meta.slug === "stat-summary-note");
   const highDim = getProjects().find(
     (p) => p.meta.slug === "high-dimensional-statistics-note-2024-2025",
   );
-  const readLabel = lang === "zh" ? "阅读" : "Read";
+  const isZh = lang === "zh";
+  const readLabel = s.common.read;
   const aboutSummary =
     navItems.find((n) => n.id === "about")?.summary[lang] ?? "";
-  const interests = isZh ? INTERESTS_ZH : INTERESTS;
+  const interests = cvInterests[lang];
 
   return (
     <div className="pb-20">
@@ -151,7 +102,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
             <a
               href={cvHref}
               download
-              className="group inline-flex shrink-0 items-center gap-3 self-start rounded-xl border border-line bg-surface p-3 pr-5 shadow-sm transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift hover:no-underline lg:self-end"
+              className="group inline-flex shrink-0 items-center gap-3 self-start rounded-xl border border-line bg-surface p-3 pr-5 shadow-sm transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-ctl hover:no-underline lg:self-end"
             >
               <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand text-on-brand transition group-hover:bg-brand-strong">
                 <Download className="h-5 w-5" aria-hidden />
@@ -162,7 +113,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
                 </span>
                 {pdfSize ? (
                   <span className="ui-text text-[11px] font-medium text-faint">
-                    PDF · {pdfSize}
+                    {`${s.common.pdf} · ${pdfSize}`}
                   </span>
                 ) : null}
               </span>
@@ -199,13 +150,13 @@ export function CvFolio({ lang }: { lang: Lang }) {
 
               <ul className="mt-6 space-y-3 text-sm">
                 <FactRow icon={Sparkles} label={s.cvFolio.now}>
-                  {profile.role[lang]} — Northwestern University
+                  {profile.role[lang]} — {profile.affiliation}
                 </FactRow>
                 <FactRow icon={MapPin} label={s.cvFolio.from}>
-                  Shenzhen, Guangdong, China
+                  {profile.location}
                 </FactRow>
-                <FactRow icon={GraduationCap} label={isZh ? "路线" : "Route"}>
-                  SZSHS · 2013 & 2016 → Tsinghua · 2019 → Northwestern · 2023
+                <FactRow icon={GraduationCap} label={s.cvFolio.route}>
+                  {cvRoute}
                 </FactRow>
               </ul>
 
@@ -311,12 +262,13 @@ export function CvFolio({ lang }: { lang: Lang }) {
               tone="bg-accent-soft text-accent"
               title={s.cvSection.education}
               sectionNo="01"
+              lang={lang}
             >
               {cvSections
                 .find((sec) => sec.id === "education")
                 ?.entries.map((entry, i) => (
                   <TimelineEntry
-                    key={entry.title}
+                    key={pick(entry.title, "en")}
                     entry={entry}
                     lang={lang}
                     first={i === 0}
@@ -331,6 +283,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
               tone="bg-brand-soft text-brand"
               title={s.cvSection.research}
               sectionNo="02"
+              lang={lang}
             >
               <ul className="space-y-4">
                 {cvSections
@@ -347,6 +300,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
               tone="bg-accent-soft text-accent"
               title={s.cvFolio.publications}
               sectionNo="03"
+              lang={lang}
             >
               <ol className="space-y-3">
                 {publications.map((pub, i) => (
@@ -389,24 +343,27 @@ export function CvFolio({ lang }: { lang: Lang }) {
               tone="bg-tertiary-soft text-tertiary"
               title={s.cvFolio.honors}
               sectionNo="04"
+              lang={lang}
             >
               <ul className="divide-y divide-line">
-                {HONORS.map((h) => (
+                {cvHonors.map((h, i) => (
                   <li
-                    key={h.title}
+                    key={pick(h.title, "en")}
                     className="flex items-start justify-between gap-4 py-3.5 first:pt-0 last:pb-0"
                   >
                     <div className="flex items-start gap-3">
                       <span
                         aria-hidden
-                        className={`mt-2 h-2 w-2 shrink-0 rounded-full ${h.dot}`}
+                        className={`mt-2 h-2 w-2 shrink-0 rounded-full ${
+                          HONOR_TONES[i % HONOR_TONES.length]
+                        }`}
                       />
                       <div>
                         <h4 className="text-lg font-semibold tracking-tight">
-                          {pick(h.title, h.titleZh)}
+                          {pick(h.title, lang)}
                         </h4>
                         <p className="mt-0.5 text-sm italic text-muted">
-                          {pick(h.sub, h.subZh)}
+                          {pick(h.sub, lang)}
                         </p>
                       </div>
                     </div>
@@ -425,6 +382,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
                 tone="bg-accent-soft text-accent"
                 title={s.cvFolio.artifacts}
                 sectionNo="05"
+                lang={lang}
               >
                 <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {[statNote, highDim].filter(Boolean).map((p) => {
@@ -574,14 +532,17 @@ function ModuleCard({
   tone,
   title,
   sectionNo,
+  lang,
   children,
 }: {
   icon: LucideIcon;
   tone: string;
   title: string;
   sectionNo: string;
+  lang: Lang;
   children: ReactNode;
 }) {
+  const s = copy[lang];
   return (
     <section className="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
       <header className="mb-5 flex items-center justify-between">
@@ -595,7 +556,7 @@ function ModuleCard({
             {title}
           </h3>
         </div>
-        <span className="ui-text font-mono text-[11px] text-faint">SECT · {sectionNo}</span>
+        <span className="ui-text font-mono text-[11px] text-faint">{`${s.common.sect} · ${sectionNo}`}</span>
       </header>
       {children}
     </section>
@@ -614,11 +575,9 @@ function TimelineEntry({
       join across entries; the dots hide the overlap) */
   first?: boolean;
 }) {
-  const isZh = lang === "zh";
-  const title = isZh && entry.titleZh ? entry.titleZh : entry.title;
-  const institution =
-    isZh && entry.institutionZh ? entry.institutionZh : entry.institution;
-  const lines = isZh && entry.linesZh?.length ? entry.linesZh : entry.lines;
+  const title = pick(entry.title, lang);
+  const institution = pick(entry.institution, lang);
+  const lines = pickList(entry.lines, lang);
   const now = entry.period?.includes("—");
   return (
     <div className="relative flex gap-4 pb-6 pl-1 last:pb-0 sm:gap-5">
@@ -684,11 +643,9 @@ function RecordEntry({
   entry: (typeof cvSections)[number]["entries"][number];
   lang: Lang;
 }) {
-  const isZh = lang === "zh";
-  const title = isZh && entry.titleZh ? entry.titleZh : entry.title;
-  const institution =
-    isZh && entry.institutionZh ? entry.institutionZh : entry.institution;
-  const lines = isZh && entry.linesZh?.length ? entry.linesZh : entry.lines;
+  const title = pick(entry.title, lang);
+  const institution = pick(entry.institution, lang);
+  const lines = pickList(entry.lines, lang);
   return (
     <li className="rounded-xl bg-surface-tint/70 px-4 py-4">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">

@@ -69,9 +69,9 @@ const CONFIG = {
   },
   /** 质量（鼠标）行为 */
   MASS: {
-    strength: 25, // 引力强度：顶点被拉向质量的最大位移（px）
+    strength: 18, // 引力强度：顶点被拉向质量的最大位移（px）
     radius: 220, // 影响半径（px）：只扭曲质量周围这个范围内的网格
-    softening: 48, // 软化长度（px）：质心附近位移 → 0，防止网格折叠出尖角
+    softening: 40, // 软化长度（px）：质心附近位移 → 0，防止网格折叠出尖角
     spring: 0.2, // 弹性跟随系数 0~1：越小越"沉重"、跟随越慢
   },
   /** 颜色与深浅（保持很淡，勿喧宾夺主） */
@@ -161,12 +161,15 @@ export function SpacetimeCanvas() {
       }
     }
 
-    /* Strongest possible inward displacement across the pointer mass and all
-       registered wells (a vertex's pull is capped by `strength` itself). */
+    /* The grid's outer boundary must stay offscreen no matter how far the
+       vertices are pulled. Since the warp pass SUMS the masses' displacement
+       vectors (2026-10-17), a vertex can move inward by at most the SUM of
+       every strength — not by the largest one, which is what this pad used to
+       assume while the pass applied wells one after another. */
     function syncPad() {
-      let max: number = CONFIG.MASS.strength;
-      for (const m of staticMasses) max = Math.max(max, m.strength);
-      const need = Math.ceil(max + CONFIG.GRID.spacing);
+      let total: number = CONFIG.MASS.strength;
+      for (const m of staticMasses) total += m.strength;
+      const need = Math.ceil(total + CONFIG.GRID.spacing);
       if (need !== gridPad) {
         gridPad = need;
         layout();
@@ -199,16 +202,22 @@ export function SpacetimeCanvas() {
       for (const m of staticMasses) {
         const r = m.el.getBoundingClientRect();
         if (r.width < 4 || r.height < 4) continue;
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        /* Cull by the well's INFLUENCE radius, never by its element box: the
+           box is a few hundred px while the influence reaches `m.radius` in
+           every direction, so a box-based test (±64px) dropped the well one
+           screen length too early and the grid snapped flat mid-scroll. */
         if (
-          r.bottom < -64 ||
-          r.top > h + 64 ||
-          r.right < -64 ||
-          r.left > w + 64
+          cx < -m.radius ||
+          cx > w + m.radius ||
+          cy < -m.radius ||
+          cy > h + m.radius
         )
           continue;
         out.push({
-          x: r.left + r.width / 2,
-          y: r.top + r.height / 2,
+          x: cx,
+          y: cy,
           strength: m.strength,
           radius: m.radius,
           r2: m.radius * m.radius,
@@ -221,34 +230,54 @@ export function SpacetimeCanvas() {
     function render() {
       const c = ctx!;
       const masses = gatherMasses();
-      // Warp pass: pull each vertex toward every mass. Regularised potential:
-      // d/√(d²+ε²) ramps displacement in smoothly from 0 at the centre (no
-      // fold-over spikes), (1 − d/R)² decays it to 0 at the influence edge.
-      // The hard cap pull ≤ 0.8·d guarantees a vertex can never cross a mass
-      // even if the config is tuned aggressively.
+      // Warp pass. Each mass contributes a DISPLACEMENT VECTOR which is
+      // ACCUMULATED and applied once per vertex (2026-10-17). It used to apply
+      // mass-by-mass, rewriting x/y in place, so well #2 read coordinates well
+      // #1 had already moved: the result depended on registration order, was
+      // not reversible, and made the pointer well and the globe's well fight
+      // instead of superpose.
+      //
+      // Per mass: regularised potential d/√(d²+ε²) ramps the displacement in
+      // smoothly from 0 at the centre (no fold-over spikes) and (1 − d/R)²
+      // decays it to 0 at the influence edge.
+      //
+      // The fold guard has to stay PER MASS (2026-10-17, second pass). It was
+      // briefly applied to the SUM magnitude against `0.8 · d_nearest`, and
+      // that creased the mesh the moment the pointer well sat next to the
+      // globe: there the sum is ~19px of GLOBE pull while `d_nearest` is the
+      // 6–25px to the CURSOR, so a 24px disc around the pointer got squashed
+      // to 30% and the neighbouring cells went 25px / 3px wide — a visible
+      // 「⟨」 corner. Two wells' contributions are unrelated to one well's
+      // distance, so the cap can only ever be checked one well at a time.
       for (let k = 0; k < baseX.length; k++) {
-        let x = baseX[k];
-        let y = baseY[k];
+        const x0 = baseX[k];
+        const y0 = baseY[k];
+        let dx = 0;
+        let dy = 0;
         for (let mi = 0; mi < masses.length; mi++) {
           const m = masses[mi];
-          const vx = m.x - x;
-          const vy = m.y - y;
+          const vx = m.x - x0;
+          const vy = m.y - y0;
           const d2 = vx * vx + vy * vy;
-          if (d2 < m.r2 && d2 > 1e-4) {
-            const d = Math.sqrt(d2);
-            const fall = 1 - d / m.radius;
-            let pull =
-              m.strength *
+          if (d2 >= m.r2 || d2 < 1e-4) continue;
+          const d = Math.sqrt(d2);
+          const fall = 1 - d / m.radius;
+          /* Fold-over guard, PER MASS: this well's own pull may never carry a
+             vertex more than 0.8·d of the way to its own centre, so no single
+             well can fold the mesh. */
+          const cap = d * 0.8;
+          const pull = Math.min(
+            m.strength *
               (d / Math.sqrt(d2 + m.softening * m.softening)) *
               fall *
-              fall;
-            if (pull > d * 0.8) pull = d * 0.8;
-            x += (vx / d) * pull;
-            y += (vy / d) * pull;
-          }
+              fall,
+            cap,
+          );
+          dx += (vx / d) * pull;
+          dy += (vy / d) * pull;
         }
-        warpX[k] = x;
-        warpY[k] = y;
+        warpX[k] = x0 + dx;
+        warpY[k] = y0 + dy;
       }
       // Draw pass: all rows then all columns as one stroked path.
       c.clearRect(0, 0, w, h);

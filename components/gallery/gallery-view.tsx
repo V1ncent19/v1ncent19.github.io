@@ -29,6 +29,7 @@ import { createPortal } from "react-dom";
 import type { GalleryItem } from "@/lib/content";
 import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
+import { pick } from "@/lib/localized";
 import { TravelStamp } from "./travel-stamps";
 
 type SortMode = "date" | "place" | "shuffle";
@@ -169,24 +170,11 @@ function daysAgoLabel(iso: string, lang: Lang): string | null {
   return lang === "zh" ? `${days} 天前` : `${days} days ago`;
 }
 
-type LocalField = "place" | "placeLocal" | "title";
-
-/** Read the language-localised field, falling back to the other language. */
-function localized(
-  item: GalleryItem,
-  field: LocalField,
-  lang: Lang,
-): string {
-  const other = lang === "en" ? "zh" : "en";
-  const rec = item as unknown as Record<string, string>;
-  return (rec[`${field}_${lang}`] || rec[`${field}_${other}`] || "").trim();
-}
-
 /** Route-appropriate "place · placeLocal" line for the lightbox header. */
 function locText(item: GalleryItem, lang: Lang): string {
   return [
-    localized(item, "place", lang),
-    localized(item, "placeLocal", lang),
+    pick(item.place, lang),
+    pick(item.placeLocal, lang),
   ]
     .filter(Boolean)
     .join(" · ");
@@ -195,7 +183,7 @@ function locText(item: GalleryItem, lang: Lang): string {
 /** Accessible one-line description (title · place · date) fallback. */
 function describe(item: GalleryItem, lang: Lang): string {
   return [
-    localized(item, "title", lang) || locText(item, lang),
+    pick(item.title, lang) || locText(item, lang),
     formatDate(item.date, lang),
   ]
     .filter(Boolean)
@@ -244,12 +232,15 @@ function accentVars(item: GalleryItem): CSSProperties {
 
 /**
  * Decorative world map for the open card. The sheet is an external amCharts
- * Mercator SVG (public/assets/gallery/worldOutlineLow.svg, kept untouched);
+ * Mercator SVG (public/data/vendor/worldOutlineLow.svg, kept untouched);
  * its viewBox is "-2 168.36 964 623.29" and its path data was projected with
  * the world centred at x = 480 (lon 0) and the equator at y = 610, at 960
  * viewBox units per 2π radians of longitude.
+ *
+ * Moved out of gallery/ into assets/vendor/ (2026-10-17): amCharts geography,
+ * not a photo anyone here took. Licence notes in assets/vendor/LICENSE.md.
  */
-const WORLD_MAP_SRC = "/assets/gallery/worldOutlineLow.svg";
+const WORLD_MAP_SRC = "/data/vendor/worldOutlineLow.svg";
 const WORLD_VB = { x: -2, y: 168.36, w: 964, h: 623.29 } as const;
 
 /**
@@ -389,8 +380,8 @@ export function GalleryView({
     const flip = dir === "asc" ? 1 : -1; // asc: natural order; desc: reversed
     if (mode === "place") {
       return [...visible].sort((a, b) => {
-        const pa = localized(a, "place", lang).toLowerCase();
-        const pb = localized(b, "place", lang).toLowerCase();
+        const pa = pick(a.place, lang).toLowerCase();
+        const pb = pick(b.place, lang).toLowerCase();
         if (!pa && pb) return 1; // unlabelled frames sink to the end
         if (pa && !pb) return -1;
         if (pa !== pb) return (pa < pb ? -1 : 1) * flip;
@@ -885,10 +876,10 @@ export function GalleryView({
    * instead.
    */
   const captionContent = (item: GalleryItem, pin: boolean) => {
-    const title = localized(item, "title", lang);
+    const title = pick(item.title, lang);
     const hasTitle = title.length > 0;
-    const place = localized(item, "place", lang);
-    const spot = localized(item, "placeLocal", lang);
+    const place = pick(item.place, lang);
+    const spot = pick(item.placeLocal, lang);
     const altText = item.alt.trim();
     const heading =
       "font-serif font-bold text-ink break-words " +
@@ -1350,7 +1341,7 @@ export function GalleryView({
  * writes one it falls back to the place line, then to the month-year.
  */
 function bigTitle(item: GalleryItem, lang: Lang): string {
-  const title = localized(item, "title", lang);
+  const title = pick(item.title, lang);
   if (title) return title;
   const place = locText(item, lang);
   if (place) return place;
@@ -1608,8 +1599,8 @@ function GalleryTile({
   onOpen: () => void;
 }) {
   const ym = formatYearMonth(item.date, lang);
-  const place = localized(item, "place", lang);
-  const spot = localized(item, "placeLocal", lang);
+  const place = pick(item.place, lang);
+  const spot = pick(item.placeLocal, lang);
   const base = place || spot; // what the resting bar + accent title show
   const big = base || ym;
   const sub = spot && spot !== base ? spot : ""; // grey placeLocal line

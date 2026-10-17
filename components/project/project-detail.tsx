@@ -1,14 +1,20 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, FileDown } from "lucide-react";
 import { Prose } from "@/components/content/prose";
-import type { Project, ProjectStatus } from "@/lib/content";
+import { projectBody, projectSummary, type Project, type ProjectStatus } from "@/lib/content";
 import type { Lang } from "@/lib/i18n";
 import { copy, formatMonth } from "@/lib/i18n";
 
 /** Shared renderer for /project/[slug] and /project/zh/[slug]. */
 export function ProjectDetail({ project, lang }: { project: Project; lang: Lang }) {
   const s = copy[lang];
-  const { type, status, updatedAt, title, summary, links, pdf } = project.meta;
+  const { type, status, updatedAt, title, links, pdf } = project.meta;
+  /* Both go through lib/content: `summary` is `{ en, zh }` and the body may be
+     split by a `<!-- zh -->` marker. Reading `project.meta.summary` or
+     `project.body` directly here is what previously shipped the English
+     summary on /project/zh/<slug>. */
+  const summary = projectSummary(project, lang);
+  const body = projectBody(project, lang);
   const backHref = lang === "zh" ? "/project/zh" : "/project";
   const backLabel = s.project.allProjects;
 
@@ -79,7 +85,7 @@ export function ProjectDetail({ project, lang }: { project: Project; lang: Lang 
       </header>
 
       <div className="pt-8">
-        <Prose source={project.body} />
+        <Prose source={body} />
       </div>
     </div>
   );

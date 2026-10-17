@@ -1,69 +1,88 @@
 # Handover — 站点现状与新功能启动入口
 
-**最后更新：2026-10-16。** 这是 `structure_file/` 的主入口文件。任何 agent 接手工作时**先读这一个文件**，再按需查 `ARCHITECTURE.md`（系统怎么搭的）和 `CONVENTIONS.md`（设计基线与工作守则）。
+**最后更新：2026-10-17。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
+`ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_PILGRIMAGE.md`（巡礼页）。
 
 ---
 
 ## 1. 一句话现状
 
-Next.js 16 静态导出的个人站（`nextjs-rebuild` 分支）已完全替代旧 Jekyll 站的规划阶段：全部主路由（Home/About/CV/Blog/Project/Guestbook/Travel）上线真实内容，双语 `/zh` 覆盖主路由；**当前迭代焦点是 Travel 模块**（互动旅行志 hub + ptes-2025 互动游记 + 景点标点），已迭代至 v18，全部改动**未 commit**（基线 `9281bd9`），等用户验收。
+Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`，HEAD `cb5cfd1`）已完全取代旧 Jekyll 站：
+全部主路由（Home / About / CV / Blog / Project / Travel / Guestbook）上线真实内容，中文 `/zh` 覆盖主路由
+（`/about/zh` 是亲笔原文，其余挂机翻声明条）。
+**Travel 是当前最重的模块**：hub（地球仪 + 游记 tiles + 相册墙 + 心愿单）、ptes-2025 互动游记、just-because 巡礼地图。
+工作区有大规模未提交改动，**等用户验收，agent 不代提交**。
 
 ## 2. 技术栈（勿改）
 
 - Next.js **16.3.4** App Router + React 19 + TS strict + Tailwind **v4**（CSS-var tokens），`output: "export"` → `out/`
-- 部署目标：GitHub Pages（v1ncent19.github.io，CNAME 已就位）；静态导出约束一切——**禁止 server-only 特性**
-- 评论 giscus（`@giscus/react`）；中文字体自托管子集化（GenWanMin2 TC）
+- 部署目标：GitHub Pages（v1ncent19.github.io，`public/CNAME` 已就位）；**静态导出约束一切——禁止 server-only 特性**
+- 评论 giscus（`@giscus/react`）；中文字体自托管子集化（GenWanMin2 TC + Cactus 深兜底）
+- 地图 MapLibre GL（`/travel` 地球仪、ptes-2025、just-because）
 
-## 3. 当前进行中的状态（2026-10-16）
+## 3. 当前状态（2026-10-17）
 
 | 项 | 状态 |
 |---|---|
-| 未提交改动 | `M .gitignore`、`M package.json` + 新增 `content/travel/`、`public/assets/pilgrimage/`、4 个 scripts。**绝不擅自 commit/push，等用户显式验收** |
-| Travel hub | MapLibre 地球仪 + 游记 tiles + 心愿单清单 + 双向 hover 联动，导航第四项 |
-| ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画）；**v15 换入 `游记.docx` 重写正文（14.8k 字）并按 GPS 单元投放**；v16 起景点标点为纯视觉标记（点击弹窗已删）；v17 全量核查 75 个景点坐标；**v18 按用户逐条报错再修 14 处、删 2 增 0 → 73 个**（含焦糖山改用本人轨迹的长时间停留点） |
-| **巡礼地图（Just Because!@藤泽）** | **数据管线已完成并验证；前端未开始**。母版归档 → `photos.json`（位置真源）+ 154 张 anime 截图 + shot/thumb 派生档已就位（48 MB，零 EXIF）；`compare/` 空，**等用户手工合成对比图后回来做地图组件**。详见 `FEATURE_PILGRIMAGE.md` |
-| 移动端 | ptes 上下 4:6 布局、图例可收起（默认收起）、tile 极简、排序格独立成行 |
-| 手机预览 | WorkBuddy 发布链 https://e7404f038b8749af93853f25d7c30b44.app.workbuddy.host （说「重新发布预览」即重新部署） |
-| 截图相册线上发布 | **暂停**（v12 起按用户要求） |
+| **content/ 组织** | 已按路由段重排（`about/ blog/ cv/ project/ travel/ site/`），双语统一为 `{en,zh}` 一种写法 |
+| **public/assets/** | 已按页面归属重排（`about/ home/ cv/ project/ gallery/ photos/`）—— **整个新树还没入库**，见 §4 |
+| Travel hub | MapLibre 地球仪 + 游记 tiles + 「Stories & frames」相册墙 + 心愿单清单 + 双向 hover 联动 |
+| ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画），景点标点 73 个，正文 14.8k 字按 GPS 投放 |
+| 巡礼地图 | `/travel/just-because`（+zh）已上线：36 个对比点 + 273 点环线 + 可缩放相机 + 滚动联动。**还差用户填 `outro` 与 36 条 `note`** |
+| Blog 索引 | md 文章 + 游记卡合并（`lib/blog-travel.ts`，读取时合并，按日期倒序），无「假 md」 |
+| 双语 | 全站只有一种写法 + `npm run check:i18n` 守卫；`/project/zh/*` 曾显示英文摘要的 bug 已修 |
+| 遗留 | 底图合规、ptes-2025 隐私（两条都等用户拍板）；9 处 anitabi 标点歧义；中文子集需覆盖 `content/travel/` |
 
-## 4. 验证流水线（每轮改动必走）
+## 4. ⚠️ 提交前必看
+
+**工作区有 440 个变更条目，其中 265 个是 `public/assets/` 旧路径的删除、新路径全部未跟踪。**
+只提交已暂存的部分 = **线上图片全断**（旧路径删了、新路径没进去）。
+
+- 提交时必须让 **删除 + 新增进同一个 commit**：先 `git add public/assets/`，再 `git status` 核对
+  「新路径是 `A` 而不是 `??`」。
+- **禁用 `git add -A` / `git add .`**（`b3baff4` 曾误提交 158 个构建产物）。按路径显式 add。
+- `public/assets/photos/gallery/original/` 被 gitignore（142 MB，**相册原图唯一副本**，别 `rm`）。
+- `mv` 而非 `git mv` 之后索引会留**幻影路径**：提交前查 `git diff --cached --name-status | grep RD`。
+- 撤销误提交用 **mixed reset**（`git reset HEAD~1`）；`--soft` 会把文件留在暂存区，之后加 `.gitignore` 对它无效。
+
+## 5. 验证流水线（每轮改动必走）
 
 ```bash
-npx tsc --noEmit                          # 1. 类型
-npx eslint <改动的文件>                    # 2. lint
-NODE_OPTIONS= npm run build               # 3. 静态导出（NODE_OPTIONS= 绕过安全 shim）
-# 4. CDP 探针验证（见下）—— serve 用 python http.server，不用 npx serve！
+npx tsc --noEmit                    # 1. 类型
+npx eslint <改动的文件>              # 2. lint
+NODE_OPTIONS= npm run build         # 3. 静态导出（NODE_OPTIONS= 绕过安全 shim）
+# 4. 视觉验收：serve out/ + Chrome 探针（见下）
 ```
 
-**⚠️ 静态预览/探针的坑（2026-09-28 实测）：`npx serve` 会把所有目录路由 200 回退到根页面 HTML（假象 = React #418）。一律用：**
+prebuild 自动跑 `badges → sync:data → check:refs → check:i18n`，任何一环失败就不出包。
 
-```bash
-cd out && python -m http.server 4173 --bind 127.0.0.1   # 与探针同一命令块内启动
-```
+**⚠️ 静态预览与探针的坑**：
 
-- 探针脚本沉淀（新轮次复制改）：`.workbuddy/probe-v12.mjs`（hub + ptes 回归 16 项 ×zh/en）、`probe-v13.mjs`（移动端/幕布/图例 14 项）、`probe-v15.mjs`（正文与 planned 标 9 项）、`probe-v16.mjs`（标点几何/无弹窗交互/日筛选 16 项）、`probe-v17.mjs`（**纯数据、无需 Chrome**：75 个景点坐标对 OSM 权威值 80m 内 + 增删改名锁定 40 项）、`probe-v18.mjs`（纯数据 23 项）、`probe-v18-page.mjs`（浏览器内读 `getSource("attractions")` 的**实际渲染坐标** 14 项）。
-- 数据核查工具：`.workbuddy/audit-attractions.mjs`（Nominatim 全量审计，输出偏差表 + `audit-attractions.json`）、`.workbuddy/apply-v17-markers.mjs` / `apply-v18-markers.mjs`（**外科式字符串替换**，每处必须恰好命中 1 次，否则整体退出不写盘；改前先 `cp` 备份到 `.workbuddy/attractions.backup-v*.json`）。
-- **景点坐标权威排序：OSM Overpass 的建筑 `way` 几何 `center` > Wikipedia infobox > Nominatim 单点**（Nominatim 常返回相邻建筑/公交站/同名街道，判据 ≥250m 才改）。用户报「偏南/偏东」时先查该建筑**完整 bbox**（OSM 常把一栋楼拆成多个 way）；「他实际停留的地方」用 `track.json` 按时间间隙分段聚类取中位数（见 `.workbuddy/shot-v18-map.mjs` 的取点写法）。
-- 截图：`Page.captureScreenshot` **带 `clip` 会丢 WebGL 画布**（截出空白）→ 整视口截；只点日期胶囊会把相机停在当天第一个 scene（day1 第一个在里斯本）→ 再 `scrollIntoView` 到目标城市的 scene；跨城市的日子别用标点质心当相机中心。
-- Chrome/serve/探针**必须同一命令块**启动（后台进程随块结束被杀）；Chrome 加 `--no-proxy-server` + `--user-data-dir` 绝对路径 + `--window-size=1600,900`。
-- 更多工程坑（styled-jsx、sticky、z-index、字体栈、react-hooks 新规则等）见 `.workbuddy/memory/MEMORY.md` —— **那是最完整的长期教训库，动 travel/about/背景前必读**。
+- `npx serve` 会把所有目录路由 200 回退到根页面 HTML（假象 = React #418）。一律用
+  `cd out && python -m http.server 4173 --bind 127.0.0.1`。
+- **Chrome / serve / 探针必须同一命令块启动**（后台进程随块结束被杀）；Chrome 加
+  `--no-proxy-server --user-data-dir=<绝对路径> --window-size=1600,900`。
+- 探针脚本必须放在 `C:/Users/V1nce/.workbuddy/binaries/node/workspace` 里跑
+  （ESM 不认 `NODE_PATH`，放别处会 `Cannot find package 'playwright-core'`），**用完即删，别放进仓库**。
+- **⚠️ build 失败时 `out/` 仍是上一次成功的产物**，探针照跑不报错、测出来全是旧数据 ——
+  每次都要单独确认 build 成功。
+- `next dev` 在本环境会反复死掉，所以验收一律走 `out/`。
 
-## 5. 新功能怎么启动（给 agent 的标准开场）
+## 6. 新功能怎么启动
 
-用户提出新功能时，agent 按 `structure_file/CONVENTIONS.md` 的守则执行，标准流程：
+1. **先读**：本文件 → `ARCHITECTURE.md`（找相关模块现有实现）→ `.workbuddy/memory/MEMORY.md`（工程坑）。
+2. **守则**：多方案先问；不编造数据；移动端行为有显著变更先确认预期；不自动 commit/push。
+3. **实现**：改代码 → 走 §5 → 视觉改动用探针截图目视验收。
+4. **收尾**：追加 `.workbuddy/memory/<日期>.md`；定案落到 `structure_file/` 对应文档（分工见 `README.md`）。
 
-1. **先读**：`handover.md`（本文件）→ `ARCHITECTURE.md`（找相关模块的现有实现）→ `.workbuddy/memory/MEMORY.md`（工程坑与既有定案）。
-2. **守则**：多方案先用问题确认；不编造数据；移动端行为有显著变更先确认预期；不自动 commit/push。
-3. **实现**：改代码 → 走第 4 节验证流水线 → 视觉改动用 CDP 探针/截图目视验收。
-4. **收尾**：追加 `.workbuddy/memory/<日期>.md` 日志；把新的长期定案沉淀进 `.workbuddy/memory/MEMORY.md`，并把本轮进度更新到本文件的「当前进行中的状态」表。
-
-## 6. 文件地图
+## 7. 文档地图
 
 | 文件 | 内容 |
 |---|---|
+| `README.md` | **文档索引**：每份文档回答什么问题、改什么要同步哪份 |
 | `handover.md` | 本文件 —— 进度与启动入口 |
-| `ARCHITECTURE.md` | 实际系统架构：路由树、目录职责、数据管线、脚本 |
-| `CONVENTIONS.md` | 锁定的 v1 设计基线 + 历次决策记录 + agent 工作守则 |
-| `GALLERY_ADDING_PHOTOS.md` | 相册加照片的操作流程（照做即可） |
-| `FEATURE_PILGRIMAGE.md` | **巡礼地图（Just Because!@藤泽）** —— 数据管线全貌 + 断点续作指引 |
-| `archive/` | 2026-09 初的重建规划原稿（Stitch、迁移审计、实施规范等），仅考古用，**内容多已过时** |
+| `ARCHITECTURE.md` | 系统现状：创作内容地图、content 布局、双语模型、路由树、目录职责、脚本清单、数据管线、样式体系 |
+| `CONVENTIONS.md` | Agent 守则 + 锁定的 v1 设计基线 + 历次决策（含已作废条目）+ Typography |
+| `GALLERY_ADDING_PHOTOS.md` | 相册加照片的操作流程（照做即可；**注意 `GalleryPhoto/` 目前不存在**） |
+| `FEATURE_PILGRIMAGE.md` | 巡礼地图：现状、管线、数据格式、实现不变量、待办、轮次记录 |
+| `archive/` | 2026-09 初的重建规划原稿（Stitch 导出、迁移审计、实施规范），仅考古，**内容多已过时** |

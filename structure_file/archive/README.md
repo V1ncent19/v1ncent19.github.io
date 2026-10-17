@@ -1,12 +1,20 @@
-# Personal Site Rebuild Drafts
+# Personal Site Rebuild Drafts（历史归档）
 
-This folder contains planning drafts for the Next.js rebuild of the Jekyll-based personal homepage. The rebuild is **in progress** on branch `nextjs-rebuild`; the planning files below are discussion documents, not final implementation instructions.
+> **⚠️ 这是 2026-09 初的重建规划原稿，只作考古用。**
+> 里面的路由、目录、部署方式（Cloudflare）、`content/gallery/` 路径、进度描述**大多已被推翻**。
+> 当前文档请回 `../README.md`（索引）→ `../handover.md`（进度）→ `../ARCHITECTURE.md`（现状）。
+> 保留它们的唯一理由：某些设计**为什么**被否掉，只有这些文件记得。
+
+以下为原稿，未改动。This folder contains planning drafts for the Next.js rebuild of the Jekyll-based personal homepage.
 
 ## Read this first
 
-- `IMPLEMENTATION_STATUS.md`: authoritative current-state report (2026-09-04) — what is built route-by-route, the **user-locked v1 design baseline**, the resume checkpoint, and what a fresh agent should do next. Start here.
+- `IMPLEMENTATION_STATUS.md`: current-state report **as of 2026-09-04** — what was built route-by-route,
+  the user-locked v1 design baseline, and the resume checkpoint. Historical snapshot only.
 
-> **Operations, not design** — `GALLERY_ADDING_PHOTOS.md` is a practical how-to (not one of the planning drafts below): it documents the routine for adding gallery photos (drop originals in `GalleryPhoto/` → `npm run gallery:gen` → fill human fields in `content/gallery/items.json`) plus edge cases (no-GPS dots, removal, filenames-as-identity) and the GPS-assisted place/placeLocal drafting procedure. Consult it whenever a gallery batch lands or the user asks how to add photos.
+> **Operations, not design** — `../GALLERY_ADDING_PHOTOS.md` is the practical how-to (it is *not* one of
+> the drafts below). Note that its 2026-09 wording is superseded: originals now live under
+> `public/assets/photos/gallery/` and the manifest is `content/travel/gallery/items.json`.
 
 ## Draft Files
 

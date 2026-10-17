@@ -4,7 +4,7 @@ import { HubHoverLink } from "@/components/travel/hub-hover-link";
 import { GalleryView, type GalleryStoryTile } from "@/components/gallery/gallery-view";
 import { getGalleryItems, getTravel } from "@/lib/content";
 import { blogPostPath, getBlogPosts } from "@/lib/blog";
-import { tripCards } from "@/lib/travel/trips";
+import { tripCards, tripFacts } from "@/lib/travel/trips";
 import { copy } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -43,18 +43,18 @@ export default function TravelPage() {
        a multi-day GPS track). */
     meta: trip.cardMeta?.en ?? "Interactive map log",
     tags: trip.stops?.en,
-    facts: trip.cardFacts?.en ?? [
-      `${trip.days} days`,
-      `${trip.distanceKm.toLocaleString("en-US", { maximumFractionDigits: 1 })} km`,
-      `${trip.gpsPoints.toLocaleString("en-US")} GPS pts`,
-    ],
+    /* Stat line comes from lib/travel/trips so the Blog index card shows the
+       exact same numbers (2026-10-17). */
+    facts: tripFacts(trip, "en"),
     cta: trip.cardCta?.en ?? "Read the log",
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
     coverPos: trip.coverPos,
-    /* The interactive trip log is pinned to the front of the flow (2026-09-25
-       user request); the food diary below instead slots into the timeline. */
-    pinned: true,
+    /* Pinning is per trip, declared in its own card.json (2026-10-17: was
+       hard-coded `true` for every trip, which pinned the pilgrimage tour as
+       well). An unpinned trip merges into the photo timeline at its own
+       start date. */
+    pinned: trip.pinned ?? false,
   }));
 
   const paris = getBlogPosts().find((p) => p.slug === PARIS_SLUG);
@@ -68,10 +68,11 @@ export default function TravelPage() {
       /* The meal date (user-specified anchor), not the post's publish date —
          the tile sits at 2024-03-20 in the timeline below. */
       facts: ["2024.03.20"],
-      cta: "Read the post",
+      /* One CTA wording across every story tile (user 2026-10-17). */
+      cta: "Read the log",
       /* Not pinned: it rides the photo timeline at its own date. Louvre
          sunset thumb for the hover orb (2026-09-26). */
-      cover: "/assets/gallery/thumb/img-0462.webp",
+      cover: "/assets/photos/gallery/thumb/img-0462.webp",
       date: "2024-03-20",
     });
   }

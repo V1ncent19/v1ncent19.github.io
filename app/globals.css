@@ -167,9 +167,18 @@ html {
   --radius-md: 8px;
   --radius-lg: 14px;
 
-  /* elevation — borders + restrained shadows */
+  /* elevation — borders + restrained shadows.
+   *
+   * `--shadow-lift` is a CARD shadow: its 32px blur is tuned for a 300px+
+   * tile. On a 44–64px control (the CV download pill, a search field) that
+   * same blur reads as a halo detached from the object — the "阴影太大"
+   * report of 2026-10-17. Controls therefore get `--shadow-ctl`: same
+   * "rises toward you" gesture, but a 12px blur with a NEGATIVE spread so
+   * the shadow hugs the shape. Use `hover:shadow-ctl` on anything button-
+   * sized; keep `hover:shadow-lift` for cards. */
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.05);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.05), 0 14px 32px rgb(0 0 0 / 0.1);
+  --shadow-ctl: 0 1px 2px rgb(0 0 0 / 0.05), 0 4px 12px -4px rgb(0 0 0 / 0.14);
   --shadow-panel: 0 24px 60px -20px rgb(0 0 0 / 0.35);
 
   /* motion */
@@ -219,6 +228,8 @@ html {
   /* elevation */
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 20px rgb(0 0 0 / 0.25);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 40px rgb(0 0 0 / 0.45);
+  /* Dark elevation reads as a dark halo, so it needs less blur, not more. */
+  --shadow-ctl: 0 1px 2px rgb(0 0 0 / 0.45), 0 4px 12px -4px rgb(0 0 0 / 0.55);
   --shadow-panel: 0 24px 70px -18px rgb(0 0 0 / 0.8);
 }
 
@@ -259,6 +270,7 @@ html {
 
   --shadow-card: var(--shadow-card);
   --shadow-lift: var(--shadow-lift);
+  --shadow-ctl: var(--shadow-ctl);
   --shadow-panel: var(--shadow-panel);
 }
 

@@ -19,8 +19,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
-import type { NavId, NavItem } from "@/content/navigation";
-import { homeCards } from "@/content/navigation";
+import type { NavId, NavItem } from "@/content/site/navigation";
+import { homeCards } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import { getBlogPosts, type BlogCategory } from "@/lib/blog";
 import { copy, formatMonth } from "@/lib/i18n";
@@ -125,8 +125,10 @@ const toneSeq: ToneName[] = ["brand", "accent", "brand", "tertiary", "accent"];
  * Framing for each card's hover circle-reveal: `pos` is the object-position
  * slice and `fit` picks cover (fill the frame) vs contain (letterbox — used
  * for the extra-wide CV comic so it shows whole, with white bars above/below,
- * like a panorama print). Images live at /assets/navigation/web/ (compressed
- * copies; originals stay in /assets/navigation/).
+ * like a panorama print). Images live at /assets/home/nav/ — one compressed
+ * webp per section, keyed by SectionId. (The uncompressed originals that used
+ * to sit beside them under /assets/navigation/ had no references and were
+ * removed 2026-10-17; they were tracked, so git history has them.)
  */
 const PEEK_FRAME: Record<SectionId, { pos: string; fit: "cover" | "contain" }> =
   {
@@ -148,6 +150,11 @@ const POST_TONE: Record<BlogCategory, string> = {
     "bg-tertiary-soft text-tertiary transition-colors group-hover:bg-tertiary group-hover:text-on-tertiary",
   documentation:
     "bg-accent-soft text-accent transition-colors group-hover:bg-accent group-hover:text-on-accent",
+  /* Travel logs (2026-10-17): they appear on the Blog index, not in this feed,
+     but the map is keyed by BlogCategory so the key has to exist. Same curated
+     orange-red as components/blog/post-tone.ts. */
+  travel:
+    "bg-[var(--curated-soft)] text-[var(--curated)] transition-colors group-hover:bg-[var(--curated)] group-hover:text-on-brand",
 };
 
 /** "2024-09-20" → "Sept 20, 2024" */
@@ -462,7 +469,7 @@ export default function HomePage() {
           <GatewayReveal className="grid grid-cols-1 gap-5 lg:grid-cols-12">
             {/* Featured: About (5 cols, matches the 2×2 height) */}
             <GatewayLink
-              href={homeCards[0].href}
+              href={homeCards[0].href.en}
               style={{ "--gw-i": 0 } as CSSProperties}
               className="gw-item group block h-full no-underline hover:no-underline lg:col-span-5"
             >
@@ -474,7 +481,7 @@ export default function HomePage() {
               {homeCards.slice(1).map((item, j) => (
                 <GatewayLink
                   key={item.id}
-                  href={item.href}
+                  href={item.href.en}
                   style={{ "--gw-i": j + 1 } as CSSProperties}
                   className="gw-item group block h-full no-underline hover:no-underline"
                 >
@@ -576,10 +583,10 @@ export default function HomePage() {
               {/* Site metadata (2026-09-05, Task D #8) — compact row card in
                   place of the old three StatTiles. Page views are LIVE via
                   busuanzi 3.6.9 (official backend), offset by the legacy
-                  baseline from content/profile.json; the comment count is
+                  baseline from content/site/profile.json; the comment count is
                   summed live from the repo's GitHub Discussions (same source
                   giscus renders); the license text is editable in
-                  content/profile.json. */}
+                  content/site/profile.json. */}
               <section className="mt-12">
                 <ModuleHeader
                   id="meta"
@@ -667,7 +674,7 @@ function GatewayCard({
           {/* eslint-disable-next-line @next/next/no-img-element -- hover-time data-src swap is incompatible with next/image; never part of LCP */}
           <img
             alt=""
-            data-peek-src={`/assets/navigation/web/${id}.webp`}
+            data-peek-src={`/assets/home/nav/${id}.webp`}
             decoding="async"
             style={{
               objectPosition: PEEK_FRAME[id].pos,

@@ -5,8 +5,13 @@
  * board re-imagined as a draggable orthographic globe.
  *
  * Canvas + d3-geo (geoOrthographic) over Natural Earth 110m land, fetched at
- * runtime from /assets/about/land-110m.json (vendored from the world-atlas
+ * runtime from /data/vendor/land-110m.json (vendored from the world-atlas
  * package; if the fetch fails the globe still renders as sphere + graticule).
+ *
+ * The file lives under assets/vendor/ rather than assets/about/ (2026-10-17):
+ * it is third-party geography, not content anyone here wrote, and public/asset
+ * directories are otherwise all hand-authored. Its licence (Natural Earth,
+ * public domain) is recorded in assets/vendor/LICENSE.md.
  *
  * Interaction model (tuned in the .workbuddy/globe-proto prototype):
  * - One unified angular-velocity ω: a fling hands its speed to ω, which then
@@ -52,7 +57,7 @@ import { registerStaticMass } from "@/components/background/spacetime-canvas";
 /** ──────────────── 维护接口：调整效果改这里 ──────────────── */
 const CONFIG = {
   /** Natural Earth 110m land (TopoJSON), vendored from world-atlas */
-  LAND_URL: "/assets/about/land-110m.json",
+  LAND_URL: "/data/vendor/land-110m.json",
   /** idle drift speed (deg/s) — direction follows the last fling */
   AUTO_SPEED: 3.5,
   /** ease time constant (ms) from fling speed → drift speed */
@@ -61,8 +66,23 @@ const CONFIG = {
   FLING_MAX: 420,
   /** ocean translucency 0–1 — lower = more spacetime grid shows through */
   SEA_ALPHA: 0.75,
-  /** gravity well this globe presses into the spacetime backdrop */
-  WELL: { strength: 120, radius: 800, softening: 100 },
+  /** Gravity well this globe presses into the spacetime backdrop.
+   *
+   *  Tuned to the SPHERE, not to the page (2026-10-17). It used to be
+   *  `{ strength: 120, radius: 800, softening: 100 }` — an influence twice the
+   *  globe's width, so the whole About grid bowed toward the planet from far
+   *  away and read as "a big mass swallowing the page". Now:
+   *    radius 340    ≈ sphere radius (208 for the 26rem max) + one patch
+   *    softening 120 ≈ 0.35·R — the dent ramps in gradually instead of
+   *                    saturating, so the old `pull ≤ 0.8d` hard cap never
+   *                    fires (it used to flatten the funnel into a plateau)
+   *    strength 68   → ~8px of displacement right at the rim, decaying to 0 by
+   *                    340px. Reads as "the planet presses a shallow dent into
+   *                    the grid" rather than "a funnel pulling things in".
+   *  The sphere paints over the deepest part (SEA_ALPHA 0.75), so what the eye
+   *  actually sees is that rim band — keep `strength` high enough for it. */
+  WELL: { strength: 68, radius: 340, softening: 120 },
+
   /** pointer hit radius for dot tooltips (px) */
   HIT_PX: 18,
   /** gap between sphere edge and canvas edge (px) */
