@@ -40,4 +40,4 @@ category: Cuisine
 
 这一碗粥的含金量谁懂。
 
-![皮蛋瘦肉粥](/assets/photos/cuisine/pidanshourouzhou.JPG)
+![皮蛋瘦肉粥](/assets/photos/blog_photo/pidanshourouzhou.JPG)

@@ -24,8 +24,8 @@ category: Cuisine
 
 效果如图：
 
-<video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/cuisine/creme3.mp4" type="video/mp4"></video>
+<video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/blog_photo/creme3.mp4" type="video/mp4"></video>
 
-![奶汁烩鸡](/assets/photos/cuisine/creme2.jpg)
+![奶汁烩鸡](/assets/photos/blog_photo/creme2.jpg)
 
-![奶汁烩三文鱼](/assets/photos/cuisine/creme1.jpg)
+![奶汁烩三文鱼](/assets/photos/blog_photo/creme1.jpg)

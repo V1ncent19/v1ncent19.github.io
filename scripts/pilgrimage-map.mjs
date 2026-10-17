@@ -7,10 +7,10 @@
  *   node scripts/pilgrimage-map.mjs --near-m 150
  *
  * INPUTS
- *   public/assets/pilgrimage/just-because/compare/*.webp   (the shipped tier)
+ *   public/assets/photos/pilgrimage/just-because/compare/*.webp   (the shipped tier)
  *   assets-src/travel-data/pilgrimage/photos.json          (position truth, git-ignored)
- *   content/travel/just-because/source/route.json          (sanitized track)
- *   content/travel/just-because/source/anitabi-212278.json (anitabi point snapshot)
+ *   public/data/travel/just-because/route.json          (sanitized track)
+ *   public/data/travel/just-because/anitabi-212278.json (anitabi point snapshot)
  *
  * OUTPUT (committed)
  *   content/travel/just-because/page.json
@@ -42,7 +42,7 @@ function arg(name, fallback = null) {
 
 const COMPARE_DIR = path.resolve(
   root,
-  arg("compare-dir", "public/assets/pilgrimage/just-because/compare"),
+  arg("compare-dir", "public/assets/photos/pilgrimage/just-because/compare"),
 );
 const PHOTOS_ABS = path.resolve(
   root,
@@ -54,11 +54,11 @@ const PHOTOS_ABS = path.resolve(
    no flags; each is still overridable via --route / --points / --out. */
 const ROUTE_ABS = path.resolve(
   root,
-  arg("route", "content/travel/just-because/source/route.json"),
+  arg("route", "public/data/travel/just-because/route.json"),
 );
 const POINTS_ABS = path.resolve(
   root,
-  arg("points", "content/travel/just-because/source/anitabi-212278.json"),
+  arg("points", "public/data/travel/just-because/anitabi-212278.json"),
 );
 const OUT_ABS = path.resolve(
   root,
@@ -211,7 +211,7 @@ async function main() {  for (const [label, abs] of [
     stops.push({
       id,
       // What the page renders. Path is rooted at the site, not the repo.
-      src: `/assets/pilgrimage/just-because/compare/${f}`,
+      src: `/assets/photos/pilgrimage/just-because/compare/${f}`,
       // Intrinsic pixel size, so the story column can reserve the right box.
       imgW: dm?.w ?? 1920,
       imgH: dm?.h ?? 2160,
@@ -280,7 +280,7 @@ async function main() {  for (const [label, abs] of [
       text: "圣地巡礼点位与动画截图来自 Anitabi",
       href: snap.sourceURL ?? "https://anitabi.cn/map?bangumiId=212278",
       license: "CC BY-NC-SA 4.0",
-      basemap: "地图底图 © OpenStreetMap contributors",
+      basemap: "Map Data © OpenStreetMap contributors",
     },
     route: {
       date: route.date,

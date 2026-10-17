@@ -53,7 +53,7 @@ category: Cuisine
 -   辣爆炸了。
 
 一番战：
-![一番战](/assets/photos/cuisine/qingjiaochaorou1.jpg)
+![一番战](/assets/photos/blog_photo/qingjiaochaorou1.jpg)
 
 二番战：
-![二番战](/assets/photos/cuisine/qingjiaochaorou2.jpg)
+![二番战](/assets/photos/blog_photo/qingjiaochaorou2.jpg)

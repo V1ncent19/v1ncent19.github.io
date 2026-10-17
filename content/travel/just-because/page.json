@@ -6,18 +6,18 @@
   "subtitle": "2026-09-21",
   "overview": {
     "_placeholder": true,
-    "text": "Just Because! 一直是苯人最喜欢的 anime 之一。26年暑假终于有时间排出一个短期的镰仓湘南行程，顺路在附近圣地巡礼了一番。由于本次旅途的主要目的还是作陪母上大人，所以只在中途某天起了个大早来巡礼。恰逢那几天刮台风，所以一直打着伞和大雨搏斗，也没有时间仔细查每一个机位，所以出品效果不尽如人意；由于时间有限所以覆盖也很不全，基本只去了藤泽-湘南深泽一线的地点，覆盖了最重要的一些名场面地点。希望以后还能有机会来做完整的巡礼。"
+    "text": "『Just Because!』一直是苯人最喜欢的 anime 之一。26年暑假终于有时间排出一个短期的镰仓湘南行程，顺路在附近圣地巡礼了一番。由于本次旅途的主要目的还是作陪母上大人，所以只在中途某天起了个大早来巡礼。恰逢那几天刮台风，所以一直打着伞和大雨搏斗，也没有时间仔细查每一个机位，所以出品效果不尽如人意；由于时间有限所以覆盖也很不全，基本只去了藤泽-湘南深泽一线的地点，覆盖了最重要的一些名场面地点。希望以后还能有机会来做完整的巡礼。"
   },
   "outro": {
-    "_placeholder": true,
+    "_placeholder": false,
     "title": "",
-    "text": ""
+    "text": " "
   },
   "attribution": {
     "text": "圣地巡礼点位与动画截图来自 Anitabi",
     "href": "https://anitabi.cn/map?bangumiId=212278",
     "license": "CC BY-NC-SA 4.0",
-    "basemap": "地图底图 © OpenStreetMap contributors"
+    "basemap": "Map Data © OpenStreetMap contributors"
   },
   "route": {
     "date": "2026-09-21",
@@ -1398,7 +1398,7 @@
   "stops": [
     {
       "id": "img-2748",
-      "src": "/assets/pilgrimage/just-because/compare/img-2748.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2748.webp",
       "imgW": 1748,
       "imgH": 2160,
       "lat": 35.33826,
@@ -1420,7 +1420,7 @@
     },
     {
       "id": "img-2751",
-      "src": "/assets/pilgrimage/just-because/compare/img-2751.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2751.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33926,
@@ -1442,7 +1442,7 @@
     },
     {
       "id": "img-2754",
-      "src": "/assets/pilgrimage/just-because/compare/img-2754.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2754.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33909,
@@ -1464,7 +1464,7 @@
     },
     {
       "id": "img-2757",
-      "src": "/assets/pilgrimage/just-because/compare/img-2757.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2757.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33898,
@@ -1486,7 +1486,7 @@
     },
     {
       "id": "img-2760",
-      "src": "/assets/pilgrimage/just-because/compare/img-2760.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2760.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33808,
@@ -1508,7 +1508,7 @@
     },
     {
       "id": "img-2762",
-      "src": "/assets/pilgrimage/just-because/compare/img-2762.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2762.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33838,
@@ -1530,7 +1530,7 @@
     },
     {
       "id": "img-2766",
-      "src": "/assets/pilgrimage/just-because/compare/img-2766.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2766.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33817,
@@ -1552,7 +1552,7 @@
     },
     {
       "id": "img-2774",
-      "src": "/assets/pilgrimage/just-because/compare/img-2774.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2774.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33165,
@@ -1574,7 +1574,7 @@
     },
     {
       "id": "img-2790",
-      "src": "/assets/pilgrimage/just-because/compare/img-2790.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2790.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33149,
@@ -1596,7 +1596,7 @@
     },
     {
       "id": "img-2791",
-      "src": "/assets/pilgrimage/just-because/compare/img-2791.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2791.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32972,
@@ -1618,7 +1618,7 @@
     },
     {
       "id": "img-2794",
-      "src": "/assets/pilgrimage/just-because/compare/img-2794.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2794.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32995,
@@ -1640,7 +1640,7 @@
     },
     {
       "id": "img-2798",
-      "src": "/assets/pilgrimage/just-because/compare/img-2798.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2798.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32923,
@@ -1662,7 +1662,7 @@
     },
     {
       "id": "img-2800",
-      "src": "/assets/pilgrimage/just-because/compare/img-2800.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2800.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.3274,
@@ -1684,7 +1684,7 @@
     },
     {
       "id": "img-2802",
-      "src": "/assets/pilgrimage/just-because/compare/img-2802.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2802.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32727,
@@ -1706,7 +1706,7 @@
     },
     {
       "id": "img-2807",
-      "src": "/assets/pilgrimage/just-because/compare/img-2807.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2807.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32945,
@@ -1728,7 +1728,7 @@
     },
     {
       "id": "img-2809",
-      "src": "/assets/pilgrimage/just-because/compare/img-2809.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2809.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32957,
@@ -1750,7 +1750,7 @@
     },
     {
       "id": "img-2811",
-      "src": "/assets/pilgrimage/just-because/compare/img-2811.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2811.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33006,
@@ -1772,7 +1772,7 @@
     },
     {
       "id": "img-2812",
-      "src": "/assets/pilgrimage/just-because/compare/img-2812.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2812.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33001,
@@ -1794,7 +1794,7 @@
     },
     {
       "id": "img-2817",
-      "src": "/assets/pilgrimage/just-because/compare/img-2817.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2817.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32995,
@@ -1816,7 +1816,7 @@
     },
     {
       "id": "img-2819",
-      "src": "/assets/pilgrimage/just-because/compare/img-2819.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2819.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33107,
@@ -1838,7 +1838,7 @@
     },
     {
       "id": "img-2821",
-      "src": "/assets/pilgrimage/just-because/compare/img-2821.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2821.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33128,
@@ -1860,7 +1860,7 @@
     },
     {
       "id": "img-2826",
-      "src": "/assets/pilgrimage/just-because/compare/img-2826.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2826.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32958,
@@ -1882,7 +1882,7 @@
     },
     {
       "id": "img-2828",
-      "src": "/assets/pilgrimage/just-because/compare/img-2828.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2828.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32964,
@@ -1904,7 +1904,7 @@
     },
     {
       "id": "img-2829",
-      "src": "/assets/pilgrimage/just-because/compare/img-2829.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2829.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32984,
@@ -1926,7 +1926,7 @@
     },
     {
       "id": "img-2831",
-      "src": "/assets/pilgrimage/just-because/compare/img-2831.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2831.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33006,
@@ -1948,7 +1948,7 @@
     },
     {
       "id": "img-2833",
-      "src": "/assets/pilgrimage/just-because/compare/img-2833.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2833.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32997,
@@ -1970,7 +1970,7 @@
     },
     {
       "id": "img-2834",
-      "src": "/assets/pilgrimage/just-because/compare/img-2834.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2834.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32965,
@@ -1992,7 +1992,7 @@
     },
     {
       "id": "img-2836",
-      "src": "/assets/pilgrimage/just-because/compare/img-2836.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2836.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32973,
@@ -2014,7 +2014,7 @@
     },
     {
       "id": "img-2840",
-      "src": "/assets/pilgrimage/just-because/compare/img-2840.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2840.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33114,
@@ -2036,7 +2036,7 @@
     },
     {
       "id": "img-2841",
-      "src": "/assets/pilgrimage/just-because/compare/img-2841.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2841.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33194,
@@ -2058,7 +2058,7 @@
     },
     {
       "id": "img-2846",
-      "src": "/assets/pilgrimage/just-because/compare/img-2846.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2846.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33258,
@@ -2080,7 +2080,7 @@
     },
     {
       "id": "img-2848",
-      "src": "/assets/pilgrimage/just-because/compare/img-2848.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2848.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33254,
@@ -2102,7 +2102,7 @@
     },
     {
       "id": "img-2850",
-      "src": "/assets/pilgrimage/just-because/compare/img-2850.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2850.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.33264,
@@ -2124,7 +2124,7 @@
     },
     {
       "id": "img-2853",
-      "src": "/assets/pilgrimage/just-because/compare/img-2853.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2853.webp",
       "imgW": 1121,
       "imgH": 2160,
       "lat": 35.33304,
@@ -2146,7 +2146,7 @@
     },
     {
       "id": "img-2857",
-      "src": "/assets/pilgrimage/just-because/compare/img-2857.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2857.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.3328,
@@ -2168,7 +2168,7 @@
     },
     {
       "id": "img-2862",
-      "src": "/assets/pilgrimage/just-because/compare/img-2862.webp",
+      "src": "/assets/photos/pilgrimage/just-because/compare/img-2862.webp",
       "imgW": 1920,
       "imgH": 2160,
       "lat": 35.32988,

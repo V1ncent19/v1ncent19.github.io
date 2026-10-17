@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import TravelLog from "@/components/travel/TravelLog";
 
-export const metadata: Metadata = { title: "Iberia 2025 — Portugal · Spain · Christmas" };
+export const metadata: Metadata = { title: "Iberia 2025 — Christmas" };
 
 export default function Ptes2025Page() {
   return (

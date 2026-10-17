@@ -71,7 +71,7 @@ const TOPO_STYLE = {
  * readable copy maplibre would print; this is the human-readable strip.
  */
 const BASEMAP_CREDITS: Record<"vector" | Exclude<SpecialBasemap, "">, string> = {
-  vector: "地图底图 © OpenStreetMap contributors · CARTO",
+  vector: "Map Data © OpenStreetMap contributors · CARTO",
   sat: "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics",
   topo: "© OpenStreetMap contributors, SRTM | style: © OpenTopoMap (CC-BY-SA)",
 };
@@ -1196,7 +1196,6 @@ export default function TravelMap({
       <div className="map-attrib">
         <span>{BASEMAP_CREDITS[specialBasemap || "vector"]}</span>
         <span className="map-attrib-sep">·</span>
-        <span>轨迹与照片为本人记录</span>
       </div>
     </div>
   );

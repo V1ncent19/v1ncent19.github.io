@@ -17,6 +17,12 @@ next-env.d.ts
 # production / build
 /build
 
+# verification screenshots from browser probes (Playwright / manual). These are
+# throwaway artefacts of "did the page render right" checks — never content and
+# never referenced by code. Committed by accident once (cb5cfd1, 34 PNG / 18 MB)
+# and removed from the index in 2026-10-17; still recoverable from that commit.
+/output/
+
 # legacy Jekyll site leftovers — the old site is kept on disk as a local
 # backup only; it is never updated and must never be committed.
 /_site/
@@ -53,25 +59,67 @@ yarn-error.log*
 /public/assets/pilgrimage/**/gps_original/
 /public/**/gps_original/
 
-# full-resolution gallery originals — local MASTER copy, still never edited in
-# place. The pipeline (npm run gallery:gen) mirrors each file byte-for-byte
-# into public/assets/gallery/original/ for the same-origin download button;
-# those copies ARE committed. Web tiers live under
-# public/assets/gallery/{thumb,large} and are produced by the same script.
+# full-resolution gallery originals — the local MASTER copy is gone: the
+# GalleryPhoto/ source dir no longer exists and `npm run gallery:gen` exits
+# with "source dir not found". The only surviving copy is the mirrored one
+# under public/assets/photos/gallery/original/ (see the rule further down),
+# which is deliberately NOT committed. Treat that folder as the master.
 /GalleryPhoto/
 
-# pilgrimage photo masters — full-resolution originals that still carry EXIF GPS
-# and were never meant to be published. Local master only; the site ships one
-# compressed, EXIF-free derivative tier instead, built by
-# scripts/pilgrimage-derive.mjs into
-# public/assets/pilgrimage/just-because/compare/.
-# (shot/, thumb/ and the anitabi anime screenshots were retired on 2026-10-16:
-# only the hand-made composites go online.)
+# pilgrimage photo masters — full-resolution ORIGINAL phone shots that still
+# carry EXIF GPS. Local master only, never published. Nothing currently lives
+# here: the 701 MB original set was retired on 2026-10-16 and the 36 hand-made
+# composites moved OUT to assets-src/pilgrimage-masters/ (2026-10-17) because
+# they carry no EXIF and are only 30 MB — see the note below.
+#
+# The rule is kept as a guard, not because a file needs it: this is the path a
+# future raw-EXIF import would land in, and it must stay uncommittable by
+# default. Do NOT widen it back to cover the composites.
 /assets-src/photos/
 
 # belt-and-braces: the masters were briefly parked under public/assets/photos/
 # before being moved to assets-src/. public/ is copied verbatim into the static
-# export, so keep this rule too — a repeat of that mistake must never be
-# committable. (The rest of public/assets/photos/ is legitimate: cal.png and the
-# cuisine/jokes/nihongo folders are tracked and used by the blog and about page.)
+# export, so keep this rule — a repeat of that mistake must never be committable.
+#
+# As of the 2026-10-17 reorganisation this ALSO covers the gallery's own
+# original tier (public/assets/photos/gallery/original/), which is a genuine
+# master rather than a parked mistake. The ** glob is doing both jobs: catching
+# any raw-EXIF import anywhere under photos/, and keeping the 142 MB original
+# tier out of git. The tracked web tiers are photos/gallery/{thumb,large} and
+# the authoring content is photos/{blog,joke,nihongo}_photo/ — all unaffected.
 /public/assets/photos/**/original/
+
+# pilgrimage COMPOSITE masters — committed, and deliberately NOT ignored.
+#
+# 2026-10-17: these 36 jpgs (29.9 MB, avg 850 KB) used to sit under
+# assets-src/photos/ and inherited that folder's ignore rule, which was written
+# for the 701 MB raw-EXIF original set. They never belonged there: magiconch
+# strips EXIF during compositing, so sharp reports 0/36 with EXIF, 0/36 with XMP
+# (only ICC, which carries no location). Nothing to protect, and being ignored
+# meant the ONLY copy of the hand-made composites — the shipped tier is a 2400px
+# webp derivative — lived outside version control.
+#
+# Hence no rule below. If you ever add one here, you are re-losing the masters.
+# Originals (`original/`) still DO go under assets-src/photos/ and stay ignored.
+
+# ── public/data/travel/ — two trip pages, two policies ─────────────────────
+#
+# Both trip pages keep their generated payload under public/data/travel/<id>/,
+# because that is the only place with a URL. The similarity ends there.
+#
+# ptes-2025: track.json is a byte-for-byte copy of
+#   content/travel/ptes-2025/data/track.json, made by `npm run sync:data`
+#   (prebuild / predev). It is a pure build artifact — ignored, never committed,
+#   regenerated from source. Editing it gets a dirty tree and then an overwrite.
+#   Remove a tracked copy with `git rm --cached`; an ignore rule alone leaves the
+#   already-tracked files in the index and they keep shipping stale bytes.
+#
+# just-because: route.json and anitabi-212278.json are NOT artifacts. They are
+#   generator outputs with no reproducible source in the repo — route.json is
+#   cut from a raw GPS export that lives (gitignored) under
+#   assets-src/travel-data/, and anitabi-212278.json is a point-in-time
+#   snapshot of a remote dataset. Rebuilding either needs data that is not in
+#   git, so they MUST stay committed. Like ptes, no human hand-edits them; that
+#   is why they live beside the generated payload instead of in content/.
+/public/data/travel/ptes-2025/
+!/public/data/travel/just-because/

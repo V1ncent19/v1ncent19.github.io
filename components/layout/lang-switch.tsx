@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { bilingualBases } from "@/content/navigation";
+import { bilingualBases } from "@/content/site/navigation";
 
 /** Alternate-language link for pages that have an English + nested /zh pair.
  * The homepage's Chinese counterpart currently lives at /zh as a placeholder

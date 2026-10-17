@@ -81,7 +81,7 @@ const CONFIG = {
    *                    the grid" rather than "a funnel pulling things in".
    *  The sphere paints over the deepest part (SEA_ALPHA 0.75), so what the eye
    *  actually sees is that rim band — keep `strength` high enough for it. */
-  WELL: { strength: 68, radius: 340, softening: 120 },
+  WELL: { strength: 80, radius: 340, softening: 120 },
 
   /** pointer hit radius for dot tooltips (px) */
   HIT_PX: 18,

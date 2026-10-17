@@ -39,7 +39,16 @@ export default function RootLayout({
       {/* The spacetime canvas sits at z-0 (see component); every real content
           layer carries relative z-10 so it stays above the backdrop. The page
           background stays on <body>. */}
-      <body className="flex min-h-svh flex-col bg-canvas font-serif text-ink antialiased">
+      {/* suppressHydrationWarning on <body> for the same reason <html> needs
+          it: trip pages add `tl-immersive` / `pj-immersive` from a parse-time
+          inline script (so the site chrome never flashes), and React does not
+          own that class. Without this, React 19 reports "attributes didn't
+          match" on every trip page entry — the class is intentional, the
+          mismatch is the price of painting correctly on frame one. */}
+      <body
+        suppressHydrationWarning
+        className="flex min-h-svh flex-col bg-canvas font-serif text-ink antialiased"
+      >
         <ThemeScript />
         {/* Site-wide spacetime backdrop: faint grid behind all content,
             pointer acts as a mass (see CONFIG in the component). */}

@@ -37,7 +37,7 @@ category: Documentation
 
 事实上已经有明显的字形差异了，但是事实上如果不指定字体，用统一的字体格式显示的话就会变成一样的字形：
 
-<img src="/assets/photos/nihongo/fontexample.png" alt="kanji" style="width: 50%;"/> 
+<img src="/assets/photos/nihongo_photo/fontexample.png" alt="kanji" style="width: 50%;"/> 
 
 为了解决这个问题，需要在网页部署时写好 css 文件，指定不同的字体。以本网站为例，需要修改/增加如下三处文件：
 
@@ -96,7 +96,7 @@ span:lang(ja) {
 Praat 是一个用于语音分析的软件，可以帮助我们分析一段音频的谱，比如下面是本人玉音放送的“瀑布”这个词的音频谱，其中上半部分是振幅谱，下半部分是频谱：
 
 <p align="center">
-  <img src="/assets/photos/nihongo/praat_pubu.png" alt="praat" style="width: 80%;"/>
+  <img src="/assets/photos/nihongo_photo/praat_pubu.png" alt="praat" style="width: 80%;"/>
 </p>
 
 利用频谱图可以帮助我们分析发音模式，例如低频区的大量（周期性的）黑色区域代表声带震动，高频区的黑色区域则一般是有吹气音的地方。
@@ -116,7 +116,7 @@ Praat 是一个用于语音分析的软件，可以帮助我们分析一段音�
 下面是玉音放送之 /atʰa/ - /ata/ - /ada/ 的 Praat 频谱图：
 
 <p align="center">
-  <img src="/assets/photos/nihongo/vot.jpg" alt="praat" style="width: 80%;"/>
+  <img src="/assets/photos/nihongo_photo/vot.jpg" alt="praat" style="width: 80%;"/>
 </p>
 
 - 在 /atʰa/ 中，可以明显看到在除阻和起震之前有很长的一段低频区没有明显的黑色，即声带没有震动，这一段就是 /tʰ/ 中送气部分 /ʰ/；大家可以通过拉长地发“他”这个字感受一下。
@@ -154,7 +154,7 @@ Praat 是一个用于语音分析的软件，可以帮助我们分析一段音�
 值得一提的例子是：与中文母语者难以区分清浊类似，日文母语者也难以区分送/不送气，比如“瀑布”这个词。下面是本人玉音放送的“瀑布”这个词的音频谱：
 
 <p align="center">
-  <img src="/assets/photos/nihongo/pubu.jpg" alt="praat" style="width: 80%;"/>
+  <img src="/assets/photos/nihongo_photo/pubu.jpg" alt="praat" style="width: 80%;"/>
 </p>
 
 实际上如果只播放红框部分的话（类似于想象你是日本人，你不能识别/pʰ/的/ʰ/部分），你就会发现听起来完全就是“布布”而非“瀑布”（这一点从频谱图也能看出来）。
@@ -169,7 +169,7 @@ Praat 是一个用于语音分析的软件，可以帮助我们分析一段音�
 例如下面是本人的【nda】的频谱图，可以清楚地看到除阻前低频区的声带振动。
 
 <p align="center">
-  <img src="/assets/photos/nihongo/nd.jpg" alt="praat" style="width: 80%;"/>
+  <img src="/assets/photos/nihongo_photo/nd.jpg" alt="praat" style="width: 80%;"/>
 </p>
 
 

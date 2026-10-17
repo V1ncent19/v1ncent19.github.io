@@ -527,7 +527,7 @@ export default function PilgrimageStory({
           <h2 className="pj-outro-title">{outro.title || "完结撒花 🎉"}</h2>
           <p className="pj-outro-line">
             {data.route.startedAtLocal.slice(11, 16)} 出发 ·{" "}
-            {data.route.endedAtLocal.slice(11, 16)} 回到镰仓高校前站 ·{" "}
+            {data.route.endedAtLocal.slice(11, 16)} 返回 ·{" "}
             {(data.route.durationSec / 3600).toFixed(1)} 小时 · {stops.length} 个场景
           </p>
           <div className="pj-outro-body">

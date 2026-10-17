@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
  * which matches what the script would have done anyway.
  *
  * The displayed value is the live count OFFSET BY the legacy baseline from
- * content/profile.json (`legacyStats.sitePvBaseline`) — busuanzi restarted
+ * content/site/profile.json (`legacyStats.sitePvBaseline`) — busuanzi restarted
  * from zero on the new domain, the baseline keeps the old site's history.
  *
  * `sessionPv` caches the last value at module scope so remounts within one

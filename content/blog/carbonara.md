@@ -24,7 +24,7 @@ category: Cuisine
 
 我喜欢先中小火焙一下胡椒碎，然后加入培根，培根出油后加入八九成熟面条，给勺煮面水中小火收稠，注意控温不然会变成炒蛋面；加入蛋黄酱，再给一勺煮面水，中小火收稠，搅拌均匀装盘，撒上 Parmesan cheese，再撒上一点黑胡椒即可。效果如下，做了三四次才像点样子（但下图这次忘了放胡椒了）。
 
-![熬酱](/assets/photos/cuisine/carbonara.jpg)
+![熬酱](/assets/photos/blog_photo/carbonara.jpg)
 
 
 [^1]: Linguine 是一种扁平的意面，你可以理解为意面版本的宽面（但好像没有那么宽）。

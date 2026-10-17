@@ -24,7 +24,7 @@ category: Cuisine
 
 效果如下，手快的话十几分钟应该就搞定了，从未如此美妙。
 
-![辛拉面](/assets/photos/cuisine/shinramen.jpg)
+![辛拉面](/assets/photos/blog_photo/shinramen.jpg)
 
 
 

@@ -47,4 +47,4 @@ category: Cuisine
 
 ## 出品参考
 
-<video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/cuisine/cheese.mp4" type="video/mp4"></video>
+<video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/blog_photo/cheese.mp4" type="video/mp4"></video>

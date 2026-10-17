@@ -71,6 +71,6 @@ boxcox(Volume ~ log(Height) + log(Girth), data = trees,
 </pre>
 </div>
 <div style='width:61.8%;' >
-<img src="/assets/boxcox.png" width="100%" alt="" ><br/>
+<img src="/assets/photos/blog_photo/boxcox.png" width="100%" alt="" ><br/>
 </div>
 

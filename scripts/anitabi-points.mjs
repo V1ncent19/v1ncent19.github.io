@@ -4,7 +4,7 @@
  * for a bangumi subject.
  *
  *   npm run anitabi:snapshot -- --bangumi 212278
- *   node scripts/anitabi-points.mjs --bangumi 212278 --out content/travel/just-because/source/anitabi-212278.json
+ *   node scripts/anitabi-points.mjs --bangumi 212278 --out public/data/travel/just-because/anitabi-212278.json
  *
  * WHY A SNAPSHOT AND NOT A LIVE FETCH
  * -----------------------------------
@@ -170,7 +170,7 @@ async function main() {
     console.error("  find the subjectID at https://bangumi.tv (Just Because! = 212278)");
     process.exit(1);
   }
-  const outAbs = path.resolve(root, arg("out", `content/travel/just-because/source/anitabi-${BANGUMI}.json`));
+  const outAbs = path.resolve(root, arg("out", `public/data/travel/just-because/anitabi-${BANGUMI}.json`));
   // Raw downloads are ~9 MB and carry no personal data, but they are throwaway —
   // default the cache under the git-ignored assets-src/travel-data/.
   const cacheDir = path.resolve(

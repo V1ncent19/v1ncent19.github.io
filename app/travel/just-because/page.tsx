@@ -4,7 +4,7 @@ import raw from "@/content/travel/just-because/page.json";
 import type { PilgrimageData } from "@/lib/travel/pilgrimage";
 
 export const metadata: Metadata = {
-  title: "Just Because! — 圣地巡礼 · 藤泽",
+  title: "Just Because! — 圣地巡礼",
   description:
     "2026 年 9 月 21 日，沿着《Just Because!》的取景地骑行藤泽与镰仓。36 组实景与动画画面对比。",
 };

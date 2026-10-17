@@ -1,11 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Map as MLMap, GeoJSONSource, MapMouseEvent, Point } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { PilgrimageStop, PilgrimageRoute, PilgrimageAttribution } from "@/lib/travel/pilgrimage";
 import { CHAPTER_END, CHAPTER_START } from "@/lib/travel/pilgrimage";
-import { applyTheme, readTheme } from "@/lib/theme";
+import {
+  applyTheme,
+  getThemeSnapshot,
+  subscribeTheme,
+  THEME_SERVER_SNAPSHOT,
+} from "@/lib/theme";
 import type { Theme } from "@/lib/site";
 
 /**
@@ -85,6 +90,44 @@ function storeCameraMode(mode: CameraMode) {
   } catch {
     /* ignore */
   }
+}
+
+/*
+ * Camera mode lives in a module-level store rather than in useState.
+ *
+ * Why (2026-10-17): the static export prerenders in Node, where localStorage
+ * does not exist, so the HTML always says "overview". Seeding useState from
+ * localStorage made the toolbar disagree with that HTML on hydration — and
+ * React does NOT patch attribute mismatches, so a reader whose stored mode was
+ * "follow" got 全 highlighted (wrong pill, wrong aria-pressed) until they
+ * clicked something. `useSyncExternalStore` renders the server value during
+ * hydration, then switches to the stored one in a normal post-hydration
+ * update, which React can apply.
+ */
+const cameraListeners = new Set<() => void>();
+let cameraSnapshot: CameraMode | null = null;
+
+function subscribeCameraMode(onChange: () => void): () => void {
+  cameraListeners.add(onChange);
+  return () => {
+    cameraListeners.delete(onChange);
+  };
+}
+
+function getCameraSnapshot(): CameraMode {
+  if (cameraSnapshot === null) cameraSnapshot = readCameraMode();
+  return cameraSnapshot;
+}
+
+const getCameraServerSnapshot = (): CameraMode => DEFAULT_CAMERA_MODE;
+
+/** Set + persist + notify. Replaces the old setState, so every caller writes
+ *  through the same path and the toolbar can never disagree with storage. */
+function applyCameraMode(mode: CameraMode): void {
+  const changed = cameraSnapshot !== mode;
+  cameraSnapshot = mode;
+  storeCameraMode(mode);
+  if (changed) for (const cb of cameraListeners) cb();
 }
 
 /** Padding (px) kept clear around the route when fitting it to the viewport.
@@ -688,7 +731,11 @@ export default function PilgrimageMap({
    * reload just like 随 does. SSR has no window, so the server snapshot is the
    * default and hydration is unaffected (the map is created in an effect,
    * long after mount). */
-  const [cameraMode, setCameraMode] = useState<CameraMode>(readCameraMode);
+  const cameraMode = useSyncExternalStore(
+    subscribeCameraMode,
+    getCameraSnapshot,
+    getCameraServerSnapshot,
+  );
   /** Read inside event handlers and the follow effect (never during render),
    *  so the mode is available without re-subscribing map listeners on every
    *  change. */
@@ -700,9 +747,19 @@ export default function PilgrimageMap({
    *  the same active stop does not re-trigger a pan. */
   const lastFollowedRef = useRef<string | null>(null);
 
-  /** The site theme mode (自/昼/夜), shared with the header toggle. Seeded
-   *  from the same storage key the header writes. */
-  const [themeMode, setThemeMode] = useState<Theme>(() => readTheme());
+  /** The site theme mode (自/昼/夜), shared with the header toggle.
+   *
+   *  Read through an external store, NOT `useState(() => readTheme())`: the
+   *  static HTML is prerendered in Node where storage does not exist, so it
+   *  always ships "system". Seeding state from localStorage made the hydrating
+   *  render disagree with that HTML, and React never patches attribute
+   *  mismatches — a reader on a stored "light" mode saw 自 lit until the next
+   *  click. The store renders the server value first, then the applied one. */
+  const themeMode = useSyncExternalStore(
+    subscribeTheme,
+    getThemeSnapshot,
+    () => THEME_SERVER_SNAPSHOT,
+  );
 
   const openStop = useMemo(
     () => stops.find((s) => s.id === openStopId) ?? null,
@@ -1149,8 +1206,7 @@ export default function PilgrimageMap({
       cameraOwnedRef.current = true;
       if (cameraModeRef.current === "follow" || cameraModeRef.current === "overview") {
         cameraModeRef.current = "manual";
-        setCameraMode("manual");
-        storeCameraMode("manual");
+        applyCameraMode("manual");
       }
     };
     m.on("dragstart", onUser);
@@ -1227,8 +1283,7 @@ export default function PilgrimageMap({
     const lats = route.coordinates.map((c) => c[1]);
     cameraOwnedRef.current = false;
     cameraModeRef.current = "overview";
-    setCameraMode("overview");
-    storeCameraMode("overview");
+    applyCameraMode("overview");
     // Clearing the memo lets the follow effect fire the instant the reader
     // switches back to 随, even if the active stop never changed in between.
     lastFollowedRef.current = null;
@@ -1249,20 +1304,19 @@ export default function PilgrimageMap({
   const toggleFollow = useCallback(() => {
     if (cameraModeRef.current === "follow") {
       cameraModeRef.current = "manual";
-      setCameraMode("manual");
-      storeCameraMode("manual");
+      applyCameraMode("manual");
       return;
     }
     cameraModeRef.current = "follow";
-    setCameraMode("follow");
-    storeCameraMode("follow");
+    applyCameraMode("follow");
     lastFollowedRef.current = null;
   }, []);
 
   /** Switch the page theme — the SAME key the site header writes, so a flip
    *  here is already in effect everywhere else (and vice versa). */
   const switchTheme = useCallback((mode: Theme) => {
-    setThemeMode(mode);
+    // applyTheme writes the DOM + storage AND notifies the store, so the
+    // toolbar re-renders from the same value the page is now using.
     applyTheme(mode);
   }, []);
 

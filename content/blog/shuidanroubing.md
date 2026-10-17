@@ -31,4 +31,4 @@ category: Cuisine
 
 ## 出品预览
 
-![水蛋蒸肉饼](/assets/photos/cuisine/roubingzhengdan.jpeg)
+![水蛋蒸肉饼](/assets/photos/blog_photo/roubingzhengdan.jpeg)

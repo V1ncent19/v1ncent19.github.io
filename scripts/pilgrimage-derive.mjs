@@ -7,8 +7,8 @@
  *   node scripts/pilgrimage-derive.mjs --force          # rebuild everything
  *   node scripts/pilgrimage-derive.mjs --limit 5        # smoke test
  *
- * MASTERS (git-ignored, never edited in place, never published)
- *   assets-src/photos/just-because/compare/{IMG_xxxx}.jpg
+ * MASTERS (committed since 2026-10-17 — see the .gitignore note)
+ *   assets-src/pilgrimage-masters/just-because/{IMG_xxxx}.jpg
  *       the 36 hand-made magiconch composites (real shot ↔ anime still). Named
  *       after the ORIGINAL phone filename (IMG_2746.jpg) so they pair with
  *       photos.json via the id you already know.
@@ -20,7 +20,7 @@
  *   looked up against photos.json for the capture position/time.
  *
  * OUTPUTS (committed — these are what the site serves)
- *   public/assets/pilgrimage/just-because/compare/{id}.webp   2400 px long edge
+ *   public/assets/photos/pilgrimage/just-because/compare/{id}.webp   2400 px long edge
  *
  * SCOPE CHANGE (2026-10-16, user decision)
  *   Only the comparison tier is produced now. The earlier shot/ + thumb/ tiers
@@ -59,11 +59,11 @@ const PHOTOS_ABS = path.resolve(
 );
 const OUT_ROOT = path.resolve(
   root,
-  arg("out", "public/assets/pilgrimage/just-because"),
+  arg("out", "public/assets/photos/pilgrimage/just-because"),
 );
 const COMPARE_SRC = path.resolve(
   root,
-  arg("compare-dir", "assets-src/photos/just-because/compare"),
+  arg("compare-dir", "assets-src/pilgrimage-masters/just-because"),
 );
 
 const COMPARE_LONG = 2400;

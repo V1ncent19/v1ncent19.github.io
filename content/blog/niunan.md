@@ -31,10 +31,10 @@ category: Cuisine
 
 把所有东西倒进锅里就可以开始炖了，哪来这么多废话。
 
-![广式炖牛腩](/assets/photos/cuisine/niunan1.jpg)
+![广式炖牛腩](/assets/photos/blog_photo/niunan1.jpg)
 
-![广式炖牛腩](/assets/photos/cuisine/niunan2.jpg)
+![广式炖牛腩](/assets/photos/blog_photo/niunan2.jpg)
 
 经过多轮迭代的正式版，图中是我迄今为止最满意的一次：
 
-![广式炖牛腩](/assets/photos/cuisine/niunan3.jpeg)
+![广式炖牛腩](/assets/photos/blog_photo/niunan3.jpeg)

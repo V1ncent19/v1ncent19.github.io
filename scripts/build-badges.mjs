@@ -5,7 +5,7 @@
  *  - `badge-frame.svg`  the shared stamp frame (two rings), inlined into every
  *                       composed badge so there is exactly ONE place to edit it;
  *  - `<key>.svg`        icon-only artwork (NO baked-in rings), one file per
- *                       badge key used in `content/gallery/items.json`.
+ *                       badge key used in `content/travel/gallery/items.json`.
  *
  * Each file's ROOT presentation attributes (stroke-width, linecap, linejoin,
  * …) are preserved onto a wrapping <g>, because inlining strips the <svg>
@@ -35,7 +35,7 @@ import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, basename } from "node:path";
 
 const BADGES_DIR = "public/assets/gallery/badges";
-const ITEMS_JSON = "content/gallery/items.json";
+const ITEMS_JSON = "content/travel/gallery/items.json";
 const OUT_FILE = "components/gallery/badge-art.generated.ts";
 const FRAME_KEY = "badge-frame.svg";
 

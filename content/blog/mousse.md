@@ -27,5 +27,5 @@ category: Cuisine
 出品目前还不算差，因为所有的分量都是我目测的，而且也没有像样的混合工具，所以有点不均匀，早些时候牛奶下多了导致慕斯会分层，但是味道和口感完全没问题，现在改进了配方后已经能有很正常的慕斯了。
 
 
-![慕斯](/assets/photos/cuisine/mousse1.jpg)
-![慕斯](/assets/photos/cuisine/mousse.jpg)
+![慕斯](/assets/photos/blog_photo/mousse1.jpg)
+![慕斯](/assets/photos/blog_photo/mousse.jpg)

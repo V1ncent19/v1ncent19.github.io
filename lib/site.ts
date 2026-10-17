@@ -1,9 +1,9 @@
 /** Central site identity constants.
- * Single source of truth is content/profile.json (consolidated 2026-09-28 —
+ * Single source of truth is content/site/profile.json (consolidated 2026-09-28 —
  * this module used to duplicate the values inline). The layout shell and
  * components keep importing `site`; the shape below is derived, not authored.
  */
-import profile from "@/content/profile.json";
+import profile from "@/content/site/profile.json";
 
 const github =
   profile.links.find((l) => l.label.toLowerCase() === "github")?.href ?? "";

@@ -17,11 +17,11 @@ category: Documentation
 又是一周过去，他们再次碰头。数学教授告诉物理教授说这个方程的确成立，“但仅仅对于正实数的简单情形成立。”
 - 换一个灯泡需要多少个分析数学家？\
 3 个，一个负责证明解的存在，一个负责证明解的唯一性，最后一个负责推导出一个构造性算法来拧灯泡。
-- <video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/jokes/33be9b7e-236b-11eb-b890-16b47e045b2f.mp4" type="video/mp4"></video>
+- <video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/joke_photo/33be9b7e-236b-11eb-b890-16b47e045b2f.mp4" type="video/mp4"></video>
   
 - $ \pi = e = 3 $
-- <img src="/assets/photos/jokes/2023-02-26-14-31-57.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-32-12.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-31-57.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-32-12.png"  width="250">
 - 工程师和物理学家，数学家分别在三个相同的房间，要求他们用一桶绿色油漆涂满房间的三面墙。\
 工程师经过一番设计，用一桶油漆刷满了一面墙，工程师说这已经是工程学上面的极限了。\
 物理学家没有动手刷墙，油漆也没动，因为经过一番计算，他发现这个任务不可能完成。\
@@ -30,24 +30,24 @@ category: Documentation
 - ... As a result, there can be no infinite-dimensional conformal groupg for the Euclidean plane. What do physicists mean when they talk about an infinite-dimensional conformal group? The misunderstanding seems to be that physicists mostly think and calculate infinitesimally, while they write and talk globally.
 - 数学系学生：这也能证？这也要证？\
   物理系学生：……先假设是对的用用看
-- <img src="/assets/photos/jokes/2023-02-26-14-26-51.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-32-41.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-31-32.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-32-24.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-30-46.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-30-58.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-31-03.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-31-09.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-32-05.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-31-23.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-32-31.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-31-27.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-32-50.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-26-51.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-32-41.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-31-32.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-32-24.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-30-46.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-30-58.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-31-03.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-31-09.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-32-05.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-31-23.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-32-31.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-31-27.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-32-50.png"  width="250">
 - So far as the theories of mathematics are about reality, they are not certain; so far as they are certain, they are not about reality.
 - 工程师的房子着火了，他拿出一个灭火器把火扑灭了。\
 物理学家的房子着火了，他花了半天的时间发明了一种新式灭火器把火扑灭了。\
 数学家的房子着火了，他看了看墙角的灭火器，自言自语道，解决的方法是存在的，于是安心地回到床上睡觉去了。
-- <img src="/assets/photos/jokes/2023-02-26-14-31-18.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-32-37.png"  width="250">
-- <img src="/assets/photos/jokes/2023-02-26-14-31-46.png"  width="400">
-- <img src="/assets/photos/jokes/2023-02-26-14-33-14.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-31-18.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-32-37.png"  width="250">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-31-46.png"  width="400">
+- <img src="/assets/photos/joke_photo/2023-02-26-14-33-14.png"  width="250">

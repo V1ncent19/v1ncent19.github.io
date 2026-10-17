@@ -21,5 +21,5 @@ category: Cuisine
 
 出品逐渐稳定：下次找时间试试薅个黑椒酱出来。
 
-![煎牛排](/assets/photos/cuisine/steak2.jpg)
-![煎牛排](/assets/photos/cuisine/steak1.jpg)
+![煎牛排](/assets/photos/blog_photo/steak2.jpg)
+![煎牛排](/assets/photos/blog_photo/steak1.jpg)

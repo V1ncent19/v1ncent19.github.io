@@ -30,4 +30,4 @@ category: Cuisine
 ## 效果图
 
 
-![炖汤](/assets/photos/cuisine/clamchowder.jpg)
+![炖汤](/assets/photos/blog_photo/clamchowder.jpg)

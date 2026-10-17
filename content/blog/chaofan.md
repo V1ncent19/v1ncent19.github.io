@@ -41,6 +41,6 @@ category: Cuisine
 
 经过若干次试验已经神功大成：
 
-<video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/cuisine/chaofan.mp4" type="video/mp4"></video>
+<video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/blog_photo/chaofan.mp4" type="video/mp4"></video>
 
 

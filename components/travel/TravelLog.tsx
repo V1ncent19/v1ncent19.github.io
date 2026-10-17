@@ -6,6 +6,28 @@ import { useStoryController } from "@/lib/travel/use-story-controller";
 import TravelMap from "./TravelMap";
 import TravelStory from "./TravelStory";
 
+/*
+ * DATA SPLIT (2026-10-17) — why the four small files are imported but the
+ * track is fetched:
+ *
+ *   trip.json      3 KB   ┐
+ *   scenes.json   90 KB   ├ imported: build-time, no URL, no copy step.
+ *   attractions    11 KB  │  These are the files a human actually edits, so
+ *   diagnostics    11 KB  ┘  their ONLY copy lives in content/ — edit them
+ *                            there and the next build picks it up.
+ *   track.json  1639 KB   ─ fetched from public/data/travel/<trip>/.
+ *                            Machine output of the GPS scrape; nobody types
+ *                            it by hand. Inlining it would put 1.6 MB (93% of
+ *                            the payload) in the JS bundle and make the page
+ *                            wait for it, and it would grow with every trip.
+ *
+ * The downstream components (TravelMap, useStoryController) only ever see the
+ * parsed objects, so they do not care which route the data took.
+ */
+import tripJson from "@/content/travel/ptes-2025/trip.json";
+import scenesJson from "@/content/travel/ptes-2025/scenes.json";
+import attractionsJson from "@/content/travel/ptes-2025/attractions.json";
+
 /**
  * Trip page (2026-09-26): permanently immersive — the landing hero and the
  * ⛶/⤡ mode chip are gone (user request "不需要 exit immersive"); the page
@@ -33,10 +55,25 @@ export default function TravelLog({
   lang?: "en" | "zh";
 }) {
   const DATA_BASE = `/data/travel/${tripId}`;
-  const [trip, setTrip] = useState<TripInfo | null>(null);
+  /*
+   * trip / scenes / attractions come from the imports above — synchronous,
+   * already typed, no fetch. Only the GPS track is fetched. Seeded with
+   * lazy initialisers so there is no `setState` in an effect body
+   * (react-hooks/set-state-in-effect).
+   *
+   * The `as unknown as` casts are compile-time only: TS infers a JSON import
+   * as exact literal shapes, so e.g. `bounds: number[]` will not satisfy the
+   * `Bounds` 4-tuple even though the runtime data is correct. Nothing is
+   * evaluated at runtime; these just re-type what the JSON already holds.
+   */
+  const [trip, setTrip] = useState<TripInfo | null>(() => tripJson as unknown as TripInfo);
   const [track, setTrack] = useState<TripTrack | null>(null);
-  const [scenes, setScenes] = useState<TravelScene[]>([]);
-  const [attractions, setAttractions] = useState<Attraction[]>([]);
+  const [scenes] = useState<TravelScene[]>(
+    () => (scenesJson as unknown as { scenes: TravelScene[] }).scenes,
+  );
+  const [attractions] = useState<Attraction[]>(
+    () => (attractionsJson as unknown as { attractions?: Attraction[] }).attractions ?? [],
+  );
   const [error, setError] = useState<string | null>(null);
   /** True once the back strip is clicked: plays the right-to-left blue wipe
    *  overlay, then hard-navigates to the hub (user 2026-09-26 v6). */
@@ -60,24 +97,22 @@ export default function TravelLog({
   }, []);
 
   useEffect(() => {
-    // attractions.json is optional per-trip (404 -> empty layer)
-    const attrP = fetch(`${DATA_BASE}/attractions.json`)
-      .then((r) => (r.ok ? r.json() : { attractions: [] }))
-      .catch(() => ({ attractions: [] }));
-    Promise.all([
-      fetch(`${DATA_BASE}/trip.json`).then((r) => r.json()),
-      fetch(`${DATA_BASE}/track.json`).then((r) => r.json()),
-      fetch(`${DATA_BASE}/scenes.json`).then((r) => r.json()),
-      attrP,
-    ])
-      .then(([trip, track, scenes, attr]) => {
+    /*
+     * Only the track is fetched (see the DATA SPLIT note above). Everything
+     * else is already in the bundle, so the page has text to render before
+     * this resolves — track.json is 1.6 MB and is the reason this is async
+     * at all.
+     */
+    fetch(`${DATA_BASE}/track.json`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`track.json → HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((track: TripTrack) => {
         // derive epoch ms once at load
         for (const p of track.points) p.ts = Date.parse(p.t);
         track.points.sort((a: { ts: number }, b: { ts: number }) => a.ts - b.ts);
-        setTrip(trip);
         setTrack(track);
-        setScenes(scenes.scenes);
-        setAttractions(attr.attractions ?? []);
       })
       .catch((e) => {
         // release the veil too, so a boot error is actually visible

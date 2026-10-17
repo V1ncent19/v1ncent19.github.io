@@ -6,7 +6,7 @@ time. A badge appears when BOTH halves are in place:
 
 1. An SVG file here named after the badge key, e.g. `taipei.svg`
    → served conceptually at `/assets/gallery/badges/taipei.svg`.
-2. The same key set on the photo in `content/gallery/items.json`
+2. The same key set on the photo in `content/travel/gallery/items.json`
    → `"badge": "taipei"`.
 
 No component code changes are needed. After adding or editing artwork, run

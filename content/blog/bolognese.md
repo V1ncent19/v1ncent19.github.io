@@ -27,13 +27,13 @@ My favourite sauce for pasta! 以前在家做的时候总感觉酱的口感不�
 
 罐头番茄+番茄膏+parmesan+刚刚薅好的蔬菜+焦化的牛肉拌在一起，给片香叶，给点牛奶就可以猛熬了，如果你喜欢应该也可以用牛肉高汤填充液体，如图所示，以后有钱了一定买口大点的锅（悲）
 
-![熬酱](/assets/photos/cuisine/bolognese1.jpg)
+![熬酱](/assets/photos/blog_photo/bolognese1.jpg)
 
 出品如图，真香吧。屯冰箱里一般能吃半个月一个月的。
 
-![熬酱](/assets/photos/cuisine/bolognese3.jpg)
+![熬酱](/assets/photos/blog_photo/bolognese3.jpg)
 
-<video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/cuisine/bolognese2.mp4" type="video/mp4"></video>
+<video autoplay="autoplay" loop="loop" id="video" x-webkit-airplay="true" webkit-playsinline="true" muted=""><source src="/assets/photos/blog_photo/bolognese2.mp4" type="video/mp4"></video>
 
 
 

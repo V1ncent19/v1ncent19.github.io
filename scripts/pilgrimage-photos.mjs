@@ -4,7 +4,7 @@
  * into a sidecar table BEFORE any compositing happens.
  *
  *   npm run pilgrimage:photos -- --dir "<photo dir>" \
- *        --points content/travel/just-because/source/anitabi-212278.json
+ *        --points public/data/travel/just-because/anitabi-212278.json
  *
  * WHY THIS STEP EXISTS
  * --------------------

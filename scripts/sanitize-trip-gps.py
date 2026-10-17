@@ -3,11 +3,11 @@
 sanitize-trip-gps.py — privacy trim for deployed trip GPS data (2026-09-26).
 
 The raw GPS track starts and ends at the author's home; the deployed
-public/data/travel/<id>/track.json therefore exposes the home coordinates
-(first/last points, dwell points, day-0 bounding box). This script trims the
-leading/trailing points that sit within RADIUS of the home anchor — detected
-automatically as the track's first point (no address is ever written into the
-script or its output) — and remaps every point-index reference:
+track.json therefore exposes the home coordinates (first/last points, dwell
+points, day-0 bounding box). This script trims the leading/trailing points
+that sit within RADIUS of the home anchor — detected automatically as the
+track's first point (no address is ever written into the script or its output)
+— and remaps every point-index reference:
 
   track.json   points / startTime / endTime / bounds / segments
                days: startIndex/endIndex shifted+clamped, empty days dropped,
@@ -25,7 +25,12 @@ original values: trimming ~3 km at each end moves them negligibly, and the
 hand-written hub card stats stay consistent.
 
 Usage:
-  python scripts/sanitize-trip-gps.py public/data/travel/ptes-2025 [--radius-m 3000] [--dry-run]
+  python scripts/sanitize-trip-gps.py content/travel/ptes-2025 [--radius-m 3000] [--dry-run]
+
+  Point it at the trip folder (the source), not the generated mirror under
+  public/data/ — sync:data regenerates the mirror from the source on the next
+  build, so sanitizing there would silently undo itself. The trip folder is
+  flat since 2026-10-17; there is no data/ subfolder any more.
 """
 
 import json

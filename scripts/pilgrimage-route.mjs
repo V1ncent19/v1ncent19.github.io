@@ -15,7 +15,7 @@
  *       so all wall-clock filtering here is done with a fixed +09:00 offset.
  *
  * OUTPUT (committed — this is the only route data the site ships)
- *   content/travel/just-because/source/route.json
+ *   public/data/travel/just-because/route.json
  *
  * PRIVACY CONTRACT
  *   This is the whole reason the script exists. The raw file holds a whole
@@ -47,7 +47,7 @@ const SRC_ABS = path.resolve(
 );
 const OUT_ABS = path.resolve(
   root,
-  arg("out", "content/travel/just-because/source/route.json"),
+  arg("out", "public/data/travel/just-because/route.json"),
 );
 
 /**

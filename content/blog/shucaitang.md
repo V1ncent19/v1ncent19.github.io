@@ -40,4 +40,4 @@ category: Cuisine
 
 ## 出品
 
-![地中海风味蔬菜汤](/assets/photos/cuisine/shucaitang.JPG)
+![地中海风味蔬菜汤](/assets/photos/blog_photo/shucaitang.JPG)
