@@ -41,9 +41,17 @@ yarn-error.log*
 # vercel
 .vercel
 
-# raw trip GPS (home-address-level) — never push; only sanitized copies in
-# public/data/travel/ (produced by scripts/sanitize-trip-gps.py) go online.
+# raw trip GPS (home-address-level) — never push. Only the sanitized, simplified
+# route (content/travel/just-because-route.json, produced by
+# scripts/pilgrimage-route.mjs) goes online.
 /assets-src/travel-data/
+
+# belt-and-braces: the whole-year GPS export was briefly parked under
+# public/assets/pilgrimage/just-because/gps_original/ before being moved to
+# assets-src/. public/ is copied verbatim into the static export, so keep this
+# rule too — that mistake must never be committable again.
+/public/assets/pilgrimage/**/gps_original/
+/public/**/gps_original/
 
 # full-resolution gallery originals — local MASTER copy, still never edited in
 # place. The pipeline (npm run gallery:gen) mirrors each file byte-for-byte
@@ -51,3 +59,19 @@ yarn-error.log*
 # those copies ARE committed. Web tiers live under
 # public/assets/gallery/{thumb,large} and are produced by the same script.
 /GalleryPhoto/
+
+# pilgrimage photo masters — full-resolution originals that still carry EXIF GPS
+# and were never meant to be published. Local master only; the site ships one
+# compressed, EXIF-free derivative tier instead, built by
+# scripts/pilgrimage-derive.mjs into
+# public/assets/pilgrimage/just-because/compare/.
+# (shot/, thumb/ and the anitabi anime screenshots were retired on 2026-10-16:
+# only the hand-made composites go online.)
+/assets-src/photos/
+
+# belt-and-braces: the masters were briefly parked under public/assets/photos/
+# before being moved to assets-src/. public/ is copied verbatim into the static
+# export, so keep this rule too — a repeat of that mistake must never be
+# committable. (The rest of public/assets/photos/ is legitimate: cal.png and the
+# cuisine/jokes/nihongo folders are tracked and used by the blog and about page.)
+/public/assets/photos/**/original/

@@ -24,7 +24,7 @@ export default function Ptes2025ZhPage() {
         重渲染 → 节点被删，v11 诊断探针实测）。TravelLog 在数据与地图就绪后加
         .tl-veil-open，收幕动画结束自动移除两个类。
       */}
-      <TravelLog tripId="ptes-2025" backHref="/travel/zh" backLabel="返回旅行志" />
+      <TravelLog tripId="ptes-2025" backHref="/travel/zh" backLabel="返回旅行志" lang="zh" />
     </>
   );
 }

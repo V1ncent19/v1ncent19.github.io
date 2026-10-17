@@ -1,6 +1,6 @@
 # Handover — 站点现状与新功能启动入口
 
-**最后更新：2026-10-07。** 这是 `structure_file/` 的主入口文件。任何 agent 接手工作时**先读这一个文件**，再按需查 `ARCHITECTURE.md`（系统怎么搭的）和 `CONVENTIONS.md`（设计基线与工作守则）。
+**最后更新：2026-10-16。** 这是 `structure_file/` 的主入口文件。任何 agent 接手工作时**先读这一个文件**，再按需查 `ARCHITECTURE.md`（系统怎么搭的）和 `CONVENTIONS.md`（设计基线与工作守则）。
 
 ---
 
@@ -14,13 +14,14 @@ Next.js 16 静态导出的个人站（`nextjs-rebuild` 分支）已完全替代�
 - 部署目标：GitHub Pages（v1ncent19.github.io，CNAME 已就位）；静态导出约束一切——**禁止 server-only 特性**
 - 评论 giscus（`@giscus/react`）；中文字体自托管子集化（GenWanMin2 TC）
 
-## 3. 当前进行中的状态（2026-10-07）
+## 3. 当前进行中的状态（2026-10-16）
 
 | 项 | 状态 |
 |---|---|
-| 未提交改动 | ~80 个文件（v1 基线后的全部迭代）。**绝不擅自 commit/push，等用户显式验收** |
+| 未提交改动 | `M .gitignore`、`M package.json` + 新增 `content/travel/`、`public/assets/pilgrimage/`、4 个 scripts。**绝不擅自 commit/push，等用户显式验收** |
 | Travel hub | MapLibre 地球仪 + 游记 tiles + 心愿单清单 + 双向 hover 联动，导航第四项 |
 | ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画）；**v15 换入 `游记.docx` 重写正文（14.8k 字）并按 GPS 单元投放**；v16 起景点标点为纯视觉标记（点击弹窗已删）；v17 全量核查 75 个景点坐标；**v18 按用户逐条报错再修 14 处、删 2 增 0 → 73 个**（含焦糖山改用本人轨迹的长时间停留点） |
+| **巡礼地图（Just Because!@藤泽）** | **数据管线已完成并验证；前端未开始**。母版归档 → `photos.json`（位置真源）+ 154 张 anime 截图 + shot/thumb 派生档已就位（48 MB，零 EXIF）；`compare/` 空，**等用户手工合成对比图后回来做地图组件**。详见 `FEATURE_PILGRIMAGE.md` |
 | 移动端 | ptes 上下 4:6 布局、图例可收起（默认收起）、tile 极简、排序格独立成行 |
 | 手机预览 | WorkBuddy 发布链 https://e7404f038b8749af93853f25d7c30b44.app.workbuddy.host （说「重新发布预览」即重新部署） |
 | 截图相册线上发布 | **暂停**（v12 起按用户要求） |
@@ -64,4 +65,5 @@ cd out && python -m http.server 4173 --bind 127.0.0.1   # 与探针同一命令�
 | `ARCHITECTURE.md` | 实际系统架构：路由树、目录职责、数据管线、脚本 |
 | `CONVENTIONS.md` | 锁定的 v1 设计基线 + 历次决策记录 + agent 工作守则 |
 | `GALLERY_ADDING_PHOTOS.md` | 相册加照片的操作流程（照做即可） |
+| `FEATURE_PILGRIMAGE.md` | **巡礼地图（Just Because!@藤泽）** —— 数据管线全貌 + 断点续作指引 |
 | `archive/` | 2026-09 初的重建规划原稿（Stitch、迁移审计、实施规范等），仅考古用，**内容多已过时** |

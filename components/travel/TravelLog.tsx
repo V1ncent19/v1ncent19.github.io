@@ -18,6 +18,7 @@ export default function TravelLog({
   tripId = "ptes-2025",
   backHref,
   backLabel,
+  lang = "en",
 }: {
   tripId?: string;
   /** When set, renders the back exit linking to the /travel hub (all
@@ -26,6 +27,10 @@ export default function TravelLog({
    *  text and the aria-label. */
   backHref?: string;
   backLabel?: string;
+  /** Page language — forwarded to the map so maplibre's own UI strings (the
+   *  cooperative-gesture hint) match the page. Defaults to English, which is
+   *  maplibre's built-in table. */
+  lang?: "en" | "zh";
 }) {
   const DATA_BASE = `/data/travel/${tripId}`;
   const [trip, setTrip] = useState<TripInfo | null>(null);
@@ -147,6 +152,7 @@ export default function TravelLog({
             onUserInteract={enterExplore}
             onResume={resumeStory}
             onMapReady={() => setMapReady(true)}
+            lang={lang}
           />
           {backHref ? (
             <>
@@ -224,97 +230,16 @@ export default function TravelLog({
           --tl-top: 0px;
           --tl-map-h: 100vh;
         }
-        /* v19 (2026-10-09): trip-page theme tokens. The trip page is its own
-           opaque "paper" surface, so it carries an explicit --tl-* layer
-           instead of the site's --surface/--ink set; the .dark block below
-           flips the same names. Scope = body.tl-immersive, so the root-level
-           exit wipe (rendered OUTSIDE .travel-layout) inherits too. */
-        body.tl-immersive {
-          --tl-paper: #faf9f7;
-          --tl-paper-2: #faf9f6;
-          --tl-surface: #ffffff;
-          --tl-surface-2: #f8f6f2;
-          --tl-surface-3: #f3f0ea;
-          --tl-panel: rgba(255, 255, 255, 0.88);
-          --tl-panel-strong: rgba(255, 255, 255, 0.92);
-          --tl-ink: #1f2937;
-          --tl-ink-2: #374151;
-          --tl-ink-3: #4b5563;
-          --tl-muted: #6b7280;
-          --tl-faint: #9ca3af;
-          --tl-line: #e5e7eb;
-          --tl-line-2: #e3e0da;
-          --tl-line-3: #d1d5db;
-          --tl-line-4: #cfd4da;
-          --tl-line-5: #c9ced4;
-          --tl-hair: rgba(15, 23, 42, 0.12);
-          --tl-paper-line: #d9d4cb;
-          --tl-divider: #eee9e2;
-          --tl-accent: #1ba7c9;
-          --tl-accent-strong: #0e7d9c;
-          --tl-accent-soft: #e8f5f9;
-          --tl-accent-soft-2: #eef9fd;
-          --tl-accent-soft-3: #e2f4fb;
-          --tl-chip: #cfeaf5;
-          --tl-on-accent: #ffffff;
-          --tl-strip: #ebe8e2;
-          --tl-strip-ink: #8a8478;
-          --tl-dot-off: #b9b2a7;
-          --tl-map-bg: #e9edf0;
-          --tl-attr: #c96f2f;
-          --tl-amber: #d97706;
-          --tl-amber-ink: #b45309;
-          --tl-gold: #d9a441;
-          --tl-slate: #5b6b9e;
-          --tl-gap: #a8a196;
-          --tl-scrim: rgba(31, 41, 55, 0.28);
-          --tl-tnav-fade: rgba(250, 249, 246, 0.96);
-          --tl-tnav-fade-97: rgba(250, 249, 246, 0.97);
-          --tl-tnav-fade-0: rgba(250, 249, 246, 0);
-        }
-        .dark body.tl-immersive {
-          --tl-paper: #15130f;
-          --tl-paper-2: #15130f;
-          --tl-surface: #201d18;
-          --tl-surface-2: #1e1b16;
-          --tl-surface-3: #232019;
-          --tl-panel: rgba(30, 27, 22, 0.88);
-          --tl-panel-strong: rgba(30, 27, 22, 0.92);
-          --tl-ink: #ebe6dc;
-          --tl-ink-2: #cdc6b8;
-          --tl-ink-3: #b6afa1;
-          --tl-muted: #9b9486;
-          --tl-faint: #7c7669;
-          --tl-line: #322e28;
-          --tl-line-2: #322e28;
-          --tl-line-3: #3a352e;
-          --tl-line-4: #3a352e;
-          --tl-line-5: #443f37;
-          --tl-hair: rgba(255, 255, 255, 0.12);
-          --tl-paper-line: #322e28;
-          --tl-divider: #2b2721;
-          --tl-accent: #3ccfff;
-          --tl-accent-strong: #7fdcff;
-          --tl-accent-soft: #10262e;
-          --tl-accent-soft-2: #0e2029;
-          --tl-accent-soft-3: #0e2029;
-          --tl-chip: #143039;
-          --tl-on-accent: #0c1a20;
-          --tl-strip: #1e1b16;
-          --tl-strip-ink: #9b9486;
-          --tl-dot-off: #5b554b;
-          --tl-map-bg: #1b1b1b;
-          --tl-attr: #e0915a;
-          --tl-amber: #e0a33a;
-          --tl-amber-ink: #e8b25a;
-          --tl-gold: #d9a441;
-          --tl-slate: #8f9ede;
-          --tl-gap: #7c7669;
-          --tl-scrim: rgba(0, 0, 0, 0.5);
-          --tl-tnav-fade: rgba(21, 19, 15, 0.96);
-          --tl-tnav-fade-97: rgba(21, 19, 15, 0.97);
-          --tl-tnav-fade-0: rgba(21, 19, 15, 0);
-        }
+        /* v19 (2026-10-09): trip-page theme tokens — MOVED to app/globals.css
+           on 2026-10-17. They are plain custom-property declarations scoped to
+           body.tl-immersive, and this styled-jsx block only exists once
+           TravelLog mounts. The pilgrimage page (/travel/just-because) sets
+           the same body class but does not render TravelLog, so every
+           var(--tl-…) there resolved to nothing (measured:
+           getComputedStyle(body).getPropertyValue("--tl-panel-strong") === "").
+           A global stylesheet is the right home — the tokens now ship in the
+           critical CSS and are correct on first paint. Do not redeclare them
+           here; edit the globals.css block instead. */
         .map-col {
           width: 46%;
           position: sticky;
@@ -574,7 +499,14 @@ export default function TravelLog({
         .map-legend {
           position: absolute;
           left: 14px;
-          bottom: 14px;
+          /* 2026-10-17: the licence strip now owns the map's bottom edge
+             (.map-attrib, shared with the pilgrimage page), so the legend has
+             to sit ABOVE it or the two overlap — the strip is a licence
+             obligation and must never be covered. --tl-attrib-h is published
+             by the strip itself (26px desktop, 42px when it wraps on mobile).
+             NOTE: no backticks in this comment — it lives inside a styled-jsx
+             template literal and a stray backtick closes the string. */
+          bottom: calc(var(--tl-attrib-h, 26px) + 14px);
           z-index: 4;
           background: var(--tl-panel-strong);
           border-radius: 10px;

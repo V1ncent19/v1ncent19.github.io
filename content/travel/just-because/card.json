@@ -1,0 +1,49 @@
+{
+  "id": "just-because",
+  "title": {
+    "en": "Just Because! — Anitabi · 藤沢",
+    "zh": "【Just Because!】圣地巡礼 / Anitabi"
+  },
+  "blurb": {
+    "en": "A single morning riding the Just Because! locations around 藤沢 and 鎌倉 — 36 live-shot ↔ anime-still composites pinned along the recorded route.",
+    "zh": "一个上午，骑行《Just Because!》在藤泽与镰仓的取景地——36 组实景与动画画面对比，沿真实轨迹逐一定位。"
+  },
+  "start": "2026-09-21",
+  "end": "2026-09-21",
+  "days": 1,
+  "distanceKm": 17.6,
+  "gpsPoints": 36,
+  "beta": false,
+  "stops": {
+    "en": [
+      "藤沢",
+      "深沢"
+    ],
+    "zh": [
+      "藤沢",
+      "深沢"
+    ]
+  },
+  "cover": "/assets/pilgrimage/just-because/card/img-2748.webp",
+  "coverPos": "center 30%",
+  "cardMeta": {
+    "en": "Anitabi pilgrimage map",
+    "zh": "圣地巡礼地图"
+  },
+  "cardCta": {
+    "en": "Ride the route",
+    "zh": "沿路线圣地巡礼"
+  },
+  "cardFacts": {
+    "en": [
+      "2.5 h",
+      "17.6 km",
+      "36 composites"
+    ],
+    "zh": [
+      "2.5 小时",
+      "17.6 km",
+      "36 张对比图"
+    ]
+  }
+}

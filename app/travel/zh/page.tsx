@@ -35,17 +35,20 @@ export default function TravelZhPage() {
     date: trip.start,
     title: trip.title.zh,
     /* v2（2026-09-26）：只保留基本 metainfo——摘要小字删除（用户要求）；
-       hover 圆形 reveal 封面对齐首页 gateway 卡。 */
-    meta: "互动地图游记",
+       hover 圆形 reveal 封面对齐首页 gateway 卡。
+       2026-10：游记可覆盖 meta/CTA/facts，避免用「N 天 · N 轨迹点」默认
+       文案描述一个上午的合成图巡礼。 */
+    meta: trip.cardMeta?.zh ?? "互动地图游记",
     tags: trip.stops?.zh,
-    facts: [
+    facts: trip.cardFacts?.zh ?? [
       `${trip.days} 天`,
       `${trip.distanceKm.toLocaleString("en-US", { maximumFractionDigits: 1 })} km`,
       `${trip.gpsPoints.toLocaleString("en-US")} 轨迹点`,
     ],
-    cta: "阅读旅行志",
+    cta: trip.cardCta?.zh ?? "阅读旅行志",
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
+    coverPos: trip.coverPos,
     /* 互动游记钉在瀑布流最前（2026-09-25 用户定案）；下面的食记改为按日期
        落进时间线。 */
     pinned: true,

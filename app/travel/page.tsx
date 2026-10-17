@@ -37,17 +37,21 @@ export default function TravelPage() {
     date: trip.start,
     title: trip.title.en,
     /* v2 (2026-09-26): basic metainfo only — the blurb excerpt is dropped
-       (user request); hover circle-reveal cover mirrors the home gateway. */
-    meta: "Interactive map log",
+       (user request); hover circle-reveal cover mirrors the home gateway.
+       Oct 2026: a trip may override meta/CTA/facts when the trip-log defaults
+       would misdescribe it (the pilgrimage is one morning of composites, not
+       a multi-day GPS track). */
+    meta: trip.cardMeta?.en ?? "Interactive map log",
     tags: trip.stops?.en,
-    facts: [
+    facts: trip.cardFacts?.en ?? [
       `${trip.days} days`,
       `${trip.distanceKm.toLocaleString("en-US", { maximumFractionDigits: 1 })} km`,
       `${trip.gpsPoints.toLocaleString("en-US")} GPS pts`,
     ],
-    cta: "Read the log",
+    cta: trip.cardCta?.en ?? "Read the log",
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
+    coverPos: trip.coverPos,
     /* The interactive trip log is pinned to the front of the flow (2026-09-25
        user request); the food diary below instead slots into the timeline. */
     pinned: true,

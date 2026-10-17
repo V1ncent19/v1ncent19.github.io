@@ -9,6 +9,10 @@
     "lint": "eslint",
     "gallery:gen": "node scripts/gallery.mjs",
     "badges": "node scripts/build-badges.mjs",
+    "anitabi:snapshot": "node scripts/anitabi-points.mjs",
+    "anitabi:images": "node scripts/anitabi-images.mjs",
+    "pilgrimage:photos": "node scripts/pilgrimage-photos.mjs",
+    "pilgrimage:derive": "node scripts/pilgrimage-derive.mjs",
     "prebuild": "npm run badges",
     "predev": "npm run badges"
   },

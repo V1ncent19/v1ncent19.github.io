@@ -45,6 +45,22 @@ interface Honor {
 
 const HONORS: Honor[] = [
   {
+    title: "Honorable Mention — MCM/ICM",
+    titleZh: "美国大学生数学建模竞赛（MCM/ICM）荣誉提名",
+    sub: "Mathematical Contest in Modeling (COMAP), track A",
+    subZh: "COMAP 数学建模竞赛 · A 题 · H 奖",
+    year: "2022",
+    dot: "bg-brand",
+  },
+  {
+    title: "Scholarship for Academic Advance",
+    titleZh: "学业进步奖学金",
+    sub: "Tsinghua University",
+    subZh: "清华大学",
+    year: "2020",
+    dot: "bg-accent",
+  },
+  {
     title: "Five-star Zijing Volunteer",
     titleZh: "五星级紫荆志愿者",
     sub: "五星级紫荆志愿者 · Tsinghua University Volunteer Association",
@@ -52,14 +68,6 @@ const HONORS: Honor[] = [
     year: "2023",
     dot: "bg-tertiary",
   },
-  // {
-  //   title: "Honorable Mention — MCM/ICM",
-  //   titleZh: "美国大学生数学建模竞赛（MCM/ICM）荣誉提名",
-  //   sub: "Mathematical Contest in Modeling (COMAP), track A",
-  //   subZh: "COMAP 数学建模竞赛 · A 题 · H 奖",
-  //   year: "2022",
-  //   dot: "bg-brand",
-  // },
   {
     title: "Ma Yuehan Cup — Shooting",
     titleZh: "马约翰杯 · 射击",

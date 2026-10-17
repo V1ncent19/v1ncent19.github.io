@@ -59,8 +59,24 @@ const TOPO_STYLE = {
   layers: [{ id: "otm", type: "raster" as const, source: "otm" }],
 };
 
-// v21 (2026-10-09 user request): the map's top-right control is split into TWO
-// INDEPENDENT groups so "page brightness" and "map form" stop fighting:
+/**
+ * The fixed bottom-strip credits (2026-10-17 user request: adopt the
+ * pilgrimage page's pattern — "把 license 和地图数据源这些信息写在地图区底部
+ * 固定条上").
+ *
+ * One entry per style the map can show, because the credit changes with the
+ * basemap: the vector pair are CARTO's, and the two raster overrides are Esri
+ * and OpenTopoMap (whose own licence requires CC-BY-SA attribution). These
+ * strings MUST match the `attribution` fields above — that is the machine-
+ * readable copy maplibre would print; this is the human-readable strip.
+ */
+const BASEMAP_CREDITS: Record<"vector" | Exclude<SpecialBasemap, "">, string> = {
+  vector: "地图底图 © OpenStreetMap contributors · CARTO",
+  sat: "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics",
+  topo: "© OpenStreetMap contributors, SRTM | style: © OpenTopoMap (CC-BY-SA)",
+};
+
+// v21 (2026-10-09 user request): the map's top-right control is split into TWO// INDEPENDENT groups so "page brightness" and "map form" stop fighting:
 //   Group 1 · 明暗 (自/昼/夜) — a 3-way RADIO, always exactly one. It IS the
 //     site theme (system/light/dark), written to the SAME key the header
 //     toggle uses, so a flip here is already in effect on the main site.
@@ -138,6 +154,11 @@ interface Props {
    *  first frame drawn). v11 entry veil: the trip page stays covered until
    *  this fires, so the reveal never exposes a half-initialised map. */
   onMapReady?: () => void;
+  /** Page language, used to localise maplibre's OWN UI strings — currently
+   *  the cooperative-gesture hint ("Ctrl + scroll to zoom"). Optional so the
+   *  English routes need no change; anything other than "zh" falls through
+   *  to maplibre's built-in English table. */
+  lang?: "en" | "zh";
 }
 // `scenes` kept in Props for the camera rebuild key ordering
 import type { TravelScene } from "@/lib/travel/types";
@@ -376,6 +397,7 @@ export default function TravelMap({
   onUserInteract,
   onResume,
   onMapReady,
+  lang = "en",
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -441,7 +463,37 @@ export default function TravelMap({
         style: style0,
         center: [(trip.bounds[0] + trip.bounds[2]) / 2, (trip.bounds[1] + trip.bounds[3]) / 2],
         zoom: 4,
-        attributionControl: { compact: true },
+        // 2026-10-17 user request: the licence and basemap credits now live in
+        // a FIXED STRIP along the bottom of the map area — the pattern the
+        // pilgrimage page already used — instead of maplibre's collapsible
+        // "i" chip, which hid the credit behind a click and floated over the
+        // map. The native control is disabled so the credit is not printed
+        // twice; `.map-attrib` below renders the same information from
+        // `BASEMAP_CREDITS`, which must stay in step with the style objects.
+        attributionControl: false,
+        // The map column is 100vh on desktop and 40-60vh on mobile, i.e. a
+        // large share of the viewport the reader scrolls THROUGH. With
+        // maplibre's default gesture set, every wheel tick over the map zooms
+        // instead of scrolling the page, so reading the story gets stuck the
+        // moment the pointer drifts across the map. `cooperativeGestures`
+        // inverts the priority: page scroll always wins, the wheel zooms only
+        // with ⌘/Ctrl, and a phone needs two fingers.
+        //
+        // The grey scrim and the hint text are NOT ours — maplibre renders
+        // `.maplibregl-cooperative-gesture-screen` (40% black, pointer-events
+        // none) on first blocked gesture and fades it out again. Its wording
+        // comes from the UI string table, so `locale` below is the only thing
+        // needed to make the hint read in the page's language.
+        cooperativeGestures: true,
+        ...(lang === "zh"
+          ? {
+              locale: {
+                "CooperativeGesturesHandler.WindowsHelpText": "按 Ctrl + 滚轮缩放地图",
+                "CooperativeGesturesHandler.MacHelpText": "按 ⌘ + 滚轮缩放地图",
+                "CooperativeGesturesHandler.MobileHelpText": "用两指移动地图",
+              },
+            }
+          : {}),
       });
       mapRef.current = map;
       setMapCreated(true);
@@ -1135,6 +1187,17 @@ export default function TravelMap({
         )}
       </div>
       {state.mode === "explore" && <ResumeStoryButton onResume={onResume} />}
+
+      {/* Licence + data-source strip, pinned to the map's bottom edge.
+          Same anatomy as the pilgrimage page's `.pj-attrib`: a translucent
+          panel that the map reads through, one line, wrapping on narrow
+          screens. It replaces maplibre's collapsible attribution chip so the
+          credit is ALWAYS visible rather than one tap away. */}
+      <div className="map-attrib">
+        <span>{BASEMAP_CREDITS[specialBasemap || "vector"]}</span>
+        <span className="map-attrib-sep">·</span>
+        <span>轨迹与照片为本人记录</span>
+      </div>
     </div>
   );
 }

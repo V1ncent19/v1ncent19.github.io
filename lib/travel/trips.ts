@@ -1,14 +1,44 @@
 /**
- * Travel hub registry (2026-09-25). Hand-written display metadata for the
- * /travel hub cards — the heavy per-trip data (track/scenes/trip JSON) stays
- * in public/data/travel/<id>/ and is fetched client-side by TravelLog; only
- * these summary fields are baked into the hub at build time. IMPORTANT: any
- * data placed in public/ ships to the web — run
- * scripts/sanitize-trip-gps.py on every trip folder first so the raw
- * home-area GPS head/tail never deploys (2026-09-26 user privacy rule).
- * When a new trip is added (lab pipeline → sanitize → public/data/travel/<id>),
- * add a row here and an app/travel/<id>/page.tsx (+ zh mirror).
+ * Travel hub registry.
+ *
+ * 2026-10-17 reorganisation: each trip owns a directory under
+ * `content/travel/<id>/`, and its hub-card metadata lives in that directory as
+ * `card.json` beside the trip's own data files:
+ *
+ *   content/travel/ptes-2025/
+ *     card.json          ← this file
+ *     trip.json etc.     ← fetched client-side from public/data/travel/<id>/
+ *   content/travel/just-because/
+ *     card.json          ← this file
+ *     page.json          ← imported at build time by the page
+ *     source/            ← generator inputs (route, anitabi snapshot)
+ *
+ * Why the change: the cards used to live as inline objects in one central
+ * array, which meant adding a trip required editing a file in `lib/` — the
+ * content was spread across the tree with nothing tying it to the trip it
+ * described. Now `content/travel/<id>/` is the complete record of a trip
+ * (metadata + data + generator inputs), and this module just sweeps the
+ * directory.
+ *
+ * ORDER: sorted by `start` date, oldest first, with `id` as the tiebreak so
+ * the result is deterministic. This module's order no longer decides the hub's
+ * visual order — app/travel/page.tsx re-sorts its tiles by their anchor date
+ * and applies the `pinned` flag itself — so the sort here only needs to be
+ * *stable and predictable*, which makes diffs and debugging sane.
+ *
+ * PRIVACY: `card.json` is build-time content and never ships as-is, but any
+ * truck payload under `public/data/travel/<id>/` DOES ship. Run
+ * scripts/sanitize-trip-gps.py on every trip folder before pointing the page
+ * at it (2026-09-26 user privacy rule).
+ *
+ * To add a trip: create `content/travel/<new-id>/card.json`, add
+ * `app/travel/<new-id>/page.tsx` (+ the `/zh` mirror), and — for the trip-log
+ * style pages — drop the sanitized JSON into `public/data/travel/<new-id>/`.
+ * Nothing in this file needs editing.
  */
+
+import fs from "node:fs";
+import path from "node:path";
 
 export interface TripCard {
   id: string;
@@ -27,46 +57,90 @@ export interface TripCard {
    */
   stops?: { en: string[]; zh: string[] };
   /**
-   * Optional hub-card cover photo (a gallery thumb URL, ideally landscape).
-   * Shown as the right-hand / top image on the /travel hub card. Point it at
-   * one of the trip's own photos in content/gallery/items.json.
+   * Optional hub-card cover photo. Shown as the right-hand / top image on the
+   * /travel hub card. For gallery-backed trips point it at one of the trip's
+   * own photos in content/gallery/items.json; a trip with its own asset tree
+   * may point anywhere under /assets.
    */
   cover?: string;
+  /** object-position for the hover-orb cover, e.g. "center 30%". */
+  coverPos?: string;
+  /**
+   * Per-trip overrides for the hub card's stat line / meta / CTA.
+   *
+   * Needed because the default trio ("N days · X km · N GPS pts") only makes
+   * sense for a tracked multi-day road trip. The pilgrimage (2026-10-16) is a
+   * single 2.5-hour ride whose "photos" are composites, so it counts scenes
+   * rather than GPS samples and reads "Anime pilgrimage map" instead of
+   * "Interactive map log". Omit these and the trip-log defaults apply.
+   */
+  cardMeta?: { en: string; zh: string };
+  cardCta?: { en: string; zh: string };
+  /** The stat line, already formatted. Overrides days/distance/gpsPoints. */
+  cardFacts?: { en: string[]; zh: string[] };
 }
 
-export const tripCards: TripCard[] = [
-  {
-    id: "ptes-2025",
-    title: {
-      en: "Iberia 2025 — Portugal · Spain · Christmas",
-      zh: "伊比利亚 2025 — 葡萄牙 · 西班牙 · 圣诞",
-    },
-    blurb: {
-      en: "Two weeks over Christmas and New Year: Lisbon, Porto, Madrid, Barcelona and the towns between — the route grows as the story scrolls.",
-      zh: "圣诞与新年的两周：里斯本、波尔图、马德里、巴塞罗那与沿途小城——轨迹随故事滚动而生长。",
-    },
-    start: "2025-12-15",
-    end: "2026-01-01",
-    /* 17 = tracked days after GPS sanitization: the raw track's 18th day
-       (2026-01-01) was a single at-home arrival ping, trimmed by
-       scripts/sanitize-trip-gps.py — the trip page intro derives its number
-       from trip.days.length, so this card must match. */
-    days: 17,
-    distanceKm: 18039.7,
-    /* Post-sanitization count (scripts/sanitize-trip-gps.py, 2026-09-26):
-       the raw track's head/tail dwell within 3 km of home is trimmed before
-       deploy — the public folder only ever carries the trip's own GPS. */
-    gpsPoints: 21863,
-    beta: true,
-    stops: {
-      en: ["Lisbon", "Porto", "Madrid", "Barcelona", "+6 towns"],
-      zh: ["里斯本", "波尔图", "马德里", "巴塞罗那", "+6 小城"],
-    },
-    // Porto riverside, 2025-12-16 (landscape) — from the trip's own photos.
-    cover: "/assets/gallery/thumb/img-5489.webp",
-  },
-  // japan-2025 raw data was moved OUT of public/ to assets-src/travel-data/
-  // (2026-09-26 user privacy decision: nothing unpublished ships GPS). To
-  // publish: run scripts/sanitize-trip-gps.py on it, copy to
-  // public/data/travel/japan-2025, add a card row here + page (+ zh mirror).
+const TRAVEL_DIR = path.join(process.cwd(), "content", "travel");
+
+/** Fields a card.json must carry; anything else is rejected so a typo in a
+ *  new card fails the BUILD rather than silently rendering an empty tile. */
+const REQUIRED: (keyof TripCard)[] = [
+  "id",
+  "title",
+  "blurb",
+  "start",
+  "end",
+  "days",
+  "distanceKm",
+  "gpsPoints",
+  "beta",
 ];
+
+/**
+ * Read every `content/travel/<id>/card.json`.
+ *
+ * Synchronous on purpose: this runs once per build, at module evaluation, the
+ * same as the hand-written array it replaces. Returning a plain module-level
+ * array keeps the two hub pages (`app/travel/page.tsx` and its zh mirror)
+ * untouched — they still just import `tripCards`.
+ */
+function readTripCards(): TripCard[] {
+  if (!fs.existsSync(TRAVEL_DIR)) return [];
+
+  const cards: TripCard[] = [];
+  for (const entry of fs.readdirSync(TRAVEL_DIR, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    /* `source/` is a generator input folder that lives INSIDE a trip
+       directory; it is not a trip of its own. Anything without a card.json is
+       skipped anyway, but naming the rule here keeps a future `source/` from
+       looking like a mystery. */
+    const file = path.join(TRAVEL_DIR, entry.name, "card.json");
+    if (!fs.existsSync(file)) continue;
+
+    const raw = JSON.parse(fs.readFileSync(file, "utf8")) as Partial<TripCard>;
+    const missing = REQUIRED.filter((k) => raw[k] === undefined);
+    if (missing.length) {
+      throw new Error(
+        `${path.relative(process.cwd(), file)} is missing: ${missing.join(", ")}. ` +
+          "Every trip card needs these fields (see lib/travel/trips.ts).",
+      );
+    }
+    /* The directory name is the URL segment and the hub tile's key, so a card
+       whose `id` disagrees with its folder would produce a dead link that only
+       fails at click time. Catch it here instead. */
+    if (raw.id !== entry.name) {
+      throw new Error(
+        `content/travel/${entry.name}/card.json declares id "${raw.id}" — ` +
+          "it must match its directory name.",
+      );
+    }
+    cards.push(raw as TripCard);
+  }
+
+  /* Oldest departure first. Ties broken by id so the order is deterministic
+     (two trips can genuinely start on the same day). */
+  cards.sort((a, b) => a.start.localeCompare(b.start) || a.id.localeCompare(b.id));
+  return cards;
+}
+
+export const tripCards: TripCard[] = readTripCards();
