@@ -46,7 +46,8 @@
 - 相册：瀑布流 + 灯箱，挂在 `/travel` 的「Stories & frames」；**只有两档 webp 上线**
   （`thumb/` + `large/`），全分辨率原图不上线、只在本地磁盘（`public/assets/photos/gallery/original/`，
   git-ignored，唯一副本），灯箱也就没有下载按钮 —— 除非某行手写了外部 `originalUrl`。
-  加照片流程见 `GALLERY_ADDING_PHOTOS.md`。
+  加照片流程见 `GALLERY_ADDING_PHOTOS.md`。**已否决（2026-10-18）：原图随站发布 + 同源下载按钮**
+  —— 142 MB 既过不了 `check:refs` 又推不上去（408），别再把它纳入版本控制。
 - **双语内容只有一种写法**（2026-10-17 统一）：可翻译字段一律 `{ "en": …, "zh": … }`，
   读的时候只走 `lib/localized.ts` 的 `pick()`。`summaryZh` / `nameEn` / `place_en` / `hrefZh`
   这类后缀已全部废除，`npm run check:i18n`（挂 prebuild）会直接让 build 失败。

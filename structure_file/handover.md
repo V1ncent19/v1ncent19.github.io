@@ -1,6 +1,6 @@
 # Handover — 站点现状与新功能启动入口
 
-**最后更新：2026-10-17。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
+**最后更新：2026-10-18。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
 `ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_PILGRIMAGE.md`（巡礼页）。
 
 ---
@@ -11,7 +11,8 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 全部主路由（Home / About / CV / Blog / Project / Travel / Guestbook）上线真实内容，中文 `/zh` 覆盖主路由
 （`/about/zh` 是亲笔原文，其余挂机翻声明条）。
 **Travel 是当前最重的模块**：hub（地球仪 + 游记 tiles + 相册墙 + 心愿单）、ptes-2025 互动游记、just-because 巡礼地图。
-2026-10-17 已把整棵新树（含 213 MB `public/assets/`）入库，发布方式见 §4。
+2026-10-17 整棵新树（含 213 MB `public/assets/`）入库；**2026-10-18 首次部署成功并覆盖旧站**
+（commit `2f2b7b7` / Actions run `39081897536` success，线上 `tuoruipeng.com` 已是新站，旧 Jekyll 的 `/gallery/` 等路由 404）。发布方式见 §4。
 
 ## 2. 技术栈（勿改）
 
@@ -20,12 +21,13 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 - 评论 giscus（`@giscus/react`）；中文字体自托管子集化（GenWanMin2 TC + Cactus 深兜底）
 - 地图 MapLibre GL（`/travel` 地球仪、ptes-2025、just-because）
 
-## 3. 当前状态（2026-10-17）
+## 3. 当前状态（2026-10-18）
 
 | 项 | 状态 |
 |---|---|
 | **content/ 组织** | 已按路由段重排（`about/ blog/ cv/ project/ travel/ site/`），双语统一为 `{en,zh}` 一种写法 |
 | **public/assets/** | 已按页面归属重排（`about/ home/ cv/ project/ gallery/ photos/`）；相册原图层除外（142 MB，不上线、git-ignored） |
+| **部署** | ✅ 2026-10-18 上线（`2f2b7b7`）：主路由全 200，相册 48 张缩略图正常，旧 Jekyll 路由（`/gallery/`）404 |
 | Travel hub | MapLibre 地球仪 + 游记 tiles + 「Stories & frames」相册墙 + 心愿单清单 + 双向 hover 联动 |
 | ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画），景点标点 73 个，正文 14.8k 字按 GPS 投放 |
 | 巡礼地图 | `/travel/just-because`（+zh）已上线：36 个对比点 + 273 点环线 + 可缩放相机 + 滚动联动。**还差用户填 `outro` 与 36 条 `note`** |
@@ -41,6 +43,9 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 **`main` 分支只是旧 Jekyll 树的备份，不参与部署，也不用为了上线去动它。**
 
 一次性前提（已配好，换仓库才需要）：Settings → Pages → Build and deployment → **Source = GitHub Actions**。
+
+当前线上：`main` 之外的 `nextjs-rebuild` 最新成功 run = `39081897536`（`2f2b7b7`）。之后每次 push
+都会重新构建；构建失败时线上**保持上一次成功的产物**（不会变空），所以「推了但页面没变」先查 Actions。
 
 ### 发布前自检：本地绿 ≠ CI 绿
 
@@ -59,6 +64,9 @@ cd /tmp/ci-sim && node scripts/check-refs.mjs      # 退出码必须为 0
 于是 **2026-10-18 取消「下载原图」功能**：清单不再有 `originalUrl`、灯箱不再有下载按钮、原图只留磁盘当母版
 （git-ignored）。原因写在 `.gitignore` 与 `scripts/gallery.mjs` 头部注释里 —— 不要再把它入库。
 
+改完之后，干净检出（`git archive HEAD`）里 `check-refs` 是 rc=0（221 条引用 / 65 个 content 文件全部解析），
+这次 push 也只推了 9 个文本文件，秒过。
+
 ### 上线后验证
 
 ```bash
@@ -66,6 +74,11 @@ curl -s "https://api.github.com/repos/V1ncent19/v1ncent19.github.io/actions/runs
 curl -o /dev/null -w '%{http_code}\n' https://tuoruipeng.com/travel/just-because/             # 新路由 200
 curl -o /dev/null -w '%{http_code}\n' https://tuoruipeng.com/assets/about/cal.png             # 新资产路径 200
 ```
+
+**2026-10-18 实测**：`/` `/travel/` `/travel/zh/` `/blog/` `/cv/` `/about/` `/project/`
+`/travel/ptes-2025/` `/travel/just-because/` `/guestbook/` 全 200；`/travel/` 的 HTML 里 48 个
+`/assets/photos/gallery/thumb/*.webp` 全部命中；`original/IMG_2408.jpeg` 404（**预期**，不上线）；
+旧站 `/gallery/` 404 —— 覆盖完成。
 
 页面有 `Cache-Control: max-age=600`，部署成功后旧页面可能还挂 10 分钟；`Last-Modified` 变了才算真换掉。
 

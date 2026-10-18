@@ -4,7 +4,8 @@
 
 > **真相源优先级：代码 > 文档。**
 > 文档里写的路径、常量、命令，随时可能被下一轮改动甩在后面 —— 在照着做之前，
-> 先 `grep` 一眼确认（尤其是常量值和文件位置）。最后一次全量核对是 **2026-10-17**。
+> 先 `grep` 一眼确认（尤其是常量值和文件位置）。最后一次全量核对是 **2026-10-17**，
+> 2026-10-18 增补了「站点上线 + 相册原图不发布」两条结论。
 
 ## 读哪一份
 
@@ -50,6 +51,7 @@ ptes-2025 的细节散在 `ARCHITECTURE.md` §数据管线 与 `content/travel/R
 | 改 `public/` 目录归属 | `ARCHITECTURE.md` §`public/assets/` 布局（判据两条） |
 | 改巡礼页的交互/常量 | `FEATURE_PILGRIMAGE.md`（§5 实现 / §6 不变量）；**常量值以代码为准** |
 | 设计基线（配色、容器、缩放） | `CONVENTIONS.md` §二（锁死项，改之前先问用户） |
+| 改发布流程 / CI / 部署状态 | `handover.md` §4；`.github/workflows/deploy.yml` |
 | 本轮做了什么 | `.workbuddy/memory/<日期>.md`；跨轮教训 → `.workbuddy/memory/MEMORY.md` |
 
 ## 这份索引是怎么核对出来的

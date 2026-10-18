@@ -257,7 +257,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 | `sync-trip-data.mjs` | `npm run sync:data` | **prebuild/predev** | 按 `MIRRORED`/`KEEP` 清单把 trip JSON 镜像进 `public/data/travel/`，其余 prune |
 | `check-refs.mjs` | `npm run check:refs` | **prebuild/predev** | `content/` 里的 `/assets/…` 字符串引用解析不到 `public/` 就 exit 1 |
 | `check-i18n.mjs` | `npm run check:i18n` | **prebuild/predev** | 旧式双语键（`*_en`/`*_zh`/`*Zh`/`*En`）或两端全空的 `{en,zh}` → exit 1 |
-| `gallery.mjs` | `npm run gallery:gen` | 加照片时手动 | 相册三档尺寸 + `items.json` 合并（**当前跑不起来，见 §数据管线**） |
+| `gallery.mjs` | `npm run gallery:gen` | 加照片时手动 | 相册两档 webp（thumb/large）+ `items.json` 合并（原图不再发布，**当前跑不起来，见 §数据管线**） |
 | `subset-cjk-fonts.py` | — | 大改内容后手动 | GenWanMin2 TC 子集化 → `public/fonts/*.woff2` |
 | `subset-cactus.py` | — | 手动 | 单字替换用的独立子集（见 `CONVENTIONS.md` §5.2） |
 | `sanitize-trip-gps.py` | — | 新 trip **必须** | GPS 清洗（home anchor + radius），隐私红线 |
