@@ -23,6 +23,7 @@ import type { NavId, NavItem } from "@/content/site/navigation";
 import { homeCards } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import { getBlogPosts, type BlogCategory } from "@/lib/blog";
+import { tripCardsAsPosts } from "@/lib/blog-travel";
 import { copy, formatMonth } from "@/lib/i18n";
 import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
@@ -150,9 +151,9 @@ const POST_TONE: Record<BlogCategory, string> = {
     "bg-tertiary-soft text-tertiary transition-colors group-hover:bg-tertiary group-hover:text-on-tertiary",
   documentation:
     "bg-accent-soft text-accent transition-colors group-hover:bg-accent group-hover:text-on-accent",
-  /* Travel logs (2026-10-17): they appear on the Blog index, not in this feed,
-     but the map is keyed by BlogCategory so the key has to exist. Same curated
-     orange-red as components/blog/post-tone.ts. */
+  /* Travel logs (2026-10-17): they appear on the Blog index AND in this feed
+     (2026-10-18 — they were the newest entries and the homepage was missing
+     them). Same curated orange-red as components/blog/post-tone.ts. */
   travel:
     "bg-[var(--curated-soft)] text-[var(--curated)] transition-colors group-hover:bg-[var(--curated)] group-hover:text-on-brand",
 };
@@ -174,10 +175,13 @@ function feedDate(date: string): string {
 }
 
 /* ---------------------------------------------------------------------------
- * Recent Posts feed — latest five items across the Blog and Project indices.
- * Blog posts get their category colour and link to their own post pages
- * (/blog/<year>/<slug>); projects link to their own pages. Sorted
- * newest-first by the ISO date string.
+ * Recent Posts feed — latest five items across the Blog index and Project list.
+ * The Blog index is md posts + travel logs (`lib/blog-travel.ts`), so the feed
+ * pulls the same `tripCardsAsPosts()` merge instead of re-inventing it — a trip
+ * is a blog entry everywhere or nowhere. Blog posts get their category colour
+ * and link to their own post pages (/blog/<year>/<slug>); trips link to
+ * /travel/<id>; projects link to their own pages. Sorted newest-first by the
+ * ISO date string.
  * ------------------------------------------------------------------------- */
 interface FeedItem {
   key: string;
@@ -200,6 +204,19 @@ function recentPosts(limit = 5): FeedItem[] {
       title: p.title,
       summary: p.excerpt,
       chip: { cls: POST_TONE[p.category], label: en.blog.category[p.category] },
+    });
+  }
+  for (const t of tripCardsAsPosts("en")) {
+    // `href` is optional on the shared index-card type (md posts derive it from
+    // date+slug); a trip always sets it. Guard so the feed can't emit a dead link.
+    if (!t.href) continue;
+    items.push({
+      key: `post-${t.slug}`,
+      href: t.href,
+      date: t.date,
+      title: t.titleText,
+      summary: t.excerptText,
+      chip: { cls: POST_TONE.travel, label: en.blog.category.travel },
     });
   }
   for (const pr of getProjects()) {

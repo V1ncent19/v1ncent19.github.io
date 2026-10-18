@@ -22,6 +22,7 @@ import type { NavId, NavItem } from "@/content/site/navigation";
 import { homeCards } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import { getBlogPosts, type BlogCategory } from "@/lib/blog";
+import { tripCardsAsPosts } from "@/lib/blog-travel";
 import { copy, formatMonth } from "@/lib/i18n";
 import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
@@ -137,7 +138,7 @@ const POST_TONE: Record<BlogCategory, string> = {
     "bg-tertiary-soft text-tertiary transition-colors group-hover:bg-tertiary group-hover:text-on-tertiary",
   documentation:
     "bg-accent-soft text-accent transition-colors group-hover:bg-accent group-hover:text-on-accent",
-  /* 游记（2026-10-17）：只在 Blog 索引出现，本 feed 用不到，但 Record 键必须齐。 */
+  /* 游记（2026-10-17）：Blog 索引与首页 feed 都收录（2026-10-18 补进 feed）。 */
   travel:
     "bg-[var(--curated-soft)] text-[var(--curated)] transition-colors group-hover:bg-[var(--curated)] group-hover:text-on-brand",
 };
@@ -159,7 +160,8 @@ function feedDateZh(date: string): string {
 }
 
 /* ---------------------------------------------------------------------------
- * 近期文章 — 与英文首页同源的数据，中文分类标签；项目链接走 /zh 路由。
+ * 近期文章 — 与英文首页同源的数据（blog md + 游记 + 项目），中文分类标签；
+ * 项目链接走 /zh 路由，游记链接走 /travel/zh/<id>（`tripCardsAsPosts("zh")`）。
  * ------------------------------------------------------------------------- */
 interface FeedItem {
   key: string;
@@ -182,6 +184,18 @@ function recentPostsZh(limit = 5): FeedItem[] {
       title: p.title,
       summary: p.excerpt,
       chip: { cls: POST_TONE[p.category], label: zh.blog.category[p.category] },
+    });
+  }
+  for (const t of tripCardsAsPosts("zh")) {
+    // `href` 在共享卡片类型里是可选的（md 文章由 date+slug 推导）；游记一定给值。
+    if (!t.href) continue;
+    items.push({
+      key: `post-${t.slug}`,
+      href: t.href,
+      date: t.date,
+      title: t.titleText,
+      summary: t.excerptText,
+      chip: { cls: POST_TONE.travel, label: zh.blog.category.travel },
     });
   }
   for (const pr of getProjects()) {
