@@ -43,8 +43,10 @@
 - giscus：博文详情页 + Guestbook（term 固定 "index"，改名会孤儿化历史评论）；其余页面不挂。
 - OtherActivity / joke → documentation 博文；HighDim2024 是 Project 下的长笔记；三篇未发布草稿（HMC/NTK/Mahalanobis）不迁移。
 - 博客索引有搜索/分类 chips/排序；`/blog#<category>` 深链已实现。
-- 相册：瀑布流 + 灯箱，挂在 `/travel` 的「Stories & frames」；原图随站发布
-  （`public/assets/photos/gallery/original/`，也是唯一副本）。加照片流程见 `GALLERY_ADDING_PHOTOS.md`。
+- 相册：瀑布流 + 灯箱，挂在 `/travel` 的「Stories & frames」；**只有两档 webp 上线**
+  （`thumb/` + `large/`），全分辨率原图不上线、只在本地磁盘（`public/assets/photos/gallery/original/`，
+  git-ignored，唯一副本），灯箱也就没有下载按钮 —— 除非某行手写了外部 `originalUrl`。
+  加照片流程见 `GALLERY_ADDING_PHOTOS.md`。
 - **双语内容只有一种写法**（2026-10-17 统一）：可翻译字段一律 `{ "en": …, "zh": … }`，
   读的时候只走 `lib/localized.ts` 的 `pick()`。`summaryZh` / `nameEn` / `place_en` / `hrefZh`
   这类后缀已全部废除，`npm run check:i18n`（挂 prebuild）会直接让 build 失败。

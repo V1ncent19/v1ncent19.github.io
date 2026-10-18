@@ -190,7 +190,8 @@ public/assets/
   project/<slug>/  各项目页的 PDF
   gallery/         badges/*.svg（手绘印章，页面元数据；build-badges 的输入源）
   photos/          ← 内容创作，按主题
-    gallery/{original,large,thumb}/   相册墙三档尺寸（同一批照片的派生）
+    gallery/{large,thumb}/            相册墙两档入库 webp（同一批照片的派生）
+    gallery/original/                 48 张全分辨率原图（142 MB）—— **本地母版，git-ignored、不上线**
     blog_photo/                       散篇配图 + 菜谱（15 篇共 25 张）+ boxcox.png
     joke_photo/                       单帖多图（20 张）
     nihongo_photo/                    单帖多图（5 张）
@@ -271,7 +272,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 
 ## 数据管线
 
-- **相册**：`GalleryPhoto/` 原图 → `npm run gallery:gen` → `public/assets/photos/gallery/{thumb,large,original}` + `content/travel/gallery/items.json`（人工字段保留）。详细流程见 `GALLERY_ADDING_PHOTOS.md`。⚠️ **`GalleryPhoto/` 源目录已不存在**，`gallery:gen` 会以「source dir not found」退出；`photos/gallery/original/`（142 MB）是当前唯一副本。
+- **相册**：`GalleryPhoto/` 原图 → `npm run gallery:gen` → `public/assets/photos/gallery/{thumb,large}` + `content/travel/gallery/items.json`（人工字段保留）。详细流程见 `GALLERY_ADDING_PHOTOS.md`。⚠️ **`GalleryPhoto/` 源目录已不存在**，`gallery:gen` 会以「source dir not found」退出；`photos/gallery/original/`（142 MB）是当前唯一副本，**已决定不上线**（2026-10-18，下载按钮随之取消；见 `.gitignore` 注释）。
 - **Badge**：`npm run badges`（prebuild/predev 自动）合成 `badge-art.generated.ts`；改图标后需手动重跑。
 - **中文字体**：`assets-src/fonts/GenWanMin2TC/` OTF → `scripts/subset-cjk-fonts.py` → `public/fonts/genwanmin2tc-{r,m,sb}.woff2`；大改内容后用 venv python 重跑。
 - **Travel GPS（隐私红线，最高优先）**：新增 trip = lab 预处理 → `scripts/sanitize-trip-gps.py` 清洗（home anchor 自动取轨迹首点、radius 3km 裁掉居家段并重排全部索引/bounds）→ 把结果拆两处：**人造内容（trip/scenes/attractions/diagnostics，~115 KB）直接放 `content/travel/<id>/`（import）；`track.json` 也放在同一层**，靠 `scripts/sync-trip-data.mjs` 的 `MIRRORED` 清单声明它需要 fetch —— **「要 URL」由清单表达，不由目录名表达**（早先的 `<id>/data/` 方案会把语义压在文件夹名上，且其 prune 曾清空过 `public/data/travel/ptes-2025/`）→ `npm run sync:data` 把它镜像到 `public/data/travel/<id>/`（产物，gitignored）→ `app/travel/<id>/page.tsx`(en+zh) + `content/travel/<id>/card.json`。**上网数据绝不含住址级 GPS；原始数据只留在 `assets-src/travel-data/`。注意 gitignored ≠ 私密：`public/` 里的一切仍然上网，只是不进版本控制。**

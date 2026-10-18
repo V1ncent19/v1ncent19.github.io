@@ -4,14 +4,14 @@
 每一节的最终依据都是 `scripts/gallery.mjs`（`npm run gallery:gen`）—— **文档与脚本冲突时，脚本赢**。
 
 > **⚠️ 先读这条：`GalleryPhoto/` 目前不存在。**
-> 2026-10-16 清理原始照片时删掉了这个本地母版目录，而脚本第 200 行仍然是
+> 2026-10-16 清理原始照片时删掉了这个本地母版目录，而脚本开头仍然是
 > `if (!fs.existsSync(SRC_DIR)) process.exit(1)`，所以 **`npm run gallery:gen` 现在会以
 > 「source dir not found」直接退出**。而且原来那批原图只剩 `public/assets/photos/gallery/original/`
-> 这一份（142 MB，git-ignored，**全站唯一副本，动它前先确认别处有备份**）。
+> 这一份（48 张 / 142 MB，**git-ignored、不上线、全站唯一副本，动它前先确认别处有备份**）。
 >
 > **恢复办法**：把 `public/assets/photos/gallery/original/` 整个复制成仓库根的 `GalleryPhoto/`，
-> 再跑 `gallery:gen`。脚本会把 `original/` 重写成同样的字节（它本来就按 `source` 命名逐字节镜像），
-> 所以这一步是幂等的。想换母版位置就改 `gallery.mjs` 的 `SRC_DIR`。
+> 再跑 `gallery:gen`。脚本只写 `thumb/` + `large/` 两档 webp，**不再回写 `original/`**
+> （见下面第 2 节），所以这一步对 `original/` 是只读的。想换母版位置就改 `gallery.mjs` 的 `SRC_DIR`。
 
 ## 三步循环
 
@@ -36,8 +36,11 @@
 - autoOrient 后写两档入库 webp（都 q78）：
   - `public/assets/photos/gallery/thumb/<id>.webp`（长边 ~480 px）
   - `public/assets/photos/gallery/large/<id>.webp`（长边 ~1680 px）
-- 把原图**逐字节**复制进 `public/assets/photos/gallery/original/<source>`，
-  让灯箱的下载按钮走同源（2026-09-07 决定：仓内原图胜过外链网盘）。
+- **不发布原图**（2026-10-18 决定）。原图不再复制进 `public/`，清单里也不再生成
+  `originalUrl`，灯箱因此**没有「下载原图」按钮**。原因：那 142 MB 一档被 `**/original/` 挡住不入库，
+  干净 CI 检出没有这些文件 → `check:refs` 失败 → Pages 构建挂（run #12）；改成入库后
+  142 MB 的 push 又反复 HTTP 408 超时。原图只留在磁盘上当母版。
+  想让某张有下载按钮，就手写一条 **外部**（http/https）`originalUrl`，脚本会保留它。
 - 合并 `content/travel/gallery/items.json`，**按 `source`（原始文件名）匹配行**：
   已存在的行只刷新生成字段；新文件追加一行，然后按日期倒序重排。
 - 自动填：`date`（EXIF `DateTimeOriginal` → `YYYY-MM-DD`）、`lat` / `lon`（EXIF GPS 十进制度，
@@ -46,7 +49,8 @@
 - 找不到源文件的清单行会**告警但不删除**（孤儿）。要删一张照片就删那一行。
 
 **绝不覆盖**的人文字段：`place` / `placeLocal` / `title`（都是 `{ en, zh }`）、单语 `alt`、
-`country_code`、`originalUrl`、`featured`、`badge`。行里手加的任何额外键也原样保留。
+`country_code`、`featured`、`badge`，以及手写的**外部** `originalUrl`。行里手加的任何额外键也原样保留。
+（例外：指向仓内 `/assets/...` 的旧 `originalUrl` 会被删掉 —— 那一档已经不上线了。）
 
 ## 3. 手填人文字段
 
@@ -62,7 +66,7 @@
 | `country_code` | 图片角标里的 ISO alpha-2（如 `TW`） |
 | `featured` | 精选集：默认排序置顶 + 橙红强调色 |
 | `badge` | 旅行印章预设 key（矢量图缺位时渲染占位符） |
-| `originalUrl` | 可选，指向原图的链接（会加下载按钮） |
+| `originalUrl` | 可选，**只认 http/https 外链**（如网盘/CDN）—— 有它才显示下载按钮；留空是常态 |
 | `color` | **不要手填** —— 由 `featured` 派生 |
 
 **双向回退**：`place` / `placeLocal` / `title` 只填一边也能两处都读通 ——

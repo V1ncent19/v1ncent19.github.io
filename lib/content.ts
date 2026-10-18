@@ -326,12 +326,14 @@ export function projectBody(project: Project, lang: ContentLang): string {
  *
  * Other shared fields: `country_code` (ISO 3166-1 alpha-2, e.g. "TW"), `badge`
  * (travel-stamp preset key, "" → generic placeholder stamp), `originalUrl`
- * (optional full-res link).
+ * (EXTERNAL full-res link only — see the field doc below; the local originals
+ * are not published).
  */
 export interface GalleryItem {
   /** Stable key derived from the original filename; also the asset basename. */
   id: string;
-  /** Original filename in the git-ignored GalleryPhoto/ directory. */
+  /** Source filename — the join key between the manifest row and the photo.
+   *  The files themselves are NOT in the repo (see `originalUrl`). */
   source: string;
   /** Real capture date, YYYY-MM-DD (EXIF DateTimeOriginal); "" when unknown. */
   date: string;
@@ -345,7 +347,10 @@ export interface GalleryItem {
   alt: string;
   /** ISO 3166-1 alpha-2 country code (e.g. "TW"); "" while unknown. */
   country_code: string;
-  /** Optional external link to the full-resolution original (shared drive). */
+  /** EXTERNAL (http/https) link to the full-resolution original, e.g. a
+   * cloud-drive / CDN share. "" when the photo has none — which is the norm:
+   * the local 142 MB original tier is NOT published (2026-10-18), so only a
+   * hand-authored external url ever brings back the lightbox download button. */
   originalUrl: string;
   /** Curated-collection flag (精选集). Controls the theme accent (see header):
    * featured → curated orange-red, else the default-blue site brand. */

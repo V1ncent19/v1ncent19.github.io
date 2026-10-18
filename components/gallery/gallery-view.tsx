@@ -865,8 +865,9 @@ export function GalleryView({
    * user brief: thin border on a faint accent wash, first line is a small
    * accent label with a graphic backtick glyph, the text flows italic
    * beneath), followed by the location map. The download link (shown only
-   * when the item shares an
-   * `originalUrl`) becomes a full-width CTA that settles at the bottom of the
+   * when the row carries a hand-authored EXTERNAL `originalUrl` — the local
+   * original tier is no longer published, see `items.json` / `.gitignore`)
+   * becomes a full-width CTA that settles at the bottom of the
    * rail on the two-pane layout (`pin`) while stacked/mobile content flows
    * naturally. As before, the accent location block is withheld while `title`
    * is empty — then the heading itself falls back to the place line, so the
@@ -961,9 +962,11 @@ export function GalleryView({
 
         {item.originalUrl ? (
           <div className={pin ? "mt-auto pt-8" : "mt-7"}>
-            {/* download attribute: same-origin originals save straight to disk
+            {/* download attribute: a same-origin url saves straight to disk
                 with the camera filename (IMG_xxxx.jpeg) instead of opening in
-                a tab; target=_blank stays as the fallback for external URLs */}
+                a tab; browsers ignore it for cross-origin urls, where
+                target=_blank is the behaviour (the normal case now that
+                originalUrl is external-only). */}
             <a
               href={item.originalUrl}
               target="_blank"

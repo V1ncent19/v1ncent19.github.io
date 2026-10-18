@@ -59,11 +59,13 @@ yarn-error.log*
 /public/assets/pilgrimage/**/gps_original/
 /public/**/gps_original/
 
-# full-resolution gallery originals — the local MASTER copy is gone: the
-# GalleryPhoto/ source dir no longer exists and `npm run gallery:gen` exits
-# with "source dir not found". The only surviving copy is the mirrored one
-# under public/assets/photos/gallery/original/ (see the rule further down),
-# which is deliberately NOT committed. Treat that folder as the master.
+# full-resolution gallery originals — the GalleryPhoto/ source dir no longer
+# exists and `npm run gallery:gen` exits with "source dir not found". The only
+# surviving copy of the 48 camera originals (142 MB) is under
+# public/assets/photos/gallery/original/, and that folder is a LOCAL MASTER
+# ONLY — never published, never committed (decision 2026-10-18, see the
+# `original/` block below). Never rewrite or delete those files in place: they
+# are the only copy and they are not in version control.
 /GalleryPhoto/
 
 # pilgrimage photo masters — full-resolution ORIGINAL phone shots that still
@@ -81,12 +83,23 @@ yarn-error.log*
 # before being moved to assets-src/. public/ is copied verbatim into the static
 # export, so keep this rule — a repeat of that mistake must never be committable.
 #
-# As of the 2026-10-17 reorganisation this ALSO covers the gallery's own
-# original tier (public/assets/photos/gallery/original/), which is a genuine
-# master rather than a parked mistake. The ** glob is doing both jobs: catching
-# any raw-EXIF import anywhere under photos/, and keeping the 142 MB original
-# tier out of git. The tracked web tiers are photos/gallery/{thumb,large} and
-# the authoring content is photos/{blog,joke,nihongo}_photo/ — all unaffected.
+# This glob also covers photos/gallery/original/, and that is now deliberate.
+# That folder holds the 48 full-resolution camera originals (142 MB) and they
+# are NOT published (decision 2026-10-18). They used to be the download tier:
+# `npm run gallery:gen` wrote an `originalUrl` into every manifest row pointing
+# into it, the lightbox rendered a "download original" button, and because this
+# glob kept the folder out of git, a clean CI checkout had none of the files —
+# scripts/check-refs.mjs (prebuild) resolves content/ strings against public/
+# and exited 1, so the Pages deploy died at build (run #12, 2026-10-17) while
+# the same build passed locally where the ignored files were still on disk.
+# Committing the tier instead only moved the problem: the 142 MB push timed out
+# (HTTP 408) repeatedly. So the download feature was dropped: the script emits
+# no `originalUrl`, the lightbox button appears only for a hand-authored
+# EXTERNAL link (http/https), and the originals stay on disk as an unpublished
+# local master (the GalleryPhoto/ copies are gone).
+#
+# Keep this glob as written. A `!` re-include rule here makes 142 MB of private
+# photos committable again and re-breaks the deploy.
 /public/assets/photos/**/original/
 
 # pilgrimage COMPOSITE masters — committed, and deliberately NOT ignored.

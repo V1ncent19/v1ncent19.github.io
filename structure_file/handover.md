@@ -7,11 +7,11 @@
 
 ## 1. 一句话现状
 
-Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`，HEAD `cb5cfd1`）已完全取代旧 Jekyll 站：
+Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代旧 Jekyll 站：
 全部主路由（Home / About / CV / Blog / Project / Travel / Guestbook）上线真实内容，中文 `/zh` 覆盖主路由
 （`/about/zh` 是亲笔原文，其余挂机翻声明条）。
 **Travel 是当前最重的模块**：hub（地球仪 + 游记 tiles + 相册墙 + 心愿单）、ptes-2025 互动游记、just-because 巡礼地图。
-工作区有大规模未提交改动，**等用户验收，agent 不代提交**。
+2026-10-17 已把整棵新树（含 213 MB `public/assets/`）入库，发布方式见 §4。
 
 ## 2. 技术栈（勿改）
 
@@ -25,7 +25,7 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`，HEAD `cb5cfd1`�
 | 项 | 状态 |
 |---|---|
 | **content/ 组织** | 已按路由段重排（`about/ blog/ cv/ project/ travel/ site/`），双语统一为 `{en,zh}` 一种写法 |
-| **public/assets/** | 已按页面归属重排（`about/ home/ cv/ project/ gallery/ photos/`）—— **整个新树还没入库**，见 §4 |
+| **public/assets/** | 已按页面归属重排（`about/ home/ cv/ project/ gallery/ photos/`）；相册原图层除外（142 MB，不上线、git-ignored） |
 | Travel hub | MapLibre 地球仪 + 游记 tiles + 「Stories & frames」相册墙 + 心愿单清单 + 双向 hover 联动 |
 | ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画），景点标点 73 个，正文 14.8k 字按 GPS 投放 |
 | 巡礼地图 | `/travel/just-because`（+zh）已上线：36 个对比点 + 273 点环线 + 可缩放相机 + 滚动联动。**还差用户填 `outro` 与 36 条 `note`** |
@@ -33,17 +33,49 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`，HEAD `cb5cfd1`�
 | 双语 | 全站只有一种写法 + `npm run check:i18n` 守卫；`/project/zh/*` 曾显示英文摘要的 bug 已修 |
 | 遗留 | 底图合规、ptes-2025 隐私（两条都等用户拍板）；9 处 anitabi 标点歧义；中文子集需覆盖 `content/travel/` |
 
-## 4. ⚠️ 提交前必看
+## 4. 发布（GitHub Pages）
 
-**工作区有 440 个变更条目，其中 265 个是 `public/assets/` 旧路径的删除、新路径全部未跟踪。**
-只提交已暂存的部分 = **线上图片全断**（旧路径删了、新路径没进去）。
+**唯一入口：`git push origin nextjs-rebuild`。** 推上去就自动部署 —— 不需要本地 `out/`，不需要 `gh-pages`
+分支，也不用把 `out/` 提交进仓库。`.github/workflows/deploy.yml` 在 push 到 `nextjs-rebuild`
+（或手动 `workflow_dispatch`）时执行 `npm ci` → `npm run build` → 上传 `out/` → `deploy-pages`。
+**`main` 分支只是旧 Jekyll 树的备份，不参与部署，也不用为了上线去动它。**
 
-- 提交时必须让 **删除 + 新增进同一个 commit**：先 `git add public/assets/`，再 `git status` 核对
-  「新路径是 `A` 而不是 `??`」。
+一次性前提（已配好，换仓库才需要）：Settings → Pages → Build and deployment → **Source = GitHub Actions**。
+
+### 发布前自检：本地绿 ≠ CI 绿
+
+CI 是**干净检出**，只有被 git 跟踪的文件。凡是「本地有、却被 `.gitignore` 挡住」的资源，本地构建能过、CI 会挂：
+
+```bash
+# 用 HEAD 的内容复现 CI 的视野，再跑 prebuild 里最脆的那一环
+rm -rf /tmp/ci-sim && mkdir -p /tmp/ci-sim
+git archive HEAD | tar -x -C /tmp/ci-sim
+cd /tmp/ci-sim && node scripts/check-refs.mjs      # 退出码必须为 0
+```
+
+2026-10-17 的 run #12 就是这么挂的：`content/travel/gallery/items.json` 里当时 48 处 `originalUrl` 指向
+`public/assets/photos/gallery/original/`，而该目录被 `**/original/` 忽略规则扫了进去 → CI 拿不到这些文件 →
+`check:refs` exit 1 → 构建阶段就失败，部署根本没发生。把 142 MB 原图入库后 push 又反复 HTTP 408 超时，
+于是 **2026-10-18 取消「下载原图」功能**：清单不再有 `originalUrl`、灯箱不再有下载按钮、原图只留磁盘当母版
+（git-ignored）。原因写在 `.gitignore` 与 `scripts/gallery.mjs` 头部注释里 —— 不要再把它入库。
+
+### 上线后验证
+
+```bash
+curl -s "https://api.github.com/repos/V1ncent19/v1ncent19.github.io/actions/runs?per_page=1"  # 看 conclusion
+curl -o /dev/null -w '%{http_code}\n' https://tuoruipeng.com/travel/just-because/             # 新路由 200
+curl -o /dev/null -w '%{http_code}\n' https://tuoruipeng.com/assets/about/cal.png             # 新资产路径 200
+```
+
+页面有 `Cache-Control: max-age=600`，部署成功后旧页面可能还挂 10 分钟；`Last-Modified` 变了才算真换掉。
+
+### 提交纪律
+
 - **禁用 `git add -A` / `git add .`**（`b3baff4` 曾误提交 158 个构建产物）。按路径显式 add。
-- `public/assets/photos/gallery/original/` 被 gitignore（142 MB，**相册原图唯一副本**，别 `rm`）。
 - `mv` 而非 `git mv` 之后索引会留**幻影路径**：提交前查 `git diff --cached --name-status | grep RD`。
 - 撤销误提交用 **mixed reset**（`git reset HEAD~1`）；`--soft` 会把文件留在暂存区，之后加 `.gitignore` 对它无效。
+- 删/移动资源时**必须让删除与新增进同一个 commit**，否则线上会出现「旧路径已删、新路径未上传」的全断图状态。
+- agent 不代 commit/push，除非用户明确同意。
 
 ## 5. 验证流水线（每轮改动必走）
 

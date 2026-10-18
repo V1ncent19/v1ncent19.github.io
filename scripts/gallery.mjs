@@ -8,17 +8,23 @@
  *   1. generates the two committed web tiers under
  *      public/assets/photos/gallery/thumb/<id>.webp  (~480px long edge) and
  *      public/assets/photos/gallery/large/<id>.webp  (~1680px long edge),
- *   2. copies each original byte-for-byte into
- *      public/assets/photos/gallery/original/<source>  so the lightbox download
- *      button can serve it same-origin (decision 2026-09-07: in-repo originals
- *      beat an external OneDrive link on simplicity and China reachability —
- *      the download is exactly as reachable as the site itself),
- *   3. maintains content/travel/gallery/items.json, the gallery manifest.
+ *   2. maintains content/travel/gallery/items.json, the gallery manifest.
+ *
+ * ORIGINALS ARE NOT PUBLISHED (decision 2026-10-18). There is no third
+ * "original" tier under public/ and no same-origin download button: publishing
+ * the 142 MB tier was what broke the Pages deploy (run #12 — content/
+ * referenced the folder, .gitignore hid it, CI failed check:refs), and a
+ * 142 MB push was what repeatedly broke the user's network. The originals
+ * stay on disk as the ONLY master copy; the only way a row gets a download
+ * button again is a hand-authored EXTERNAL `originalUrl` (http/https, e.g. a
+ * cloud-drive/CDN link) — the merge keeps an external url and strips any
+ * leftover in-repo path (see the originalUrl cleanup in the row loop).
  *
  * items.json is the source of truth for the HUMAN fields — the bilingual text
  * block (place / placeLocal / title as `*_en` + `*_zh`, plus a SINGLE
  * language-neutral `alt`), the curated `featured` flag, and the shared
- * `country_code`, `originalUrl`, `badge`. The script never overwrites those:
+ * `country_code`, `originalUrl` (external only), `badge`. The script never
+ * overwrites those:
  * it merges the generated fields (real EXIF capture date, EXIF GPS lat/lon,
  * oriented dimensions, asset URLs) into rows matched by the original filename,
  * appends rows for new originals, and warns (rather than deletes) when a source
@@ -60,7 +66,6 @@ const MANIFEST = path.join(
 const ASSET_ROOT = path.join(root, "public", "assets", "photos", "gallery");
 const THUMB_DIR = path.join(ASSET_ROOT, "thumb");
 const LARGE_DIR = path.join(ASSET_ROOT, "large");
-const ORIGINAL_DIR = path.join(ASSET_ROOT, "original");
 
 const THUMB_LONG = 480; // masonry grid
 const LARGE_LONG = 1680; // lightbox
@@ -154,19 +159,8 @@ function uniqueId(file, taken) {
 }
 
 /**
- * Mirror one original into public/assets/photos/gallery/original/ (byte-for-byte so
- * the download button serves the untouched file). Skips the copy when the
- * destination already matches by size — the run is incremental.
+ * Ensure `dir` exists.
  */
-function syncOriginal(srcAbs, destAbs) {
-  if (
-    fs.existsSync(destAbs) &&
-    fs.statSync(srcAbs).size === fs.statSync(destAbs).size
-  )
-    return;
-  fs.copyFileSync(srcAbs, destAbs);
-}
-
 async function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
@@ -226,7 +220,6 @@ async function main() {
 
     const thumbOut = path.join(THUMB_DIR, `${id}.webp`);
     const largeOut = path.join(LARGE_DIR, `${id}.webp`);
-    const originalOut = path.join(ORIGINAL_DIR, file);
 
     const largeInfo = await sharp(srcAbs)
       .autoOrient()
@@ -238,19 +231,9 @@ async function main() {
       .resize({ width: THUMB_LONG, height: THUMB_LONG, fit: "inside", withoutEnlargement: true })
       .webp({ quality: QUALITY })
       .toFile(thumbOut);
-    syncOriginal(srcAbs, originalOut);
 
     const meta = await exifMeta(srcAbs);
     const { date, lat, lon } = meta;
-
-    // Download URL: the script owns the in-repo path (synced byte-for-byte
-    // from GalleryPhoto). A hand-authored EXTERNAL url (http/https, e.g. a
-    // future CDN move) still wins; any other legacy value ("", "test") is
-    // replaced by the local path.
-    const handUrl =
-      typeof prior?.originalUrl === "string" && /^https?:\/\//i.test(prior.originalUrl)
-        ? prior.originalUrl
-        : "";
 
     const row = {
       // human fields — preserved from the previous manifest when present
@@ -274,7 +257,6 @@ async function main() {
       // `alt` is single + language-neutral: keep the authored value, or fold
       // the retired bilingual/single forms in on the first run over an old file.
       alt: prior?.alt || prior?.alt_en || prior?.alt_zh || "",
-      originalUrl: handUrl || `/assets/photos/gallery/original/${encodeURI(file)}`,
       // `featured` (curated flag) is human-authored; `color` derives from it on
       // every run — featured → curated orange-red accent, else "" (default blue).
       featured: prior?.featured === true,
@@ -299,6 +281,11 @@ async function main() {
     }
     delete row.alt_en;
     delete row.alt_zh;
+    // originalUrl: EXTERNAL download links only (decision 2026-10-18 — the
+    // local original tier under public/ is not published any more). Legacy
+    // local-path values from an old manifest are stripped here; a hand-authored
+    // http/https url (cloud-drive/CDN link) survives the merge untouched.
+    if (!/^https?:\/\//i.test(row.originalUrl ?? "")) delete row.originalUrl;
     rows.push(row);
   }
 
@@ -333,7 +320,6 @@ async function main() {
 try {
   await ensureDir(THUMB_DIR);
   await ensureDir(LARGE_DIR);
-  await ensureDir(ORIGINAL_DIR);
   await ensureDir(path.dirname(MANIFEST));
   await main();
 } catch (err) {
