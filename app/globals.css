@@ -2022,12 +2022,10 @@ body.pj-immersive .pj-page {
   color: var(--tl-faint);
 }
 
-/* ---- back to hub: the trip log's .tl-back-strip, element for element ----
-   Was display:none, which meant it never showed at all. Now: a circular
-   button below the controls on narrow screens, and a full-height vertical
-   strip on desktop where the arrow crossfades into the upright label.
-   Every value below is copied from TravelLog.tsx so a reader moving between
-   the two pages sees the same control in the same place (2026-10-17). */
+/* ---- back to hub: shared trip-log geometry and colours ----
+   A circular button on narrow screens, and a full-height desktop strip.
+   Desktop content uses fixed right-edge anchors and one transition rhythm
+   so expanding the strip never adds a second movement to the crossfade. */
 .pj-back {
   position: fixed;
   top: 58px;
@@ -2060,6 +2058,8 @@ body.pj-immersive .pj-page {
 }
 @media (min-width: 1024px) {
   .pj-back {
+    --pj-back-duration: 220ms;
+    --pj-back-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
     top: 0;
     bottom: 0;
     right: 0;
@@ -2071,9 +2071,10 @@ body.pj-immersive .pj-page {
     color: var(--tl-strip-ink);
     border-left: 1px solid var(--tl-hair);
     box-shadow: none;
-    /* the label is absolutely positioned, so the flex box centres the arrow
-       alone — an in-flow invisible label would push it off centre */
-    transition: width 0.25s ease, background 0.2s ease, color 0.2s ease;
+    transition:
+      width var(--pj-back-duration) var(--pj-back-ease),
+      background-color var(--pj-back-duration) var(--pj-back-ease),
+      color var(--pj-back-duration) var(--pj-back-ease);
   }
   .pj-back:hover {
     width: 58px;
@@ -2082,35 +2083,38 @@ body.pj-immersive .pj-page {
     transform: none;
     box-shadow: none;
   }
-  /* arrow ↔ label crossfade: the arrow drifts left and fades, the vertical
-     label then fades in with a slight leftward settle */
+  /* Anchor both glyphs independently of the changing strip width. Their
+     opacity transitions are complementary, including on a quick reversal. */
+  .pj-back-arrow,
+  .pj-back-label {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    pointer-events: none;
+    transition:
+      opacity var(--pj-back-duration) var(--pj-back-ease),
+      transform var(--pj-back-duration) var(--pj-back-ease);
+  }
   .pj-back-arrow {
-    transition: opacity 0.16s ease, transform 0.24s ease;
+    transform: translate(50%, -50%);
   }
   .pj-back:hover .pj-back-arrow {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translate(50%, -50%) translateX(-4px);
   }
   .pj-back-label {
-    /* the base rule hides the label at every width — this block must
-       explicitly re-show it, or the crossfade animates an element that never
-       paints */
     display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) translateX(6px);
+    transform: translate(50%, -50%) translateX(4px);
     writing-mode: vertical-rl;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 3px;
     white-space: nowrap;
     opacity: 0;
-    transition: opacity 0.2s ease 0.08s, transform 0.25s ease 0.08s;
   }
   .pj-back:hover .pj-back-label {
     opacity: 1;
-    transform: translate(-50%, -50%) translateX(0);
+    transform: translate(50%, -50%);
   }
 }
 

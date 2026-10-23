@@ -239,12 +239,12 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 
 | 目录 | 职责 | 关键点 |
 |---|---|---|
-| `components/travel/` | Travel 模块全部组件 | **ptes**：`TravelMap.tsx`（MapLibre，basemap 持久化到 localStorage）、`TravelLog.tsx`（游记布局/幕布/样式主体，styled-jsx）、`TravelNav.tsx`（总进度条）、`TravelStory.tsx`（数据→布局装配）、`ResumeStoryButton.tsx`；**hub**：`hub-globe.tsx`（D3 正交投影地球仪）、`hub-hover-link.tsx`（地球↔列表共享 hotId 桥）；**巡礼**：`PilgrimageLog.tsx`（外壳，三状态合成一个 `view`）、`PilgrimageMap.tsx`（相机三态 + 亮线/光标 + 时间牌 + 弹窗）、`PilgrimageStory.tsx`（右栏滚动联动） |
+| `components/travel/` | Travel 模块全部组件 | **ptes**：`TravelMap.tsx`（MapLibre 相机按游记关键帧移动；开场定位 Evanston–ORD；GPS 场景使用行程范围固定取景，避免跟随标点抖动；过渡窗口保持同一相邻帧对且视野约束同步渐变；basemap 持久化到 localStorage）、`TravelLog.tsx`（游记布局/幕布/样式主体，styled-jsx）、`TravelNav.tsx`（总进度条）、`TravelStory.tsx`（数据→布局装配）、`ResumeStoryButton.tsx`；**hub**：`hub-globe.tsx`（D3 正交投影地球仪）、`hub-hover-link.tsx`（地球↔列表共享 hotId 桥）；**巡礼**：`PilgrimageLog.tsx`（外壳，三状态合成一个 `view`）、`PilgrimageMap.tsx`（相机三态 + 亮线/光标 + 时间牌 + 弹窗）、`PilgrimageStory.tsx`（右栏滚动联动） |
 | `components/gallery/` | `gallery-view.tsx` 同文件承载照片画廊 + 游记 StoryTile + 排序条 | 被 `/travel` 消费（`/gallery` 路由 2026-09-28 已删）；排序条方向格移动端独立成行 |
 | `components/background/` | `spacetime-canvas.tsx` 时空背景（质量引力井 warp 网格） | 维护接口：CONFIG；各井的**位移向量累加后一次性施加**（不可逐井原地改写），网格向视口外延伸 **Σstrength** 防「引力拉伸露边界」；静态井按**影响半径**剔除而非元素包围盒 |
 | `components/layout/` | 导航、§ 锚点（`section-mark.tsx`）、页头、`lang-switch.tsx` | 全站 sticky 导航经 `.site-chrome-header{display:contents}` |
 | `components/about/` | About 分层信息 + travel-board（世界地图足迹）+ `travel-globe.tsx`（地球仪与引力井） | MARKER radius 持续调优 |
-| `lib/` | `i18n.ts`（双语 UI 字典）、`localized.ts`（`pick`/`pickList` 唯一回退）、`blog.ts`/`blog-travel.ts`/`content.ts`（内容装载；`blog-travel.ts` = 行程并入 Blog 索引）、`site.ts`、`theme.ts`（`useSyncExternalStore` 主题）、`lede-math.ts`（卡片摘要 KaTeX）、`travel/`（`trips.ts` trip 注册表 + `pilgrimage.ts` 巡礼领域模型 + `types.ts` + `use-story-controller.ts` 滚动状态机 + `gps.ts`） | |
+| `lib/` | `i18n.ts`（双语 UI 字典）、`localized.ts`（`pick`/`pickList` 唯一回退）、`blog.ts`/`blog-travel.ts`/`content.ts`（内容装载；`blog-travel.ts` = 行程并入 Blog 索引）、`site.ts`、`theme.ts`（`useSyncExternalStore` 主题）、`lede-math.ts`（卡片摘要 KaTeX）、`travel/`（`trips.ts` trip 注册表 + `pilgrimage.ts` 巡礼领域模型 + `types.ts` + `use-story-controller.ts` 滚动状态机：弹簧缓动的文档阅读线共同驱动标点时间与地图镜头，单调三次插值平滑分节速度，章节坐标按布局缓存 + `gps.ts`） | |
 | `content/` | `site/{profile.json,navigation.ts}`、`blog/*.md`、`travel/gallery/items.json`、`cv/`、`project/`、`travel/` | manifest 类文件「脚本生成 + 人工编辑」模式 |
 | `public/data/travel/<trip>/` | 两个 trip 的**生成器产物**都在这里，但入库策略不同 | **ptes**：`track.json` 是 `sync:data` 的产物，gitignored；**just-because**：`route.json` + `anitabi-212278.json` 无仓库内可再生源（GPS 原始导出在 gitignored 的 `assets-src/`；anitabi 是时点快照），**必须入库**。共同点：都不用人工维护。**隐私红线见 §数据管线** |
 | `scripts/` | 见下表「脚本清单」，共 14 个 | 四个挂 `prebuild`/`predev`（`badges → sync:data → check:refs → check:i18n`），其余手动跑 |

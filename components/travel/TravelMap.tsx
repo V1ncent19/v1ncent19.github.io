@@ -14,6 +14,7 @@ import type {
   TripInfo,
   TripTrack,
   TrackPoint,
+  TravelScene,
 } from "@/lib/travel/types";
 import { padBounds, localClockAt } from "@/lib/travel/gps";
 import type { StoryState } from "@/lib/travel/use-story-controller";
@@ -161,8 +162,6 @@ interface Props {
   lang?: "en" | "zh";
 }
 // `scenes` kept in Props for the camera rebuild key ordering
-import type { TravelScene } from "@/lib/travel/types";
-
 // a GPS recording hole this long AND this far apart would draw as a straight
 // chord slicing across streets - render it as a dotted `gap` instead
 const HOLE_DT_MS = 120_000;
@@ -357,6 +356,29 @@ function zoomForBounds(b: Bounds, width: number, height: number, padding: number
   return Math.log2(Math.min(zx, zy));
 }
 
+/** First narrative GPS scene, used to establish a grounded opening view. */
+function openingFrame(
+  trip: TripInfo,
+  scenes: TravelScene[],
+  width: number,
+  height: number
+): { center: [number, number]; zoom: number } {
+  const firstScene = scenes.find(
+    (scene) => scene.gps && scene.segment !== "title" && scene.segment !== "transit"
+  );
+  if (!firstScene?.gps) {
+    return {
+      center: [(trip.bounds[0] + trip.bounds[2]) / 2, (trip.bounds[1] + trip.bounds[3]) / 2],
+      zoom: Math.min(6, zoomForBounds(trip.bounds, width, height, 40)),
+    };
+  }
+  const bounds = padBounds(firstScene.gps.bounds, 0.18);
+  return {
+    center: firstScene.gps.center,
+    zoom: Math.min(14.5, Math.max(7, zoomForBounds(bounds, width, height, 50))),
+  };
+}
+
 // R20: per-kind route layers use data-driven opacity/width (each feature
 // carries `op`/`w` from the continuous age fade). Finale (band "full")
 // features ride the same layers with FULL_STYLE values.
@@ -458,11 +480,17 @@ export default function TravelMap({
     (async () => {
       const maplibregl = (await import("maplibre-gl")).default;
       if (cancelled || !containerRef.current) return;
+      const opening = openingFrame(
+        trip,
+        scenes,
+        containerRef.current.clientWidth || 900,
+        containerRef.current.clientHeight || 800
+      );
       const map = new maplibregl.Map({
         container: containerRef.current,
         style: style0,
-        center: [(trip.bounds[0] + trip.bounds[2]) / 2, (trip.bounds[1] + trip.bounds[3]) / 2],
-        zoom: 4,
+        center: opening.center,
+        zoom: opening.zoom,
         // 2026-10-17 user request: the licence and basemap credits now live in
         // a FIXED STRIP along the bottom of the map area — the pattern the
         // pilgrimage page already used — instead of maplibre's collapsible
@@ -684,26 +712,29 @@ export default function TravelMap({
 
   // ---- scroll-blended camera field (continuous transitions).
   // Each section registers one camera key at its document-space top edge:
-  //   - intro / transit / title / finale: STATIC frame (bounds fit)
-  //   - stay scenes: FOLLOW (marker position at the scene's fit zoom)
-  // The camera target is a smoothstep blend of the two neighbouring keys
-  // within +/-CAM_BLEND_VH viewports of each key top. Keys marked noClamp
-  // (intro, finale) release the marker-visibility clamp so the overview can
-  // actually settle on the whole route.
+  //   - intro / transit / finale: STATIC frame (bounds fit)
+  //   - GPS scenes: a stable frame around that scene's route bounds
+  // The camera target blends one neighbouring key pair across each complete
+  // transition window. Bounds-fit keys (intro, transit, finale) release the
+  // marker-visibility clamp so their entire route frames remain stable.
   type CamSpec =
     | { kind: "static"; lng: number; lat: number; zoom: number }
     | { kind: "follow"; zoom: number | null };
-  type CamKey = { y: number; spec: CamSpec; h?: number; noClamp?: boolean };
+  type CamKey = { y: number; spec: CamSpec; h?: number; noClamp?: boolean; wide?: boolean };
   const camRef = useRef<{ lng: number; lat: number; zoom: number } | null>(null);
   const camKeysRef = useRef<CamKey[]>([]);
   const camViewportRef = useRef({ vw: 900, vh: 800 });
   const finaleYRef = useRef<number | null>(null);
   const posRef = useRef({ lng: 0, lat: 0 });
+  const readingYRef = useRef(state.readingY);
   // Site-integration note: was a render-phase ref write — moved to an effect
   // (committed before the next rAF camera frame reads it).
   useEffect(() => {
     posRef.current = { lng: state.position.lon, lat: state.position.lat };
   }, [state.position.lon, state.position.lat]);
+  useEffect(() => {
+    readingYRef.current = state.readingY;
+  }, [state.readingY]);
   const CAM_BLEND_VH = 0.35; // transition half-window, in viewport heights
 
   useEffect(() => {
@@ -714,16 +745,18 @@ export default function TravelMap({
       camViewportRef.current = { vw, vh };
       const keys: CamKey[] = [];
       const [bx0, by0, bx1, by1] = trip.bounds;
-      // intro: frame the whole trip
+      // intro: open on the first narrative scene (Evanston–ORD for PTES)
       const introEl = document.querySelector('[data-scene-id="__intro__"]');
+      const opening = openingFrame(trip, scenes, vw, vh);
       keys.push({
         y: introEl ? introEl.getBoundingClientRect().top + window.scrollY : 0,
         noClamp: true,
+        wide: true,
         spec: {
           kind: "static",
-          lng: (bx0 + bx1) / 2,
-          lat: (by0 + by1) / 2,
-          zoom: Math.min(6, zoomForBounds(trip.bounds, vw, vh, 40)),
+          lng: opening.center[0],
+          lat: opening.center[1],
+          zoom: opening.zoom,
         },
       });
       // day-title capsules hold no camera key (user 2025-09-25): the camera
@@ -738,21 +771,35 @@ export default function TravelMap({
           const b = padBounds(scene.gps.bounds, 0.3);
           keys.push({
             y,
+            // The complete leg is fitted into this frame. Letting the marker
+            // clamp pull its center toward live GPS positions made the view
+            // drift and hunt around transit handoffs.
+            noClamp: true,
+            wide: true,
             spec: {
               kind: "static",
               lng: (b[0] + b[2]) / 2,
               lat: (b[1] + b[3]) / 2,
-              zoom: Math.min(11.5, Math.max(2.2, zoomForBounds(b, vw, vh, 40))),
+              // Long-distance legs need to zoom farther out on narrow/mobile
+              // viewports. A 2.2 floor cropped the route even though the
+              // bounds-fit calculation had correctly asked for a wider view.
+              zoom: Math.max(0, Math.min(11.5, zoomForBounds(b, vw, vh, 40))),
             },
           });
         } else if (scene.segment === "title") {
           // day capsule: pure UI, no camera correspondence
         } else if (scene.gps) {
+          // Keep the camera anchored to the scene's route footprint instead
+          // of chasing every GPS sample. At city scale, a marker-following
+          // center exposes every small turn and GPS wobble as camera shake.
+          const b = padBounds(scene.gps.bounds, 0.18);
           keys.push({
             y,
             spec: {
-              kind: "follow",
-              zoom: Math.min(14.5, Math.max(7, zoomForBounds(padBounds(scene.gps.bounds, 0.18), vw, vh, 50))),
+              kind: "static",
+              lng: (b[0] + b[2]) / 2,
+              lat: (b[1] + b[3]) / 2,
+              zoom: Math.min(14.5, Math.max(7, zoomForBounds(b, vw, vh, 50))),
             },
           });
         } else {
@@ -767,6 +814,7 @@ export default function TravelMap({
         keys.push({
           y: fy,
           noClamp: true,
+          wide: true,
           spec: {
             kind: "static",
             lng: (bx0 + bx1) / 2,
@@ -796,12 +844,12 @@ export default function TravelMap({
       ro.disconnect();
       window.removeEventListener("resize", rebuild);
     };
-  }, [trip.bounds, mapCreated, scenes]);
+  }, [trip, mapCreated, scenes]);
 
   /** camera target at the controller's activation band line (scroll-driven) */
   const evalCamAt = (
     bandY: number
-  ): { lng: number; lat: number; zoom: number; noClamp: boolean } | null => {
+  ): { lng: number; lat: number; zoom: number; clamp: number } | null => {
     const keys = camKeysRef.current;
     if (keys.length === 0) return null;
     const unloaded = posRef.current.lng === 0 && posRef.current.lat === 0;
@@ -811,70 +859,97 @@ export default function TravelMap({
       if (unloaded) return null;
       return { lng: posRef.current.lng, lat: posRef.current.lat, zoom: k.spec.zoom };
     };
-    const fin = (v: { lng: number; lat: number; zoom: number | null } | null, noClamp: boolean) =>
-      v ? { lng: v.lng, lat: v.lat, zoom: v.zoom ?? 12, noClamp } : null;
+    const fin = (v: { lng: number; lat: number; zoom: number | null } | null, clamp: number) =>
+      v ? { lng: v.lng, lat: v.lat, zoom: v.zoom ?? 12, clamp } : null;
+    const clampOf = (k: CamKey) => (k.noClamp === true ? 0 : 1);
     const { vh } = camViewportRef.current;
-    if (bandY <= keys[0].y) return fin(specOf(keys[0]), keys[0].noClamp === true);
-    const last = keys[keys.length - 1];
-    if (bandY >= last.y) return fin(specOf(last), last.noClamp === true);
+    if (bandY <= keys[0].y) return fin(specOf(keys[0]), clampOf(keys[0]));
     let lo = 0;
     let hi = keys.length - 1;
-    while (hi - lo > 1) {
-      const mid = (lo + hi) >> 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
       if (keys[mid].y <= bandY) lo = mid;
-      else hi = mid;
+      else hi = mid - 1;
     }
-    // inside the next key's blend window? smoothstep prev spec -> next spec
-    const H = Math.max(60, keys[hi].h ?? CAM_BLEND_VH * vh);
-    const t = (bandY - (keys[hi].y - H)) / (2 * H);
-    // release the clamp only when BOTH blend partners are overview keys - an OR
-// here let the finale's noClamp leak backward across the whole last-transit
-// blend, so the Frankfurt->Chicago camera abandoned the marker and panned
-// west with no zoom (user 2025-09-15)
-    const noClamp = keys[lo].noClamp === true && keys[hi].noClamp === true;
-    if (t <= 0) return fin(specOf(keys[lo]), noClamp);
+
+    // Keep one key pair for the whole blend window. Switching pairs at the
+    // key's exact y used to change a half-blended target to the new key in one
+    // frame, causing the visible jump at scene handoffs.
+    let from = lo;
+    let to = lo;
+    let h = 0;
+    if (lo > 0) {
+      const currentH = keys[lo].h ?? CAM_BLEND_VH * vh;
+      if (bandY <= keys[lo].y + currentH) {
+        from = lo - 1;
+        to = lo;
+        h = currentH;
+      }
+    }
+    if (from === to && lo < keys.length - 1) {
+      const nextH = keys[lo + 1].h ?? CAM_BLEND_VH * vh;
+      if (bandY >= keys[lo + 1].y - nextH) {
+        from = lo;
+        to = lo + 1;
+        h = nextH;
+      }
+    }
+    if (from === to) return fin(specOf(keys[lo]), clampOf(keys[lo]));
+    const H = Math.max(1, h);
+    const t = (bandY - (keys[to].y - H)) / (2 * H);
     const sBlend = t >= 1 ? 1 : t * t * (3 - 2 * t);
-    const a = specOf(keys[lo]);
-    const b = specOf(keys[hi]);
-    if (!a || !b) return fin(a ?? b, noClamp);
+    const a = specOf(keys[from]);
+    const b = specOf(keys[to]);
+    // Keep the marker inside the viewport for the entire handoff whenever
+    // either camera key is a narrative scene. Fading the clamp toward zero at
+    // the transit key let the marker slip offscreen during the final part of
+    // the zoom-out, even though the transit frame itself fits the full route.
+    // Pure overview-to-overview blends (intro/finale) can stay unclamped.
+    const clamp = clampOf(keys[from]) === 0 && clampOf(keys[to]) === 0 ? 0 : 1;
+    if (!a || !b) return fin(a ?? b, clamp);
     const zA = a.zoom ?? b.zoom ?? 12;
     const zB = b.zoom ?? a.zoom ?? 12;
+    let centerBlend = sBlend;
+    let zoomBlend = sBlend;
+    if (keys[from].wide || keys[to].wide) {
+      // Stage wide-scene handoffs so the marker does not get stranded between
+      // a moving center and a zoom level that has not caught up yet. On zoom
+      // out, establish the wide frame before panning; on zoom in, settle the
+      // center first and tighten the zoom after it is in place.
+      const smooth = (v: number) => {
+        const x = Math.max(0, Math.min(1, v));
+        return x * x * (3 - 2 * x);
+      };
+      if (zB < zA) {
+        zoomBlend = smooth(sBlend / 0.42);
+        centerBlend = smooth((sBlend - 0.42) / 0.58);
+      } else if (zB > zA) {
+        centerBlend = smooth(sBlend / 0.58);
+        zoomBlend = smooth((sBlend - 0.42) / 0.58);
+      }
+    }
     return {
-      lng: a.lng + (b.lng - a.lng) * sBlend,
-      lat: a.lat + (b.lat - a.lat) * sBlend,
-      zoom: zA + (zB - zA) * sBlend,
-      noClamp,
+      lng: a.lng + (b.lng - a.lng) * centerBlend,
+      lat: a.lat + (b.lat - a.lat) * centerBlend,
+      zoom: zA + (zB - zA) * zoomBlend,
+      clamp,
     };
   };
 
   useEffect(() => {
     if (!mapCreated || state.mode !== "story") return;
     let raf = 0;
-    const zoomFastUntilRef = { current: 0 };
-    const zoomBigGapRef = { current: 0 }; // largest zoom gap seen in the current move
-    // landing-zone state: fixed-duration ease onto the target once residuals
-    // are small, so the exponential tail stops re-rendering the map
-    const landRef = {
-      current: null as null | {
-        t0: number;
-        from: { lng: number; lat: number; zoom: number };
-        to: { lng: number; lat: number; zoom: number };
-      },
-    };
-    let last = performance.now();
-    // resume smoothly from wherever the camera currently is (also covers
-    // returning from explore mode: glide back to the story instead of snapping)
+    // Re-sync after explore mode so a user-panned map does not resume from a
+    // stale story-camera ref.
     const map0 = mapRef.current;
-    if (map0 && !camRef.current) {
+    if (map0) {
       camRef.current = { lng: map0.getCenter().lng, lat: map0.getCenter().lat, zoom: map0.getZoom() };
     }
-    const CENTER_TAU_MS = 250; // smaller = snappier center follow (marker is already spring-damped)
-    const ZOOM_TAU_MS = 1100;  // larger = calmer zoom transitions
-    const step = (now: number) => {
-      const dt = Math.min(100, now - last);
-      last = now;
+    const step = () => {
       const map = mapRef.current;
-      const bandY = window.scrollY + window.innerHeight * 0.475;
+      // Marker time and camera key both use the controller's spring-damped
+      // reading line, so neither can run ahead on a separate scroll clock.
+      const bandY = readingYRef.current;
       // finale flips the route rendering to the unfaded full track
       const fy = finaleYRef.current;
       const full = fy !== null && bandY >= fy - 2;
@@ -887,133 +962,42 @@ export default function TravelMap({
       if (map && ev && cam) {
         const tgt = { lng: ev.lng, lat: ev.lat, zoom: ev.zoom };
         // keep the marker inside the viewport while the camera crosses scales:
-        // entering a continent-scale transit the target center runs far ahead
-        // of the zoom-out — pull it back toward the marker ("zoom first, then
-        // pan") so readers never lose the dot. Released for intro/finale
-        // overviews, where the whole route is the point.
+        // entering a continent-scale transit the target center can run ahead
+        // of the zoom-out — pull it toward the marker so readers do not lose
+        // the dot. The influence fades across the same transition as the
+        // camera target. Released for intro/finale overviews.
         const m = posRef.current;
         const merc = (lat: number) => {
           const phi = (Math.max(-85.05, Math.min(85.05, lat)) * Math.PI) / 180;
           return (1 - Math.log(Math.tan(phi) + 1 / Math.cos(phi)) / Math.PI) / 2;
         };
-        const scale = 512 * Math.pow(2, cam.zoom);
+        const targetScale = 512 * Math.pow(2, tgt.zoom);
         const R = 0.38 * Math.min(camViewportRef.current.vw, camViewportRef.current.vh);
-        // marker already off-screen at the current zoom: collapse the zoom
-        // fast so the overview lands before the racing marker is lost for
-        // seconds (Frankfurt->Chicago entry; d0-2's EWR layover pin never
-        // trips this path, so its approved entry is unchanged)
-        const mDx = ((m.lng - cam.lng) / 360) * scale;
-        const mDy = (merc(m.lat) - merc(cam.lat)) * scale;
-        const offscreen = tgt.zoom < cam.zoom && Math.hypot(mDx, mDy) > R;
-        // while collapsing, pull the target center to 0.6R of the marker:
-        // the center's chase lag (tau 130ms against a fast-racing target)
-        // used to add ~0.3-0.8R on top of the clamp radius, peaking the
-        // marker at up to 1.8R during fast scrubs (d16-3 entry)
-        const Rc = offscreen ? R * 0.6 : R;
-        if (!ev.noClamp) {
-          const dx = ((tgt.lng - m.lng) / 360) * scale;
-          const dy = (merc(tgt.lat) - merc(m.lat)) * scale;
+        // Keep the marker in the visible region while ordinary scene bounds
+        // are active; transit route frames are already fitted and opt out.
+        // A fixed radius avoids switching clamp thresholds as the marker
+        // crosses an offscreen test, which made the camera center twitch.
+        const Rc = R;
+        if (ev.clamp > 0) {
+          const dx = ((tgt.lng - m.lng) / 360) * targetScale;
+          const dy = (merc(tgt.lat) - merc(m.lat)) * targetScale;
           const dist = Math.hypot(dx, dy);
           if (dist > Rc) {
             const f = Rc / dist;
-            tgt.lng = m.lng + (tgt.lng - m.lng) * f;
-            tgt.lat = m.lat + (tgt.lat - m.lat) * f;
+            const clampedLng = m.lng + (tgt.lng - m.lng) * f;
+            const clampedLat = m.lat + (tgt.lat - m.lat) * f;
+            tgt.lng += (clampedLng - tgt.lng) * ev.clamp;
+            tgt.lat += (clampedLat - tgt.lat) * ev.clamp;
           }
         }
-        const aC = 1 - Math.exp(-dt / CENTER_TAU_MS);
-        // adaptive zoom speed: while casually scrolling the blended target
-        // drifts and the gap stays small -> calm tau. Scrubbing the progress
-        // bar or jumping days teleports the target, and a fixed 1100ms tau
-        // left the map zooming for seconds after the marker had arrived.
-        // LATCH, not per-frame tiers: a plain gap threshold drops back to the
-        // slow tau as soon as the gap narrows, and the last ~0.3 zoom units
-        // crawl for seconds (measured). Once a big gap is seen, stay fast for
-        // 1s (re-armed every big-gap frame) so the WHOLE approach is quick.
-        const zGap = Math.abs(tgt.zoom - cam.zoom);
-        if (zGap > 1.5) {
-          zoomFastUntilRef.current = now + 1400;
-          if (zGap > zoomBigGapRef.current) zoomBigGapRef.current = zGap;
-        }
-        // R10 kept the WHOLE approach quick via a 1400ms latch, but
-        // transit-scale moves (zoom gap 9+, e.g. 11.5 -> 2.2 into an ocean
-        // crossing) still had ~1.4 units left when the latch expired and
-        // then crawled at the calm 1100ms tau for ~3.5s (measured 8-10s
-        // total entry vs ~2s for ordinary scrubs). Moves that started big
-        // stay on the fast tau until the landing zone takes over; ordinary
-        // moves keep the approved R10 behavior.
-        const bigMove = zoomBigGapRef.current > 3 && zGap > 0.06;
-        const zTau = now < zoomFastUntilRef.current || bigMove ? 360 : ZOOM_TAU_MS;
-        if (zGap <= 0.06) zoomBigGapRef.current = 0;
-        const aZ = 1 - Math.exp(-dt / zTau);
-        const aZuse = offscreen ? 1 - Math.exp(-dt / 300) : aZ;
-        const aCuse = offscreen ? 1 - Math.exp(-dt / 130) : aC;
         const dLng = tgt.lng - cam.lng;
         const dLat = tgt.lat - cam.lat;
         const dZoom = tgt.zoom - cam.zoom;
-        // LANDING ZONE: the exponential tail never reaches the target - it
-        // keeps nudging the transform by sub-pixel amounts for ~10s, and on
-        // raster basemaps (satellite/terrain) every re-render re-samples the
-        // imagery, reading as seconds of shimmer after a scrub (measured:
-        // ~680 jumpTo calls in the 12s after a jump). Once BOTH residuals
-        // are small, ease onto the target in a fixed 300ms and stop
-        // rendering for good; a fresh scrub aborts the landing back to
-        // chasing (thresholds below the abort values so completion is exact).
-        const remPx = Math.hypot((dLng / 360) * scale, (merc(tgt.lat) - merc(cam.lat)) * scale);
-        const ld = landRef.current;
-        if (ld) {
-          const moved =
-            Math.hypot(((tgt.lng - ld.to.lng) / 360) * scale, (merc(tgt.lat) - merc(ld.to.lat)) * scale) > 1.5 ||
-            Math.abs(tgt.zoom - ld.to.zoom) > 0.01;
-          if (moved) landRef.current = null;
-        }
-        if (
-          !landRef.current &&
-          Math.abs(dZoom) < 0.06 &&
-          remPx < 15 &&
-          (Math.abs(dZoom) > 1e-4 || remPx > 1)
-        ) {
-          landRef.current = {
-            t0: now,
-            from: { lng: cam.lng, lat: cam.lat, zoom: cam.zoom },
-            to: { lng: tgt.lng, lat: tgt.lat, zoom: tgt.zoom },
-          };
-        }
-        const landNow = landRef.current;
-        if (landNow) {
-          const u = Math.min(1, (now - landNow.t0) / 300);
-          const sL = u * u * (3 - 2 * u);
-          cam.lng = landNow.from.lng + (landNow.to.lng - landNow.from.lng) * sL;
-          cam.lat = landNow.from.lat + (landNow.to.lat - landNow.from.lat) * sL;
-          cam.zoom = landNow.from.zoom + (landNow.to.zoom - landNow.from.zoom) * sL;
-          if (u >= 1) {
-            // land on the LIVE target (abort threshold keeps it within
-            // 1.5px / 0.01 zoom of the captured one) so the loop goes quiet
-            cam.lng = tgt.lng;
-            cam.lat = tgt.lat;
-            cam.zoom = tgt.zoom;
-            landRef.current = null;
-          }
-        } else {
-          cam.lng += dLng * aCuse;
-          cam.lat += dLat * aCuse;
-          cam.zoom += dZoom * aZuse;
-        }
-        // hard clamp on the camera center: the target-side clamp above leaves
-        // the center's chase lag (v_marker * tau) stacked on top of Rc, and
-        // during day-jump sweeps the spring moves the marker far faster than
-        // any chase tau can follow. Enforce the contract directly - the
-        // correction is radial and continuous, so the camera simply rides
-        // Rc behind the marker until the sweep settles.
-        if (!ev.noClamp) {
-          const cdx = ((m.lng - cam.lng) / 360) * scale;
-          const cdy = (merc(m.lat) - merc(cam.lat)) * scale;
-          const cdist = Math.hypot(cdx, cdy);
-          if (cdist > Rc) {
-            const f2 = 1 - Rc / cdist;
-            cam.lng += (m.lng - cam.lng) * f2;
-            cam.lat += (m.lat - cam.lat) * f2;
-          }
-        }
+        // No second camera easing stage: the shared damped reading line is
+        // the only clock for both marker and camera, preventing zoom lag.
+        cam.lng = tgt.lng;
+        cam.lat = tgt.lat;
+        cam.zoom = tgt.zoom;
         // skip micro-moves to avoid churn when settled
         if (Math.abs(dLng) > 1e-6 || Math.abs(dLat) > 1e-6 || Math.abs(dZoom) > 1e-4) {
           map.jumpTo({ center: [cam.lng, cam.lat], zoom: cam.zoom });
