@@ -21,7 +21,8 @@ import type { CSSProperties, ReactNode } from "react";
 import type { NavId, NavItem } from "@/content/site/navigation";
 import { homeCards } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
-import { getBlogPosts, type BlogCategory } from "@/lib/blog";
+import type { BlogCategory } from "@/lib/blog";
+import { blogIndexCards } from "@/lib/blog-travel";
 import { copy, formatMonth } from "@/lib/i18n";
 import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
@@ -137,7 +138,8 @@ const POST_TONE: Record<BlogCategory, string> = {
     "bg-tertiary-soft text-tertiary transition-colors group-hover:bg-tertiary group-hover:text-on-tertiary",
   documentation:
     "bg-accent-soft text-accent transition-colors group-hover:bg-accent group-hover:text-on-accent",
-  /* 游记（2026-10-17）：只在 Blog 索引出现，本 feed 用不到，但 Record 键必须齐。 */
+  /* 游记（2026-10-23）：feed 改读 `blogIndexCards()` 后游记也会出现在本页，
+     配色与 components/blog/post-tone.ts 一致。 */
   travel:
     "bg-[var(--curated-soft)] text-[var(--curated)] transition-colors group-hover:bg-[var(--curated)] group-hover:text-on-brand",
 };
@@ -174,13 +176,15 @@ function recentPostsZh(limit = 5): FeedItem[] {
   const zh = copy.zh;
   const items: FeedItem[] = [];
 
-  for (const p of getBlogPosts()) {
+  /* md 文章 + 游记（`blogIndexCards` 读取时合并，按日期倒序）。真博文没有
+     `href`，走 /blog/<year>/<slug>；游记指向 /travel[zh]/<id>。 */
+  for (const p of blogIndexCards("zh")) {
     items.push({
       key: `post-${p.slug}`,
-      href: `/blog/${p.date.slice(0, 4)}/${p.slug}`,
+      href: p.href ?? `/blog/${p.date.slice(0, 4)}/${p.slug}`,
       date: p.date,
       title: p.title,
-      summary: p.excerpt,
+      summary: p.excerptText,
       chip: { cls: POST_TONE[p.category], label: zh.blog.category[p.category] },
     });
   }

@@ -91,7 +91,8 @@ lib/blog-travel.ts
 - `BlogPostCard` 因此有三个**只有非博文条目才用**的可选字段：`href`（链接目标）、`meta`
   （替换"≈ N 分钟"）、`cta`（替换"阅读"）。真博文一律不填，卡片照旧从 `date`/`minutes` 推导。
 - 分类 `travel` 用 gallery 的 `--curated` 橙红（`components/blog/post-tone.ts`）；
-  首页 feed 的 `POST_TONE` 也必须列全，虽然首页不显示游记。
+  首页 Recent Posts 直接消费 `blogIndexCards()`，因此游记也会出现在首页 feed
+  （2026-10-23 起；此前只列 md 文章，游记永远不上首页）。
 - 新增行程 = 加一个目录，Blog 索引自动多一条，**无需改任何代码**。
 
 #### 双语模型：一个字段一种写法（2026-10-17 统一）
