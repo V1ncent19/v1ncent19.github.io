@@ -22,7 +22,8 @@ import type { CSSProperties, ReactNode } from "react";
 import type { NavId, NavItem } from "@/content/site/navigation";
 import { homeCards } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
-import { getBlogPosts, type BlogCategory } from "@/lib/blog";
+import type { BlogCategory } from "@/lib/blog";
+import { blogIndexCards } from "@/lib/blog-travel";
 import { tripCardsAsPosts } from "@/lib/blog-travel";
 import { copy, formatMonth } from "@/lib/i18n";
 import { EmailCopyButton } from "@/components/home/email-copy-button";
@@ -151,9 +152,8 @@ const POST_TONE: Record<BlogCategory, string> = {
     "bg-tertiary-soft text-tertiary transition-colors group-hover:bg-tertiary group-hover:text-on-tertiary",
   documentation:
     "bg-accent-soft text-accent transition-colors group-hover:bg-accent group-hover:text-on-accent",
-  /* Travel logs (2026-10-17): they appear on the Blog index AND in this feed
-     (2026-10-18 — they were the newest entries and the homepage was missing
-     them). Same curated orange-red as components/blog/post-tone.ts. */
+  /* Travel logs (2026-10-23): the feed now reads `blogIndexCards()`, so trips
+     do appear here — same curated orange-red as components/blog/post-tone.ts. */
   travel:
     "bg-[var(--curated-soft)] text-[var(--curated)] transition-colors group-hover:bg-[var(--curated)] group-hover:text-on-brand",
 };
@@ -175,13 +175,13 @@ function feedDate(date: string): string {
 }
 
 /* ---------------------------------------------------------------------------
- * Recent Posts feed — latest five items across the Blog index and Project list.
- * The Blog index is md posts + travel logs (`lib/blog-travel.ts`), so the feed
- * pulls the same `tripCardsAsPosts()` merge instead of re-inventing it — a trip
- * is a blog entry everywhere or nowhere. Blog posts get their category colour
- * and link to their own post pages (/blog/<year>/<slug>); trips link to
- * /travel/<id>; projects link to their own pages. Sorted newest-first by the
- * ISO date string.
+ * Recent Posts feed — latest five items across the Blog index and Projects.
+ * The Blog side is `blogIndexCards("en")`, i.e. markdown posts PLUS the travel
+ * logs merged at read time by lib/blog-travel.ts (2026-10-23: they used to be
+ * excluded here, which meant a trip never surfaced on the home page even
+ * though it was on /blog). Blog entries get their category colour; travel
+ * entries link straight to /travel/<id>. Projects link to their own pages.
+ * Sorted newest-first by the ISO date string.
  * ------------------------------------------------------------------------- */
 interface FeedItem {
   key: string;
@@ -196,13 +196,15 @@ function recentPosts(limit = 5): FeedItem[] {
   const en = copy.en;
   const items: FeedItem[] = [];
 
-  for (const p of getBlogPosts()) {
+  /* md posts + travel logs, already merged and newest-first. A real post has
+     no `href` and lives at /blog/<year>/<slug>; a trip points at /travel/<id>. */
+  for (const p of blogIndexCards("en")) {
     items.push({
       key: `post-${p.slug}`,
-      href: `/blog/${p.date.slice(0, 4)}/${p.slug}`,
+      href: p.href ?? `/blog/${p.date.slice(0, 4)}/${p.slug}`,
       date: p.date,
       title: p.title,
-      summary: p.excerpt,
+      summary: p.excerptText,
       chip: { cls: POST_TONE[p.category], label: en.blog.category[p.category] },
     });
   }

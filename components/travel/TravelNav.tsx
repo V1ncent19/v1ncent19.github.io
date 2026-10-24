@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { TripInfo, TravelScene } from "@/lib/travel/types";
 
@@ -15,7 +15,7 @@ import type { TripInfo, TravelScene } from "@/lib/travel/types";
  * section spine on the capsule's left end — so the text column sits centred
  * between the two blue bars (user 2026-09-26 v4).
  */
-export default function TravelNav({
+function TravelNav({
   trip,
   scenes,
   activeSceneId,
@@ -695,3 +695,5 @@ export default function TravelNav({
     </>
   );
 }
+
+export default memo(TravelNav);

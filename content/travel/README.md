@@ -81,6 +81,22 @@ const MIRRORED = new Set(["ptes-2025/track.json"]);
   wait for it, and grow with every trip added — so it is fetched from
   `public/data/travel/<id>/` after mount.
 
+On the PTES page, a reading line at 47.5% of the viewport selects the active
+story section. A single damped document-space reading line drives both the
+marker timeline and camera-key interpolation, so the map cannot use raw scroll
+progress while the marker follows a delayed clock. Camera center and zoom share
+one response curve. Narrative time uses monotone cubic interpolation between
+scene anchors, keeping marker speed continuous as one section hands off to the
+next. Chapter positions are rebuilt when layout changes and looked up by
+binary search during scroll. Camera transitions keep the same pair of scene
+keys throughout the full blend window, including when the reading line crosses
+a chapter boundary; the marker-visibility clamp fades across that same window.
+This prevents a mid-transition key-pair swap from snapping the camera at
+handoffs such as Evanston → Transit. GPS scenes anchor the camera to their
+padded route bounds rather than the live marker, so small GPS turns and drift
+do not shake the map. The visibility clamp nudges the frame only when the
+marker approaches the viewport edge.
+
 Only the files listed in `MIRRORED` are copied. `npm run sync:data` — run
 automatically by `prebuild` and `predev` — copies them byte for byte, and
 `--check` fails if the two disagree. Editing the `public/` copy leaves a dirty

@@ -16,6 +16,7 @@
 | 知道「该怎么做」、哪些设计已锁死、哪些被推翻过 | `CONVENTIONS.md` |
 | 加相册照片 | `GALLERY_ADDING_PHOTOS.md` |
 | 改巡礼页（`/travel/just-because`） | `FEATURE_PILGRIMAGE.md` |
+| 查看全站交互走查与改进建议 | `INTERACTION_AUDIT.md` |
 | 想知道 2026-09 的原始设计意图 | `archive/`（**多已过时，只考古**） |
 
 路径速查（都在本目录）：
@@ -26,6 +27,7 @@ ARCHITECTURE.md              系统现状
 CONVENTIONS.md               守则与基线
 GALLERY_ADDING_PHOTOS.md     相册 how-to
 FEATURE_PILGRIMAGE.md        巡礼页
+INTERACTION_AUDIT.md         全站交互走查与建议
 archive/                     旧规划原稿 + Stitch 导出（8 MB）
 ```
 

@@ -340,6 +340,8 @@ export default function TravelLog({
         }
         @media (min-width: 1024px) {
           .tl-back-strip {
+            --tl-back-duration: 220ms;
+            --tl-back-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
             top: 0;
             bottom: 0;
             right: 0;
@@ -354,11 +356,9 @@ export default function TravelLog({
             color: var(--tl-strip-ink);
             border-left: 1px solid var(--tl-hair);
             box-shadow: none;
-            /* the label is absolutely positioned, so the flex box centres the
-               triangle alone — v5's in-flow invisible label pushed the arrow
-               above the true vertical centre (user 2026-09-26) */
-            transition: width 0.25s ease, background 0.2s ease,
-              color 0.2s ease;
+            transition: width var(--tl-back-duration) var(--tl-back-ease),
+              background-color var(--tl-back-duration) var(--tl-back-ease),
+              color var(--tl-back-duration) var(--tl-back-ease);
           }
           .tl-back-strip:hover {
             width: 58px;
@@ -367,15 +367,23 @@ export default function TravelLog({
             transform: none;
             box-shadow: none;
           }
-          /* arrow ↔ label crossfade (user 2026-09-26: no hard swap): the
-             triangle drifts left and fades first, the vertical label then
-             fades in with a slight leftward settle */
+          /* Keep both glyphs on a fixed anchor as the strip grows so the
+             crossfade does not inherit the container's width change. */
+          .tl-back-arrow,
+          .tl-back-strip-label {
+            position: absolute;
+            top: 50%;
+            right: 24px;
+            pointer-events: none;
+            transition: opacity var(--tl-back-duration) var(--tl-back-ease),
+              transform var(--tl-back-duration) var(--tl-back-ease);
+          }
           .tl-back-arrow {
-            transition: opacity 0.16s ease, transform 0.24s ease;
+            transform: translate(50%, -50%);
           }
           .tl-back-strip:hover .tl-back-arrow {
             opacity: 0;
-            transform: translateX(-10px);
+            transform: translate(50%, -50%) translateX(-4px);
           }
           .tl-back-strip-label {
             /* the base rule hides the label with display:none at every
@@ -384,22 +392,17 @@ export default function TravelLog({
                opacity reads "1" regardless — v6 shipped with an invisible
                label, spotted by the user 2026-09-26) */
             display: block;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) translateX(6px);
+            transform: translate(50%, -50%) translateX(4px);
             writing-mode: vertical-rl;
             font-size: 12px;
             font-weight: 600;
             letter-spacing: 3px;
             white-space: nowrap;
             opacity: 0;
-            transition: opacity 0.2s ease 0.08s,
-              transform 0.25s ease 0.08s;
           }
           .tl-back-strip:hover .tl-back-strip-label {
             opacity: 1;
-            transform: translate(-50%, -50%) translateX(0);
+            transform: translate(50%, -50%);
           }
         }
         /* Click handoff (v9, 2026-09-28 user feedback): faster (0.35→0.25s)
@@ -1028,6 +1031,14 @@ export default function TravelLog({
           margin-left: auto;
         }
 
+        .scene-index {
+          display: inline-block;
+          margin-right: 8px;
+          color: var(--tl-faint);
+          font-size: 11px;
+          font-variant-numeric: tabular-nums;
+          letter-spacing: 0.06em;
+        }
         .scene-head h2 {
           margin: 6px 0 2px;
           font-size: 22px;

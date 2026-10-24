@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo } from "react";
+import { Fragment, memo, useEffect, useMemo } from "react";
 import type { TravelScene, TripInfo } from "@/lib/travel/types";
 import TravelNav from "./TravelNav";
 
@@ -15,7 +15,7 @@ function SegmentChip({ segment }: { segment: string }) {
 
 const NIGHT_GAP_MS = 6 * 3_600_000; // >6h between scenes = an overnight stay
 
-export default function TravelStory({
+function TravelStory({
   trip,
   scenes,
   registerSection,
@@ -31,6 +31,13 @@ export default function TravelStory({
     const m = activeSceneId.match(/^d(\d+)-/);
     return m ? +m[1] : -1;
   }, [activeSceneId]);
+
+  // Temporary review aid: number each visible narrative section in reading
+  // order, skipping the non-rendered day-title anchors.
+  const sceneNumbers = useMemo(() => {
+    const visible = scenes.filter((scene) => scene.unit !== "title");
+    return new Map(visible.map((scene, index) => [scene.id, index + 1]));
+  }, [scenes]);
 
   // click a capsule to jump to its day, aligned like the nav drawer
   const jumpToDay = (no: number) => {
@@ -260,6 +267,9 @@ export default function TravelStory({
                   >
                     {s.unit !== "title" && (
                       <div className="scene-head">
+                        <span className="scene-index" aria-hidden="true">
+                          {String(sceneNumbers.get(s.id) ?? 0).padStart(2, "0")}
+                        </span>
                         <SegmentChip segment={s.segment} />
                         {s.title && <h2>{s.title}</h2>}
                         <div className="scene-meta">
@@ -357,3 +367,5 @@ export default function TravelStory({
     </div>
   );
 }
+
+export default memo(TravelStory);

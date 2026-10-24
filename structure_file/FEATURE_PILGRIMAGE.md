@@ -309,7 +309,7 @@ type CameraMode = "follow" | "overview" | "manual";
 
 - **时间牌** `.pj-time-plate`：`NN / 36 · 点名` + `HH:MM`。移动端宽度预算：390 px 上 `14 + plate + 12 + 172(五枚控件) + 14 = 390`，故 plate 取 `calc(100vw - 214px)`（max 13rem），高度钉 55 px。早先 `calc(100vw - 16.5rem)` 只有 126 px，开场两行文案全被省略号切掉。
 - **弹窗** `.pj-popup` = **80×100 纯缩略图**（用户要求「面积降到 1/10」）：只剩图 + 16 px 关闭钮，**没有文字** —— 站名在时间牌、全文与大图在右栏、`note` 也在右栏。`background: color-mix(... 62%, transparent)` + `backdrop-filter: blur(16px) saturate(1.5)`，深色另给一档。`POPUP_W = 80` / `POPUP_H = 104` 必须与 globals.css 的 `.pj-popup{width}` 同步；移动端**不要**再写满宽覆盖。定位要做**上下翻转**（`PW = min(POPUP_W=80, w-16)`、`PH = POPUP_H`），否则上半区点被顶出屏幕。
-- **返回键** `.pj-back`：桌面 48 px 全高竖条（hover 58 px + 箭头淡出/竖排文字淡入）；移动端**右上角** `top:58px; right:14px; 42×42`，与 ptes `.tl-back-strip` 逐值一致。放左下会压在本页自己的底部进度条（`.pjr-bar`，fixed/z-30）上，两个蓝色元素叠成一团。
+- **返回键** `.pj-back`：桌面 48 px 全高竖条（hover 58 px + 箭头淡出/竖排文字淡入）；宽度、颜色、透明度与位移统一为 220 ms、同一缓动、无延迟。箭头和文字固定锚定在右缘内 24 px，各自仅有 4 px 的轻微位移，避免侧条变宽额外带动内容；移出时文字与箭头同步切换。PTES `.tl-back-strip` 使用相同桌面节奏与锚点。移动端**右上角** `top:58px; right:14px; 42×42`，位置与尺寸仍与 ptes 一致。放左下会压在本页自己的底部进度条（`.pjr-bar`，fixed/z-30）上，两个蓝色元素叠成一团。
 - **每站阅读顺序 = 章节名 → `note` → 图**（`pj-stop-head > pj-stop-note > pj-stop-card`）。
 
 ### 5.6 hub tile

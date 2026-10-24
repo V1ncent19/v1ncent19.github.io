@@ -120,6 +120,8 @@ const DEFAULT_COLUMNS = 3;
 const LIGHTBOX_TWO_COL = 768; // px overlay content width that enables the panes
 const CAPTION_RAIL_NARROW = 320; // rail width below the widest desktop widths
 const CAPTION_RAIL_WIDE = 380;
+const LIGHTBOX_IMAGE_MAX_WIDTH = 1040; // cap wide photos on large desktop displays
+const LIGHTBOX_IMAGE_MAX_HEIGHT = 820; // keep portrait photos off viewport edges
 
 const EN_MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -351,11 +353,8 @@ export function GalleryView({
   /** Lightbox overlay's content box (viewport minus its padding), px. */
   const [box, setBox] = useState({ w: 0, h: 0 });
 
-  /* Shared-element open/close (2026-09-04, Request C). No on-screen prev/next
-   * arrows any more — switching is keyboard-only. Open expands the panel from
-   * the clicked thumbnail's rect; close collapses back to it. To keep the Close
-   * button from drifting between photos it is pinned to the overlay (viewport),
-   * not anchored to the image stage whose size changes per photo. */
+  /* Shared-element open/close (2026-09-04, Request C). Open expands the panel
+   * from the clicked thumbnail's rect; close collapses back to it. */
   const tileRect = useRef<{ x: number; y: number; w: number; h: number } | null>(
     null,
   );
@@ -718,8 +717,7 @@ export function GalleryView({
     };
   }, [isOpen]);
 
-  // While open: keep focus inside, and let Esc / arrow keys navigate. There
-  // are no on-screen prev/next buttons any more; ←/→ switch photos, Esc (or
+  // While open: keep focus inside, and let Esc / arrow keys navigate. Esc (or
   // any non-button click) animates out.
   useEffect(() => {
     if (openIdx === null) return;
@@ -795,25 +793,26 @@ export function GalleryView({
     [],
   );
 
-  /* Two-pane geometry for the opened card. `wide` mirrors the Tailwind break
-   * used by the responsive class switch below (LIGHTBOX_TWO_COL px content box).
-   * When wide, the caption rail takes a fixed width and the image column the
-   * rest — but the image column is then sized to HUG the photo's own aspect
-   * (fitImage), so a portrait is tall and never sits in a wide black band. */
+  /* Two-pane geometry for the opened card. Keep the image bounded on large
+   * displays while leaving it aspect-fit, so arrows stay attached to a
+   * predictable image stage instead of the entire viewport. */
   const wide = box.w >= LIGHTBOX_TWO_COL;
   const railW = box.w >= 1040 ? CAPTION_RAIL_WIDE : CAPTION_RAIL_NARROW;
+  const imageMaxW = Math.max(
+    0,
+    Math.min(box.w - railW, LIGHTBOX_IMAGE_MAX_WIDTH, Math.round(box.w * 0.68)),
+  );
   const fit =
     active && wide
-      ? fitImage(active, Math.max(0, box.w - railW), Math.max(0, box.h))
+      ? fitImage(
+          active,
+          imageMaxW,
+          Math.min(box.h, LIGHTBOX_IMAGE_MAX_HEIGHT),
+        )
       : { imgW: 0, imgH: 0 };
   const paneImage = fit.imgW > 0 && fit.imgH > 0 ? fit : null;
 
-  /**
-   * Photo overlays of the image stage: frosted meta chip bottom-left, position
-   * counter bottom-right. Both track the photo's own corners (they annotate the
-   * image), so they move with it across aspect changes — that is intended. The
-   * Close button lives here too (2026-09-05 mobile review, see `closeButton`).
-   */
+  /** Photo metadata stays attached to the image stage as its aspect changes. */
   const stageControls = () =>
     active ? (
       <>
