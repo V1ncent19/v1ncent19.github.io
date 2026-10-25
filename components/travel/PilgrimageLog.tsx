@@ -97,6 +97,57 @@ export default function PilgrimageLog({
     return () => obs.disconnect();
   }, []);
 
+  /* ---- entry curtain (v19, 2026-10-24) ----------------------------------
+     body.pj-boot is set by the page's PARSE-TIME script, so the sheet covers
+     the viewport from the first frame and the bare pre-mount layout never
+     flashes. Here we only release it: pj-veil-open plays the retract, whose
+     animationend (listened for on body — pseudo-element events target the
+     owning element) removes both classes.
+     The map gate is what makes this feel deliberate: retracting on mount
+     alone would reveal a half-painted canvas, which is the same failure the
+     trip log's veil was built to avoid. A 1.5s fallback releases anyway if
+     the map never reports (tile host down, WebGL hiccup) so the curtain can
+     never hold the page hostage. */
+  const [mapReady, setMapReady] = useState(false);
+  useEffect(() => {
+    if (!mapReady) return;
+    const t = setTimeout(() => document.body.classList.add("pj-veil-open"), 180);
+    return () => clearTimeout(t);
+  }, [mapReady]);
+
+  useEffect(() => {
+    // same guard as the trip log's fallback: never re-add the release class to
+    // a body that has already finished booting, or it sticks around forever
+    const t = setTimeout(() => {
+      if (
+        document.body.classList.contains("pj-boot") &&
+        !document.body.classList.contains("pj-veil-open")
+      ) {
+        document.body.classList.add("pj-veil-open");
+      }
+    }, 1500);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!document.body.classList.contains("pj-boot")) return;
+    const done = (e: AnimationEvent) => {
+      // pj-entry-pull = the CSS-only fallback, pj-entry-open = the released
+      // retract. Distinct names so the released one always replays from 0.
+      if (
+        (e.animationName === "pj-entry-pull" || e.animationName === "pj-entry-open") &&
+        e.pseudoElement === "::before"
+      ) {
+        document.body.classList.remove("pj-boot", "pj-veil-open");
+      }
+    };
+    document.body.addEventListener("animationend", done);
+    return () => {
+      document.body.removeEventListener("animationend", done);
+      document.body.classList.remove("pj-boot", "pj-veil-open");
+    };
+  }, []);
+
   /** The story column reports the stop it is reading. Everything the map needs
    *  is derived in one place, so the popup can never disagree with the dot. */
   const handleActive = useCallback((id: string | null, p: number) => {
@@ -148,6 +199,7 @@ export default function PilgrimageLog({
         attribution={data.attribution}
         isDark={isDark}
         lang={lang}
+        onMapReady={() => setMapReady(true)}
       />
 
       <PilgrimageStory
@@ -177,11 +229,23 @@ export default function PilgrimageLog({
           }
         }}
       >
+        {/* Optical centring — see the long note on .tl-back-arrow in
+            TravelLog. The chevrons' geometric span is x ∈ [6,18]; with
+            stroke-width 2 and round caps the INK spans [5,19], whose centre
+            is exactly 12 — the viewBox centre. So the path data must stay
+            UNSHIFTED: any translate here moves the ink off the axis. The
+            centring fix lives in the BOX, not the glyph (the strip's lone
+            border-left used to shift the content column by 0.5px).
+            Size 16 (2026-10-24: "可以把左箭头缩小一半。目前箭头的尺寸和悬浮后
+            字体大小差异太大") — at 32 the glyph was twice the cap height of the
+            12px vertical label it crossfades into, so hovering felt like a
+            different control appeared. 16px puts the chevron at roughly the
+            label's own optical weight. */}
         <svg
           className="pj-back-arrow"
           viewBox="0 0 24 24"
-          width="26"
-          height="26"
+          width="16"
+          height="16"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -198,6 +262,10 @@ export default function PilgrimageLog({
       </a>
 
       {leaving ? <div className="pj-back-wipe" aria-hidden="true" /> : null}
+      {/* Entry curtain wordmark — see the .tl-veil-band note in TravelLog. */}
+      <span className="tl-veil-band" aria-hidden="true">
+        Just Because!
+      </span>
     </div>
   );
 }

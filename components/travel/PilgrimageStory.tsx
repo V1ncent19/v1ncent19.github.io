@@ -1,9 +1,12 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { PilgrimageData } from "@/lib/travel/pilgrimage";
 import { CHAPTER_END, CHAPTER_START } from "@/lib/travel/pilgrimage";
+import { MAP_SPLIT_EVENT } from "@/lib/travel/map-split";
+import { chapterAtFraction } from "@/lib/travel/scrub-chapters";
+import { useScrubTrack } from "@/lib/travel/use-scrub-track";
 
 /**
  * Pilgrimage story column.
@@ -241,7 +244,15 @@ export default function PilgrimageStory({
     // Expose the scorer so a programmatic scroll can re-run it once it lands
     // (see the click-to-scroll effect's `reassert`).
     recomputeRef.current = recompute;
+    // The band is scored from live geometry, but nothing makes the observer
+    // FIRE when the map is resized — a drag changes the panel without any
+    // intersection crossing, and the address bar collapsing changes it again.
+    // Without this the plate keeps naming the stop that owned the OLD band
+    // until the reader happens to scroll the next section across the old
+    // threshold. (`rootMargin` above is only a trigger region, not the scorer.)
+    window.addEventListener(MAP_SPLIT_EVENT, recompute);
     return () => {
+      window.removeEventListener(MAP_SPLIT_EVENT, recompute);
       observer.disconnect();
       recomputeRef.current = null;
     };
@@ -602,6 +613,11 @@ function PilgrimageRail({
   const [ticks, setTicks] = useState<{ id: string; label: string; at: number }[]>([]);
   /** The chapter currently in the reading band — lit tick. */
   const [activeId, setActiveId] = useState<string | null>(null);
+  /** v16 (2026-10-24 user request): the chapter index drawer. Same object and
+   *  the same interaction as the trip log's ☰ ("anitabi页面也可以有一个目录按钮，
+   *  操作逻辑与ptes相同"): tap to open a right-hand sheet listing every chapter,
+   *  tap a row to jump to it, tap the scrim or press Escape to close. */
+  const [open, setOpen] = useState(false);
 
   /* measure: section top → percentage of the scrollable range.
      The 0.475 bias is ptes' constant (TravelNav), and it is right for the
@@ -611,7 +627,21 @@ function PilgrimageRail({
     const measure = () => {
       const root = scopeRef.current;
       if (!root) return;
-      const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const vh = window.innerHeight;
+      // The band has to follow the DRAGGABLE split (2026-10-24): on a phone
+      // the map owns y = 0..mapH, so the reading band's centre is
+      // mapH + 0.35 x (vh - mapH), not 0.475 x vh. At the default 58vh the two
+      // agree to within half a percent; once the reader drags the split 150px
+      // they diverge by ~100px, which is enough for a neighbour's tick to light
+      // up instead of the chapter being read. Measured, never assumed.
+      const mapCol = root.closest(".pj-page")?.querySelector(".pj-map-col");
+      const mapH = mapCol
+        ? Math.min(vh, Math.max(0, mapCol.getBoundingClientRect().height))
+        : 0;
+      // A full-height column (desktop) is not an overlay: keep the viewport rule.
+      const stacked = mapH > 0 && mapH < vh - 120;
+      const bandY = stacked ? mapH + 0.35 * (vh - mapH) : vh * 0.475;
+      const max = Math.max(1, document.documentElement.scrollHeight - vh);
       const next: { id: string; label: string; at: number }[] = [];
       for (const m of marks) {
         const el = root.querySelector<HTMLElement>(`[data-pj-stop="${CSS.escape(m.id)}"]`);
@@ -620,7 +650,7 @@ function PilgrimageRail({
         next.push({
           id: m.id,
           label: m.label,
-          at: Math.min(100, Math.max(0, ((y - window.innerHeight * 0.475) / max) * 100)),
+          at: Math.min(100, Math.max(0, ((y - bandY) / max) * 100)),
         });
       }
       setTicks(next);
@@ -632,9 +662,13 @@ function PilgrimageRail({
     const ro = new ResizeObserver(measure);
     ro.observe(document.body);
     window.addEventListener("resize", measure);
+    // A drag on the licence strip changes the map height WITHOUT resizing the
+    // body, so neither signal above fires; map-split.tsx dispatches this.
+    window.addEventListener(MAP_SPLIT_EVENT, measure);
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", measure);
+      window.removeEventListener(MAP_SPLIT_EVENT, measure);
     };
   }, [marks, scopeRef]);
 
@@ -655,19 +689,36 @@ function PilgrimageRail({
       // on any unrelated re-render.
       for (const container of [railRef.current, barTrackRef.current]) {
         if (!container) continue;
-        for (const el of Array.from(container.children)) {
-          const he = el as HTMLElement;
-          he.classList.toggle("read", parseFloat(he.dataset.at ?? "0") <= f * 100);
+        // .pjr-mark are graduations, not chapter buttons — skip them, or the
+        // walk would tag each one `read`.
+        for (const el of Array.from(container.querySelectorAll<HTMLElement>(".pjr-tick"))) {
+          el.classList.toggle("read", parseFloat(el.dataset.at ?? "0") <= f * 100);
         }
       }
 
-      // Which chapter owns the band — the same 35–65% window PilgrimageStory's
-      // observer uses, so the lit tick always agrees with the lit section.
+      // Which chapter owns the band — the same band the observer and the
+      // landing offset use, so the lit tick always agrees with the lit section.
+      //
+      // The band is NOT a fixed slice of the viewport on a stacked layout: the
+      // sticky map owns the top of the screen and the reader can drag where it
+      // ends (lib/travel/map-split.tsx publishes that as --pj-band-top on the
+      // page root). Reading `vh * 0.35` here lit the wrong tick as soon as the
+      // split moved — measured: dragging the map from 58vh to 44vh left the
+      // rail highlighting the NEXT chapter, because the real band had moved up
+      // 78px while this window had not. On desktop the column is full-height,
+      // the hook writes nothing, and the fallback is the original 35%.
       const root = scopeRef.current;
       if (root) {
         const vh = window.innerHeight;
-        const bandTop = vh * 0.35;
-        const bandBottom = vh * 0.65;
+        const declaredBandTop = parseFloat(
+          getComputedStyle(root).getPropertyValue("--pj-band-top"),
+        );
+        const bandTop = Number.isFinite(declaredBandTop)
+          ? declaredBandTop
+          : vh * 0.35;
+        // The band is the first 65% of what is left below the map, which on a
+        // full-height column is 0.35vh…0.65vh — the original numbers.
+        const bandBottom = bandTop + (vh - bandTop) * 0.65;
         let best: { id: string; score: number } | null = null;
         for (const el of Array.from(root.querySelectorAll<HTMLElement>("[data-pj-stop]"))) {
           const r = el.getBoundingClientRect();
@@ -707,7 +758,69 @@ function PilgrimageRail({
       `[data-pj-stop="${CSS.escape(id)}"]`,
     );
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setOpen(false);
   };
+
+  /* Mobile slider scrub (2026-10-24) — the trip log's .tnav-scrub, mirrored.
+     "进度条还是不要刻度了，做成一个普通的可拖动进度条就可以。不过在拖动的时候，
+     端点上可以浮现出一个方框，标示拖到的是哪个章节。"
+     Fraction is in the SCROLL domain, matching how the bar's fill is drawn.
+     behavior:"instant" is required: a smooth scroll restarted on every
+     pointermove never converges on the finger's position. */
+  const scrubTo = useCallback((fraction: number) => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (max <= 0) return;
+    window.scrollTo({ top: fraction * max, behavior: "instant" });
+  }, []);
+
+  const scrubBoxRef = useRef<HTMLDivElement>(null);
+  const scrubBoxTextRef = useRef<HTMLSpanElement>(null);
+
+  /** Same shape as the trip log's marks so chapterAtFraction can read both. */
+  const scrubMarks = useMemo(
+    () => ticks.map((t) => ({ no: t.id, left: t.at })),
+    [ticks]
+  );
+
+  /** DOM write, not state — the frame loop owns .read/.active here and a
+   *  re-render per pointermove would fight it. */
+  const paintScrub = useCallback(
+    (fraction: number) => {
+      const box = scrubBoxRef.current;
+      const track = barTrackRef.current;
+      const mark = chapterAtFraction(scrubMarks, fraction);
+      if (!box || !track || !mark) return;
+      const hit = ticks.find((t) => t.id === mark.no);
+      if (scrubBoxTextRef.current) scrubBoxTextRef.current.textContent = hit?.label ?? "";
+      const w = track.getBoundingClientRect().width;
+      // Keep the box inside the bar's rounded ends.
+      const inset = Math.min(52, w / 2);
+      box.style.left = `${Math.min(w - inset, Math.max(inset, fraction * w)).toFixed(1)}px`;
+      box.classList.add("is-on");
+    },
+    [scrubMarks, ticks]
+  );
+
+  const scrub = useScrubTrack({
+    onScrub: (f) => {
+      scrubTo(f);
+      paintScrub(f);
+    },
+    onRelease: (f) => {
+      scrubTo(f);
+      scrubBoxRef.current?.classList.remove("is-on");
+    },
+  });
+
+  // Escape closes the index sheet (same contract as the trip log's drawer).
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   const toTop = () => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -780,10 +893,94 @@ function PilgrimageRail({
         aria-label={lang === "zh" ? "阅读进度" : "Reading progress"}
       >
         <div className="pjr-track" ref={barTrackRef}>
+          {/* Graduations: DESKTOP RAIL ONLY since 2026-10-24. On a phone the
+              bar is a plain slider — "进度条还是不要刻度了" — so the media
+              query below hides .pjr-mark and .pjr-tick together. They stay in
+              the DOM because the vertical rail reuses the same arrays. */}
+          {ticks.map((t) => (
+            <span
+              key={t.id}
+              className="pjr-mark"
+              /* round() snaps the percentage to a whole CSS pixel before the
+                 rule is drawn — without it the edge lands on a fractional
+                 device pixel and the ruler shows marks of differing width.
+                 See .tnav-mark in TravelNav.tsx for the measurements. */
+              style={{
+                left: `round(${Math.min(99.9, Math.max(0, t.at))}%, 1px)`,
+              }}
+              aria-hidden="true"
+            />
+          ))}
           <div className="pjr-fill" ref={barFillRef} />
+          {/* Draggable surface (the whole tube). The chapter box is NOT in
+              here — .pjr-track clips (overflow:hidden), so a box above its
+              top edge would be invisible; see the note at the box below. */}
+          <div className="pjr-scrub" {...scrub.surfaceProps} />
           {renderTicks(false)}
         </div>
+        {/* Chapter box — a sibling of the tube, inside .pjr-bar. It has to be
+            OUT here: .pjr-track carries overflow:hidden, so anything placed
+            above its top edge is clipped away silently (measured correctly,
+            opacity 1, and completely invisible). Anchored off the bar's own
+            box; the bar's padding-top is the tube's top inset. */}
+        <div className="pjr-scrub-box" ref={scrubBoxRef} aria-hidden="true">
+          <span className="pjr-scrub-text" ref={scrubBoxTextRef} />
+        </div>
+
+        {/* v16: chapter index, left of the tube (the trip log puts it on the
+            right; here the reading direction is the same L→R fill, so the
+            button sits on the side the reader is heading towards). */}
+        <button
+          type="button"
+          className={`pjr-toc${open ? " is-open" : ""}`}
+          onClick={() => setOpen((v) => !v)}
+          aria-label={lang === "zh" ? "目录" : "Chapter index"}
+          aria-expanded={open}
+        >
+          ☰
+        </button>
       </div>
+
+      {/* chapter index sheet — same interaction contract as the trip log's day
+          drawer: scrim tap / Escape / row tap all close it. */}
+      <div
+        className={`pjr-backdrop${open ? " open" : ""}`}
+        onClick={() => setOpen(false)}
+        aria-hidden="true"
+      />
+      <aside
+        className={`pjr-drawer${open ? " open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={lang === "zh" ? "目录" : "Chapter index"}
+        aria-hidden={!open}
+      >
+        <div className="pjr-drawer-head">
+          <span>{lang === "zh" ? "目录" : "Chapter index"}</span>
+          <button
+            type="button"
+            className="pjr-drawer-x"
+            onClick={() => setOpen(false)}
+            aria-label={lang === "zh" ? "关闭" : "Close"}
+            tabIndex={open ? 0 : -1}
+          >
+            ×
+          </button>
+        </div>
+        <div className="pjr-list">
+          {ticks.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={`pjr-row${t.id === activeId ? " active" : ""}`}
+              onClick={() => jumpTo(t.id)}
+              tabIndex={open ? 0 : -1}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </aside>
     </>
   );
 }

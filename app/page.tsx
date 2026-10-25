@@ -24,7 +24,6 @@ import { homeCards } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import type { BlogCategory } from "@/lib/blog";
 import { blogIndexCards } from "@/lib/blog-travel";
-import { tripCardsAsPosts } from "@/lib/blog-travel";
 import { copy, formatMonth } from "@/lib/i18n";
 import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
@@ -182,6 +181,11 @@ function feedDate(date: string): string {
  * though it was on /blog). Blog entries get their category colour; travel
  * entries link straight to /travel/<id>. Projects link to their own pages.
  * Sorted newest-first by the ISO date string.
+ *
+ * ⚠️ Do NOT append `tripCardsAsPosts()` here: `blogIndexCards()` ALREADY
+ * contains the trips. Both loops together listed every travel log twice on the
+ * home page (merge accident, fixed 2026-10-24). Trips enter this feed exactly
+ * one way — through the Blog index merge.
  * ------------------------------------------------------------------------- */
 interface FeedItem {
   key: string;
@@ -206,19 +210,6 @@ function recentPosts(limit = 5): FeedItem[] {
       title: p.title,
       summary: p.excerptText,
       chip: { cls: POST_TONE[p.category], label: en.blog.category[p.category] },
-    });
-  }
-  for (const t of tripCardsAsPosts("en")) {
-    // `href` is optional on the shared index-card type (md posts derive it from
-    // date+slug); a trip always sets it. Guard so the feed can't emit a dead link.
-    if (!t.href) continue;
-    items.push({
-      key: `post-${t.slug}`,
-      href: t.href,
-      date: t.date,
-      title: t.titleText,
-      summary: t.excerptText,
-      chip: { cls: POST_TONE.travel, label: en.blog.category.travel },
     });
   }
   for (const pr of getProjects()) {

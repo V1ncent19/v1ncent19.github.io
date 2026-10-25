@@ -12,6 +12,7 @@ import {
   THEME_SERVER_SNAPSHOT,
 } from "@/lib/theme";
 import type { Theme } from "@/lib/site";
+import { MAP_SPLIT, useMapSplit } from "@/lib/travel/map-split";
 
 /**
  * Pilgrimage map — one map, zoom and pan enabled, auto-follow while reading.
@@ -63,10 +64,12 @@ const FOLLOW_KEY = "pilgrimage-camera-mode";
 type CameraMode = "follow" | "overview" | "manual";
 
 /** The mode the page boots into when the reader has no stored preference.
- *  "overview" (2026-10-17 user pick): the landing view is the whole loop, so
- *  the first thing a reader sees is the shape of the ride rather than one
- *  arbitrary stop's street corner. 随 is then a deliberate choice. */
-const DEFAULT_CAMERA_MODE: CameraMode = "overview";
+ *  "follow" (2026-10-24 user decision, reversed from the 2026-10-17
+ *  "overview" pick): entering the page should already track the stop being
+ *  read, so the map and the text column agree without a click. 全 is still
+ *  one tap away, and anything the reader picks is remembered — this only
+ *  governs the FIRST visit on a device. */
+const DEFAULT_CAMERA_MODE: CameraMode = "follow";
 
 /** Parse the stored mode, tolerating the old boolean flag ("1" = follow,
  *  "0" = manual — "0" meant "the reader moved the camera themselves"). */
@@ -231,6 +234,10 @@ interface Props {
    *  the cooperative-gesture hint. Optional; anything other than "zh" falls
    *  through to maplibre's built-in English table. */
   lang?: "en" | "zh";
+  /** Fired once the style is loaded and the initial framing has been applied.
+   *  The entry curtain (body.pj-boot) waits on this so it never retracts onto
+   *  a grey half-painted canvas — same gate the trip log uses. */
+  onMapReady?: () => void;
 }
 
 /** Seconds from the route's first sample to a stop's photo, i.e. the value to
@@ -684,9 +691,17 @@ export default function PilgrimageMap({
   attribution,
   isDark,
   lang = "en",
+  onMapReady,
 }: Props) {
   const holderRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
+  /** Draggable map/story split (mobile only). Writes --pj-map-h on the column;
+   *  the strip at the map's bottom edge is the handle. See lib/travel/map-split. */
+  const { mountColumn, renderHandle } = useMapSplit(
+    MAP_SPLIT.pilgrimage.storageKey,
+    MAP_SPLIT.pilgrimage.cssVar,
+    MAP_SPLIT.pilgrimage.defaultVh,
+  );
   /** Keeps the canvas matched to its container as the layout settles. */
   const roRef = useRef<ResizeObserver | null>(null);
   /** The zoom produced by the one-time fitBounds. Every later camera move
@@ -1008,6 +1023,10 @@ export default function PilgrimageMap({
         }
         m.resize();
         frame();
+
+        // Reveal gate: the style is loaded and the initial framing is applied,
+        // so the curtain retracts onto a painted map rather than a grey canvas.
+        onMapReady?.();
 
         // Seed the cursor: overview starts at the first stop, so the dot has
         // somewhere sensible to be before the reader scrolls at all.
@@ -1364,7 +1383,7 @@ export default function PilgrimageMap({
     : null;
 
   return (
-    <div className="pj-map-col">
+    <div className="pj-map-col" ref={mountColumn}>
       {/* The MapLibre container deliberately carries NO styling class of ours.
           maplibre-gl.css ships `.maplibregl-map { position: relative }`, and an
           equal-specificity rule that loads later wins — so a `.pj-map` on the
@@ -1480,15 +1499,20 @@ export default function PilgrimageMap({
           requires attribution AND a link back wherever they are rendered —
           this strip is a licence obligation, not decoration. The basemap
           credit is required by OpenStreetMap's own licence. */}
-      <div className="pj-attrib">
-        <a href={attribution.href} target="_blank" rel="noopener noreferrer">
-          {attribution.text}
-        </a>
-        <span className="pj-attrib-sep">·</span>
-        <span>{attribution.license}</span>
-        <span className="pj-attrib-sep">·</span>
-        <span>{attribution.basemap}</span>
-      </div>
+      {renderHandle({
+        className: "pj-attrib",
+        children: (
+          <>
+            <a href={attribution.href} target="_blank" rel="noopener noreferrer">
+              {attribution.text}
+            </a>
+            <span className="pj-attrib-sep">·</span>
+            <span>{attribution.license}</span>
+            <span className="pj-attrib-sep">·</span>
+            <span>{attribution.basemap}</span>
+          </>
+        ),
+      })}
     </div>
   );
 }

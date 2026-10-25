@@ -21,7 +21,8 @@ import type { CSSProperties, ReactNode } from "react";
 import type { NavId, NavItem } from "@/content/site/navigation";
 import { homeCards } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
-import { getBlogPosts, type BlogCategory } from "@/lib/blog";
+import { type BlogCategory } from "@/lib/blog";
+import { blogIndexCards } from "@/lib/blog-travel";
 import { copy, formatMonth } from "@/lib/i18n";
 import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
@@ -160,7 +161,7 @@ function feedDateZh(date: string): string {
 
 /* ---------------------------------------------------------------------------
  * 近期文章 — 与英文首页同源的数据（blog md + 游记 + 项目），中文分类标签；
- * 项目链接走 /zh 路由，游记链接走 /travel/zh/<id>（`tripCardsAsPosts("zh")`）。
+ * 项目链接走 /zh 路由，游记链接走 /travel/zh/<id>（都由 `blogIndexCards("zh")` 给出）。
  * ------------------------------------------------------------------------- */
 interface FeedItem {
   key: string;
@@ -185,18 +186,6 @@ function recentPostsZh(limit = 5): FeedItem[] {
       title: p.title,
       summary: p.excerptText,
       chip: { cls: POST_TONE[p.category], label: zh.blog.category[p.category] },
-    });
-  }
-  for (const t of tripCardsAsPosts("zh")) {
-    // `href` 在共享卡片类型里是可选的（md 文章由 date+slug 推导）；游记一定给值。
-    if (!t.href) continue;
-    items.push({
-      key: `post-${t.slug}`,
-      href: t.href,
-      date: t.date,
-      title: t.titleText,
-      summary: t.excerptText,
-      chip: { cls: POST_TONE.travel, label: zh.blog.category.travel },
     });
   }
   for (const pr of getProjects()) {

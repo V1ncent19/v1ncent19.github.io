@@ -60,12 +60,20 @@
 - 标题/正文长文用衬线，UI 控件用无衬线。
 - **中文衬线现为自托管 GenWanMin2 TC 子集**（`--font-serif-zh` 首位；管线见 ARCHITECTURE）。
   ⚠️ 旧决策的 Noto Serif SC/JP 方向已被取代；日文片段靠字体栈兜底渲染。
+- **字重映射（2026-10-24 起，五个子集）**：EL/L/R/M/SB → `font-weight` **300/400/500/600/700**。
+  早先只有 R/M/SB（400/500/600），任何 300–400 的请求都拿到 Regular，「想细一点」无从表达；
+  现在 `font-medium`(500) 是 R、正文 400 是 L。**改 `@font-face` 的 weight 段时必须同步重跑
+  `scripts/subset-cjk-fonts.py`**（脚本的 `FAMILIES.weights` 列了全部五档），否则 404 → 静默掉到系统字体。
+- **页头主标题用 `font-medium`（500）而非 `font-semibold`（600）**（2026-10-24 用户反馈「字有点加粗了，
+  没有体现出字体曲线感」）：Palatino 在 54–72 px 下 600 会把粗细对比压平；500 保留层次。
+  tracking 同步从 `-0.025em` 收到 `-0.02em`，避免细的接笔粘连。**别再往 600/700 调回去**。
 - **深兜底是 Cactus Classical Serif（仙人掌明體）**：`scripts/subset-cactus.py` 从 28 MB 的完整 TTF
   子集出 `public/fonts/cactus-subset.woff2`（324 KB，OFL 随附）。`@font-face` 里 `local()` 优先，
   **完整 TTF 绝不进 `public/`**。它只在 GenWanMin2 缺字时接手，所以平时看不见它。
 - ⚠️ **子集扫描范围 = `scripts/subset-cjk-fonts.py` 的 `SCAN_DIRS`（现含 `content` 与 `public/data`）**。2026-10-09 前它只扫 `content/app/components`，**游记 JSON（当时在 `public/data/travel/*`）的字从未入子集** → 正文约 26% 的 CJK 掉进系统 sans（YaHei UI）。**凡是会渲染到屏幕的新内容（新 JSON 数据源）都要确认在扫描范围内，然后重跑子集**（`fontTools.subset` + brotli，managed venv）。
   - 2026-10-17 起 trip 数据的源全部在 `content/travel/<trip>/`（**扁平，无 `data/` 子目录**），`public/data/` 只是 `sync:data` 对 `MIRRORED` 清单里那几个文件的镜像。两条路径都在 `SCAN_DIRS` 里，重复扫描无副作用，保留 `public/data` 是为了兜住别的 HTML 页面直接引用的静态 JSON。
 - ⚠️ **`.travel-layout` 是 sans 作用域**（`TravelLog.tsx`）。该布局里的正文元素必须**显式**声明衬线栈，否则继承 sans 违反 §44。现状：`.scene-body p` 与 `.excerpt` 显式 `var(--font-serif-latin), var(--font-serif-zh)`；chip/表头/控件保持 sans。
+- ⚠️ **页面根节点不要设 `font-family`**。巡礼页的 `.pj-page` 曾写 `var(--font-ui)`，整页正文/评论/概述全部静默变无衬线，而标题因为各自**又**声明了一遍衬线所以没坏 —— 表象是「标题衬线、正文无衬线」，扫一遍看不出来（2026-10-24 修）。现在 `.pj-page` 与 `body` 一致是衬线，UI 例外逐个元素显式声明（`.pj-kicker`、`.pj-overview-meta`、`.pj-intro-hint`、`.pj-scroll-hint .hint-text`、`.pj-time-plate`、`.pj-tool-btn`、`.pj-back`、`.pj-outro-hint`、`.pjr-tip`，以及两页共用、声明在基础规则里的 `.pj-attrib / .map-attrib`）。**新加巡礼页元素时直接在自己的规则里写清楚**，别去父级加一行。
 
 ### 5.1 中西文混排空格（硬规范，但**没有自动检查**了）
 
@@ -140,7 +148,120 @@
 
 - 新增 trip 必须走 GPS 清洗管线（隐私红线，见 ARCHITECTURE §数据管线）。
 - 返回条带、图例、tile hover、胶囊吸顶、幕布动画等交互均已逐项定稿（v7–v14.1）；动这些区域前**必读 MEMORY.md 对应条目**，避免推翻已拍板细节。
+- **返回条 hover 只动 opacity，不动位移**（2026-10-24 定案，v13）：ptes 的
+  `.tl-back-*` 与 just-because 的 `.pj-back-*` 都是两行网格
+  `grid-template-rows: 1fr 14px 1fr` —— 箭头钉在中间 14px 车道，竖排标签
+  **`grid-row: 1 / span 3` + `align-self: center`**。这样两个字形**任何一帧都不相交**，
+  浮现也只有透明度过渡。**别把锚点合并、别给浮现加 `translateX`。**
+  - **居中只能靠跨轨 + `align-self: center`**。`grid-row: 1` + `align-self: center`
+    实测偏 -228.5px（900 高）/-363.5px（1440 高），**误差随窗口高度线性增长**
+    —— 用户三次反馈「还是没居中」就是这个（2026-10-24 定的案，前两版都是错的）。
+    跨 `span 3` 后包含块 = 整条，中心相等是几何恒等式，实测 640/720/900/1080/1440
+    五档偏移全 **0.0**。
+  - **`justify-items` 不能和 `align-items` 写在一起**：lightningcss 会把这对合并成
+    `place-items` 并**重排轴**（`place-items: stretch center`），正好抵消
+    `align-items: stretch`，轨道重新塌回内容高度。
+  - **水平居中是三步，缺一步墨迹就还歪**（v18 定案，用户贴图打回两次之后）：
+    ① `writing-mode: vertical-lr` —— `vertical-rl` 的行盒贴**右**边缘，墨迹偏
+    **+19.5px**，文字全挤在视口边上；② `width: fit-content` 把盒子收缩到一个字列，
+    否则行盒撑满、`text-align` 无处施展；③ `margin: 0 auto` —— 收缩后
+    `justify-self` **失效**（实测盒子仍偏 10.5px），且 `margin-inline: auto` 在此
+    上下文算出 0，**必须写 `margin` 简写**。三步齐上后两页 `inkOffset` 均 0.5px。
+    **`justify-self` 也别写在容器上**：箭头是标签的兄弟 item，居中 item 对它无用。
+  - **量竖排文字的居中，只能用 `document.createRange()`**：`range.selectNodeContents(label)`
+    取的是真实字形矩形；`getBoundingClientRect()` 取的是**盒子**。盒子和墨迹在竖排
+    里可以差 19.5px，而盒子永远是 0.5px —— 这正是连续两轮「测着已居中、看着没居中」的原因。
+  - **图标居中同理，且 `getBoundingClientRect()` / `getBBox()` 都不含描边**（v20, 2026-10-24）：
+    双箭头 `M11 17 6 12l5-5` + `M18 17l-5-5 5-5` 的几何跨度是 x∈[6,18]，**加
+    `stroke-width: 2` 的圆头端帽后墨迹是 [5,19]，中心正好 12 = viewBox 中心**。
+    所以 path 数据**不需要任何位移** —— 曾按端点中心 11.5 推算出「偏左 0.5 单位」并
+    给两个 path 各加 +0.5，那是在**端点上算的、没算描边**，32px 下反而引入 0.67px 误差。
+    判据：`svg.getBBox()` 返回的是**未描边**轮廓，要自己按 `stroke-width / 2` 外扩；
+    最终验收仍然只能看**渲染像素**（PNG 列亮度直方图）。
+  - **`border-left: 1px` 会把整列往右推 0.5px**（v20，用户「未悬浮左箭头还是贴左」的真凶）：
+    `box-sizing: border-box` 下，单边边框让 48px 条带的内容盒缩成 46px 且左边界内移
+    1px，**列中心 = stripCx + 0.5**。箭头与文字都在这个偏了 0.5px 的列里「完美居中」，
+    所以任何以**列**为基准的探针都报 0.5px、而人眼拿**条带**做基准就看出歪。
+    **修法是补一条同宽的 `border-right: 1px solid transparent`**，不要用
+    `transform: translateX(-0.5px)`（那会让 hover 缩放也带上偏移），也不要改宽度。
+    修后 2 页 × 1/2/3 倍屏，idle 与 hover 的 `dx` 全为 **0.00**、`gapL == gapR`。
+  - 竖排标签的 `font-size` / `line-height` **写死 px**：写 `inherit` 会拿到祖先的
+    15.3px × `line-height: 1.65`，每个字撑到 25px，整串高 6px，600px 高视口里
+    裁掉最底部字形。`max-height: calc(50% - 20px)` 既是为这串 126px 字留公差，
+    也负责把它关在上半区、不与箭头相交。
+- **移动端进度条 = 普通可拖拽条 + 章节小方框**（2026-10-24 定案，v21，**推翻 v17 的水银温度计**）。
+  用户原话：「进度条还是不要刻度了，做成一个普通的可拖动进度条就可以。不过在拖动的时候，
+  端点上可以浮现出一个方框，标示拖到的是哪个章节。」
+  - **刻度已全部删除**：`@media (max-width: 1023.9px)` 里 `.tnav-mark` / `.tnav-tick` /
+    `.pjr-mark` / `.pjr-tick` 直接 `display: none`。v17 那套 `background: none !important`
+    成组覆盖 `.read` / `.active` / `:hover` 的写法一并删掉 —— 前提是刻度不再显示，
+    留着只会让人误以为刻度还在。
+  - **拖拽逻辑抽成共享 hook** `lib/travel/use-scrub-track.ts`（两页共用），章节换算在
+    `lib/travel/scrub-chapters.ts`（`chapterAtFraction` / `fractionOfChapter`，
+    `ScrubMark.no` 是 `string | number`：ptes 按天数、anitabi 按站点 id）。
+  - **拖拽状态必须全放 ref，不能进 `useState`**：帧循环每帧都在 `classList.toggle`
+    写 `.read` / `.active`，`useState` 会让组件在手势中每秒重渲约 60 次，并与循环抢
+    同一批 DOM 节点。所有视觉后果都直接写 DOM（`style.left` / `textContent` / `classList`）。
+  - **`behavior: "instant"` 是硬性要求**：`smooth` 每帧重启一次滚动，永远追不上手指。
+  - **`touch-action: none` 是手机能拖的前提**，没有它浏览器会把手势当成页面滚动，
+    `pointermove` 根本不派发。
+  - **章节方框必须是 `.tnav` / `.pjr-bar` 的子元素，绝不能放进 `.tnav-track` / `.pjr-track`**：
+    track 有 `overflow: hidden`，放进去会**量到正确尺寸、`opacity` 报 1、就是看不见**。
+    定位用 `bottom: calc(100% - 10px + 8px)` 贴住管子上沿。**判据只能用
+    `document.elementsFromPoint()` 看栈顶，computed style 全对也可能被裁掉。**
+  - 方框左右夹取 `inset = min(44, w/2)`，防止贴边时溢出屏幕；松手（`onRelease`）后移除 `is-on`。
+  - 桌面竖轨**不受影响**：`.tnav-rail-fill` 的 `z-index` 必须是 `auto`，不能继承基类
+    `.tnav-fill` 的 `2`（那个 2 是给移动端水银柱写的）—— 否则桌面轨道的填充会盖在
+    12px 刻度点上，圆点与轨道焊成一根实心条。详见 `MEMORY.md`。
+- **☰ 目录按钮在进度条右侧（ptes）/ 左侧（anitabi），是底栏内的 flex 子元素**（v17 定案；
+  下文「水银柱」是 v17 对填充的旧称，v21 起刻度已删、只剩一根实心填充条，几何未变）。
+  v15 曾把它做成独立的 `position: fixed` 圆形 chip，用户随后改主意：「目录按钮就放在
+  水银柱右边挺好的，不过高度或大小需要调整一下，让这个底栏看起来大小整体比较协调」。
+  所以现在是 `.tnav` / `.pjr-bar` 里的 `flex: none` 子元素，**30×30、透明、无边框、
+  无投影**，配 10px 管 + 10px 内边距 → 条带高 51px，上下留白相等，读起来是一个控件。
+  ptes 放右侧（填充自左向右，按钮在终点侧），anitabi 放左侧——两页方向都是 L→R，
+  用户对 anitabi 只要求「操作逻辑与 ptes 相同」，未指定位置。桌面 ≥1024px 三件
+  （`.tnav-toc-btn` / `.pjr-toc` / backdrop / drawer）全部 `display: none`，
+  竖轨自带百分比和回顶。
 - trip 正文双语混合原始数据，不做 i18n。
+- **flight 段的 marker 是飞机字形**（2026-10-24 定案）：`position-plane` symbol 层，
+  机头沿航线切线（`headingAt` 的 mid-frame 平均，东向必须乘 cos(lat)），
+  **`icon-rotation-alignment` 必须是 `"map"`** —— 改成 `viewport` 会让地图旋转时机头脱离航线。
+  `ground`/`gap` 仍用蓝点，两套图层靠 `kind` 属性互斥过滤，别合并成一个带 case 的层。
+  图标是 canvas 现场画的，**不是资源文件**（不进 public/，不参与 check:refs）。
+
+### 移动端地图/文字分割（2026-10-24 定案）
+
+- **两页都可拖动**（巡礼页默认 58vh、ptes 默认 40vh），范围 25vh–85vh，**只改高度不改上下顺序**，
+  **无重置按钮**，高度存 localStorage（`pj-map-split` / `tl-map-split`）。实现见
+  `lib/travel/map-split.tsx`（`useMapSplit`）。
+- **手柄 = 整条 license 字条**，右侧竖排双箭头只是提示（绝对定位，不随文字折行）。
+  字条本身**必须保持 `position: absolute; bottom: 0`** —— 移动端别再写 `position: relative`，
+  那会让它跑到地图顶部、被时间牌盖住，点不到授权链接（2026-10-24 实测踩过）。
+- **轻点 vs 拖动**：`DRAG_THRESHOLD = 6px`，轻点回放 `closest("a").click()`；
+  拖动绝不触发链接。两条都要验，别只验一条。
+- **两页堆叠断点不同，不能共用一条 media query**：巡礼页 1023px、ptes **900px**
+  （`STACKED_QUERY` 里分开写）。共用会让 ptes 在 901–1023 双栏布局下出现手柄和
+  `touch-action: none`。
+- **落点偏移（`--pj-land`）只能由 JS 写给 `.pj-page` 的祖先**：`.pj-stop` 在故事列，
+  与地图列是**兄弟**，自定义属性不跨兄弟继承。曾经写成
+  `calc(var(--pj-map-h) …)` 直接失效（IVT，整条声明作废，静默回落到 1rem）。
+- **拖动后要主动重算谁在阅读带里**：`ResizeObserver` 感知不到纯 CSS 变量改动，
+  靠 `MAP_SPLIT_EVENT`（`map-split-change`）广播；PilgrimageStory 的 scorer、两条
+  rail 的 `measure()`、`use-story-controller` 的 `bandY()` 都监听它。
+  **`--pj-band-top` 在桌面必须清空**（`removeProperty`），否则 rail 会拿手机的带顶去判定。
+- **`react-hooks/refs`（React 19）会把 hook 返回值的任何属性读取当成读 ref**：
+  `split.dragging` / `split.handleProps` 全报错。所以 hook 直接返回**渲染好的手柄节点**
+  （`renderHandle`），调用方解构 `{ mountColumn, renderHandle }`，渲染期不碰 `split.*`。
+- **解析后的地图高度必须同时写到 frame**（`frameFor` → `.pj-page` / `.travel-layout`），
+  不只写在有高度的那一列上。ptes 的 `.day-capsule { top: … }`、`.map-col` 的高度与灰线
+  （`border-bottom`）、`.finale` 的 `min-height` 都在故事列里，只能通过共同祖先拿到。
+  统一读 `var(--tl-map-h-mobile, var(--tl-map-h))` / ptes 同理，旧变量留作 no-JS fallback。
+  只修 `.map-pane` 会出现「地图变高了、灰线留在中间」。
+- **手柄的上下箭头不要再加动画**（2026-10-24 用户明确要求）。`tl-split-nudge` 关键帧已删除，
+  只剩 hover / dragging 的着色过渡。
+- **拖拽相关验证要分段 await**：胶囊的 `pinned` 类是 rAF 里算的，在同一个 `evaluate` 里
+  连做 scroll + 读 rect 会读到上一帧的 `pinned: false` —— 这是测量假象，不是回归。
 
 ## 七、仍未决（用户决定）
 

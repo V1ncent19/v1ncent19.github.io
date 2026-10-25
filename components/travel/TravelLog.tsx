@@ -135,13 +135,13 @@ export default function TravelLog({
         (e.animationName === "tl-entry-pull" || e.animationName === "tl-entry-open") &&
         e.pseudoElement === "::before"
       ) {
-        document.body.classList.remove("tl-veil-boot", "tl-veil-open");
+        document.body.classList.remove("tl-veil-boot", "tl-veil-open", "tl-veil-band");
       }
     };
     document.body.addEventListener("animationend", done);
     return () => {
       document.body.removeEventListener("animationend", done);
-      document.body.classList.remove("tl-veil-boot", "tl-veil-open");
+      document.body.classList.remove("tl-veil-boot", "tl-veil-open", "tl-veil-band");
     };
   }, []);
 
@@ -159,9 +159,21 @@ export default function TravelLog({
   // Fallback: if the map never fires "load" (tile host down, WebGL hiccup),
   // the veil must not hold the page hostage — release 1.5s after the data
   // is in regardless of the map gate.
+  // The guard matters: the fast path can finish in ~500ms and remove
+  // tl-veil-boot, after which this timer would still fire and re-add
+  // tl-veil-open to a body that is no longer booting — a class that then
+  // never comes off (observed: tl-veil-open lingering on body long after the
+  // curtain had gone).
   useEffect(() => {
     if (!trip || !track) return;
-    const t = setTimeout(() => document.body.classList.add("tl-veil-open"), 1500);
+    const t = setTimeout(() => {
+      if (
+        document.body.classList.contains("tl-veil-boot") &&
+        !document.body.classList.contains("tl-veil-open")
+      ) {
+        document.body.classList.add("tl-veil-open");
+      }
+    }, 1500);
     return () => clearTimeout(t);
   }, [trip, track]);
 
@@ -171,7 +183,17 @@ export default function TravelLog({
     return <div className="boot-error">Failed to load travel data: {error}</div>;
   }
   if (!trip || !track) {
-    return <div className="boot-loading">Loading trip data…</div>;
+    /* The entry curtain covers the viewport from the parse-time class, so this
+       placeholder is never actually read — it is only what sits underneath if
+       the curtain is disabled (prefers-reduced-motion) or its CSS fails. Kept
+       as text rather than blank so a JS-dead/stripped-CSS state is still
+       intelligible instead of a white page. */
+    return (
+      <div className="boot-loading" role="status" aria-live="polite">
+        <span className="boot-loading-dot" aria-hidden="true" />
+        Loading trip data…
+      </div>
+    );
   }
 
   return (
@@ -212,12 +234,35 @@ export default function TravelLog({
                 {/* "《" double chevron (user 2026-09-27, replaces the v6
                     hollow triangle): reads as a "go back" glyph in the gray
                     rest state; hover still crossfades it into the vertical
-                    label. Two stroked chevrons, no fill. */}
+                    label. Two stroked chevrons, no fill.
+
+                    CENTRING (v20, 2026-10-24: "未悬浮状态的左箭头的水平对齐
+                    还是位置不对"). The geometric span is x ∈ [6,18] and the
+                    stroke adds 1 unit on each side, so the INK spans [5,19] —
+                    centre exactly 12, i.e. the viewBox centre. The path data
+                    therefore needs NO offset: this got "fixed" with a +0.5
+                    translate in v19 on the theory that the glyph was 0.5 off,
+                    which was arithmetic done on the endpoints and not on the
+                    stroked outline. That shift was itself a 0.67px error at
+                    32px. Leave the coordinates alone.
+
+                    The real offender was the BOX: `border-left: 1px` with
+                    border-box sizing narrowed the grid column to 46px and
+                    pushed its centre 0.5px right of the strip's centre, so
+                    every child centred "correctly" inside a mis-centred
+                    column. Fixed with a transparent matching border-right.
+                    See .tl-back-strip's border-right comment.
+
+                    Size 16 (2026-10-24: "可以把左箭头缩小一半。目前箭头的尺寸和
+                    悬浮后字体大小差异太大，看起来很奇怪"). At 32 the chevron was
+                    twice the cap height of the 12px vertical label it
+                    crossfades into, so the hover read as a different, bigger
+                    control. 16px matches the label's optical weight. */}
                 <svg
                   className="tl-back-arrow"
                   viewBox="0 0 24 24"
-                  width="26"
-                  height="26"
+                  width="16"
+                  height="16"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
@@ -281,6 +326,14 @@ export default function TravelLog({
           top: var(--tl-top);
           height: var(--tl-map-h);
           transition: height 0.45s ease;
+          /* The licence strip's height, published on the COLUMN so the map
+             inside can trim MapLibre's gesture veil (see the note on the
+             gesture-screen rule further down). This 26px is only the
+             prerendered/first-paint guess: lib/travel/map-split.tsx measures
+             the real strip and overwrites this property inline, so a wrapped
+             two-line credit on a narrow phone is handled without a breakpoint
+             here. */
+          --tl-attrib-h: 26px;
           /* Map/story divider (2026-09-26): neutral paper gray as of v6 —
              the brand blue was reserved for interactive elements (user
              2026-09-26: "地图和文本区的分界线改成灰色"). */
@@ -355,6 +408,16 @@ export default function TravelLog({
             background: var(--tl-strip);
             color: var(--tl-strip-ink);
             border-left: 1px solid var(--tl-hair);
+            /* SYMMETRIC BOX (v20, 2026-10-24: "未悬浮状态的左箭头的水平对齐
+               还是位置不对"). border-left: 1px with border-box sizing shrinks
+               the CONTENT box to 47px and shifts it 1px right, so the grid
+               column's centre lands at stripCx + 0.5. Both the chevron and
+               the label then centre perfectly INSIDE that column — which is
+               why every previous probe said "centred" (they compared against
+               the column) while the eye compared against the strip and saw
+               an offset. A transparent right border of the same width
+               restores the content box to 46px centred on the strip. */
+            border-right: 1px solid transparent;
             box-shadow: none;
             transition: width var(--tl-back-duration) var(--tl-back-ease),
               background-color var(--tl-back-duration) var(--tl-back-ease),
@@ -367,23 +430,59 @@ export default function TravelLog({
             transform: none;
             box-shadow: none;
           }
-          /* Keep both glyphs on a fixed anchor as the strip grows so the
-             crossfade does not inherit the container's width change. */
-          .tl-back-arrow,
-          .tl-back-strip-label {
-            position: absolute;
-            top: 50%;
-            right: 24px;
-            pointer-events: none;
-            transition: opacity var(--tl-back-duration) var(--tl-back-ease),
-              transform var(--tl-back-duration) var(--tl-back-ease);
+          /* Crossfade WITHOUT motion (v12, 2026-10-24).
+             History: v9 (dfd956e) anchored both glyphs on one fixed point, so
+             the 26px chevron sat on top of the 20x126px label for the whole
+             220ms (measured 18.9 x 26.0 px intersection) and the label also
+             slid 4px while fading. v10 stacked them in two grid rows — the
+             overlap went away, but the label then started under the ARROW
+             and ran to the viewport top, leaving its ink centre 80px above
+             the strip's centre. v11 added align-self:center and called it
+             centred — it was NOT, and the amount was viewport-dependent
+             (measured ink centre 228.5px above the strip centre at 900px
+             tall, 363.5px at 1440px: the error grew with the window, which
+             is why it looked fine in one probe window and wrong in the
+             browser the user actually reads in).
+             ROOT CAUSE: the base rule sets display:flex + align-items:center.
+             The desktop block changed display to grid but never reset
+             align-items, so every row was sized to its CONTENT and packed
+             into the middle of a 900px-tall strip: rows were 7+126+14 =
+             147px, the grid box only 147px tall, and align-items:center then
+             parked that whole 147px block at the strip's centre. Row 1's
+             centre was therefore 70px above the midline, not on it.
+             FIX: stretch the tracks (no align-items on the grid), so row 1
+             really is the top half. Centring is then GEOMETRY, not a magic
+             offset — the label's centre is the strip's centre at every window
+             size, which is what "按比例居中" should mean. */
+          .tl-back-strip {
+            display: grid;
+            grid-template-rows: 1fr 14px 1fr;
+            grid-template-columns: 1fr;
+            align-items: stretch;
+            /* No justify-self on the container: the arrow is the label's
+               sibling in the same column, so centring "the item" there does
+               nothing for the label. The label centres itself with
+               width:fit-content + margin-inline:auto (see .tl-back-strip-label),
+               which is what actually moves the INK onto the axis.
+               And do NOT use justify-items here: lightningcss merges a
+               justify-items / align-items pair into place-items and silently
+               reorders the axes, which restores the row-collapsing centring. */
           }
           .tl-back-arrow {
-            transform: translate(50%, -50%);
-          }
-          .tl-back-strip:hover .tl-back-arrow {
-            opacity: 0;
-            transform: translate(50%, -50%) translateX(-4px);
+            grid-row: 2;
+            grid-column: 1;
+            align-self: center;
+            /* HORIZONTAL centring of the idle chevron (v19, 2026-10-24:
+               "未悬浮状态的左箭头的水平对齐还是位置不对，目前贴左").
+               The SVG is 26px wide in a 57px column and grid items default
+               to justify-self:start, so it sat flush against the strip's left
+               edge — the label was centred but the arrow was not, and since
+               the arrow is what you see at rest, the whole button read as
+               left-aligned. align-self only handles the BLOCK axis (vertical
+               here); the inline axis needs its own declaration. */
+            justify-self: center;
+            pointer-events: none;
+            transition: opacity var(--tl-back-duration) var(--tl-back-ease);
           }
           .tl-back-strip-label {
             /* the base rule hides the label with display:none at every
@@ -392,17 +491,82 @@ export default function TravelLog({
                opacity reads "1" regardless — v6 shipped with an invisible
                label, spotted by the user 2026-09-26) */
             display: block;
-            transform: translate(50%, -50%) translateX(4px);
-            writing-mode: vertical-rl;
+            /* Span ALL THREE tracks, not just row 1.
+               v13 (2026-10-24, after the user reported this twice): putting
+               the label in row 1 and centring it there does NOT centre it on
+               the strip. Measured, and reproduced in a bare test page, so it
+               is the layout's behaviour rather than a stray rule: a
+               vertical-rl box in a 1fr row reported its centre 228.5px ABOVE
+               the strip centre and, worse, the error GREW with the window
+               (183.5px at 720 tall, 363.5px at 1440) — which is why it looked
+               right in one test window and wrong in the browser the user
+               actually reads in.
+               Spanning 1 / span 3 and centring gives offset EXACTLY 0 at every
+               size, because the item's containing block is then the whole
+               strip: its centre is the strip's centre by construction. No
+               magic number, and it survives any window height. It still
+               cannot touch the chevron — the label is capped to the top half
+               by max-height below, which keeps their boxes disjoint. */
+            grid-row: 1 / span 3;
+            grid-column: 1;
+            align-self: center;
+            max-height: calc(50% - 20px);
+            overflow: hidden;
+            /* vertical-lr, NOT vertical-rl (v18, 2026-10-24).
+               THE BUG THE USER KEPT REPORTING, and why every earlier attempt
+               "measured" as fixed: getBoundingClientRect on the LABEL reports
+               the BLOCK's box, and the block was (by construction) 0.5px from
+               the strip's centre — so every probe said "centred". The INK was
+               not. With vertical-rl the line box runs right-to-left, so the
+               single line starts flush against the label's RIGHT edge: the
+               15px-wide glyph column sat at x=1423..1438 in a 58px strip
+               (ink centre 19.5px right of the strip's centre), and the text
+               also ended up hard against the viewport's right edge — exactly
+               what "水平对齐也不对" meant. vertical-lr lays the line from the
+               LEFT edge instead, so the ink starts where the box starts.
+               Note this is a writing-direction issue, not an alignment one:
+               justify-self / text-align can move the BOX, they cannot change
+               which edge the line box starts from. */
+            writing-mode: vertical-lr;
+            /* AND the box must shrink to the glyph column. With the block
+               57px wide (= the whole strip), the line box fills it and has
+               nowhere to go: text-align centres lines inside the line box,
+               the line box fills the block, so the ink stayed 18.5px left.
+               width: fit-content makes the block exactly one glyph column
+               wide, and justify-self: center then puts THAT column on the
+               strip's centre — box centring and ink centring finally agree.
+               (Both numbers were measured, not guessed: 8.5px of padding +
+               15px glyph column = 23.5px from each side of the 58px strip,
+               using the label's own padding so the inset is not hard-coded
+               to today's text length.) */
+            width: fit-content;
+            padding-inline: 8px;
+            text-align: center;
+            /* Auto margins, not justify-self, for the shrunken box. Once the
+               block is size-fit it is also OFFSET-FREE inside its grid area,
+               and justify-self no longer reaches it (measured: box stayed
+               10.5px left). With auto margins the free space is split evenly,
+               which is the same guarantee and does not depend on how the
+               browser classifies a size-fit item. */
+            margin: 0 auto;
+            /* Explicit px, not inherit: the strip's inherited line-height
+               (15.3px x 1.65 ≈ 25px) leaks into the label and inflates the
+               natural height by ~6px, which clipped the bottom glyphs
+               ("to Travel") on a 600px-tall viewport. */
             font-size: 12px;
+            line-height: 19px;
             font-weight: 600;
             letter-spacing: 3px;
             white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity var(--tl-back-duration) var(--tl-back-ease);
+          }
+          .tl-back-strip:hover .tl-back-arrow {
             opacity: 0;
           }
           .tl-back-strip:hover .tl-back-strip-label {
             opacity: 1;
-            transform: translate(50%, -50%);
           }
         }
         /* Click handoff (v9, 2026-09-28 user feedback): faster (0.35→0.25s)
@@ -451,6 +615,21 @@ export default function TravelLog({
           height: var(--tl-map-h);
           transition: height 0.45s ease;
         }
+        /* Draggable split (2026-10-24). Below 900px the layout stacks and
+           --tl-map-h becomes the reader's number; the hook writes it onto this
+           element as --tl-map-h-mobile. Kept SEPARATE from --tl-map-h because
+           that one also drives the day capsule's top and the finale's
+           min-height, and on desktop it must stay 100vh (immersive) / 60vh
+           (landing). */
+        @media (max-width: 900px) {
+          .map-pane {
+            height: var(--tl-map-h-mobile, var(--tl-map-h));
+            /* No height transition while a finger is on the strip: the 0.45s
+               ease would lag the map half a second behind the pointer. The
+               hook adds .is-dragging for the duration of the gesture. */
+            transition: none;
+          }
+        }
         .map-container {
           position: absolute;
           inset: 0;
@@ -458,6 +637,18 @@ export default function TravelLog({
              tiles — if the basemap hasn't finished loading (fast scroll on
              mobile), the story text underneath no longer shows through. */
           background: var(--tl-map-bg);
+        }
+        /* MapLibre's cooperative-gesture veil ("USE TWO FINGERS TO MOVE THE
+           MAP") is inset:0 against the nearest positioned ancestor. Here that
+           is already .map-container, so it never escaped the map — but the
+           container's bottom edge IS the pane's bottom edge, which the licence
+           strip sits on, so the veil's last 26px (42px under 640px) fell on the
+           strip and greyed it out. Pull the veil's bottom up by exactly the
+           strip's height. !important because maplibre-gl.css is imported by
+           the map component and lands after this sheet at equal specificity.
+           The value comes from .map-col above. */
+        .maplibregl-cooperative-gesture-screen {
+          bottom: var(--tl-attrib-h, 26px) !important;
         }
         /* Map's top-right control (2026-09-26 v4; split into two groups
            v21 2026-10-09): TWO separate segmented pills so the reader sees at
@@ -897,6 +1088,13 @@ export default function TravelLog({
           line-height: 1.8;
           max-width: 460px;
         }
+        /* The sign-off line ("感谢阅读 ~ See you on the next trip!"). It had NO
+           rule at all, so it inherited the layout root's sans and read as a
+           caption while the sentence above it is a stat line. It is a human
+           sentence in a story, so it takes the serif — 2026-10-24. */
+        .finale-hint {
+          font-family: var(--font-serif-latin), var(--font-serif-zh);
+        }
         /* v12: the deleted story-footer's data-source note, kept as a small
            caption inside the finale */
         .finale-src {
@@ -1132,8 +1330,35 @@ export default function TravelLog({
           display: flex;
           align-items: center;
           justify-content: center;
+          gap: 10px;
           min-height: 60vh;
           color: var(--tl-muted);
+        }
+        /* quiet pulse, so the fallback state still reads as "working" — it is
+           what shows if the curtain is off (reduced motion) or its CSS dies */
+        .boot-loading-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: var(--tl-accent);
+          animation: tl-boot-pulse 1.2s ease-in-out infinite;
+        }
+        @keyframes tl-boot-pulse {
+          0%,
+          100% {
+            opacity: 0.25;
+            transform: scale(0.8);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .boot-loading-dot {
+            animation: none;
+            opacity: 0.6;
+          }
         }
 
         @media (max-width: 900px) {
@@ -1152,6 +1377,16 @@ export default function TravelLog({
             position: sticky;
             z-index: 10;
             border-right: none;
+            /* 2026-10-24: the column, not just the pane, has to follow the
+               split. The map pane was already reading --tl-map-h-mobile, but
+               this element still pinned itself to --tl-map-h (40vh) — and the
+               GRAY SEAM (border-bottom) is drawn HERE. Dragging the map
+               taller moved the pane and left the divider behind, hovering in
+               the middle of the map (user: "灰色线标识顶部没有同步变化").
+               The column is the one that owns the sticky geometry, so the
+               reader's height belongs on it; the pane follows it at 100%. */
+            height: var(--tl-map-h-mobile, var(--tl-map-h));
+            transition: none;
             /* v13 (2026-09-28 user request): the map/text seam on mobile was
                a bare cut — same paper-gray rule as the desktop border-right. */
             border-bottom: 2px solid var(--tl-paper-line);
@@ -1162,11 +1397,24 @@ export default function TravelLog({
           .intro {
             min-height: 60vh;
           }
-          /* v13: the map is sticky over the top 40vh for the WHOLE scroll, so
-             the day capsule must pin just BELOW it — the old top (46px) put
-             it behind the map (z 5 < 10) where it vanished (user report). */
+          /* v13: the map is sticky over the top for the WHOLE scroll, so the
+             day capsule must pin just BELOW it — the old top (46px) put it
+             behind the map (z-index 5 vs the map's 10) where it vanished
+             (user report).
+             2026-10-24: reads --tl-map-h-mobile, NOT --tl-map-h.
+             --tl-map-h is declared on .travel-layout while the capsule
+             lives in the SIBLING .story-col, so the old calc on --tl-map-h
+             substituted empty and was invalid at computed-value time — the
+             capsule stayed at the fallback 40vh + 8px (345.6px) no matter where
+             the strip was dragged (measured: map bottom 338px, capsule 345.6px,
+             so the capsule and its gray line started INSIDE the map and the
+             story text scrolled underneath them). --tl-map-h-mobile is
+             written by lib/travel/map-split.tsx on the shared frame AND on the
+             map column, so it inherits down to .day-capsule — the same fix as
+             the pilgrimage page's --pj-land. --tl-map-h stays behind it as
+             the no-JS/prerender fallback. */
           .day-capsule {
-            top: calc(var(--tl-map-h) + 8px);
+            top: calc(var(--tl-map-h-mobile, var(--tl-map-h)) + 8px);
           }
           /* v13 (2026-09-28 user request): same centre-at-full-scroll
              geometry as desktop, rebased to the VISIBLE area. The map always
@@ -1174,7 +1422,7 @@ export default function TravelLog({
              centre exactly on the midline of the strip between the map's
              bottom edge and the viewport bottom. */
           .finale {
-            min-height: calc(100vh - var(--tl-map-h));
+            min-height: calc(100vh - var(--tl-map-h-mobile, var(--tl-map-h)));
           }
           /* v21: two pills (3 theme + 2 basemap segments) run wider than the
              old single track — trim each segment and the gap so the pair still
@@ -1193,6 +1441,17 @@ export default function TravelLog({
           text (user report: "幕布没有遮住所有的文字"); as a root-level fixed
           element with inset-0 it always spans the full viewport. */}
       {leaving ? <div className="tl-back-wipe" aria-hidden="true" /> : null}
+      {/* Entry curtain wordmark (v19, 2026-10-24). The sheet itself is the
+          body::before pseudo driven by body.tl-veil-boot — a real node there
+          would break React 19 hydration and miss the viewport on first paint.
+          A real element is fine for the LABEL, because hydration is free to
+          own its text; it simply sits on top of the pseudo and is revealed by
+          the same classes. It rides in the resting band on the right edge, so
+          what the reader sees during boot is a titled blue spine, not the
+          naked "Loading trip data…" string. */}
+      <span className="tl-veil-band" aria-hidden="true">
+        Iberia 2025
+      </span>
     </>
   );
 }

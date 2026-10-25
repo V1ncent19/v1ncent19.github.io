@@ -32,6 +32,33 @@ type SceneAnchor = { id: string; y: number };
 /** viewport line used for both scene activation and time sampling */
 const BAND = 0.475;
 
+/**
+ * The same line, as a document-space y for the CURRENT layout.
+ *
+ * On desktop BAND x viewportHeight is exactly right: the map column is the
+ * whole left half and the story column starts at y = 0, so "the middle of the
+ * screen" is "the middle of the reading area".
+ *
+ * On a phone it is not. `.map-col` is sticky and owns the top of the viewport,
+ * so the story only exists in the strip BELOW it — and since 2026-10-24 that
+ * strip's top edge is draggable (lib/travel/map-split.tsx). Reading 0.475 x vh
+ * there points INTO the map for anything under ~70vh, which makes the
+ * controller activate the wrong scene. Measured per call (never cached): the
+ * map's height changes mid-gesture.
+ */
+function bandY(vh: number): number {
+  const mapCol =
+    typeof document === "undefined"
+      ? null
+      : document.querySelector(".travel-layout .map-col");
+  const mapH = mapCol
+    ? Math.min(vh, Math.max(0, mapCol.getBoundingClientRect().height))
+    : 0;
+  // A column that fills the viewport is the desktop split, not an overlay.
+  if (mapH <= 0 || mapH >= vh - 120) return vh * BAND;
+  return mapH + (vh - mapH) * 0.35;
+}
+
 // ---- damped follower (critically damped spring in document pixels) ----
 // Fast flings or content-thin sections move the scroll target far ahead;
 // the shared reading line accelerates to catch up and decelerates into place.
@@ -202,7 +229,7 @@ export function useStoryController(
   // frame of delay is invisible (the spring itself is rAF-driven).
   useEffect(() => {
     if (track && currentTime === 0 && track.points.length > 0) {
-      const y = window.scrollY + window.innerHeight * BAND;
+      const y = window.scrollY + bandY(window.innerHeight);
       targetYRef.current = y;
       springRef.current.y = y;
       const t = timeAtY(y, anchorsRef.current) || track.points[0].ts;
@@ -260,7 +287,7 @@ export function useStoryController(
   const updateProgress = useCallback(() => {
     const sections = sceneAnchorsRef.current;
     if (sections.length > 0) {
-      const lineY = window.scrollY + window.innerHeight * BAND;
+      const lineY = window.scrollY + bandY(window.innerHeight);
       let lo = 0;
       let hi = sections.length;
       while (lo < hi) {
@@ -276,7 +303,7 @@ export function useStoryController(
     }
 
     if (anchorsRef.current.length < 2) return;
-    const y = window.scrollY + window.innerHeight * BAND;
+    const y = window.scrollY + bandY(window.innerHeight);
     capRef.current = Math.max(VMAX_FLOOR, Math.abs(y - springRef.current.y) / CATCH_SECONDS);
     targetYRef.current = y;
     kickSpring();

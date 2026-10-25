@@ -62,11 +62,21 @@ export default function JustBecausePage() {
         export ships visible site chrome, and PilgrimageLog only adds
         body.pj-immersive in a hydration-time effect — without this parse-time
         script the header/footer flash for a frame on entry.
+
+        v19 (2026-10-24): also sets pj-boot, the entry curtain. It has to be a
+        PARSE-TIME class, not a React node — the page used to show a bare
+        unstyled frame (and, before the data was inlined, a loading string)
+        for the whole mount. globals.css paints the curtain off this class
+        from the very first frame; PilgrimageLog adds pj-veil-open once the
+        map reports ready, and the retract collapses toward the right edge —
+        the time-reverse of the back button's blue wipe.
       */}
       <script
         dangerouslySetInnerHTML={{
           __html:
-            'try{if(document.body)document.body.classList.add("pj-immersive","tl-immersive");}catch(e){}',
+            'try{if(document.body){document.body.classList.add("pj-immersive","tl-immersive");'
+            + 'if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches)'
+            + 'document.body.classList.add("pj-boot");}}catch(e){}',
         }}
       />
       <PilgrimageLog data={data} backHref="/travel" backLabel="Back to Travel" />

@@ -60,6 +60,8 @@ FAMILIES = [
         "license": "SIL_Open_Font_License_1.1.txt",
         "out": "public/fonts",
         "weights": [
+            ("el", "GenWanMin2TC-EL.otf"),
+            ("l", "GenWanMin2TC-L.otf"),
             ("r", "GenWanMin2TC-R.otf"),
             ("m", "GenWanMin2TC-M.otf"),
             ("sb", "GenWanMin2TC-SB.otf"),

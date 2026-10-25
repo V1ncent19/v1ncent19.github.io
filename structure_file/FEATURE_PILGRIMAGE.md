@@ -1,7 +1,7 @@
 # FEATURE — 巡礼地图（Just Because! @ 藤泽）
 
 **状态：已完成并上线**（`○ /travel/just-because` + `○ /travel/zh/just-because`），等用户补完文案。
-**最后核对：2026-10-17**（对照 `components/travel/Pilgrimage*.tsx` 与 `content/travel/just-because/page.json` 逐项核实）。
+**最后核对：2026-10-24**（对照 `components/travel/Pilgrimage*.tsx` 与 `content/travel/just-because/page.json` 逐项核实）。
 
 > **怎么读这份文档**
 > - 只想了解现状 / 判断还差什么 → §0 + §7。
@@ -23,7 +23,7 @@
 | 位置真源 | `assets-src/travel-data/pilgrimage/photos.json`（119 张的 id ↔ 坐标 ↔ 时间，gitignored） |
 | 可 fetch 数据 | `public/data/travel/just-because/{route.json, anitabi-212278.json}`，**入库**（不可再生，由 `sync-trip-data.mjs` 的 `KEEP` 名单保护） |
 | 文案 | `overview.text` 已写（但 `_placeholder` 仍为 `true`）；`outro.text` 空；36 站 `note` 全空 |
-| 交互 | 可缩放可拖动、跟随镜头默认开、五枚控件（`自/昼/夜` + `随` + `全`）、滚动联动、点标点跳章节 |
+| 交互 | 可缩放可拖动、跟随镜头默认开、五枚控件（`自/昼/夜` + `随` + `全`）、滚动联动、点标点跳章节、**移动端可拖拽进度条（2026-10-24）** |
 | 待决 | ① 底图合规（OSM/Carto vs 腾讯/高德）；② ptes-2025 轨迹隐私（**不属本功能**，见 §7） |
 
 ---
@@ -309,6 +309,9 @@ type CameraMode = "follow" | "overview" | "manual";
 
 - **时间牌** `.pj-time-plate`：`NN / 36 · 点名` + `HH:MM`。移动端宽度预算：390 px 上 `14 + plate + 12 + 172(五枚控件) + 14 = 390`，故 plate 取 `calc(100vw - 214px)`（max 13rem），高度钉 55 px。早先 `calc(100vw - 16.5rem)` 只有 126 px，开场两行文案全被省略号切掉。
 - **弹窗** `.pj-popup` = **80×100 纯缩略图**（用户要求「面积降到 1/10」）：只剩图 + 16 px 关闭钮，**没有文字** —— 站名在时间牌、全文与大图在右栏、`note` 也在右栏。`background: color-mix(... 62%, transparent)` + `backdrop-filter: blur(16px) saturate(1.5)`，深色另给一档。`POPUP_W = 80` / `POPUP_H = 104` 必须与 globals.css 的 `.pj-popup{width}` 同步；移动端**不要**再写满宽覆盖。定位要做**上下翻转**（`PW = min(POPUP_W=80, w-16)`、`PH = POPUP_H`），否则上半区点被顶出屏幕。
+  - **`z-index: 3`，低地图 HUD 一档（2026-10-24 修）**。此前是 `5`，而 `.pj-map-overlay-top`（时间牌）与 `.pj-map-tools`（`自/昼/夜` + `随/全`）都是 `4` → 标点靠近角落时，80 px 的缩略图**直接盖住时间牌和控件**（用户报「会把地区图左上角的位置卡片，以及右上角的按钮都挡住」）。改为 `3` 后弹窗仍在 MapLibre canvas 之上，HUD 压住它。
+  - **为什么是缩略图让位**：时间牌是「我现在看的是哪一站」的唯一指示，两颗胶囊是镜头模式失控时唯一的退路；弹窗只是「这张图从哪儿来」的旁证。让 HUD 盖住图比让图盖住 HUD 代价小。**不要**为了「不遮挡」去改 `place()` 的夹取逻辑 —— 弹窗本来就被夹在贴图内（`x ∈ [8, w-PW-8]`），角落附近必然与 HUD 相交，这是几何注定的，只能靠层序解决。
+  - 验收方式：往 `.pj-map-col` 注入一个同 class 的 `<figure class="pj-popup">`，摆到与时间牌 / 工具栏相交处，`elementsFromPoint` 栈顶必须**不是** `pj-popup`。
 - **返回键** `.pj-back`：桌面 48 px 全高竖条（hover 58 px + 箭头淡出/竖排文字淡入）；宽度、颜色、透明度与位移统一为 220 ms、同一缓动、无延迟。箭头和文字固定锚定在右缘内 24 px，各自仅有 4 px 的轻微位移，避免侧条变宽额外带动内容；移出时文字与箭头同步切换。PTES `.tl-back-strip` 使用相同桌面节奏与锚点。移动端**右上角** `top:58px; right:14px; 42×42`，位置与尺寸仍与 ptes 一致。放左下会压在本页自己的底部进度条（`.pjr-bar`，fixed/z-30）上，两个蓝色元素叠成一团。
 - **每站阅读顺序 = 章节名 → `note` → 图**（`pj-stop-head > pj-stop-note > pj-stop-card`）。
 
@@ -336,6 +339,8 @@ type CameraMode = "follow" | "overview" | "manual";
 14. **sentinel 两个易错点**：① finale 曾写 `data-pj-stop=""`，被 `.filter(el => el.dataset.pjStop)` 当**假值**丢掉 → **从未参与评分**；② `progress` 不能用 `stopIndex.get(id) ?? 0` 算 sentinel，会把封面报成 `1/n`（等于回到第一站）。
 15. **点标点要走两条通道**：`onNavigateToStop`（右栏滚动）与 `onOpenStop`（弹窗）必须分开，否则「滚到该站 → observer 报告 active → handleActive 重算 open」会和刚打开的弹窗打架。滚动定位要减掉 `mapH`（移动端 sticky 地图高度），否则目标站落在图后面。`handleActive` 里用 `lastFollowedRef` 去重，避免每次 observer 回调都重设镜头。
 16. **主题必须走 `useSyncExternalStore`，不能 `useState(() => readTheme())`** —— 静态导出的 HTML 在 Node 里预渲染，惰性初始化会让首帧与服务端不一致，而 React **不修补属性不匹配**（不是闪一下，是永久错误状态）。`自/昼/夜` 复用 `lib/theme` 的 `applyTheme`，与站点头像**共用同一个 storage key**。
+17. **地图浮层的层序是 `canvas < 弹窗(3) < HUD(4)`，三者不可互换**。`.pj-map-box` 只写 `position: absolute` 而**不写 z-index**（见第 1 条），所以它不生成层叠上下文 —— 弹窗、时间牌、工具栏在同一个上下文里按数字比较，改一个数字立刻生效。**一旦给 `.pj-map-box` 加上 `z-index`，这三者会被一起锁进新上下文**，届时弹窗与 HUD 的先后只由 DOM 顺序决定、数字失效，调 `z-index` 会变成无效操作。需要新浮层时：内容类（缩略图、提示、气泡）不超过 3，HUD 类（常驻控件）用 4 起。
+18. **`.pj-map-col` 里定位的任何浮层，`left`/`top` 都是相对整列的 CSS 像素**，而弹窗的 `x`/`y` 来自 `m.project()` 的 canvas 坐标 —— 两者在桌面是同一个原点（`.pj-map-box` 铺满列、`inset: 0`），**移动端不是**（`.pj-map-col` 是 sticky，且署名条占掉底部 `--tl-attrib-h`）。改布局时先确认 `.pj-map-box` 仍然覆盖了浮层坐标系的全部范围。
 
 ---
 
@@ -361,6 +366,7 @@ type CameraMode = "follow" | "overview" | "manual";
 | 2026-10-17 四轮 | 跟随镜头推近。用户说「放大到目前的 5 倍」，实现时先定口径（zoom 级数 / 线性像素 / 面积，彼此差 200 倍），按**级数**实现。真正的判据是底图细节：Carto 在 zoom ≤16 用泛化层，15.5 只剩空纸面，18.17 才有建筑 + 路名。当时取 `FOLLOW_ZOOM_DELTA = 5`；**现值为 2 / 2.5**（后续又调低，以代码为准） |
 | 2026-10-17 五轮 | ① 亮线跟随光标（原「线瞬变、点 ease」）；② 移动端点击跳转差一站的**两个真因**（`readPanel()` 把带算进地图 / `finish()` 在滚动途中触发）；③ `img-2846` 与 `img-2848` 相距 1.2 px → 几何不可点，用户拍板**推翻固定比例**，改可缩放 + 可拖动 + 跟随默认开 + 「全」键；④ `CameraMode` 三态（旧的「布尔 + 一次性 `userMovedRef`」必然坏：跟随 effect 会消费并重置那个 ref，点「全」只 `fitBounds` 一次而 `follow` 仍为 true，下一次换站立刻抢回镜头） |
 | 2026-10-17 九轮 | 概述 / 完结改成**真正的章节**（sentinel 参与 observer 评分），时间牌改读真实起止时刻 |
+| 2026-10-24 十轮 | ① **移动端进度条改成普通可拖拽条**（刻度全去掉），拖动时端点浮出章节小方框 —— 与 ptes 共享 `lib/travel/use-scrub-track.ts` + `lib/travel/scrub-chapters.ts`，详见 `CONVENTIONS.md`「进度条」条；② **弹窗 `z-index` 5 → 3**，让时间牌与两枚控件压住它。两件事同批验收 |
 
 **两个「看着像 bug 其实是数据」的结论**，别再重查：
 
@@ -388,6 +394,39 @@ type CameraMode = "follow" | "overview" | "manual";
 | 数据在 `content/.../source/` | 在 `public/data/travel/just-because/`（`KEEP` 保护） |
 | `FOLLOW_ZOOM_DELTA = 5` | 现值 `2` / `2.5`（`NARROW` / `WIDE`） |
 | 「§8 未提交的改动清单」 | 已过时；提交状态只看 `git status` |
+
+## 附录 D — 开屏幕布（entry curtain，2026-10-24 新增）
+
+两页共用同一套机制：进入页面时屏幕右侧有一条竖窄蓝带，等数据/地图就绪后**从右往左退场**，
+是「点返回按钮后蓝幕从右拉出」的**逆过程**。用户原话即按此描述提的需求。
+
+| 项 | ptes（`/travel/ptes-2025`） | anitabi（`/travel/just-because`） |
+|---|---|---|
+| body 启动类 | `tl-veil-boot` | `pj-boot` |
+| 释放类 | `tl-veil-open` | `pj-veil-open` |
+| 起始带宽 | `--veil-band: 0.055` | `--veil-band: 0.08` |
+| 就绪信号 | `<TravelStory>` 拿到 `trip` + `track` | `PilgrimageMap` 的 `onMapReady` |
+| 退场动画 | `tl-entry-open` 0.46s | `pj-entry-open` 0.5s |
+
+**四条硬约束，动了就坏：**
+
+1. **幕布必须是 `body::before` 伪元素 + 解析期脚本加的类，绝不能是 React 节点。**
+   水合前插进 DOM 的节点会撞 React 19（#418 → 重渲染 → 节点被删）；用 React
+   渲染的 `position: fixed` 元素会挂到 boot 盒子上、够不到视口。
+2. **启动类只在 `prefers-reduced-motion: reduce` 之外才加**（`page.tsx` 里内联脚本判断），
+   并且 CSS 侧对该媒体查询直接 `display: none` —— 幕布是纯装饰，不能挡残障用户的正文。
+3. **每个动画状态用独立的 keyframes 名**（`*-entry-pull` / `*-entry-open`）。
+   复用同一个名字只会给一个已跑完的动画**重新计时**，画面完全不动（v13 踩过）。
+4. **清理监听只认 `pseudoElement === "::before"` 且名字匹配的那两个动画**，
+   否则页面上任何其它动画结束都会把类摘掉。
+
+**兜底与竞态**：1500ms 的兜底定时器把 boot 推到 open，但它**必须先判断
+`body` 是否还挂着 boot 类、且没有 open 类**。不判断的话，快速路径（正常退场）
+已经在 1080ms 清完类，兜底会在 1500ms 把 `*-veil-open` 重新加回 body 并永久残留
+（实测残留到 3000ms 仍在）。加判断后两页分别在 1590ms / 1198ms 完全清空。
+
+**加载态兜底**：幕布在屏时数据可能还没到，`<div className="boot-loading">`
+必须自带宽高与 `role="status"`，否则会露出裸的 "Loading trip data…" 文字。
 
 ---
 

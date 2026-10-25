@@ -7,7 +7,12 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Map as MLMap, GeoJSONSource, LineLayerSpecification } from "maplibre-gl";
+import type {
+  Map as MLMap,
+  GeoJSONSource,
+  LineLayerSpecification,
+  ExpressionSpecification,
+} from "maplibre-gl";
 import type {
   Attraction,
   Bounds,
@@ -20,6 +25,7 @@ import { padBounds, localClockAt } from "@/lib/travel/gps";
 import type { StoryState } from "@/lib/travel/use-story-controller";
 import { applyTheme, readTheme } from "@/lib/theme";
 import type { Theme } from "@/lib/site";
+import { MAP_SPLIT, useMapSplit } from "@/lib/travel/map-split";
 import ResumeStoryButton from "./ResumeStoryButton";
 
 // Basemap is swappable without touching travel data (roadmap §24).
@@ -220,6 +226,141 @@ function kindOf(p: TrackPoint): Kind {
   return p.k === "air" || p.k === "gap" ? p.k : "ground";
 }
 
+/** Kind of the LINK that point `i` sits on — the same predicates
+ *  routeFeatureCollection() uses (kind + hole test), so the marker's dot/plane
+ *  switch and the line style can never disagree at a boundary. */
+function linkKindAt(pts: TrackPoint[], i: number): Kind {
+  const p = pts[i];
+  if (!p) return "ground";
+  const q = pts[i + 1];
+  if (q && kindOf(p) === "ground" && q.ts - p.ts > HOLE_DT_MS && haversineM(p, q) > HOLE_DIST_M)
+    return "gap";
+  return kindOf(p);
+}
+
+// Window used to estimate the heading at the marker, in degrees of longitude
+// travelled: wide enough that sample noise cannot swing the bearing, narrow
+// enough that a curved leg (the North Atlantic great circle turns ~30°) reads
+// the LOCAL tangent rather than the whole leg's chord.
+const HEAD_WINDOW_DEG = 0.5;
+
+/**
+ * Compass bearing (deg CW from north) of the track AT index i — the "mid-frame"
+ * direction: average of the local unit vectors toward a fix ~0.5° ahead and one
+ * ~0.5° behind. Averaging the two (rather than reading the next chord) puts the
+ * nose on the arc's tangent at the marker instead of on the chord of whichever
+ * pair of fixes happens to straddle it, which also stops it twitching as the
+ * window's endpoints step from one sample to the next.
+ *
+ * Both endpoints are projected onto the tangent plane at the marker: Δlon is
+ * scaled by cos(lat) to become an east displacement, Δlat is already north.
+ * Subtracting raw degrees instead would make every leg read due east (a degree
+ * of longitude is ~cos(lat) as long as a degree of latitude), and on a
+ * 10 000 km leg the endpoints are far enough away that even that breaks down.
+ */
+function headingAt(pts: TrackPoint[], i: number): number | null {
+  if (!Number.isFinite(i) || i < 0 || i >= pts.length) return null;
+  const base = pts[i];
+  if (!base) return null;
+  // east component of a degree of longitude at the marker's latitude
+  const cosLat = Math.max(1e-6, Math.cos((base.lat * Math.PI) / 180));
+  // Walk out to the window edges. Both loops stop at a REAL point check, not
+  // just an index bound: pts can be shorter than the index suggests at the
+  // moment the track is being swapped in, and a missing neighbour here would
+  // otherwise feed `undefined` into the vector maths below.
+  let ahead: TrackPoint | null = null;
+  for (let j = i + 1; j < pts.length; j++) {
+    const p = pts[j];
+    if (!p) break;
+    ahead = p;
+    if (Math.abs(p.lon - base.lon) >= HEAD_WINDOW_DEG) break;
+  }
+  let behind: TrackPoint | null = null;
+  for (let k = i - 1; k >= 0; k--) {
+    const p = pts[k];
+    if (!p) break;
+    behind = p;
+    if (Math.abs(p.lon - base.lon) >= HEAD_WINDOW_DEG) break;
+  }
+  // fall back to the other side when the marker sits on an endpoint
+  if (!ahead) ahead = behind;
+  if (!behind) behind = base;
+  if (!ahead) return null;
+  const vec = (from: TrackPoint, to: TrackPoint) => {
+    const dLon = ((to.lon - from.lon) * Math.PI) / 180;
+    const dLat = ((to.lat - from.lat) * Math.PI) / 180;
+    return { e: dLon * cosLat, n: dLat }; // radians, already comparable
+  };
+  const fwd = vec(base, ahead);
+  const back = vec(behind, base);
+  const e = fwd.e + back.e;
+  const n = fwd.n + back.n;
+  const magn = Math.hypot(e, n);
+  if (!(magn > 1e-12)) return null;
+  return (Math.atan2(e / magn, n / magn) * 180) / Math.PI;
+}
+
+// ---- plane glyph (flight legs) ------------------------------------------
+// Drawn into a canvas and added with map.addImage (2x for retina) rather than
+// shipped as an asset: no extra file, no extra request, and check:refs never
+// has to know about it. The path is authored nose-up (map bearing 0 = north),
+// which is exactly what icon-rotate + icon-rotation-alignment:"map" expect.
+const PLANE_ICON = "position-plane";
+const PLANE_VIEWBOX = 512; // SVG space the path below is authored in
+
+// A four-engine airliner seen from above, nose at y=0.
+const PLANE_PATH = [
+  "M 256 34",
+  "C 274 34 284 62 284 96",       // fuselage, right of the nose
+  "L 284 176",
+  "L 462 286",                    // right wing leading edge (swept)
+  "L 462 318",
+  "L 284 256",
+  "L 284 388",
+  "L 352 434",                    // right horizontal stabiliser
+  "L 352 458",
+  "L 256 432",
+  "L 160 458",
+  "L 160 434",
+  "L 228 388",
+  "L 228 256",
+  "L 50 318",
+  "L 50 286",
+  "L 228 176",
+  "L 228 96",
+  "C 228 62 238 34 256 34",
+  "Z",
+].join(" ");
+
+function planeIconData(fill: string): { width: number; height: number; data: Uint8ClampedArray } {
+  // 96 px box for a 512-unit path (~0.19 scale) leaves room for the 3 px white
+  // outline: the silhouette spans y 34..458, i.e. ~6 px from the top edge at
+  // this size, and a 1.5 px half-stroke would otherwise be clipped flat.
+  const size = Math.round(PLANE_VIEWBOX * 0.1875); // 96 device px (2x of 48 CSS)
+  const strokePx = 3; // white outline width, in device px
+  const c = document.createElement("canvas");
+  c.width = size;
+  c.height = size;
+  const g = c.getContext("2d");
+  if (!g) return { width: size, height: size, data: new Uint8ClampedArray(size * size * 4) };
+  const k = size / PLANE_VIEWBOX;
+  g.scale(k, k);
+  const p = new Path2D(PLANE_PATH);
+  g.fillStyle = fill;
+  // lineWidth is in the PRE-transform unit (the 512-unit space), so divide by
+  // the scale factor to land a strokePx-wide line on the device grid
+  g.lineWidth = strokePx / k;
+  g.lineJoin = "round";
+  g.miterLimit = 2;
+  // stroke first, fill on top: the outline ends up outside the silhouette,
+  // matching the white ring the ground dot carries
+  g.strokeStyle = "#ffffff";
+  g.stroke(p);
+  g.fill(p);
+  const img = g.getImageData(0, 0, size, size);
+  return { width: size, height: size, data: img.data };
+}
+
 /** R20: continuous narrative-age fade. Opacity/width ramp by how far behind
  *  the marker a segment sits in NARRATIVE time — no per-day boundary jump
  *  (the old d0/d1/d2/old ladder snapped a whole day at once). Stops match the
@@ -291,7 +432,7 @@ function routeFeatureCollection(
       (lines[cur.key] ??= []).push(smoothLine(cur.key, cur.line));
     cur = null;
   };
-  let lastKind: Kind = end > 0 ? kindOf(pts[end - 1]) : "ground";
+  let lastKind: Kind = end > 0 ? linkKindAt(pts, end - 1) : "ground";
   let lastFade = fadeOf(Math.max(0, end - 1));
   // R20b: time-stable segmentation key (see FADE_BUCKET_MS above)
   const keyOf = (i: number, k: Kind) =>
@@ -300,10 +441,8 @@ function routeFeatureCollection(
   for (let i = 0; i < end; i++) {
     const p = pts[i];
     const q = pts[i + 1];
-    lastKind =
-      kindOf(p) === "ground" && q.ts - p.ts > HOLE_DT_MS && haversineM(p, q) > HOLE_DIST_M
-        ? "gap"
-        : kindOf(p);
+    // linkKindAt() holds the kind + hole predicate shared with the marker
+    lastKind = linkKindAt(pts, i);
     lastFade = fadeOf(i);
     const key = keyOf(i, lastKind);
     if (!cur || cur.key !== key) {
@@ -341,6 +480,41 @@ function routeFeatureCollection(
     });
   }
   return { type: "FeatureCollection" as const, features };
+}
+
+/** Marker decoration at narrative time tMs — computed from the SAME index the
+ *  route was drawn up to, so the plane can never appear on a link whose line
+ *  has not been reached yet. */
+interface MarkerState {
+  kind: Kind;
+  /** compass deg, null when the track is stationary there (no heading) */
+  bearing: number | null;
+  /** 1 normally; the flight glyph fades with its arc (user 2026-10-24) */
+  op: number;
+}
+
+function markerStateAt(
+  track: TripTrack,
+  uptoIdx: number | null,
+  tMs: number,
+  full: boolean
+): MarkerState {
+  const pts = track?.points;
+  if (!pts || pts.length < 2) return { kind: "ground", bearing: null, op: 1 };
+  const n = pts.length;
+  // clamp defensively: Math.min(NaN, n-1) is NaN, and pts[NaN] is undefined —
+  // a NaN index reaches here on the very first frames (currentTime still 0
+  // while the controller's rAF-driven initialisation is pending)
+  const raw = uptoIdx === null ? n - 1 : uptoIdx;
+  const i = Number.isFinite(raw) ? Math.max(0, Math.min(raw, n - 1)) : 0;
+  const kind = linkKindAt(pts, i);
+  return {
+    kind,
+    bearing: headingAt(pts, i),
+    // the arc's own age fade, quantized identically so plane and dash step
+    // together; finale renders everything at full style, hence 1
+    op: full ? 1 : opQ(ageFade(tMs - pts[i].ts).op),
+  };
 }
 
 /** web-mercator zoom that fits `b` into a viewport of width x height */
@@ -446,6 +620,13 @@ export default function TravelMap({
   // v14 (2026-09-28 user request): the legend ate map space on small screens —
   // collapsible, COLLAPSED by default on every viewport.
   const [legendOpen, setLegendOpen] = useState(false);
+  /** Draggable map/story split (mobile only) — same hook as the pilgrimage
+   *  page; the licence strip at the map's bottom edge is the handle. */
+  const { mountColumn, renderHandle } = useMapSplit(
+    MAP_SPLIT.trip.storageKey,
+    MAP_SPLIT.trip.cssVar,
+    MAP_SPLIT.trip.defaultVh,
+  );
   const finaleModeRef = useRef(false);
   const modeRef = useRef(state.mode);
   // Site-integration note: was a render-phase ref write — moved to an effect.
@@ -537,9 +718,13 @@ export default function TravelMap({
       const mountOverlays = () => {
         if (map.getSource("route")) return; // already mounted
         map.addSource("route", { type: "geojson", data: EMPTY_FC });
+        // Seed with the CURRENT marker state, not empty properties: a basemap
+        // swap remounts this stack from scratch while the reader sits
+        // mid-flight, and the layer filters + icon-rotate read `kind` and
+        // `bearing` off this feature.
         map.addSource("position", {
           type: "geojson",
-          data: {
+          data: positionFRef.current ?? {
             type: "Feature" as const,
             properties: {},
             geometry: { type: "Point", coordinates: [state.position.lon, state.position.lat] },
@@ -597,11 +782,17 @@ export default function TravelMap({
           },
         });
 
-        // --- marker: breathing halo under the dot (rAF-animated below)
+        // --- marker: breathing halo under the dot (rAF-animated below).
+        // Ground/gap links show the accent dot; flight links swap to the plane
+        // glyph (added below) so the marker says "I am on an arc" as clearly as
+        // the amber dashed line does. Both read the same `kind` property off
+        // the `position` source, so the swap is a filter flip, not a fade.
+        const notAir: ExpressionSpecification = ["!=", ["get", "kind"], "air"];
         map.addLayer({
           id: "position-halo",
           type: "circle",
           source: "position",
+          filter: notAir,
           paint: {
             "circle-radius": 10,
             "circle-color": ACCENT,
@@ -612,11 +803,39 @@ export default function TravelMap({
           id: "position-dot",
           type: "circle",
           source: "position",
+          filter: notAir,
           paint: {
             "circle-radius": 6,
             "circle-color": ACCENT,
             "circle-stroke-color": "#ffffff",
             "circle-stroke-width": 2,
+          },
+        });
+        // --- flight marker: plane glyph, nose along the track tangent.
+        // icon-rotation-alignment "map" is the point of the whole thing — the
+        // nose follows the compiled bearing, not the screen, so it stays on the
+        // arc's forward direction even when the reader rotates the map.
+        const icon = planeIconData(AIR);
+        if (!map.hasImage(PLANE_ICON)) map.addImage(PLANE_ICON, icon as never);
+        map.addLayer({
+          id: "position-plane",
+          type: "symbol",
+          source: "position",
+          filter: ["==", ["get", "kind"], "air"],
+          layout: {
+            "icon-image": PLANE_ICON,
+            // 96 device px icon → 0.275 = ~26 css px box; the silhouette is
+            // ~79% of that, i.e. a ~14 px long plane — half the previous 0.55
+            // at the user's request (2026-10-24), roughly the dot's footprint.
+            "icon-size": 0.275,
+            "icon-rotate": ["coalesce", ["get", "bearing"], 0],
+            "icon-rotation-alignment": "map",
+            "icon-pitch-alignment": "map",
+            "icon-allow-overlap": true,
+            "icon-ignore-placement": true,
+          },
+          paint: {
+            "icon-opacity": ["coalesce", ["get", "op"], 1],
           },
         });
 
@@ -699,7 +918,9 @@ export default function TravelMap({
     const t0 = performance.now();
     const step = (now: number) => {
       const map = mapRef.current;
-      if (map && map.getLayer("position-halo")) {
+      // on a flight link the halo belongs to the dot, and the dot is filtered
+      // out — skip the write instead of animating an invisible circle
+      if (map && map.getLayer("position-halo") && positionFRef.current?.properties?.kind !== "air") {
         const ph = 0.5 + 0.5 * Math.sin(((now - t0) / 2600) * Math.PI * 2);
         map.setPaintProperty("position-halo", "circle-radius", 8 + 10 * ph);
         map.setPaintProperty("position-halo", "circle-opacity", 0.04 + 0.2 * (1 - ph));
@@ -1013,18 +1234,23 @@ export default function TravelMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
+    const full = finaleModeRef.current;
     const fc = routeFeatureCollection(
       track,
       state.pointIdx,
       state.currentTime,
-      finaleModeRef.current,
+      full,
       state.position
     );
     routeFCRef.current = fc;
     (map.getSource("route") as GeoJSONSource | undefined)?.setData(fc);
+    // marker: the kind/bearing/opacity ride on the feature so the layer
+    // FILTERS (dot vs plane) and icon-rotate are pure style, no per-frame
+    // setLayoutProperty churn.
+    const mk = markerStateAt(track, state.pointIdx, state.currentTime, full);
     const pf: GeoJSON.Feature = {
       type: "Feature",
-      properties: {},
+      properties: { kind: mk.kind, bearing: mk.bearing ?? 0, op: mk.op },
       geometry: { type: "Point", coordinates: [state.position.lon, state.position.lat] },
     };
     positionFRef.current = pf;
@@ -1098,7 +1324,7 @@ export default function TravelMap({
   );
 
   return (
-    <div className="map-pane">
+    <div className="map-pane" ref={mountColumn}>
       <div ref={containerRef} className="map-container" />
       {/* v21 (2026-10-09 user request): two INDEPENDENT pills so page
           brightness and map form stop fighting. LEFT: 自/昼/夜, a 3-way radio
@@ -1177,10 +1403,10 @@ export default function TravelMap({
           panel that the map reads through, one line, wrapping on narrow
           screens. It replaces maplibre's collapsible attribution chip so the
           credit is ALWAYS visible rather than one tap away. */}
-      <div className="map-attrib">
-        <span>{BASEMAP_CREDITS[specialBasemap || "vector"]}</span>
-        <span className="map-attrib-sep">·</span>
-      </div>
+      {renderHandle({
+        className: "map-attrib",
+        children: <span>{BASEMAP_CREDITS[specialBasemap || "vector"]}</span>,
+      })}
     </div>
   );
 }

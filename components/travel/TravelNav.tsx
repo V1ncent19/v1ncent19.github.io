@@ -1,7 +1,10 @@
 "use client";
 
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import { MAP_SPLIT_EVENT } from "@/lib/travel/map-split";
+import { chapterAtFraction } from "@/lib/travel/scrub-chapters";
+import { useScrubTrack } from "@/lib/travel/use-scrub-track";
 import type { TripInfo, TravelScene } from "@/lib/travel/types";
 
 /**
@@ -48,13 +51,25 @@ function TravelNav({
         if (!byDay.has(no)) byDay.set(no, el.getBoundingClientRect().top + window.scrollY);
       }
       const docH = document.documentElement.scrollHeight;
-      const max = Math.max(1, docH - window.innerHeight);
+      const vh = window.innerHeight;
+      const max = Math.max(1, docH - vh);
+      // The reading line, not the viewport centre: on a phone the map is a
+      // sticky band at the top that the story sits BELOW, and since 2026-10-24
+      // that band's height is draggable. A day's position on the bar has to
+      // move with it, or dragging the split leaves every tick pointing at the
+      // wrong place. Desktop is unchanged (a 100vh column is not an overlay).
+      const mapCol = document.querySelector(".travel-layout .map-col");
+      const mapH = mapCol
+        ? Math.min(vh, Math.max(0, mapCol.getBoundingClientRect().height))
+        : 0;
+      const bandY =
+        mapH > 0 && mapH < vh - 120 ? mapH + (vh - mapH) * 0.35 : vh * 0.475;
       setTicks(
         [...byDay.entries()]
           .sort((a, b) => a[0] - b[0])
           .map(([no, y]) => ({
             no,
-            left: Math.min(100, Math.max(0, ((y - window.innerHeight * 0.475) / max) * 100)),
+            left: Math.min(100, Math.max(0, ((y - bandY) / max) * 100)),
           }))
       );
     };
@@ -62,9 +77,13 @@ function TravelNav({
     const ro = new ResizeObserver(measure);
     ro.observe(document.body);
     window.addEventListener("resize", measure);
+    // A split drag moves every day in the document without resizing the
+    // viewport OR the body, so neither signal above fires (map-split.tsx).
+    window.addEventListener(MAP_SPLIT_EVENT, measure);
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", measure);
+      window.removeEventListener(MAP_SPLIT_EVENT, measure);
     };
   }, [scenes]);
 
@@ -88,9 +107,12 @@ function TravelNav({
       const pct = f * 100;
       for (const container of [trackRef.current, railRef.current]) {
         if (!container) continue;
-        for (const el of Array.from(container.children)) {
-          const he = el as HTMLElement;
-          he.classList.toggle("read", parseFloat(he.dataset.left ?? "0") <= pct);
+        // .tnav-mark spans are markings, not day buttons — skip them, or the
+        // loop would slap a `read` class on each and re-run the (deleted)
+        // tint rules. querySelectorAll keeps the walk off the container's
+        // own non-tick children.
+        for (const el of Array.from(container.querySelectorAll<HTMLElement>(".tnav-tick"))) {
+          el.classList.toggle("read", parseFloat(el.dataset.left ?? "0") <= pct);
         }
       }
       // v9 (2026-09-28, user pick plan A): the rail's x-alignment is MEASURED
@@ -140,8 +162,21 @@ function TravelNav({
     setOpen(false);
   };
 
-  const activeNo = useMemo(() => {
-    const m = activeSceneId.match(/^d(\d+)-/);
+  /* Mobile slider scrub (2026-10-24). The bar is no longer a row of invisible
+     day buttons — the user asked for "一个普通的可拖动进度条…拖动的时候端点
+     上可以浮现出一个方框，标示拖到的是哪个章节".
+     The scrub fraction is expressed in the SCROLL domain (same axis the bar's
+     fill is drawn in), so dragging to f means "scroll so that the scroll
+     position is f of the way through the document". `behavior: "instant"` is
+     mandatory: a smooth scroll per pointermove would restart the animation
+     every frame and the page would never catch up with the finger. */
+  const scrubTo = useCallback((fraction: number) => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (max <= 0) return;
+    window.scrollTo({ top: fraction * max, behavior: "instant" });
+  }, []);
+
+  const activeNo = useMemo(() => {    const m = activeSceneId.match(/^d(\d+)-/);
     return m ? +m[1] : -1;
   }, [activeSceneId]);
 
@@ -155,6 +190,54 @@ function TravelNav({
     }
     return m;
   }, [scenes]);
+
+  const scrubBoxRef = useRef<HTMLDivElement>(null);
+  const scrubBoxTextRef = useRef<HTMLSpanElement>(null);
+
+  /** "Day 3 · Heading" — built from the same dayInfo the drawer uses, so the
+   *  scrub box and the day index can never disagree. */
+  const scrubTextFor = useCallback(
+    (no: number) => {
+      const info = dayInfo.get(no);
+      return `Day ${no} · ${info?.heading || info?.place || trip.days[no]?.label || ""}`;
+    },
+    [dayInfo, trip.days]
+  );
+
+  /** Write the playhead + label straight to the DOM. Deliberately NOT state:
+   *  the frame loop owns .read/.active on this subtree and rewrites them every
+   *  frame, so a re-render per pointermove would fight it. */
+  const paintScrub = useCallback(
+    (fraction: number) => {
+      const box = scrubBoxRef.current;
+      const mark = chapterAtFraction(ticks, fraction);
+      if (!box || !mark) return;
+      if (scrubBoxTextRef.current) scrubBoxTextRef.current.textContent = scrubTextFor(mark.no);
+      const track = trackRef.current;
+      if (track) {
+        const w = track.getBoundingClientRect().width;
+        // Clamp the box's own centre so it never spills past the rounded ends
+        // of a 390px-wide bar. The box is anchored to .tnav, whose horizontal
+        // padding is 0 and whose left edge is the track's left edge, so the
+        // track's width is the right ruler for both.
+        const inset = Math.min(44, w / 2);
+        box.style.left = `${Math.min(w - inset, Math.max(inset, fraction * w)).toFixed(1)}px`;
+      }
+      box.classList.add("is-on");
+    },
+    [ticks, scrubTextFor]
+  );
+
+  const scrub = useScrubTrack({
+    onScrub: (f) => {
+      scrubTo(f);
+      paintScrub(f);
+    },
+    onRelease: (f) => {
+      scrubTo(f);
+      scrubBoxRef.current?.classList.remove("is-on");
+    },
+  });
 
   const drawerRows = useMemo(
     () =>
@@ -188,9 +271,46 @@ function TravelNav({
     <>
       <div className="tnav" role="navigation" aria-label="Trip progress">
         <div className="tnav-track" ref={trackRef}>
+          {/* Graduations are DESKTOP-ONLY since 2026-10-24. The mobile bar is
+              now a plain slider — "进度条还是不要刻度了，做成一个普通的可拖动
+              进度条就可以" — so the .tnav-mark spans are suppressed by the
+              same media query that kills the tick dots (see the mobile block
+              at the bottom of this <style>). They stay in the DOM so the
+              desktop rail, which shares this component, keeps its ruler. */}
+          {ticks.map((t) => (
+            <span
+              key={t.no}
+              className="tnav-mark"
+              /* round() snaps the percentage to a WHOLE CSS PIXEL before the
+                 rule is drawn. Without it the edge lands on a fractional
+                 device pixel (measured 53.59 / 109.47 / 150.84 at 2x) and the
+                 ruler shows marks of differing width — see the .tnav-mark
+                 rule for the full measurement. */
+              style={{
+                left: `round(${Math.min(99.9, Math.max(0, t.left))}%, 1px)`,
+              }}
+              aria-hidden="true"
+            />
+          ))}
           <div className="tnav-fill" ref={fillRef} />
+          {/* Desktop rail keeps its clickable day dots; the mobile bar drops
+              them entirely (see the media query) and scrubs instead. */}
+          <div className="tnav-scrub" {...scrub.surfaceProps} />
           {renderTicks(false)}
         </div>
+        {/* The chapter box lives OUTSIDE .tnav-track on purpose: the track has
+            `overflow: hidden` (it is the capsule that clips the mercury), so a
+            box positioned above its top edge was clipped away — it measured
+            correctly, reported opacity 1, and was invisible (2026-10-24).
+            Anchored to the bar instead, and offset to line up with the tube:
+            `--tnav-tube-top` is the bar's padding-top + the tube's half
+            height, so the box's bottom edge clears the tube by 8px. */}
+        <div className="tnav-scrub-box" ref={scrubBoxRef} aria-hidden="true">
+          <span className="tnav-scrub-text" ref={scrubBoxTextRef} />
+        </div>
+        {/* v16 (2026-10-24 user request): the ☰ is back INSIDE the bar, to the
+            right of the tube — "目录按钮就放在水银柱右边挺好的" — sized to the
+            tube so the whole band reads as one strip. */}
         <button
           className={`tnav-toc-btn${open ? " is-open" : ""}`}
           onClick={() => setOpen((v) => !v)}
@@ -291,16 +411,188 @@ function TravelNav({
           align-items: center;
           gap: 10px;
           padding: 10px 0 8px;
-          background: linear-gradient(to bottom, var(--tl-tnav-fade) 65%, var(--tl-tnav-fade-0));
+          /* v14 (2026-10-24): the translucent fade is gone. It let the story
+             text bleed through the control, so the bar now owns a solid band. */
+          background: var(--tl-paper);
           pointer-events: none;
         }
+        /* ---- mercury thermometer track (v16, 2026-10-24 user request) ----
+           The user asked for the FORM, not for glass: "不需要玻璃和3d效果，
+           我只是在描述形态逻辑". So: one long rounded capsule, and inside it
+           GRADUATIONS THAT STAY VISIBLE FOR THE WHOLE TUBE — they are grey
+           markings today and stay grey after the mercury passes, so a reader
+           can always see "there is a section here" (user 2026-10-24: "刻度可以
+           在上方一直为灰色，这样进度条通过后刻度还在").
+           Layer order, bottom to top:
+             bore (element background)
+             .tnav-fill    (z 2)  mercury, opaque, covers the unread bore
+             .tnav-mark    (z 3)  graduations, ABOVE the mercury — always grey
+             ::after       (z 4)  hairline along the bore's top
+             ::before      (z 5)  soft end-shading at the round caps
+           Note this is the OPPOSITE of v14/v15, where the marks sat under the
+           mercury and vanished as it advanced. Marks are element children of
+           the tube, never a tick's ::before: a tick is positioned, so its
+           pseudo joins the BUTTON's stacking layer and no z-index on it can
+           put it over the mercury. */
         .tnav-track {
           position: relative;
           flex: 1;
-          height: 4px;
-          border-radius: 2px;
-          background: var(--tl-line-2);
+          height: 10px;
+          border-radius: 5px;
+          background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--tl-ink) 9%, var(--tl-surface-2)) 0%,
+            color-mix(in srgb, var(--tl-ink) 3%, var(--tl-surface)) 55%,
+            color-mix(in srgb, var(--tl-ink) 8%, var(--tl-surface-2)) 100%
+          );
+          box-shadow:
+            inset 0 1px 1.5px color-mix(in srgb, var(--tl-ink) 16%, transparent),
+            inset 0 -1px 0 color-mix(in srgb, white 70%, transparent),
+            0 0 0 1px color-mix(in srgb, var(--tl-ink) 8%, transparent);
+          overflow: hidden;
           pointer-events: auto;
+        }
+        /* graduations — full-height hairlines, always grey.
+           z-index 3 puts them OVER the opaque mercury, so the section markers
+           survive the passage of the fill instead of being erased by it.
+
+           THE "刻度线粗细不一" BUG (v18). Ticks are laid out at arbitrary
+           fractional percentages, so their edges land on fractional DEVICE
+           pixels: measured at 2x, mark edges were at 53.59 / 109.47 / 150.84
+           device px. A 2px-wide rule is 4 device px at 2x, but because the
+           start is fractional, how many device pixels actually get full
+           coverage varies — the ruler ends up with marks that read 3px wide
+           and marks that read 2px wide in the same row. Making the rule wider
+           (v17 went 1px -> 2px) does not help, because it is the EDGE
+           alignment that varies, not the width.
+           FIX: snap the position itself to whole CSS pixels with round().
+           The percentage is resolved in CSS against the track, rounded to a
+           whole px, and only then offset by half the rule so the rule's centre
+           lands on that pixel boundary. 1px is then exactly one CSS pixel
+           (2 device px at 2x, 1 at 1x) and every graduation has the same
+           weight at every DPR. */
+        .tnav-mark {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 1px;
+          margin-left: -0.5px;
+          z-index: 3;
+          background: color-mix(in srgb, var(--tl-ink) 30%, transparent);
+          pointer-events: none;
+        }
+        /* ---- Draggable slider surface (2026-10-24) --------------------
+           "进度条还是不要刻度了，做成一个普通的可拖动进度条就可以。不过在拖动
+           的时候，端点上可以浮现出一个方框，标示拖到的是哪个章节。"
+
+           A transparent sheet over the whole tube. It exists so the tube has
+           ONE continuous draggable region instead of 31 tiny buttons whose
+           22px hit boxes overlapped each other (measured 9.4px of track per
+           day on a 390px phone — elementFromPoint used to return the wrong
+           neighbour). Desktop hides it: the rail keeps its clickable dots and
+           its tooltips.
+           touch-action: none is what makes the drag work at all on a phone —
+           without it the browser claims the gesture for page scrolling and
+           pointermove never fires after the first frame.
+           z-index 6 sits above the tube's own layers (::before is z1, the
+           mercury z2) so the gesture is caught everywhere on the bar. */
+        .tnav-scrub {
+          display: none;
+        }
+        /* The chapter box is a child of .tnav (NOT of .tnav-track, which clips
+           with overflow:hidden). It is bottom-anchored off the bar's own box:
+           the bar's padding-top is 10px, so the tube's top edge is 10px below
+           the bar's top, i.e. bottom: calc(100% - 10px). The extra 8px
+           lifts the box clear of the tube's rim. */
+        .tnav-scrub-box {
+          position: absolute;
+          left: 0;
+          bottom: calc(100% - 10px + 8px);
+          transform: translateX(-50%) scale(0.92);
+          transform-origin: bottom center;
+          padding: 4px 9px;
+          border-radius: 6px;
+          background: var(--tl-surface-2);
+          border: 1px solid var(--tl-line-2);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+          font-family: var(--font-ui);
+          font-size: 11px;
+          line-height: 1.35;
+          font-weight: 600;
+          letter-spacing: 0.01em;
+          white-space: nowrap;
+          color: var(--tl-ink);
+          opacity: 0;
+          pointer-events: none;
+          z-index: 7;
+          transition: opacity 0.14s ease, transform 0.14s ease;
+        }
+        /* Opacity alone would still leave the box occupying a paint slot at
+           the far side of the bar on first touch; scale keeps the "pops out
+           of the playhead" feel without any travel across the track. */
+        .tnav-scrub-box.is-on {
+          opacity: 1;
+          transform: translateX(-50%) scale(1);
+        }
+        /* Soft shading at the two round caps, so the capsule closes cleanly
+           and the first/last graduation does not sit on the rim. Kept flat —
+           no highlight, no gloss ("不需要玻璃和3d效果").
+           z-index 1, i.e. UNDER the mercury (z 2), NOT 5 as in v16. At 5 this
+           72%-paper wash sat on top of the fill and turned the slug's left cap
+           into a pale wedge — the "凸起/渐变" the user reported. Below the
+           fill it still shades the empty bore, and the fill's own rounded end
+           closes the capsule wherever the liquid has reached. */
+        .tnav-track::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          border-radius: inherit;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              90deg,
+              color-mix(in srgb, var(--tl-paper) 72%, transparent) 0,
+              transparent 8px
+            ),
+            linear-gradient(
+              270deg,
+              color-mix(in srgb, var(--tl-paper) 72%, transparent) 0,
+              transparent 8px
+            );
+        }
+        /* A single hairline along the bore's top — the only 3D-ish cue left,
+           and it is what keeps a 10px bar from reading as a flat stripe. */
+        .tnav-track::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          height: 1px;
+          z-index: 4;
+          border-radius: 1px;
+          background: color-mix(in srgb, white 72%, transparent);
+          pointer-events: none;
+        }
+        /* mercury: an opaque slug, not a tinted film.
+           FLAT (v17, user 2026-10-24: "液面不需要凸起效果"). The previous
+           three-stop vertical gradient (22% white top / accent middle / darker
+           bottom) shaded the slug across its 10px height and read as a raised
+           tube — a bulge. One flat accent fill now: the "mercury" is told by
+           the contrast against the bore, not by any modelling.
+           The right edge keeps border-radius 5px (a half-height cap = 5px on a
+           10px tube), so the head is a true semicircle and never a notch. */
+        .tnav-fill {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 0%;
+          z-index: 2;
+          border-radius: 5px;
+          background: var(--tl-accent);
+          transition: width 0.1s linear;
         }
         /* Vertical progress rail (2026-09-26 user redesign): lives in the
            story gutter instead of hugging the screen edge, top-anchored below
@@ -427,6 +719,19 @@ function TravelNav({
           right: 0;
           width: auto;
           height: 0%;
+          /* z-index:auto, NOT the base rule's 2 (2026-10-24: "桌面端的进度条在
+             ptes 界面的效果是不对的，在激活的时候都是实心无边缘的").
+             The base .tnav-fill raises itself to z2 so the mercury covers the
+             bore in the MOBILE bar — but the desktop rail reuses the class, so
+             the fill was also painting OVER the tick dots. A 12px dot centred
+             on a 4px rail then has its middle 4px covered by the blue line:
+             the dot and the track fuse into one solid blue slug and the 2px
+             white ring survives only as two slivers, so read/active dots read
+             as "solid, no edge" (user screenshot).
+             anitabi's .pjr-rail-fill never set z-index, which is why its dots
+             looked right. Both ticks are position:absolute with z-index:auto
+             and come AFTER the fill in DOM order, so auto puts them on top. */
+          z-index: auto;
           transition: height 0.1s linear;
         }
         /* Rail ticks ride ON the rail: centred horizontally, positioned by
@@ -443,17 +748,6 @@ function TravelNav({
         }
         .tnav-rail-track .tnav-tick:hover .tnav-tip {
           transform: translateY(-50%) translateX(0);
-        }
-        .tnav-fill {
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 0%;
-          border-radius: 2px;
-          background: var(--tl-accent);
-          opacity: 0.55;
-          transition: width 0.1s linear;
         }
         .tnav-tick {
           position: absolute;
@@ -524,26 +818,97 @@ function TravelNav({
         .tnav-tick.edge-r:hover .tnav-tip {
           transform: translateY(0);
         }
+        /* Mobile ticks: 31 round dots on a ~320px track overlap each other
+           (9.4px of track per day against a 12px diameter — measured on a
+           390px phone). 2026-10-24 user pick: drop the dots, one 1px hairline
+           per day, the progress fill stays the only bright object. The 22px
+           hit box is unchanged, so tapping a day still works; the hairline is
+           a ::before inside the same button.
+           These rules MUST live here rather than in globals.css: this
+           styled-jsx block is emitted after the global sheet, so the base
+           .tnav-tick declarations above would win a same-weight cascade in
+           the other direction. Declared in globals.css too, for the
+           pilgrimage page's .pjr-tick, which it does own. */
+        @media (max-width: 1023.9px) {
+          /* ---- slider mode (2026-10-24) ------------------------------
+             Three things change at once, and they only make sense together:
+             1. the graduations disappear ("不要刻度了");
+             2. the per-day dots/buttons stop painting AND stop being hit
+                targets (the scrub sheet below owns the whole tube);
+             3. one transparent sheet becomes the draggable surface.
+             The dots are hidden with display:none on the BUTTONS rather
+             than the sheet being layered above them: a pointer capture on a
+             sheet that covers buttons would still let the buttons win hover
+             styles, and their z-index 6 would eat the gesture. */
+          .tnav-mark {
+            display: none;
+          }
+          .tnav-tick {
+            display: none;
+          }
+          .tnav-scrub {
+            display: block;
+            position: absolute;
+            inset: -9px 0;
+            z-index: 6;
+            touch-action: none;
+            /* The sheet is the control; a grab cursor is wrong on touch and
+               misleading on a narrow desktop window, so keep it default. */
+            -webkit-tap-highlight-color: transparent;
+          }
+        }
+        @media (min-width: 1024px) {
+          .tnav-scrub-box {
+            display: none;
+          }
+        }
+        /* ---- ☰ day index: right end of the bar (v16, 2026-10-24) ----
+           The user first wanted it out of the bar, then changed their mind
+           after seeing it: "目录按钮就放在水银柱右边挺好的，不过高度或大小需要
+           调整一下，让这个底栏看起来大小整体比较协调". So it is a flex child
+           again (right of the tube), sized in the same range as the tube
+           rather than towering over it: 30x30 against a 10px tube with 10px
+           band padding gives a 50px band — the button's half-height above
+           and below the tube is equal, so the band reads balanced.
+           Bare glyph, no border or fill: a bordered chip competed with the
+           capsule next to it (that was the v15 look, and the reason it read
+           as two unrelated controls). */
         .tnav-toc-btn {
-          pointer-events: auto;
-          border: 1px solid var(--tl-line-2);
-          background: var(--tl-surface-2);
-          color: var(--tl-ink-3);
-          border-radius: 6px;
+          flex: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           width: 30px;
-          height: 26px;
-          font-size: 14px;
+          height: 30px;
+          padding: 0;
+          border: 0;
+          border-radius: 8px;
+          background: transparent;
+          color: var(--tl-ink-3);
+          font-size: 15px;
+          line-height: 1;
           cursor: pointer;
-          transition: color 0.2s ease, border-color 0.2s ease, transform 0.25s ease,
-            background 0.2s ease;
+          pointer-events: auto;
+          transition: color 0.2s ease, background 0.2s ease;
+        }
+        .tnav-toc-btn:hover,
+        .tnav-toc-btn:active {
+          color: var(--tl-accent);
+          background: color-mix(in srgb, var(--tl-accent) 12%, transparent);
+        }
+        .tnav-toc-btn.is-open {
+          color: var(--tl-accent-strong);
+          background: var(--tl-accent-soft);
         }
         /* v13 (2026-09-28 user request): on narrow viewports the top sticky
            bar overlaid the map's upper edge and fought the basemap slider
            ("总进度条和地图的干涉效果很奇怪"). Pin the whole bar to the
            VIEWPORT BOTTOM instead. fixed takes it out of flow (the ~28px it
            occupied at the story top is reclaimed — harmless), so re-declare
-           every positioning property the base rule set, and flip the fade
-           gradient upward. Desktop keeps display:none (base ≥1024 rule). */
+           every positioning property the base rule set. v14 (2026-10-24):
+           the upward fade is replaced by a solid sheet with a hairline on top
+           — the text underneath used to show through the control. Desktop
+           keeps display:none (base ≥1024 rule). */
         @media (max-width: 1023.9px) {
           .tnav {
             position: fixed;
@@ -552,22 +917,14 @@ function TravelNav({
             left: 0;
             right: 0;
             padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
-            background: linear-gradient(
-              to top,
-              var(--tl-tnav-fade-97) 62%,
-              var(--tl-tnav-fade-0)
-            );
+            background: var(--tl-paper);
+            border-top: 1px solid var(--tl-divider);
+            box-shadow: 0 -6px 18px color-mix(in srgb, var(--tl-ink) 7%, transparent);
           }
-        }
-        .tnav-toc-btn:hover {
-          color: var(--tl-accent);
-          border-color: var(--tl-accent);
-          transform: scale(1.08);
-        }
-        .tnav-toc-btn.is-open {
-          color: var(--tl-accent-strong);
-          border-color: var(--tl-accent);
-          background: var(--tl-accent-soft);
+          .tnav-toc-btn:focus-visible {
+            outline: 2px solid color-mix(in srgb, var(--tl-accent) 60%, transparent);
+            outline-offset: 2px;
+          }
         }
         .tnav-backdrop {
           position: fixed;

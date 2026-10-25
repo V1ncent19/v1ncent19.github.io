@@ -177,10 +177,16 @@ export function SiteHeader() {
       {/* ---- 1 · Identity — scrolls away with the page ---- */}
       <header className="relative">
         <div className="shell flex flex-col pt-5 pb-6 sm:pt-8 sm:pb-7">
-          {/* text-balance keeps the two lines even instead of a widow word;
+          {/* Weight 500, not 600 (2026-10-24, user: "字有点加粗了，没有体现出
+              字体曲线感"): the Latin name sets in Palatino at 54–72 px, and its
+              600 cut fattened the thin/thick contrast that gives the serif its
+              curve. 500 keeps the masthead weightier than body text while
+              letting the strokes breathe; -0.02em tracking (was -0.025em) also
+              stops the hairline joins from closing up at that weight.
+              `text-balance` keeps the two lines even instead of a widow word;
               the quoted handle is nowrap so a narrow viewport never splits
               `v1ncent19` away from its quotation marks mid-name. */}
-          <h1 className="font-serif text-4xl font-semibold leading-tight tracking-tight text-balance sm:text-5xl xl:text-6xl">
+          <h1 className="font-serif text-4xl font-medium leading-tight tracking-[-0.02em] text-balance sm:text-5xl xl:text-6xl">
             <Link
               href={lang === "zh" ? "/zh" : "/"}
               aria-label="Home"

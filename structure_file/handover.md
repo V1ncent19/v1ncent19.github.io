@@ -1,6 +1,6 @@
 # Handover — 站点现状与新功能启动入口
 
-**最后更新：2026-10-18。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
+**最后更新：2026-10-24。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
 `ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_PILGRIMAGE.md`（巡礼页）。
 
 ---
@@ -21,7 +21,7 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 - 评论 giscus（`@giscus/react`）；中文字体自托管子集化（GenWanMin2 TC + Cactus 深兜底）
 - 地图 MapLibre GL（`/travel` 地球仪、ptes-2025、just-because）
 
-## 3. 当前状态（2026-10-18）
+## 3. 当前状态（2026-10-24）
 
 | 项 | 状态 |
 |---|---|
@@ -29,8 +29,9 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 | **public/assets/** | 已按页面归属重排（`about/ home/ cv/ project/ gallery/ photos/`）；相册原图层除外（142 MB，不上线、git-ignored） |
 | **部署** | ✅ 2026-10-18 上线（`2f2b7b7`）：主路由全 200，相册 48 张缩略图正常，旧 Jekyll 路由（`/gallery/`）404 |
 | Travel hub | MapLibre 地球仪 + 游记 tiles + 「Stories & frames」相册墙 + 心愿单清单 + 双向 hover 联动 |
-| ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画），景点标点 73 个，正文 14.8k 字按 GPS 投放 |
+| ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画），景点标点 73 个，正文 14.8k 字按 GPS 投放。**移动端进度条已改成可拖拽条（2026-10-24）** |
 | 巡礼地图 | `/travel/just-because`（+zh）已上线：36 个对比点 + 273 点环线 + 可缩放相机 + 滚动联动。**还差用户填 `outro` 与 36 条 `note`** |
+| 两页共用的进度条 | **移动端普通可拖拽条 + 拖动时浮出章节方框**（2026-10-24，v21，推翻 v17 水银温度计）；桌面竖轨圆点白环已修复。共享代码 `lib/travel/use-scrub-track.ts` + `lib/travel/scrub-chapters.ts` |
 | Blog 索引 | md 文章 + 游记卡合并（`lib/blog-travel.ts`，读取时合并，按日期倒序），无「假 md」 |
 | 双语 | 全站只有一种写法 + `npm run check:i18n` 守卫；`/project/zh/*` 曾显示英文摘要的 bug 已修 |
 | 遗留 | 底图合规、ptes-2025 隐私（两条都等用户拍板）；9 处 anitabi 标点歧义；中文子集需覆盖 `content/travel/` |
@@ -111,6 +112,13 @@ prebuild 自动跑 `badges → sync:data → check:refs → check:i18n`，任何
   （ESM 不认 `NODE_PATH`，放别处会 `Cannot find package 'playwright-core'`），**用完即删，别放进仓库**。
 - **⚠️ build 失败时 `out/` 仍是上一次成功的产物**，探针照跑不报错、测出来全是旧数据 ——
   每次都要单独确认 build 成功。
+- **`page.screenshot({ scale: "device" })` 在本机不生效**，输出仍是 CSS 像素（1440 宽页面
+  只给 160×8，而非 640×32）。要读渲染像素就把 clip 按 CSS 像素放大，别指望 dpr。
+- **样式表查不出层序问题**：两页 computed style 可以逐字段相同，而画面上一个「实心无边缘」、
+  一个有白环 —— 差别只在绘制顺序。**视觉层级一律用 `document.elementsFromPoint()` 的栈顶
+  判定，或用 PNG 解码后的像素行**（见 `.workbuddy/memory/` 里手写解码器的做法）。
+- **找 `.read` / `.active` 元素要扫多个滚动位置**（0.15 / 0.25 / 0.35 …），单一位置经常
+  一个都没有 → 探针拿到全白样本还"通过"。
 - `next dev` 在本环境会反复死掉，所以验收一律走 `out/`。
 
 ## 6. 新功能怎么启动

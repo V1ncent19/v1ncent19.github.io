@@ -1,19 +1,42 @@
 @import "tailwindcss";
 
 /* Self-hosted 源雲明體丹 GenWanMin2 TC, per-weight subset webfonts
-   (2026-09-07). Sources: assets-src/fonts/GenWanMin2TC/*.otf (22 MB each —
-   never deploy raw); subsets → public/fonts/genwanmin2tc-{r,m,sb}.woff2
-   (~640 KB each) via scripts/subset-cjk-fonts.py. R/M/SB map to the site's
-   used weights 400/500/600 (bold-700 requests resolve to SB). `local()`
+   (2026-09-07; EL/L added 2026-10-24 so light headings have a real lightweight
+   sibling instead of a synthesized fake-bold). Sources:
+   assets-src/fonts/GenWanMin2TC/*.otf (22 MB each —
+   never deploy raw); subsets → public/fonts/genwanmin2tc-{el,l,r,m,sb}.woff2
+   (~850 KB each) via scripts/subset-cjk-fonts.py. EL/L/R/M/SB map to the
+   font's own 300/400/500/600 weights (bold-700 requests resolve to SB; a
+   `font-weight: 350` for the masthead lands on L). `local()`
    first: visitors with the font installed use their full local copy and
    skip the download. */
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-EL"),
+    url("/fonts/genwanmin2tc-el.woff2")
+      format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-L"),
+    url("/fonts/genwanmin2tc-l.woff2")
+      format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 @font-face {
   font-family: "GenWanMin2 TC";
   src:
     local("GenWanMin2TC-R"),
     url("/fonts/genwanmin2tc-r.woff2")
       format("woff2");
-  font-weight: 400;
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
@@ -23,7 +46,7 @@
     local("GenWanMin2TC-M"),
     url("/fonts/genwanmin2tc-m.woff2")
       format("woff2");
-  font-weight: 500;
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
@@ -33,7 +56,7 @@
     local("GenWanMin2TC-SB"),
     url("/fonts/genwanmin2tc-sb.woff2")
       format("woff2");
-  font-weight: 600;
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -1392,74 +1415,15 @@ body.tl-immersive .site-chrome-footer {
   display: none;
 }
 
-/* ---- Trip page entry veil (2026-09-28 v11) ----
-   The time-reverse of the trip page's exit wipe (components/travel/
-   TravelLog): the page boots UNDER a full-viewport light-blue sheet and the
-   sheet retracts toward the right edge (where the back strip lives) once
-   the trip data AND the MapLibre map have fired their ready signals.
-   Colour runs the exit fade backwards: #eef9fd while covering, deepening to
-   the strip's hover blue #cfeaf5 as it pulls away.
-
-   The sheet is a body::before PSEUDO-ELEMENT driven by classes the route
-   page's pre-paint inline script sets (tl-veil-boot) and TravelLog toggles
-   (tl-veil-open). It must NOT be a real DOM node: a node appended before
-   hydration breaks React 19 (#418 -> client re-render -> node deleted), and
-   a React-rendered fixed veil hangs off the small boot box / route-fade
-   wrapper and misses the viewport on first paint. A class + pseudo-element
-   is invisible to hydration and paints from the very first frame
-   (tl-immersive is the hydration-safety precedent). */
-body.tl-veil-boot::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 95;
-  background: var(--tl-accent-soft-2, #eef9fd);
-  transform-origin: right center;
-  pointer-events: none;
-  /* v12.1 JS-dead fallback (2026-09-28): the curtain must NEVER hold the
-     page hostage. If client JS never arrives (or takes pathologically long —
-     a cold `next dev` compile measured 40s once), this delayed self-retract
-     is pure CSS and runs with or without JS. When JS opens the veil normally
-     it adds .tl-veil-open, whose rule overrides this shorthand entirely
-     (higher specificity replaces the whole animation), so the normal path is
-     unchanged. If the fallback fires while JS is merely slow, its
-     animationend still reaches the TravelLog cleanup listener and the classes
-     come down; if JS is truly dead the sheet just stays at scaleX(0) —
-     invisible and pointer-transparent. */
-  animation: tl-entry-pull 0.4s ease-in 4s forwards;
-}
-/* v13 (2026-09-28 bugfix): the open rule used to replay the SAME keyframes
-   name (tl-entry-pull). Per CSS Animations, same name = the existing
-   animation's timing updates without restarting — its start time stays the
-   page's first paint, so by the time the map finished loading (1–3s) the
-   0.4s animation was already "over" and the veil snapped away instantly
-   (user: "揭幕没有动画效果"). A DISTINCT name forces cancel + re-create, so
-   the retract always plays from 0. Direction is unchanged and already
-   correct: origin right + scaleX 1→0 reveals the page left edge first and
-   sweeps right — the time-reverse of the exit wipe (covers right→left).
-   Duration 0.4→0.5s so the sweep actually registers. */
-body.tl-veil-boot.tl-veil-open::before {
-  animation: tl-entry-open 0.5s ease-in forwards;
-}
-@keyframes tl-entry-open {
-  from {
-    transform: scaleX(1);
-    background-color: var(--tl-accent-soft-2, #eef9fd);
-  }
-  45% {
-    background-color: var(--tl-accent-soft-3, #e2f4fb);
-  }
-  to {
-    transform: scaleX(0);
-    background-color: var(--tl-chip, #cfeaf5);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  body.tl-veil-boot::before {
-    display: none;
-  }
-}
-
+/* ---- Travel page entry curtains ----
+   MOVED (v19, 2026-10-24): the v11 veil that lived here is gone. Its rules
+   are now part of the shared "entry curtain" block further down this file,
+   which BOTH the trip log (body.tl-veil-boot) and the pilgrimage page
+   (body.pj-boot) use. Keeping two definitions of the same pseudo-element
+   split across the stylesheet meant the old animation shorthand silently
+   won on order and the newer band form never played.
+   The full contract lives with the new block — search for
+   "entry curtain". */
 /* ═══════════════════════════════════════════════════════════════════════════
    Pilgrimage page (/travel/just-because) — added 2026-10-16
    A lighter cousin of the ptes travel log: instead of a time-interpolated
@@ -1476,7 +1440,19 @@ body.tl-veil-boot.tl-veil-open::before {
   min-height: 100vh;
   background: var(--tl-paper);
   color: var(--tl-ink);
-  font-family: var(--font-ui);
+  /* SERIF, matching body and the trip log. This was `var(--font-ui)` until
+     2026-10-24, which meant the WHOLE page inherited sans — the reader's own
+     notes (`.pj-stop-note`), the overview prose and the outro body were all
+     system sans at 12–14px, while the trip log's `.scene-body p` was serif.
+     The titles only survived because `.pj-overview h1` / `.pj-outro-title`
+     redeclared the serif stack by hand, so the page read as "serif headings,
+     sans body" — the defect the user reported.
+     A page root is the wrong place for the UI exception: it silently rewrites
+     every descendant that does not opt back out. The sans elements are now
+     listed explicitly (`.pj-kicker`, `.pj-overview-meta`, the scroll hints,
+     the plate, the credits strip, the rail tips, the tool buttons) — add new
+     ones there instead of reaching for this line again. */
+  font-family: var(--font-serif-latin), var(--font-serif-zh);
   -webkit-font-smoothing: antialiased;
 }
 body.pj-immersive .pj-page {
@@ -1491,6 +1467,11 @@ body.pj-immersive .pj-page {
   height: 100vh;
   border-right: 2px solid var(--tl-paper-line);
   background: var(--tl-map-bg);
+  /* The licence strip's height, declared on the COLUMN so both the strip (a
+     descendant) and the map (a deeper descendant) can read it. The map uses
+     it to keep MapLibre's gesture veil off the strip — the veil is inset:0
+     against `.pj-map`, whose box extends behind the strip. */
+  --tl-attrib-h: 26px;
 }
 /* Absolute-fill wrapper. The MapLibre container must NOT be this element:
    maplibre-gl.css ships `.maplibregl-map { position: relative }`, and since it
@@ -1502,9 +1483,33 @@ body.pj-immersive .pj-page {
   position: absolute;
   inset: 0;
 }
+/* MapLibre's cooperative-gesture hint — the grey "USE TWO FINGERS TO MOVE THE
+   MAP" veil. It is `position: absolute; inset: 0` (plus z-index 99999), sized
+   against the nearest positioned ancestor. Two things went wrong on a phone:
+
+   1. Neither the canvas holder nor `.pj-map-box` was positioned, so the veil
+      walked up to `.pj-map-col` / `.map-pane` and covered the whole column —
+      including the licence strip, which is opaque but sat UNDER the 40% black
+      (2026-10-24 user report: "灰色区域外溢到 license/拖动条"). Fix: the map
+      element itself is now the containing block, so the veil can never be
+      larger than the map.
+   2. Even then the map's box runs all the way to the strip's bottom edge, so
+      an `inset: 0` veil still covers the strip's last 26px (42px on a narrow
+      trip-log strip). Fix: pull the veil's bottom edge up by the strip height,
+      published as `--tl-attrib-h` on the map column.
+
+   `!important` is deliberate here: maplibre-gl.css is imported by the map
+   component and lands AFTER this sheet, and its selector is a plain class, so
+   the only way to win from the outside is specificity + importance. These two
+   properties are the whole reason the veil ever escaped the map. */
+.maplibregl-cooperative-gesture-screen {
+  bottom: var(--tl-attrib-h, 26px) !important;
+}
 .pj-map {
+  position: relative;
   width: 100%;
   height: 100%;
+  /* (See the note below on why this must be `relative`, never `absolute`.) */
 }
 /* Attribution: anitabi is CC BY-NC-SA 4.0 — the credit must stay legible.
    Shared by BOTH travel pages (2026-10-17): the pilgrimage page invented this
@@ -1536,10 +1541,128 @@ body.pj-immersive .pj-page {
   background: var(--tl-panel);
   backdrop-filter: blur(6px);
   border-top: 1px solid var(--tl-line);
+  /* Attribution is a UI label, not prose (2026-10-24). Both pages' strips read
+     sans on purpose; stated here rather than inherited from a page root. */
+  font-family: var(--font-ui);
 }
 @media (max-width: 640px) {
   .map-attrib {
     --tl-attrib-h: 42px;
+  }
+}
+/* ---- drag handle (2026-10-24) -------------------------------------------
+   Below the stacking breakpoint the licence strip doubles as the map/story
+   split handle: dragging it up or down resizes the map (see
+   lib/travel/map-split.tsx). The user's pick was "the whole strip is
+   draggable, the arrows only hint at it" — so the affordance is a 22px slot at
+   the right edge, absolutely positioned so it can never wrap with the text,
+   and the strip reserves that much padding on its right.
+
+   `touch-action: none` is what makes the vertical drag possible at all: without
+   it the browser claims every vertical touch for page scrolling and the first
+   pointermove is a pointercancel. `user-select: none` stops a long press from
+   starting a text selection instead of a drag. Neither applies on desktop,
+   where there is no split to drag and the strip must stay plain text. */
+@media (max-width: 1023px) {
+  .pj-attrib,
+  .pj-attrib a {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .pj-attrib {
+    /* NOT `position: relative`. The strip is `position: absolute; bottom: 0`
+       from the base rule, anchored to the map box — overriding that here left
+       it in normal flow at the TOP of the map (measured: strip at y=0, under
+       the time plate, whose own backdrop swallowed the tap on the licence
+       link). The grip positions against the strip, which is itself a
+       positioned box, so nothing here needs to change. */
+    padding-right: 2rem;
+  }
+  .pj-attrib.is-dragging {
+    cursor: grabbing;
+  }
+}
+/* The trip log stacks 100px EARLIER than the pilgrimage page (its sheet says
+   `max-width: 900px`), so these must not share one block: between 901 and 1023
+   the trip log is still two columns with a full-height map, and a grip there
+   would promise a drag that resizes a sidebar the reader cannot see move.
+   lib/travel/map-split.tsx keys its own viewport test off the same numbers. */
+@media (max-width: 900px) {
+  .map-attrib,
+  .map-attrib a {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .map-attrib {
+    padding-right: 2rem;
+  }
+  .map-attrib.is-dragging {
+    cursor: grabbing;
+  }
+}
+.tl-split-handle {
+  display: none;
+}
+@media (max-width: 1023px) {
+  /* The grip itself is shown per page below (see the 900px block): the element
+     is shared markup, but each layout reaches the stacked state at its own
+     breakpoint. */
+  .pj-attrib .tl-split-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2rem;
+    color: var(--tl-muted);
+    pointer-events: none;
+    transition: color 0.18s ease, background 0.18s ease;
+  }
+  /* Static, deliberately (2026-10-24 user: "提示可以拖动的上下箭头符号不需要
+     有上下浮动的动画效果"). The chevrons used to breathe via `tl-split-nudge`;
+     the grip now holds still and only the hover/drag tint changes. The colour
+     transition above is the whole affordance. */
+  .tl-split-grip {
+    animation: none;
+  }
+  .is-dragging .tl-split-handle {
+    color: var(--tl-accent-strong);
+    background: var(--tl-accent-soft);
+  }
+}
+/* The trip log's grip appears 100px later than the pilgrimage page's, matching
+   its `max-width: 900px` stacked layout. Everything inside this block is a copy
+   of the rules above for the other strip — kept as a duplicate rather than
+   hoisting the shared declarations, because the two breakpoints must be able to
+   move independently (the trip log added a 40:60 split at 900px, the
+   pilgrimage page has always stacked at 1024px). */
+@media (max-width: 900px) {
+  .map-attrib .tl-split-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2rem;
+    color: var(--tl-muted);
+    pointer-events: none;
+    transition: color 0.18s ease, background 0.18s ease;
+  }
+  /* Static, same as the pilgrimage grip (2026-10-24). */
+  .map-attrib .tl-split-grip {
+    animation: none;
+  }
+  .map-attrib.is-dragging .tl-split-handle {
+    color: var(--tl-accent-strong);
+    background: var(--tl-accent-soft);
   }
 }
 .pj-attrib a,
@@ -1587,6 +1710,9 @@ body.pj-immersive .pj-page {
   padding: 8px 12px;
   font-size: 12px;
   line-height: 1.4;
+  /* Map HUD: a timestamp plate over imagery, so it stays sans/mono-adjacent
+     like the trip log's `.timeline-indicator` (2026-10-24). */
+  font-family: var(--font-ui);
   background: var(--tl-panel-strong);
   backdrop-filter: blur(8px) saturate(1.2);
   border-radius: 10px;
@@ -1642,7 +1768,10 @@ body.pj-immersive .pj-page {
   border-radius: 999px;
   background: transparent;
   color: var(--tl-ink-2);
-  font: inherit;
+  /* `font: inherit` used to be enough because the page root was sans. The
+     buttons carry single characters (自/昼/夜/随/全), so they must keep the UI
+     stack explicitly now that `.pj-page` is serif (2026-10-24). */
+  font-family: var(--font-ui);
   font-size: 13px;
   line-height: 1;
   cursor: pointer;
@@ -1664,7 +1793,19 @@ body.pj-immersive .pj-page {
    stop. The old 300px card covered a third of the map. */
 .pj-popup {
   position: absolute;
-  z-index: 5;
+  /* BELOW the map chrome, on purpose (2026-10-24 user report: the comparison
+     card "会把地区图左上角的位置卡片，以及右上角的按钮都挡住"). `.pj-map-overlay-top`
+     and `.pj-map-tools` sit at z-index 4; this card used to be 5, so a pin
+     near a corner painted its 80px frame straight over the time plate or the
+     two control pills — the reader lost the clock and the 自/昼/夜 switch
+     exactly while inspecting a stop.
+     Chrome wins over content here: the plate is how you know WHICH stop you
+     are looking at, and the pills are the only way out of a broken camera
+     mode. The popup is a peek at where a frame came from, so being clipped by
+     a HUD panel is the cheaper failure. Placed at 3 so it stays above the
+     MapLibre canvas (which is z-index auto inside `.pj-map-box`) while leaving
+     either inset a step free for a future panel. */
+  z-index: 3;
   /* Must match POPUP_W in PilgrimageMap.tsx — the card is positioned by JS and
      a mismatch would push it off the pin. 80 × 100 ≈ 1/10 the old card's area. */
   width: 80px;
@@ -1767,6 +1908,9 @@ body.pj-immersive .pj-page {
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 12px;
+  /* Section label — sans, like the trip log's `.kicker`. Explicit since the
+     page root stopped providing it (2026-10-24). */
+  font-family: var(--font-ui);
   color: var(--tl-accent);
   font-weight: 700;
 }
@@ -1780,6 +1924,9 @@ body.pj-immersive .pj-page {
 .pj-overview-meta {
   margin: 0.9rem 0 0;
   font-size: 0.82rem;
+  /* Date · time · distance — metadata, so sans (2026-10-24). The prose right
+     below it (`.pj-overview-body`) keeps the page's serif. */
+  font-family: var(--font-ui);
   color: var(--tl-muted);
 }
 .pj-overview-body {
@@ -1806,6 +1953,8 @@ body.pj-immersive .pj-page {
   margin: 1.6rem 0 0;
   font-size: 14px;
   line-height: 1.7;
+  /* UI cue, not prose — sans (2026-10-24). */
+  font-family: var(--font-ui);
   color: var(--tl-muted);
 }
 
@@ -1859,6 +2008,8 @@ body.pj-immersive .pj-page {
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  /* Tracked caps label — sans (2026-10-24). */
+  font-family: var(--font-ui);
   color: var(--tl-strip-ink);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -2019,6 +2170,8 @@ body.pj-immersive .pj-page {
 .pj-outro-hint {
   margin-top: 1.6rem;
   font-size: 0.8rem;
+  /* Small sign-off line, same role as the trip log's `.finale-hint`: sans. */
+  font-family: var(--font-ui);
   color: var(--tl-faint);
 }
 
@@ -2037,6 +2190,8 @@ body.pj-immersive .pj-page {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  /* A control — sans, stated explicitly (2026-10-24). */
+  font-family: var(--font-ui);
   color: var(--tl-on-accent);
   background: var(--tl-accent);
   box-shadow: 0 4px 14px rgba(27, 167, 201, 0.35);
@@ -2070,6 +2225,11 @@ body.pj-immersive .pj-page {
     background: var(--tl-strip);
     color: var(--tl-strip-ink);
     border-left: 1px solid var(--tl-hair);
+    /* Symmetric box — see the note on .tl-back-strip's border-right in
+       TravelLog. A lone border-left shifts the content box 0.5px right of
+       the strip's centre, so every child centred "correctly" inside the
+       column was still 0.5px off the strip. */
+    border-right: 1px solid transparent;
     box-shadow: none;
     transition:
       width var(--pj-back-duration) var(--pj-back-ease),
@@ -2083,38 +2243,82 @@ body.pj-immersive .pj-page {
     transform: none;
     box-shadow: none;
   }
-  /* Anchor both glyphs independently of the changing strip width. Their
-     opacity transitions are complementary, including on a quick reversal. */
-  .pj-back-arrow,
-  .pj-back-label {
-    position: absolute;
-    top: 50%;
-    right: 24px;
-    pointer-events: none;
-    transition:
-      opacity var(--pj-back-duration) var(--pj-back-ease),
-      transform var(--pj-back-duration) var(--pj-back-ease);
+  /* Crossfade WITHOUT motion (v12, 2026-10-24). dfd956e anchored both glyphs
+     on one fixed right-edge point (18.9 x 26.0px of overlap for the whole
+     220ms) and slid the label 4px while fading. Two more rounds were needed:
+     the label then sat 80px above the strip's centre, and the v11 fix
+     (align-self:center) was still off by a viewport-dependent amount (228.5px
+     at 900px tall, 363.5px at 1440px). Root cause was NOT the label: the base
+     .pj-back rule sets display:flex; align-items:center, and the grid block
+     never reset align-items — so rows were sized to content and the whole
+     147px block was packed into the middle of a 900px strip. Stretching the
+     tracks makes row 1 the real top half, and the label's centre IS the
+     strip's centre at any window size. See the trip log's .tl-back-strip for
+     the full note. Fade is opacity-only. */
+  .pj-back {
+    display: grid;
+    grid-template-rows: 1fr 14px 1fr;
+    grid-template-columns: 1fr;
+    /* No justify-self here: the arrow is the label's sibling in the same
+       column, and centring it individually does nothing for the label. The
+       label centres itself with width:fit-content + margin-inline:auto (see
+       .pj-back-label), which is what actually moves the INK onto the axis. */
+    align-items: stretch;
   }
   .pj-back-arrow {
-    transform: translate(50%, -50%);
-  }
-  .pj-back:hover .pj-back-arrow {
-    opacity: 0;
-    transform: translate(50%, -50%) translateX(-4px);
+    grid-row: 2;
+    grid-column: 1;
+    align-self: center;
+    /* the inline axis needs its own declaration — grid items default to
+       justify-self:start, which pinned the 26px chevron to the left edge of
+       a 57px column. align-self only covers the block axis. */
+    justify-self: center;
+    pointer-events: none;
+    transition: opacity var(--pj-back-duration) var(--pj-back-ease);
   }
   .pj-back-label {
     display: block;
-    transform: translate(50%, -50%) translateX(4px);
-    writing-mode: vertical-rl;
+    /* span all three tracks and centre in them — the only placement that
+       centres exactly at every window height (row-1 + align-self was off by a
+       viewport-dependent amount; see the trip log's .tl-back-strip-label) */
+    grid-row: 1 / span 3;
+    grid-column: 1;
+    align-self: center;
+    max-height: calc(50% - 20px);
+    overflow: hidden;
+    /* vertical-lr, NOT vertical-rl — see the full note on the trip log's
+       .tl-back-strip-label. In short: vertical-rl starts the line against the
+       box's RIGHT edge, so the 15px glyph column sat 19.5px right of the
+       strip's centre and hard against the viewport edge, while the BLOCK's box
+       measured 0.5px from centre and every probe therefore reported "fixed". */
+    writing-mode: vertical-lr;
+    /* shrink the block to one glyph column, then let justify-self centre THAT
+       column — with a full-width block the line box fills it and text-align
+       has nothing to centre (measured: ink stayed 18.5px left of centre).
+       padding-inline keeps the inset from being tied to today's text. */
+    width: fit-content;
+    padding-inline: 8px;
+    text-align: center;
+    /* auto margins centre the shrunken box — justify-self stops reaching a
+       size-fit item (measured: box stayed 10.5px left of centre) */
+    margin: 0 auto;
+    /* explicit px, not inherit: the strip's inherited line-height leaks in
+       and inflates the word by ~6px, clipping the bottom glyphs on a
+       600px-tall viewport (2026-10-24) */
     font-size: 12px;
+    line-height: 19px;
     font-weight: 600;
     letter-spacing: 3px;
     white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--pj-back-duration) var(--pj-back-ease);
+  }
+  .pj-back:hover .pj-back-arrow {
     opacity: 0;
   }
   .pj-back:hover .pj-back-label {
     opacity: 1;
-    transform: translate(50%, -50%);
   }
 }
 
@@ -2146,6 +2350,128 @@ body.pj-immersive .pj-page {
   }
 }
 
+/* ============================ entry curtain =============================
+   v19 (2026-10-24 user request): "与点击返回按钮之后的蓝幕从右边拉出相反
+   的过程" — the curtain now starts as a BAND ON THE RIGHT EDGE (the width of
+   the back strip, grown from the same origin) and retracts to nothing, which
+   is the literal time-reverse of .tl-back-wipe / .pj-back-wipe growing from
+   transform-origin:right to a full screen. It also means the native
+   "Loading trip data…" string is never visible: the sheet covers the
+   viewport from the very first paint (a body::before pseudo driven by a
+   parse-time class — see the hydration notes on body.tl-veil-boot::before).
+
+   Shared by BOTH travel pages. The trip log throws `tl-veil-boot`; the
+   pilgrimage page (`pj-boot`, added in its own inline script) opts into the
+   same sheet with a wider resting band because its tap targets and text are
+   denser. Each page releases with its own class so neither has to know
+   about the other. */
+body.tl-veil-boot::before,
+body.pj-boot::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 96;
+  background: var(--tl-accent-soft-2, #eef9fd);
+  transform-origin: right center;
+  transform: scaleX(var(--veil-band, 0.06));
+  pointer-events: none;
+}
+/* the trip log's strip is 48px at rest; the pilgrimage page's is 48px too but
+   its curtain carries a wordmark, so it holds slightly wider */
+body.tl-veil-boot {
+  --veil-band: 0.055;
+}
+body.pj-boot {
+  --veil-band: 0.08;
+}
+/* the wordmark inside the band: hidden while covering, faded in as the band
+   regains its width. Drawn by a real element (a span the components render)
+   because pseudo-elements cannot be reached by hydration-safe text. */
+.tl-veil-band {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 97;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  color: var(--tl-accent-strong, #0f7f99);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  writing-mode: vertical-lr;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+}
+body.tl-veil-boot .tl-veil-band,
+body.pj-boot .tl-veil-band {
+  opacity: 1;
+  transition: opacity 0.18s linear;
+}
+body.tl-veil-boot.tl-veil-open .tl-veil-band,
+body.pj-boot.pj-veil-open .tl-veil-band {
+  opacity: 0;
+}
+/* release — the band collapses toward the right edge, the exact reverse of
+   the exit wipe expanding from it. Distinct keyframes name from the idle
+   state's so the animation always replays from 0 (the v13 lesson). */
+body.tl-veil-boot.tl-veil-open::before {
+  animation: tl-entry-open 0.46s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+body.pj-boot.pj-veil-open::before {
+  animation: pj-entry-open 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+@keyframes tl-entry-open {
+  from {
+    transform: scaleX(1);
+    background-color: var(--tl-accent-soft-2, #eef9fd);
+  }
+  55% {
+    background-color: var(--tl-accent-soft-3);
+  }
+  to {
+    transform: scaleX(0);
+    background-color: var(--tl-chip);
+  }
+}
+@keyframes pj-entry-open {
+  from {
+    transform: scaleX(1);
+    background-color: var(--tl-accent-soft-2, #eef9fd);
+  }
+  55% {
+    background-color: var(--tl-accent-soft-3);
+  }
+  to {
+    transform: scaleX(0);
+    background-color: var(--tl-chip);
+  }
+}
+/* JS-dead / slow-JS fallback, pure CSS so the curtain never holds the page
+   hostage (same contract as the v11 veil): if the release class never
+   arrives, self-retract after 3.5s. */
+body.tl-veil-boot::before,
+body.pj-boot::before {
+  animation: tl-entry-pull 0.46s ease-in 3.5s forwards;
+}
+body.tl-veil-boot.tl-veil-open::before,
+body.pj-boot.pj-veil-open::before {
+  animation-duration: 0.46s;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.tl-veil-boot::before,
+  body.pj-boot::before {
+    display: none;
+  }
+  .tl-veil-band {
+    display: none;
+  }
+}
+
 .pj-loading {
   min-height: 100vh;
   display: grid;
@@ -2158,6 +2484,21 @@ body.pj-immersive .pj-page {
 /* ---- progress rail (ptes' .tnav-rail / .tnav, same object) ---- */
 .pjr-rail,
 .pjr-bar {
+  display: none;
+}
+/* Slider scrub layer (2026-10-24). The base .pjr-scrub / .pjr-scrub-box rules
+   live ONLY inside @media (max-width: 1023.9px) further down — writing a
+   `display: none` default here and re-enabling it in the media query would be
+   a same-weight cascade where the LATER rule (the default) wins, which is the
+   bug that bit .pjr-fill. Nothing above the query therefore mentions these
+   classes at all. */
+/* The chapter-index sheet and its trigger only exist on the phone/tablet
+   layout; hide them by default so a desktop window never paints the trigger
+   or, worse, a stray sheet at the right edge (the media query below owns
+   their real rules — these are the no-JS/desktop fallbacks). */
+.pjr-toc,
+.pjr-backdrop,
+.pjr-drawer {
   display: none;
 }
 
@@ -2293,6 +2634,8 @@ body.pj-immersive .pj-page {
   position: absolute;
   white-space: nowrap;
   font-size: 12px;
+  /* Hover tooltip — UI text, so sans (2026-10-24). */
+  font-family: var(--font-ui);
   color: var(--tl-ink-2);
   background: var(--tl-surface-2);
   border: 1px solid var(--tl-line-2);
@@ -2341,29 +2684,410 @@ body.pj-immersive .pj-page {
   transform: translateY(0);
 }
 
+/* ---- mobile ticks: dots → hairlines (2026-10-24) --------------------------
+   Thirty-four chapter ticks plus one 12px dot each do not fit on a phone: the
+   4px track is ~320px wide at 390px, i.e. 9.4px per tick against a 12px
+   diameter, so every neighbour overlapped. Shrinking the dots does not fix it
+   either — at 6px they read as a dotted rule, and the chapter boundary
+   (the thing the rail is FOR: "where am I, what is next") disappears.
+
+   The user's pick: drop the dots, keep a 1px hairline per chapter, let the
+   progress fill be the only bright object. Each tick keeps its full 22×22 hit
+   box, so jumping still works exactly as before — the line is a ::before
+   inside the same button, not a separate element.
+
+   DESKTOP IS UNCHANGED: the vertical rail has 600px of height for the same
+   34 chapters and the round dots are the established look there.
+   The trip log's .tnav-tick carries an IDENTICAL block inside
+   components/travel/TravelNav.tsx's styled-jsx, not here: that sheet is
+   emitted after this one and its base .tnav-tick rule would out-cascade these
+   (same specificity, later wins). Keep the two in step by hand. */
+@media (max-width: 1023.9px) {
+  /* ---- slider mode (2026-10-24) -------------------------------------
+     Mirrors the trip log's .tnav-scrub: "进度条还是不要刻度了，做成一个普通的
+     可拖动进度条就可以。不过在拖动的时候，端点上可以浮现出一个方框，标示拖到的
+     是哪个章节。" The graduations and the per-chapter dots both disappear, and
+     one transparent sheet over the whole tube becomes the drag surface.
+     Hiding the BUTTONS (not layering the sheet over them) is deliberate: a
+     captured pointer would still let the buttons keep their hover styles, and
+     their z-index 2 would eat the gesture anyway. */
+  .pjr-mark,
+  .pjr-tick {
+    display: none;
+  }
+  /* The base .pjr-scrub rule (display:none) is declared ABOVE this block and
+     is same-weight, so the selector here needs one extra class to win — the
+     cascade never looks at media queries, only at specificity and order. */
+  .pjr-scrub {
+    display: block;
+    position: absolute;
+    inset: -9px 0;
+    z-index: 6;
+    /* Without this the browser claims the vertical gesture for page scrolling
+       and pointermove never fires after the first frame. */
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* The chapter box. Sits ABOVE the tube (bottom: 100% + offset) so it never
+     covers the mercury it is pointing at, and is centred on the playhead by
+     the transform. `left` is written in px by paintScrub, never as a
+     percentage: the clamp that keeps it inside the bar's rounded ends is
+     expressed in px. */
+  .pjr-scrub-box {
+    position: absolute;
+    left: 0;
+    /* Anchored to .pjr-bar (NOT the tube — .pjr-track clips with
+       overflow:hidden, so a box above its top edge was painted, measured
+       correctly, reported opacity 1, and was completely invisible).
+       The bar's padding-top puts the tube's top edge 10px below the bar's
+       top, so bottom: 100% - 10px + 8px lifts the box 8px clear of the rim. */
+    bottom: calc(100% - 10px + 8px);
+    transform: translateX(-50%) scale(0.92);
+    transform-origin: bottom center;
+    padding: 4px 9px;
+    border-radius: 6px;
+    background: var(--tl-surface-2);
+    border: 1px solid var(--tl-line-2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    /* A control label — sans, stated explicitly (2026-10-24 font audit). */
+    font-family: var(--font-ui);
+    font-size: 11px;
+    line-height: 1.35;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    color: var(--tl-ink);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 7;
+    transition: opacity 0.14s ease, transform 0.14s ease;
+  }
+  .pjr-scrub-box.is-on {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  /* `z-index` matters: the ticks are siblings of the progress fill, which the
+     sheet declares AFTER them — so the fill painted on top and swallowed every
+     tap on an already-read chapter (elementFromPoint returned .pjr-tick on
+     ticks past the fill's head and .pjr-fill for the ones under it, i.e. the
+     earliest chapters were the unreachable ones). A positioned element with an
+     explicit z-index always beats a positioned sibling without one. */
+  /* 14px wide, not 22: thirty-eight chapters on a 358px track are 9.6px apart,
+     so a 22px box had three neighbours overlapping at every point and the
+     LATEST sibling in the DOM won the tap — with equal z-index and equal size
+     that is plain paint order, i.e. the reader who aimed at chapter 10 got 11
+     (measured: elementFromPoint returned 11 for 10's centre). At 14px the
+     overlap is one neighbour instead of two, and the hairline under the finger
+     is what the tap resolves to. The visible 1px line is untouched; only the
+     invisible box shrank, and 14x22 is still a comfortable target. */
+  .pjr-tick {
+    width: 14px;
+    height: 22px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+  /* v15 — `background: none !important` is load-bearing. The frame loop adds
+     `.read` to every chapter the reader has passed (kept for the DESKTOP rail,
+     whose dots do change colour), and the base `.pjr-tick.read` rule up the
+     sheet is (0,2,0) against this block's (0,1,0): the later position does not
+     help, specificity decides first. Without the !important every passed
+     chapter paints a 14x22 OPAQUE accent block over the mercury — the "column
+     cut into pills" the tube exists to avoid (this is exactly what broke the
+     trip log's tube). */
+  .pjr-tick,
+  .pjr-tick.read,
+  .pjr-tick.active,
+  .pjr-tick:hover,
+  .pjr-tick:active {
+    background: none !important;
+    box-shadow: none !important;
+  }
+  /* v15 (2026-10-24): the notches are now their own .pjr-mark elements under
+     the mercury, NOT the tick's ::before — see the note above .pjr-mark
+     below. The button keeps only its (invisible) 14x22 hit box. */
+  .pjr-tick::before {
+    content: none;
+  }
+  /* Hover/active must not scale or halo any more — a scaled tick and a 4px
+     ring bring the "wall of dots" straight back. The button is invisible in
+     every state (see the !important block above); the cursor is the only
+     affordance, which is enough on a tap-first layout. */
+  .pjr-tick:hover,
+  .pjr-tick:active {
+    transform: translate(-50%, -50%);
+    border-radius: 2px;
+  }
+  /* Graduations — one hairline per chapter, positioned by the inline `left`
+     written from the measured chapter offsets (days/chapters are not evenly
+     spaced in the document, so a fixed repeating period would drift off the
+     hit boxes). z-index 1: UNDER the opaque mercury (z 2), so the blue
+     column stays continuous instead of being cut into pills. Markings only —
+     no read/active tint (user 2026-10-24: "只作标识用，没有激活效果"). */
+  .pjr-mark {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    width: 1px;
+    margin-left: -0.5px;
+    z-index: 1;
+    background: color-mix(in srgb, var(--tl-ink) 26%, transparent);
+    pointer-events: none;
+  }
+  /* Focus must still be visible for keyboard users — a ring on the invisible
+     22px button, not on the hairline. */
+  .pjr-tick:focus-visible {
+    outline: 2px solid rgba(27, 167, 201, 0.55);
+    outline-offset: -3px;
+    border-radius: 4px;
+  }
+}
+
 /* phone / tablet: horizontal bar fixed to the viewport bottom (ptes v13 moved
    it there for the same reason — at the top it fought the map's controls; on
-   this page the map owns the top 58 vh). */
+   this page the map owns the top 58 vh).
+   v14 (2026-10-24): the upward translucency fade is gone — the story ran
+   visibly through the control. The bar is now a solid sheet with a hairline
+   on top, and the track inside it is the same mercury tube as the trip log's
+   .tnav-track (see components/travel/TravelNav.tsx for the layer notes). */
 @media (max-width: 1023.9px) {
   .pjr-bar {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     z-index: 30;
     padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
-    background: linear-gradient(to top, var(--tl-tnav-fade-97) 62%, var(--tl-tnav-fade-0));
+    background: var(--tl-paper);
+    border-top: 1px solid var(--tl-divider);
+    box-shadow: 0 -6px 18px color-mix(in srgb, var(--tl-ink) 7%, transparent);
     pointer-events: none;
   }
   .pjr-track {
     position: relative;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--tl-line-2);
-    pointer-events: auto;
-    margin-bottom: 6px;
+    flex: 1;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--tl-ink) 9%, var(--tl-surface-2)) 0%,
+      color-mix(in srgb, var(--tl-ink) 3%, var(--tl-surface)) 55%,
+      color-mix(in srgb, var(--tl-ink) 8%, var(--tl-surface-2)) 100%
+    );
+    box-shadow:
+      inset 0 1px 1.5px color-mix(in srgb, var(--tl-ink) 16%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, white 70%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--tl-ink) 8%, transparent);
+    overflow: hidden;
   }
+  /* the bar itself is pointer-events:none so the page stays scrollable under
+     it; the tube re-enables taps on its notches */
+  .pjr-track {
+    pointer-events: auto;
+  }
+  /* soft shading at the two round caps; flat, no gloss (v16).
+     z-index 1 = UNDER the mercury, not 5 as in v16: at 5 the 72%-paper wash
+     covered the fill and turned its left cap into a pale wedge, which is what
+     the user reported as a raised/gradient liquid surface. Under the fill it
+     only shades the empty bore. See the trip log's .tnav-track::before. */
+  .pjr-track::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--tl-paper) 72%, transparent) 0,
+        transparent 8px
+      ),
+      linear-gradient(
+        270deg,
+        color-mix(in srgb, var(--tl-paper) 72%, transparent) 0,
+        transparent 8px
+      );
+  }
+  /* one hairline along the bore's top */
+  .pjr-track::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    z-index: 4;
+    border-radius: 1px;
+    background: color-mix(in srgb, white 72%, transparent);
+    pointer-events: none;
+  }
+  /* graduations: full height, ALWAYS GREY and ABOVE the mercury, so the
+     chapter markers survive the fill passing over them (v16 user request:
+     "刻度可以在上方一直为灰色，这样进度条通过后刻度还在").
+     1px at 30% ink, and the element's `left` is snapped to a whole CSS pixel
+     via round(…, 1px) at the call site. Before that the edges landed on
+     fractional DEVICE pixels (measured 53.59 / 109.47 / 150.84 at 2x) and the
+     same ruler showed marks that read 3px and marks that read 2px — the
+     "刻度线粗细不一" report. Widening the rule does not fix it; aligning the
+     edge does. See the full note on .tnav-mark in TravelNav.tsx. */
+  .pjr-mark {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    margin-left: -0.5px;
+    z-index: 3;
+    background: color-mix(in srgb, var(--tl-ink) 30%, transparent);
+    pointer-events: none;
+  }
+  /* ---- chapter index button (v16) -------------------------------------
+     Sized in the tube's range, not around it: 30x30 against a 10px tube
+     with 10px band padding keeps the band's top/bottom whitespace equal, so
+     the strip reads as one control. Bare glyph — a bordered chip next to the
+     capsule made two unrelated objects of one bar. */
+  .pjr-toc {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--tl-ink-3);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 0.2s ease, background 0.2s ease;
+  }
+  .pjr-toc:hover,
+  .pjr-toc:active {
+    color: var(--tl-accent);
+    background: color-mix(in srgb, var(--tl-accent) 12%, transparent);
+  }
+  .pjr-toc.is-open {
+    color: var(--tl-accent-strong);
+    background: var(--tl-accent-soft);
+  }
+  .pjr-toc:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--tl-accent) 60%, transparent);
+    outline-offset: 2px;
+  }
+  .pjr-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: var(--tl-scrim);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .pjr-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .pjr-drawer {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 41;
+    flex-direction: column;
+    width: 320px;
+    max-width: 88vw;
+    background: var(--tl-surface);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.14);
+    transform: translateX(106%);
+    visibility: hidden;
+    transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.34s;
+  }
+  .pjr-drawer.open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  .pjr-drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--tl-divider);
+    font-weight: 700;
+    color: var(--tl-ink);
+  }
+  .pjr-drawer-x {
+    border: 0;
+    background: transparent;
+    color: var(--tl-muted);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+  .pjr-drawer-x:hover {
+    color: var(--tl-accent);
+    background: var(--tl-accent-soft);
+  }
+  .pjr-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0 calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .pjr-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 11px 18px;
+    border: 0;
+    border-bottom: 1px solid var(--tl-divider);
+    background: transparent;
+    color: var(--tl-ink-2);
+    font-size: 14px;
+    line-height: 1.45;
+    cursor: pointer;
+  }
+  .pjr-row:hover,
+  .pjr-row:active {
+    background: var(--tl-surface-tint);
+    color: var(--tl-ink);
+  }
+  .pjr-row.active {
+    color: var(--tl-accent-strong);
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 var(--tl-accent);
+  }
+}
+
+/* ---- mercury in the mobile bar (v17) -----------------------------------
+   OUTSIDE every @media block, deliberately. The base .pjr-fill rule lives at
+   ~2450 — AFTER the block that ends just above — so any override inside it
+   lost the cascade and the bar kept opacity .55 / radius 2px / no z-index.
+   Scoped by .pjr-bar (0,2,0) so it beats the base (0,1,0) regardless of
+   order; the display rules further up keep it hidden on desktop anyway.
+   NOTE the :not(.pjr-rail-fill): the desktop VERTICAL rail reuses the same
+   .pjr-fill class, and the bar's fill sits inside the bar — without the
+   exclusion a probe (and any future override) can hit the rail's slug
+   instead and report opacity .55 / radius 2px as if the bar were unaffected.
+   Flat fill: a 3-stop vertical gradient shaded the slug across the tube's
+   10px height and read as a raised tube — a bulge, which the user rejected
+   ("液面不需要凸起效果"). */
+.pjr-bar .pjr-fill:not(.pjr-rail-fill) {
+  z-index: 2;
+  border-radius: 5px;
+  background: var(--tl-accent);
+  opacity: 1;
 }
 
 /* ---- responsive: stack on narrow screens ---- */
@@ -2376,8 +3100,18 @@ body.pj-immersive .pj-page {
     top: 0;
     width: 100%;
     /* Tall enough that the whole loop stays legible on a phone — at 52vh the
-       route's dense eastern cluster collapses into the right edge. */
-    height: 58vh;
+       route's dense eastern cluster collapses into the right edge.
+       Since 2026-10-24 58vh is only the DEFAULT: the licence strip at the
+       map's bottom edge is a drag handle (lib/travel/map-split.tsx) that
+       writes --pj-map-h on this element in px. Everything derived from the
+       map height reads the same variable, so one write moves the whole
+       geometry (the 58vh → 100vh desktop rule above is untouched: the hook
+       only writes while the layout is stacked).
+       The hook also parents `--pj-band-top` and `--pj-land` here, which the
+       story column's `.pj-stop` reads by inheritance. They MUST stay on an
+       ancestor of the sections — see the note on `.pj-page .pj-stop` below. */
+    --pj-map-h: 58vh;
+    height: var(--pj-map-h);
     border-right: 0;
     border-bottom: 2px solid var(--tl-paper-line);
     z-index: 10;
@@ -2385,25 +3119,49 @@ body.pj-immersive .pj-page {
   .pj-story-col {
     padding-bottom: 8vh;
   }
-  /* On a phone the story column lives BELOW the sticky 58vh map, so a section
-     must land at the top of the *reading band*, not at the top of the
-     viewport — otherwise the previous section still owns most of the band (a
-     526 px section parked flush under the map leaves 194 px of the section
-     above it inside the band, so the map reported stop N−1 for a click on N).
+  /* On a phone the story column lives BELOW the sticky map, so a section must
+     land at the top of the *reading band*, not at the top of the viewport —
+     otherwise the previous section still owns most of the band (a 526 px
+     section parked flush under the map leaves 194 px of the section above it
+     inside the band, so the map reported stop N−1 for a click on N).
      `scrollIntoView` applies scroll-padding and scroll-margin ADDITIVELY, and
-     the root carries `scroll-padding-top: 5.5rem`, which at the site's
-     --page-scale of 0.9 (root font 14.4 px) is 79.2 px. Measured, and exactly
-     linear:
-         elTopAfter = docTop − 79.2 − scrollMarginTop
-     For a 390×844 phone the band top is 58vh + 0.35×(100vh − 58vh) = 614.4,
-     so scrollMarginTop = 614 − 79 = 535. The scorer in PilgrimageStory.tsx
-     (readPanel) then agrees with the landing because both now measure the same
-     490…844 panel.
-     Percentages here resolve against the ELEMENT's height (not the viewport),
-     which is why `calc()` with vh was wrong; a fixed px value calibrated to
-     the 58vh/35% band is the honest form. Revisit if either constant moves. */
-  .pj-stop {
-    scroll-margin-top: 535px;
+     the root carries `scroll-padding-top: 5.5rem` = 79.2 px at the site's
+     --page-scale of 0.9, so the landing offset is
+         scrollMarginTop = bandTop − 79.2
+     for the 614 px band top of a 390×844 phone at the default split.
+
+     THE NUMBER ARRIVES AT RUNTIME — and it has to. Three forms were tried and
+     only the third works, so please do not "simplify" this back:
+       • `calc(var(--pj-map-h) + .35 * (100vh - var(--pj-map-h)) - 79px)` — the
+         height variable is declared on `.pj-map-col` while `.pj-stop` lives in
+         the SIBLING story column, and a custom property inherits down the tree,
+         never across to a sibling. The substitution came back empty, the whole
+         declaration was invalid at computed-value time, and the section kept
+         the 1rem from the component block above. (Confirmed in the browser,
+         which is what closed this out: both rules matched `.pj-stop`, the
+         later and more specific one still computed to 1rem.)
+       • moving the declaration to a shared ANCESTOR so it would inherit down —
+         the ancestor above both columns is `.pj-page`, and making the rule
+         reach `.pj-stop` from there costs a descendant combinator that also
+         matches on desktop, where 1rem is correct. A `calc()` cannot undo
+         itself inside a media query.
+       • **what is here now**: the hook (map-split.tsx) measures
+         `scroll-padding-top` and writes the finished px as `--pj-land` on the
+         map column, which DOES inherit down to the sibling story column's
+         sections. It also publishes `--pj-band-top`, the number the scorer in
+         PilgrimageStory.tsx reads, so the landing offset and the "which stop am
+         I looking at" answer are the same measurement and cannot disagree after
+         a drag.
+     `var(--pj-land, 535px)` — 535 is the resolved default (614.4 − 79.2 for a
+     390×844 phone at 58vh), used only for the prerendered frame and the no-JS
+     build (where nothing scrolls). Everything is in px, deliberately: a
+     percentage `scroll-margin-top` resolves against the ELEMENT's own height,
+     not the viewport — that mistake once put every landing 190 px off.
+     `.pj-page` is only the desktop guard: the same selector appears in the
+     `min-width: 1024px` block at the end of the responsive rules, and this one
+     must not outrank it. */
+  .pj-page .pj-stop {
+    scroll-margin-top: var(--pj-land, 535px);
   }
   .pj-inner {
     padding: 0 1.25rem;
@@ -2479,5 +3237,16 @@ body.pj-immersive .pj-page {
     left: auto;
     width: 42px;
     height: 42px;
+  }
+}
+
+/* The split hook keeps writing --pj-land while the viewport is stacked, and a
+   desktop window can be reached by widening without a reload (or by rotating a
+   tablet), so the desktop layout must not inherit a phone's landing offset. It
+   has no reading band to park under anyway, so the value written in the
+   component block above — 1rem, against the capsule-nav offset — stands. */
+@media (min-width: 1024px) {
+  .pj-page .pj-stop {
+    scroll-margin-top: 1rem;
   }
 }
