@@ -1,6 +1,6 @@
 # Conventions — 设计基线、决策记录与 Agent 守则
 
-来源：合并自 archive/ 中的 `DECISIONS.md`、`DESIGN_SYSTEM.md`、`UI_IMPLEMENTATION_GUIDE.md`、`AGENT_WORKFLOW.md`（2026-09 初的原始决策），**最后核对 2026-10-17**。**带 ⚠️ 的行是被后续决策推翻或已过时的原始记录**，保留仅供考古；无标记的行仍然有效。
+来源：合并自 archive/ 中的 `DECISIONS.md`、`DESIGN_SYSTEM.md`、`UI_IMPLEMENTATION_GUIDE.md`、`AGENT_WORKFLOW.md`（2026-09 初的原始决策），**全量核对 2026-10-17；本轮相关规则专项更新 2026-10-25**。**带 ⚠️ 的行是被后续决策推翻或已过时的原始记录**，保留仅供考古；无标记的行仍然有效。
 
 > 这份文件只回答「**该怎么做**」。系统长什么样见 `ARCHITECTURE.md`，进度见 `handover.md`。
 
@@ -14,10 +14,8 @@
 - 有不确定实施方案时先问，不闷头猜。
 - 不加后端，不做破坏静态导出的事，除非用户明确批准。
 - 旧内容是素材不是指令；Stitch 导出（见 archive/）只是视觉参考，禁止把其占位文案当真实内容。
-- 每轮改动走验证流水线（`handover.md` §4）；完成后更新记忆文件（`.workbuddy/memory/`）。
-- **新定案写到哪**：能落到「系统长什么样」的 → 本文档或 `ARCHITECTURE.md`；某个功能的细节 →
-  对应 `FEATURE_*.md`；跨功能的工程坑与「改错了会坏」的教训 → `.workbuddy/memory/MEMORY.md`；
-  本轮做了什么 → `.workbuddy/memory/<日期>.md` 日志；进度 → `handover.md` 状态表。
+- 每轮改动走验证流水线（`handover.md` §5）；完成后维护 `structure_file/`，不依赖外部记忆文件。
+- **新定案写到哪**：系统现状 → `ARCHITECTURE.md`；长期规则 → 本文档；功能细节 → 对应 `FEATURE_*.md`；试验、撤销与交互验收 → `INTERACTION_AUDIT.md`；进度 → `handover.md`。
 
 ## 二、锁定设计基线（v1，用户拍板，不得擅改）
 
@@ -29,6 +27,7 @@
 
 ## 三、导航与路由
 
+- 首页、总导航、标签和卡片确认的当前规则以 `FEATURE_HOME_NAVIGATION.md` 为准；不要恢复被撤销的留白调整或试验印章。
 - 首页卡片序 About → CV → Travel → Blog → Project（`homeCards` = `navItems` 去掉 `home` / `guestbook`）；胶囊导航第一项是 Home。
 - **导航现行七项**：Home · About · CV · **Travel**（第四项）· Blog · Project · **Guestbook**（第七项，无 gateway 卡，唯一入口在 Direct access）。
 - ⚠️ 旧计划「Gallery 在主导航」已废，**且 `/gallery` 路由本身已于 2026-09-28 删除** ——
@@ -58,20 +57,47 @@
 ## 五、Typography
 
 - 标题/正文长文用衬线，UI 控件用无衬线。
-- **中文衬线现为自托管 GenWanMin2 TC 子集**（`--font-serif-zh` 首位；管线见 ARCHITECTURE）。
-  ⚠️ 旧决策的 Noto Serif SC/JP 方向已被取代；日文片段靠字体栈兜底渲染。
+- **拉丁衬线是自托管 `"EB Garamond"`**（2026-10-25 用户选定，替换原 Palatino Linotype 系统栈）。
+  可变字体 `wght 400–800`，两个文件（roman / italic）各 ~53 KB，覆盖全站用到的 400/500/600/700。
+  字体栈后面仍保留 Palatino / Georgia / Times 作回退；**没有 `local()`**（EB Garamond 在
+  Windows/macOS 上极少预装，装了也常是全字符版，与子集不一致）。
+  **尺寸补偿仅放在 EB Garamond 的 `@font-face`，按字重分别校准**。
+  roman/italic 的 400/500/600/700/800 字重 x-height 分别为 400/407/413/419/423（每 1000 em），
+  `size-adjust` 分别为 117.5% / 115.479115% / 113.801453% / 112.171838% / 111.111111%，
+  等价于旧的 0.47 / 各字重 x-height，保留英文大小。注册共用两个文件 URL，不增加字体下载。
+  **不要恢复 `body` 上的 `font-size-adjust: ex-height 0.47`**：它会继承到中文与 UI，
+  将源雲明體丹缩至 91.44%（0.47 / 0.514）。2026-10-25 移除后中文恢复约 9.36%，
+  字号 token 与容器宽度保持原值；中文换行可能改变。两种补偿同时使用会抵消 `size-adjust`。
+- **字号阶梯：小字单独抬一档（2026-10-25 用户选「保守档 B」）**。`--page-scale: 0.9` 会把**所有**
+  rem 字号同比压缩，于是默认 0.75rem 的 `text-xs` 只剩 10.8px；`text-[10px]` 是字面 10px，不随根字号缩放。正文档（15.3–16.2px）在这个密度下可读，所以**只抬最小的两级**，见
+  `app/globals.css` 的 "Small-type tier" 段：`--text-xs` 0.9rem（12.96px）、`--text-sm` 1.02rem（14.69px）。
+  ⚠️ **两条规则缺一不可**：`text-[Npx]` 是**字面 px、不读 `--text-*`**（构建产物里实测仍是 `10px`），
+  所以另有一条 `html :is(.text-\[9px\], … .text-\[11px\])` 把它们一并抬到 12.96px。
+  **小字档不修改正文 token 与容器宽度**；小字及徽标自身尺寸变化仍可能导致局部重排，不能省略视觉验收。
+  ⚠️ 想让正文也变大只能动 `--page-scale`，但那会连容器一起放大、**行长完全不变**（实测 cpl 恒 105/90.3），
+  且要同步改按 0.9 校准过的绝对值（`globals.css` landing offset 的 79.2px）。见 `handover.md`。
+- **行内代码 `code` 是 0.93em**（原 0.84em 在 15.3px 正文里只有 12.85px，2026-10-25 随小字档一起抬）。
+- **中文衬线现为自托管 GenWanMin2 TC 子集**（`--font-serif-zh` 首位；管线见 ARCHITECTURE）。旧 Noto Serif SC/JP 方向已被取代；日文片段靠字体栈兜底渲染。
+- **文章分类徽章单独使用 `.post-category-tag`**（首页 Recent Posts / Blog 列表和正文页）：0.8rem 字号、1.25 行高，padding 0.2rem 0.6rem，高约 20.2px。不要加回 text-[10px]/text-[11px]，否则会被全局小字抬升规则覆盖；分类筛选按钮保持原尺寸。
+- 首页 Recent Posts 额外用 `.recent-post-tag`：0.7rem（10.08px）、padding 0.2rem 0.5rem，高约 18.4px。导航条、手机导航窗格及首页卡片的 Beta 统一用 `.beta-badge`：0.65rem（9.36px）、1.2 行高、padding 0.16rem 0.45rem，高约 15.8px；不要使用会触发全局抬升的任意值字号工具类。
+- 其他辅助徽标使用 `.badge-text`（0.75rem / 10.8px、1.3 行高）或 `.badge-text-sm`（0.7rem / 10.08px、1.25 行高），不再附加 text-[9/9.5/10/10.5/11px]。适用 PDF、编号、分类数量、履历年份/类型、旅行日志徽标/地点及灯箱元信息胶囊。目录链接、正文/照片说明、标题和导航主文字保留原字号，不取消全局阅读字号规则。
+- 包裹文字的徽标另加 `.badge-pill`，统一 inline-flex 居中与 padding 0.2rem 0.55rem；固定尺寸的编号圆/方块不加这层内边距，灯箱元信息胶囊保留自身较宽的内边距。
 - **字重映射（2026-10-24 起，五个子集）**：EL/L/R/M/SB → `font-weight` **300/400/500/600/700**。
   早先只有 R/M/SB（400/500/600），任何 300–400 的请求都拿到 Regular，「想细一点」无从表达；
   现在 `font-medium`(500) 是 R、正文 400 是 L。**改 `@font-face` 的 weight 段时必须同步重跑
   `scripts/subset-cjk-fonts.py`**（脚本的 `FAMILIES.weights` 列了全部五档），否则 404 → 静默掉到系统字体。
 - **页头主标题用 `font-medium`（500）而非 `font-semibold`（600）**（2026-10-24 用户反馈「字有点加粗了，
-  没有体现出字体曲线感」）：Palatino 在 54–72 px 下 600 会把粗细对比压平；500 保留层次。
+  没有体现出字体曲线感」）：当时的 Palatino 在 54–72 px 下 600 会把粗细对比压平；500 保留层次。
   tracking 同步从 `-0.025em` 收到 `-0.02em`，避免细的接笔粘连。**别再往 600/700 调回去**。
+  （2026-10-25 换成 EB Garamond 后这条仍然适用且更明显：它的可变轴在 600 以上对比会掉，
+  500 才是这一档标题的甜点。已实测页头视觉无变化。）
 - **深兜底是 Cactus Classical Serif（仙人掌明體）**：`scripts/subset-cactus.py` 从 28 MB 的完整 TTF
   子集出 `public/fonts/cactus-subset.woff2`（324 KB，OFL 随附）。`@font-face` 里 `local()` 优先，
   **完整 TTF 绝不进 `public/`**。它只在 GenWanMin2 缺字时接手，所以平时看不见它。
 - ⚠️ **子集扫描范围 = `scripts/subset-cjk-fonts.py` 的 `SCAN_DIRS`（现含 `content` 与 `public/data`）**。2026-10-09 前它只扫 `content/app/components`，**游记 JSON（当时在 `public/data/travel/*`）的字从未入子集** → 正文约 26% 的 CJK 掉进系统 sans（YaHei UI）。**凡是会渲染到屏幕的新内容（新 JSON 数据源）都要确认在扫描范围内，然后重跑子集**（`fontTools.subset` + brotli，managed venv）。
   - 2026-10-17 起 trip 数据的源全部在 `content/travel/<trip>/`（**扁平，无 `data/` 子目录**），`public/data/` 只是 `sync:data` 对 `MIRRORED` 清单里那几个文件的镜像。两条路径都在 `SCAN_DIRS` 里，重复扫描无副作用，保留 `public/data` 是为了兜住别的 HTML 页面直接引用的静态 JSON。
+  - ⚠️ **子集是「字符集快照」，不是「只增不减」**：每次重跑都从零重建，**只保留当时扫描得到的字**。2026-10-25 核对发现 `75edc94` 重新生成 m/r/sb 时把 挖 / 掘 / 灣 三个字弄丢了（2282 → 2398 字形，多 119 少 3），已用 `git checkout 9c122fc -- public/fonts/genwanmin2tc-{m,r,sb}.woff2` 字节级还原，并在脚本里加了 `PINNED_CHARS = "挖掘灣"` 兜底（并入 `harvest_chars()` 的初始集合）。
+  - **改字重映射 / 重跑子集之前先备份 woff2，跑完 diff cmap**：`set(new.getBestCmap()) - set(old.getBestCmap())` 的两个方向都要看，`old - new` 非空就是这次掉字。
 - ⚠️ **`.travel-layout` 是 sans 作用域**（`TravelLog.tsx`）。该布局里的正文元素必须**显式**声明衬线栈，否则继承 sans 违反 §44。现状：`.scene-body p` 与 `.excerpt` 显式 `var(--font-serif-latin), var(--font-serif-zh)`；chip/表头/控件保持 sans。
 - ⚠️ **页面根节点不要设 `font-family`**。巡礼页的 `.pj-page` 曾写 `var(--font-ui)`，整页正文/评论/概述全部静默变无衬线，而标题因为各自**又**声明了一遍衬线所以没坏 —— 表象是「标题衬线、正文无衬线」，扫一遍看不出来（2026-10-24 修）。现在 `.pj-page` 与 `body` 一致是衬线，UI 例外逐个元素显式声明（`.pj-kicker`、`.pj-overview-meta`、`.pj-intro-hint`、`.pj-scroll-hint .hint-text`、`.pj-time-plate`、`.pj-tool-btn`、`.pj-back`、`.pj-outro-hint`、`.pjr-tip`，以及两页共用、声明在基础规则里的 `.pj-attrib / .map-attrib`）。**新加巡礼页元素时直接在自己的规则里写清楚**，别去父级加一行。
 
@@ -144,10 +170,28 @@
 验证脚本（`probe-nihongo-font.mjs`，做 DOM 计算样式 + 裁剪位图 + canvas 字形光栅金标准 + 运行时删规则 A/B +
 `lang` 回退对照，12 项）**已随 `.workbuddy/` 清理消失**；下面是它当初验出的结论，仍成立。
 
-## 六、Travel 模块细粒度定案（节选，全量见 `.workbuddy/memory/MEMORY.md`）
+## 六、Travel 模块细粒度定案
+
+- **统一旅行日志框架（2026-10-24）**：公共布局、控件位置、分隔拖拽、章节导航与幕布只维护一份，详见 `FEATURE_TRAVEL_LOG.md`。断点 1024px，移动端默认地图比例由内容类型配置（journal 40vh、pilgrimage 58vh）；正文排版与镜头策略保持独立。下方返回条旧类名已由公共 `.travel-log-back*` 替代，几何与 opacity-only 规则继续有效。
 
 - 新增 trip 必须走 GPS 清洗管线（隐私红线，见 ARCHITECTURE §数据管线）。
-- 返回条带、图例、tile hover、胶囊吸顶、幕布动画等交互均已逐项定稿（v7–v14.1）；动这些区域前**必读 MEMORY.md 对应条目**，避免推翻已拍板细节。
+- **游记的「发布日期」用 `end`，不用 `start`**（2026-10-25 定案）。游记要等行程
+  完整结束才会写，所以它在首页 / `/travel` hub / Blog 索引里按**返程日**排序与显示。
+  统一走 `lib/travel/trips.ts` 的 `tripPostedAt(trip)`，**不要再在三处各自写 `trip.start`**。
+  两处**不**改：`TravelStory` 里 `{trip.start} → {trip.end}` 是行程窗口本身，
+  `readTripCards()` 的 `cards.sort((a,b) => a.start…)` 是「**最早出发的排最前**」
+  的行程顺序（hub tile 依赖它），都不是发布日期。原文案「last departure first」见该函数注释。
+- **相册「精选集」是置顶，不是筛选**（2026-10-25 定案，**推翻 2026-09-05「精选行不再置顶」**）。
+  开着的时候 `featured: true` 的行排在最前、其余照片接在后面，**墙上永远显示全部**。
+  实现是 `ordered` 里一次稳定分区（`filter(featured)` ++ `filter(!featured)`），
+  **不要再写 `items.filter(i => i.featured)`** —— 那会让新加的、`featured: false` 的照片
+  从墙面上消失（2026-10-25 加 `img-6308` 时正是这个假象被当成「图没进去」）。
+  配套的第二处：`flow` 里「按日期把行程卡插进照片流」的 `while` 循环**必须跳过置顶段**
+  （`pinnedCount`），否则拿 2026-08 的精选图去比 2024-03 的行程卡，会把几张行程卡倒进
+  精选段中间、把顺序打散。三次排序模式下精选段都是完整 20 张、日期倒序，已验。
+- **旅行日志默认都是 featured 导航入口**（2026-10-25）：ptes-2025 与 just-because / Anitabi 均置顶在照片流之前；新日志 pinned 默认 true。照片精选开关、日期/地点/随机排序不把这些日志入口混回普通照片。
+- featured 排位与可见置顶图标分开：`pinned` 控制排位，`showPinnedBadge` 控制图标（默认 false）。目前仅 PTES 显示图标，Anitabi 仍排在前方但不显示。
+- 返回条带、图例、tile hover、胶囊吸顶、幕布动画等交互均已逐项定稿（v7–v14.1）；动这些区域前**必读 `FEATURE_TRAVEL_LOG.md`、`FEATURE_PILGRIMAGE.md` 及 `FEATURE_HOME_NAVIGATION.md` 对应条目**，避免推翻已拍板细节。
 - **返回条 hover 只动 opacity，不动位移**（2026-10-24 定案，v13）：ptes 的
   `.tl-back-*` 与 just-because 的 `.pj-back-*` 都是两行网格
   `grid-template-rows: 1fr 14px 1fr` —— 箭头钉在中间 14px 车道，竖排标签
@@ -212,7 +256,7 @@
   - 方框左右夹取 `inset = min(44, w/2)`，防止贴边时溢出屏幕；松手（`onRelease`）后移除 `is-on`。
   - 桌面竖轨**不受影响**：`.tnav-rail-fill` 的 `z-index` 必须是 `auto`，不能继承基类
     `.tnav-fill` 的 `2`（那个 2 是给移动端水银柱写的）—— 否则桌面轨道的填充会盖在
-    12px 刻度点上，圆点与轨道焊成一根实心条。详见 `MEMORY.md`。
+    12px 刻度点上，圆点与轨道焊成一根实心条。历史视觉规则见 `FEATURE_PILGRIMAGE.md`；现行进度条以 `FEATURE_TRAVEL_LOG.md` 为准。
 - **☰ 目录按钮在进度条右侧（ptes）/ 左侧（anitabi），是底栏内的 flex 子元素**（v17 定案；
   下文「水银柱」是 v17 对填充的旧称，v21 起刻度已删、只剩一根实心填充条，几何未变）。
   v15 曾把它做成独立的 `position: fixed` 圆形 chip，用户随后改主意：「目录按钮就放在

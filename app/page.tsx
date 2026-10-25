@@ -46,29 +46,23 @@ const sectionIcons: Record<SectionId, LucideIcon> = {
 };
 
 /** Short section descriptor shown under each gateway card title. */
-const sectionBlurbs: Record<SectionId, { sub: string; desc: string }> = {
+const sectionBlurbs: Record<SectionId, { desc: string }> = {
   about: {
-    sub: "A short introduction",
     desc: "Who I am & what I do, plus a few fun facts.",
   },
   cv: {
-    sub: "Education · research · activities",
-    desc: "The academic record so far, a formal CV attached.",
+    desc: "Academic experience and research, with a formal CV PDF.",
   },
   travel: {
-    sub: "Trips · maps · photography",
-    desc: "Interactive GPS trip logs (Beta) and the travel photo gallery.",
+    desc: "Journeys traced on maps, with photos along the way.",
   },
   blog: {
-    sub: "Fun daily writing",
-    desc: "Short writing — statistics notes, cooking experiments, linguistics, and other miscellany.",
+    desc: "Notes on statistics, cooking, language, and more.",
   },
   project: {
-    sub: "Notes & small works",
-    desc: "Long-running study notes and digests.",
+    desc: "Study notes and small works, maintained over time.",
   },
   guestbook: {
-    sub: "Say hi · report a bug",
     desc: "One shared board for greetings, stray thoughts and bug reports — comments land in a single guestbook thread.",
   },
 };
@@ -91,6 +85,7 @@ const tones = {
     wash: "from-brand-soft/70 via-transparent to-transparent",
     hover: "group-hover:text-brand",
     fill: "group-hover:bg-brand group-hover:text-on-brand",
+    confirm: "[--confirm-tone:var(--brand)] [--confirm-fill:var(--brand-soft)]",
     waterHover: "group-hover:text-brand/30",
     line: "bg-brand",
     arrow: "text-brand",
@@ -102,6 +97,7 @@ const tones = {
     wash: "from-accent-soft/60 via-transparent to-transparent",
     hover: "group-hover:text-accent",
     fill: "group-hover:bg-accent group-hover:text-on-accent",
+    confirm: "[--confirm-tone:var(--accent)] [--confirm-fill:var(--accent-soft)]",
     waterHover: "group-hover:text-accent/30",
     line: "bg-accent",
     arrow: "text-accent",
@@ -113,6 +109,7 @@ const tones = {
     wash: "from-tertiary-soft/60 via-transparent to-transparent",
     hover: "group-hover:text-tertiary",
     fill: "group-hover:bg-tertiary group-hover:text-on-tertiary",
+    confirm: "[--confirm-tone:var(--tertiary)] [--confirm-fill:var(--tertiary-soft)]",
     waterHover: "group-hover:text-tertiary/30",
     line: "bg-tertiary",
     arrow: "text-tertiary",
@@ -426,7 +423,7 @@ export default function HomePage() {
               >
                 <Download className="h-[18px] w-[18px] text-brand" aria-hidden />
                 <span>Download Curriculum Vitae</span>
-                <span className="rounded bg-surface-sink px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-muted">
+                <span className="badge-pill badge-text rounded bg-surface-sink font-semibold uppercase tracking-wider text-muted">
                   PDF
                 </span>
               </a>
@@ -469,7 +466,7 @@ export default function HomePage() {
             id="navigation"
             aside={
               <span className="font-serif text-sm text-muted">
-                {homeCards.length} places to start
+                discover the site using the cards below!
               </span>
             }
           >
@@ -699,31 +696,28 @@ function GatewayCard({
           strokeWidth={1}
         />
       </span>
-      <div className="relative flex items-center gap-2">
+      <div className="gateway-card-meta relative flex items-center gap-2">
         <span
-          className={`ui-text inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${tone.soft} ${tone.fg} ${tone.fill}`}
+          className={`badge-text-sm ui-text inline-flex h-6 w-6 items-center justify-center rounded-full font-bold transition-colors ${tone.soft} ${tone.fg} ${tone.fill}`}
         >
           {String(index + 1).padStart(2, "0")}
-        </span>
-        <span className="ui-text text-xs tracking-wider text-muted">
-          {sectionBlurbs[id].sub}
         </span>
         {/* Travel is the interactive trip-log hub — flagged Beta until the
             owner declares it stable (2026-09-25). */}
         {id === "travel" ? (
-          <span className="ui-text ml-auto rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand">
+          <span className="beta-badge ml-auto bg-brand-soft text-brand">
             Beta
           </span>
         ) : null}
       </div>
-      <div className="relative mt-auto pt-6">
+      <div className={`gateway-copy relative mt-auto ${featured ? "gateway-copy-featured" : "gateway-copy-compact"}`}>
         {/* Title glass capsule: at rest the pill is fully transparent (its
             padding is offset by negative margins, so layout is identical to
             the bare title). On hover-capable pointers / keyboard focus it
             frosts over (surface glass + blur) and its tone tint fades in,
             keeping "Blog" readable above the revealed photo — same soft →
             solid colour story as the number chip. */}
-        <span className={`gw-title-pill ${tone.fg}`}>
+        <span lang="en" data-featured={featured ? "" : undefined} className={`gw-title-pill ${tone.fg}`}>
           <span aria-hidden className={`gw-title-pill-tint ${tone.soft}`} />
           <h3
             className={`tracking-tight transition-colors ${featured ? "text-2xl sm:text-3xl" : "text-xl"} ${tone.hover}`}
@@ -731,22 +725,15 @@ function GatewayCard({
             {item.label.en}
           </h3>
         </span>
-        <p className="mt-1 text-[0.95rem] leading-relaxed text-muted">
+        <p className="gateway-description text-[0.95rem] leading-relaxed text-muted">
           {sectionBlurbs[id].desc}
         </p>
-        {/* Hover arrow: rests hidden, slides in with the card's tone */}
-        <div aria-hidden className="relative mt-3 flex justify-end">
-          <ArrowRight
-            className={`-translate-x-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 ${tone.arrow} ${featured ? "h-[22px] w-[22px]" : "h-5 w-5"}`}
-          />
-        </div>
       </div>
-      {/* Launch stamp: pop-in arrow that plays while GatewayLink holds the
-          click for a beat — the "click registered, launching" ack before
-          navigating (user request: arrow instead of the old checkmark). */}
+      {/* One central arrow persists from hover to confirmation. On click,
+          the original soft disc, shadow and halo stamp in around it. */}
       <span aria-hidden className="gateway-stamp">
         <span
-          className={`gateway-stamp-chip ${tone.soft} ${tone.fg} ${featured ? "h-16 w-16" : "h-14 w-14"}`}
+          className={`gateway-stamp-chip ${tone.confirm} ${featured ? "h-16 w-16" : "h-14 w-14"}`}
         >
           <ArrowRight
             className={featured ? "h-8 w-8" : "h-7 w-7"}
@@ -775,7 +762,7 @@ function RecentPostList({ items }: { items: FeedItem[] }) {
               <div className="min-w-0 flex-1">
                 <div className="ui-text mb-1.5 flex flex-wrap items-center gap-2">
                   <span
-                    className={`inline-flex items-center rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${item.chip.cls}`}
+                    className={`post-category-tag recent-post-tag inline-flex items-center rounded-full ${item.chip.cls}`}
                   >
                     {item.chip.label}
                   </span>

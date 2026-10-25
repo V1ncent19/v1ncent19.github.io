@@ -1,5 +1,9 @@
 "use client";
 
+import "./gallery-hover.css";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import {
   ArrowDownUp,
   ArrowDownWideNarrow,
@@ -31,8 +35,13 @@ import type { Lang } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
 import { pick } from "@/lib/localized";
 import { TravelStamp } from "./travel-stamps";
+import { useCardLaunch } from "@/lib/use-card-launch";
+import { beginTravelEntry } from "@/lib/travel/log/entry-transition";
 
 type SortMode = "date" | "place" | "shuffle";
+type ReturnView = { mode: SortMode; dir: "asc" | "desc"; featuredFirst: boolean; shuffleNonce: number; prefCols: number };
+// Keep the existing wall arrangement when a client-side story visit returns.
+const returnViews = new Map<string, ReturnView>();
 
 /**
  * A non-photo "story" card pinned to the front of the masonry flow (2026-09-25
@@ -47,6 +56,8 @@ export interface GalleryStoryTile {
   /** Stable DOM/FLIP key; must not collide with any GalleryItem id. */
   id: string;
   href: string;
+  /** The destination owns the full-screen travel-entry curtain. */
+  travelLog?: boolean;
   /** Large ghost numeral at the card's top, e.g. "01". */
   index?: string;
   title: string;
@@ -61,6 +72,8 @@ export interface GalleryStoryTile {
    * stamp a "pinned" marker on the card. Pinned tiles ignore sort/filter.
    */
   pinned?: boolean;
+  /** Draw the pin icon only when explicitly requested; does not affect order. */
+  showPinnedBadge?: boolean;
   /**
    * YYYY-MM-DD anchor for unpinned tiles: in date-sorted mode they are merged
    * into the photo stream at this date (2026-09-25 user request — the Paris
@@ -337,14 +350,18 @@ export function GalleryView({
   const s = copy[lang];
   const unit = lang === "zh" ? "张" : "photos";
 
-  const [mode, setMode] = useState<SortMode>("date");
+  const returnKey = `${embedded ? "embedded" : "page"}:${lang}`;
+  const [returnView] = useState(() => returnViews.get(returnKey));
+  const [mode, setMode] = useState<SortMode>(returnView?.mode ?? "date");
   /** Sort direction for the date/place keys ("shuffle" ignores it). Each key
    *  carries its own natural default: newest-first for dates, A→Z for places. */
-  const [dir, setDir] = useState<"asc" | "desc">("desc");
-  /** Curated-collection filter (精选集): when active, only `featured` rows show. */
-  const [featuredOnly, setFeaturedOnly] = useState(true);
-  const [shuffleNonce, setShuffleNonce] = useState(0);
-  const [prefCols, setPrefCols] = useState<number>(DEFAULT_COLUMNS);
+  const [dir, setDir] = useState<"asc" | "desc">(returnView?.dir ?? "desc");
+  /** Curated PIN (精选集): when on, `featured` rows lead the wall and every
+   *  other photo follows — it does not hide anything (2026-10-25). */
+  const [featuredFirst, setFeaturedFirst] = useState(returnView?.featuredFirst ?? true);
+  const [shuffleNonce, setShuffleNonce] = useState(returnView?.shuffleNonce ?? 0);
+  const [prefCols, setPrefCols] = useState<number>(returnView?.prefCols ?? DEFAULT_COLUMNS);
+  const rememberView = () => { returnViews.set(returnKey, { mode, dir, featuredFirst, shuffleNonce, prefCols }); };
   const [containerW, setContainerW] = useState(0);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
@@ -364,35 +381,56 @@ export function GalleryView({
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [closing, setClosing] = useState(false); // drives .gb-overlay-out
 
-  /** Curated filter applied: everything, or only `featured` rows. */
-  const visible = useMemo(
-    () => (featuredOnly ? items.filter((i) => i.featured === true) : items),
-    [items, featuredOnly],
-  );
+  /** Curated mode (精选集). 2026-10-25 user decision: it is a PIN, not a
+   *  filter — featured frames are grouped at the front and every other photo
+   *  follows, so the wall never hides anything. (Before this it filtered the
+   *  list down to `featured` only, which made a new, non-featured upload look
+   *  like it had not been added at all.) The `visible` list is therefore the
+   *  full set again; the ordering work happens in `ordered` below. */
+  const visible = items;
 
   /** Photos in the current display order. Date = newest/oldest by `dir`;
    *  place = alphabetical by `dir` (unlabelled frames always sink); the
-   *  tiebreaker follows the same direction. Featured rows no longer lead
-   *  (2026-09-05 user decision, supersedes Task D #2's curated-first band). */
+   *  tiebreaker follows the same direction.
+   *
+   *  Curated mode (2026-10-25) PINS featured frames to the front instead of
+   *  filtering them: a stable two-band partition, featured first, then the
+   *  rest — each band keeps the exact order it would have had anyway, so
+   *  toggling the pin never reshuffles within a band. This supersedes the
+   *  2026-09-05 "featured rows no longer lead" decision; that one was made
+   *  when the alternative was *filtering*, and the user has since asked for
+   *  the wall to show everything with favourites up front.
+   *
+   *  Shuffle is the exception: the point of shuffling is a fresh, unbiased
+   *  arrangement, so a pinned band would defeat it. Featured still leads there
+   *  (the pin is a deliberate user-facing choice), but the random order inside
+   *  each band is freshly drawn. */
   const ordered = useMemo(() => {
-    if (mode === "shuffle") return shuffleList(visible, shuffleNonce);
-    const flip = dir === "asc" ? 1 : -1; // asc: natural order; desc: reversed
-    if (mode === "place") {
-      return [...visible].sort((a, b) => {
-        const pa = pick(a.place, lang).toLowerCase();
-        const pb = pick(b.place, lang).toLowerCase();
-        if (!pa && pb) return 1; // unlabelled frames sink to the end
-        if (pa && !pb) return -1;
-        if (pa !== pb) return (pa < pb ? -1 : 1) * flip;
-        return (a.date || "").localeCompare(b.date || "") * flip;
-      });
-    }
-    return [...visible].sort(
-      (a, b) =>
-        ((a.date || "").localeCompare(b.date || "") ||
-          a.id.localeCompare(b.id)) * flip,
-    );
-  }, [visible, mode, dir, lang, shuffleNonce]);
+    const base = mode === "shuffle" ? shuffleList(visible, shuffleNonce) : (() => {
+      const flip = dir === "asc" ? 1 : -1; // asc: natural order; desc: reversed
+      if (mode === "place") {
+        return [...visible].sort((a, b) => {
+          const pa = pick(a.place, lang).toLowerCase();
+          const pb = pick(b.place, lang).toLowerCase();
+          if (!pa && pb) return 1; // unlabelled frames sink to the end
+          if (pa && !pb) return -1;
+          if (pa !== pb) return (pa < pb ? -1 : 1) * flip;
+          return (a.date || "").localeCompare(b.date || "") * flip;
+        });
+      }
+      return [...visible].sort(
+        (a, b) =>
+          ((a.date || "").localeCompare(b.date || "") ||
+            a.id.localeCompare(b.id)) * flip,
+      );
+    })();
+    if (!featuredFirst) return base;
+    // Array#filter is stable, so this is a partition, not a re-sort.
+    return [
+      ...base.filter((i) => i.featured === true),
+      ...base.filter((i) => i.featured !== true),
+    ];
+  }, [visible, mode, dir, lang, shuffleNonce, featuredFirst]);
 
   // Measure the grid once + on resize (state updates only inside rAF / events).
   useEffect(() => {
@@ -487,8 +525,21 @@ export function GalleryView({
       kind: "story" as const,
       story,
     }));
+    /* The curated pin (2026-10-25) puts non-chronological items at the front,
+     * so the date-merge below must not run over them: comparing a pinned
+     * 2026-08 featured photo against a story dated 2024-03 would make the
+     * `while` loop dump several stories in the middle of the featured band and
+     * scramble its order. The featured band is emitted as one intact run, and
+     * only the photos AFTER it are merged with stories by date. */
+    const firstUnfeatured = ordered.findIndex((i) => i.featured !== true);
+    const pinnedCount =
+      !featuredFirst ? 0 : firstUnfeatured === -1 ? ordered.length : firstUnfeatured;
     let s = 0;
     ordered.forEach((item, photoIndex) => {
+      if (photoIndex < pinnedCount) {
+        flow.push({ kind: "photo", item, photoIndex });
+        return;
+      }
       // desc: a story leads every photo strictly older than it (equal dates:
       // the photo of that day stays first). asc mirrors the comparison.
       while (
@@ -504,7 +555,7 @@ export function GalleryView({
     });
     stories.slice(s).forEach((story) => flow.push({ kind: "story", story }));
     return flow;
-  }, [storyTiles, ordered, mode, dir]);
+  }, [storyTiles, ordered, mode, dir, featuredFirst]);
 
   /** Round-robin split of the flow into columns (see header note). */
   const columnList = useMemo(() => {
@@ -658,7 +709,7 @@ export function GalleryView({
     setClosing(true);
     const panel = dialogRef.current;
     // Re-measure the trigger tile NOW instead of reusing the rect captured at
-    // open time: the tile was hovered when clicked (its -4px hover lift shifts
+    // open time: the tile was hovered when clicked (its hover lift shifts
     // the rect up), and by close the pointer is over the overlay, so the
     // resting rect is the correct collapse target — reusing the stale one made
     // the panel land ~4px high and pop on unmount.
@@ -819,14 +870,14 @@ export function GalleryView({
         {metaChip ? (
           <span
             aria-hidden
-            className="ui-text pointer-events-none absolute bottom-3 left-3 z-20 flex max-w-[75%] items-center gap-1 rounded-lg border border-white/20 bg-black/55 px-3 py-1.5 text-[11px] font-medium tracking-wide text-white/95 backdrop-blur-md tabular-nums"
+            className="badge-text ui-text pointer-events-none absolute bottom-3 left-3 z-20 flex max-w-[75%] items-center gap-1 rounded-lg border border-white/20 bg-black/55 px-3 py-1.5 font-medium tracking-wide text-white/95 backdrop-blur-md tabular-nums"
           >
             <span className="min-w-0 truncate">{metaChip}</span>
           </span>
         ) : null}
         <span
           aria-hidden
-          className="ui-text pointer-events-none absolute right-3 bottom-3 z-20 rounded-full bg-black/45 px-3 py-1 text-[11px] font-medium tracking-wider text-white/90 backdrop-blur-md tabular-nums"
+          className="badge-text ui-text pointer-events-none absolute right-3 bottom-3 z-20 rounded-full bg-black/45 px-3 py-1 font-medium tracking-wider text-white/90 backdrop-blur-md tabular-nums"
         >
           {(openIdx ?? 0) + 1} / {ordered.length}
         </span>
@@ -1028,15 +1079,19 @@ export function GalleryView({
 
         {/* ---- Sort strip + column chooser ---- */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border border-line bg-surface-tint px-4 py-3">
-          {/* Curated filter (精选集) — pinned to the very front of the strip.
+          {/* Curated PIN (精选集) — pinned to the very front of the strip.
+              Since 2026-10-25 this no longer filters the wall down to the
+              featured frames: it partitions the order so favourites lead and
+              everything else follows (see `ordered`). aria-pressed therefore
+              describes "the pin is on", not "a subset is being shown".
               The accent follows the same rule as the tiles — featured = orange. */}
           <button
             type="button"
-            onClick={() => setFeaturedOnly((v) => !v)}
-            aria-pressed={featuredOnly}
+            onClick={() => setFeaturedFirst((v) => !v)}
+            aria-pressed={featuredFirst}
             className={[
               "ui-text inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors hover:no-underline",
-              featuredOnly
+              featuredFirst
                 ? "border-[var(--curated)] bg-[var(--curated-soft)] text-[var(--curated)]"
                 : "border-line bg-surface text-muted shadow-sm hover:bg-surface-tint hover:text-ink",
             ].join(" ")}
@@ -1044,7 +1099,7 @@ export function GalleryView({
             <Star
               className="h-3.5 w-3.5"
               aria-hidden
-              fill={featuredOnly ? "currentColor" : "none"}
+              fill={featuredFirst ? "currentColor" : "none"}
             />
             {s.gallery.featured}
           </button>
@@ -1167,8 +1222,9 @@ export function GalleryView({
         </div>
 
         {/* ---- Masonry grid (explicit columns); story cards lead the flow,
-            then the curated-filtered / sorted photos. A filter with no picks
-            AND no story cards renders a friendly empty state instead ---- */}
+            then the photos. Since 2026-10-25 the featured chip is a PIN, not a
+            filter, so this empty state can only mean "there are no photos at
+            all" — it no longer fires just because nothing is featured. ---- */}
         {visible.length === 0 && storyTiles.length === 0 ? (
           <div className="mt-8 flex items-center justify-center rounded-xl border border-dashed border-line bg-surface-tint/60 px-6 py-14 text-center">
             <p className="ui-text max-w-md text-sm leading-relaxed text-muted">
@@ -1181,7 +1237,7 @@ export function GalleryView({
               <div key={ci} className="flex min-w-0 flex-1 flex-col gap-3">
                 {col.map((entry) =>
                   entry.kind === "story" ? (
-                    <StoryTile key={entry.story.id} story={entry.story} />
+                    <StoryTile key={entry.story.id} story={entry.story} onLeave={rememberView} />
                   ) : (
                     <GalleryTile
                       key={entry.item.id}
@@ -1465,22 +1521,27 @@ function WorldLocationMap({
  * readable. Click plays the gateway's "launching" confirmation — the card
  * settles (scale 0.985) and the CTA arrow nudges — before navigation.
  */
-function StoryTile({ story }: { story: GalleryStoryTile }) {
-  function launch(e: React.MouseEvent<HTMLAnchorElement>) {
-    const el = e.currentTarget;
-    if (el.classList.contains("is-launching")) return;
-    e.preventDefault();
-    el.classList.add("is-launching");
-    window.setTimeout(() => {
-      window.location.href = story.href;
-    }, 320);
-  }
+function StoryTile({ story, onLeave }: { story: GalleryStoryTile; onLeave: () => void }) {
+  const router = useRouter();
+  const { ref, onClick, onPointerMove, onPointerDown, onFocus } = useCardLaunch({
+    delay: 320,
+    navigate: () => {
+      onLeave();
+      if (story.travelLog) beginTravelEntry();
+      router.push(story.href);
+    },
+    resetHoverOnReturn: true,
+  });
   return (
-    <a
+    <Link
+      ref={ref}
       href={story.href}
       data-gid={story.id}
-      onClick={launch}
-      className="story-tile no-underline hover:no-underline relative flex aspect-[4/5] w-full flex-col overflow-hidden rounded-xl border border-line bg-surface-tint p-4 text-left shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-line-strong hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:p-5"
+      onClick={onClick}
+      onPointerMove={onPointerMove}
+      onPointerDown={onPointerDown}
+      onFocus={onFocus}
+      className="story-tile no-underline hover:no-underline relative flex aspect-[4/5] w-full flex-col overflow-hidden rounded-xl border border-line bg-surface-tint p-4 text-left shadow-sm transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:p-5"
     >
       {/* Hover circle-reveal cover (home gateway effect, 2026-09-26). Sits
           under the type; the veil keeps the card readable while open. */}
@@ -1496,7 +1557,7 @@ function StoryTile({ story }: { story: GalleryStoryTile }) {
         </span>
       ) : null}
 
-      {story.pinned ? (
+      {story.pinned && story.showPinnedBadge ? (
         <span
           aria-hidden
           className="absolute right-3.5 top-3.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft text-brand sm:right-4 sm:top-4"
@@ -1516,7 +1577,7 @@ function StoryTile({ story }: { story: GalleryStoryTile }) {
           {story.latest ? (
             <span
               data-latest
-              className="ui-text mt-0.5 rounded-full border border-brand/30 bg-brand-soft px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-brand"
+              className="badge-pill badge-text-sm ui-text mt-0.5 rounded-full border border-brand/30 bg-brand-soft font-bold uppercase tracking-wider text-brand"
             >
               {story.latest}
             </span>
@@ -1531,7 +1592,7 @@ function StoryTile({ story }: { story: GalleryStoryTile }) {
       </span>
 
       {story.badge ? (
-        <span className="ui-text z-10 mt-2.5 self-start rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand">
+        <span className="badge-pill badge-text-sm ui-text z-10 mt-2.5 self-start rounded-full bg-brand-soft font-bold uppercase tracking-wider text-brand">
           {story.badge}
         </span>
       ) : null}
@@ -1544,7 +1605,7 @@ function StoryTile({ story }: { story: GalleryStoryTile }) {
           {story.tags.map((t) => (
             <span
               key={t}
-              className="rounded-full border border-line bg-surface px-2 py-0.5 text-[10.5px] font-medium leading-4 text-muted"
+              className="badge-pill badge-text rounded-full border border-line bg-surface font-medium text-muted"
             >
               {t}
             </span>
@@ -1577,7 +1638,7 @@ function StoryTile({ story }: { story: GalleryStoryTile }) {
           <ArrowRight className="h-7 w-7" strokeWidth={2.5} />
         </span>
       </span>
-    </a>
+    </Link>
   );
 }
 
@@ -1589,7 +1650,9 @@ function StoryTile({ story }: { story: GalleryStoryTile }) {
  * travel-stamp badge + theme-coloured place title + muted placeLocal line, a
  * divider, then a relative date — "N days ago" once mounted (left) ·
  * coordinates (right). The card reveal grows to its own height (grid-rows
- * 0fr→1fr), so short and long captions both animate smoothly.
+ * 0fr→1fr), so short and long captions both animate smoothly. The scoped
+ * gallery-hover.css owns the 280ms reveal / 200ms return, delayed text fade
+ * and restrained image/lift motion, shared by hover and keyboard focus.
  */
 function GalleryTile({
   item,
@@ -1628,7 +1691,7 @@ function GalleryTile({
       data-gid={item.id}
       style={accentVars(item)}
       aria-label={item.alt.trim() || describe(item, lang)}
-      className="group relative block w-full overflow-hidden rounded-xl border border-line bg-surface text-left shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-line-strong hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+      className="gallery-photo-tile relative block w-full overflow-hidden rounded-xl border border-line bg-surface text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <div className="relative">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1640,13 +1703,13 @@ function GalleryTile({
           width={item.width}
           height={item.height}
           style={{ aspectRatio: `${item.width} / ${item.height}` }}
-          className="block h-auto w-full transition-transform duration-700 ease-out group-hover:scale-105"
+          className="gallery-photo-image block h-auto w-full"
         />
 
         {/* Bottom gradient deepens on hover */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-50 transition-opacity duration-500 group-hover:opacity-80"
+          className="gallery-photo-shade pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
         />
 
         {/* Caption: frosted bar (rest) morphs into the white card (hover).
@@ -1654,12 +1717,12 @@ function GalleryTile({
             as the detail 0fr→1fr grows into place. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-2 bottom-2 z-10 overflow-hidden rounded-lg border border-white/15 bg-black/45 shadow-sm backdrop-blur-md transition-all duration-500 ease-out group-hover:rounded-xl group-hover:border-line group-hover:bg-surface group-hover:shadow-lg"
+          className="gallery-photo-caption pointer-events-none absolute inset-x-2 bottom-2 z-10 overflow-hidden rounded-lg border border-white/15 bg-black/45 shadow-sm backdrop-blur-md"
         >
           {/* Resting frosted line */}
-          <div className="grid grid-rows-[1fr] transition-all duration-500 ease-out group-hover:grid-rows-[0fr] group-focus-visible:grid-rows-[0fr]">
+          <div className="gallery-photo-rest">
             <div className="min-h-0 overflow-hidden">
-              <div className="flex h-8 items-center justify-between gap-2 px-2.5 whitespace-nowrap transition-opacity duration-300 group-hover:opacity-0 group-focus-visible:opacity-0 sm:px-3">
+              <div className="gallery-photo-rest-text flex h-8 items-center justify-between gap-2 px-2.5 whitespace-nowrap sm:px-3">
                 <span className="flex min-w-0 items-center gap-1.5">
                   <span
                     aria-hidden
@@ -1678,9 +1741,9 @@ function GalleryTile({
           </div>
 
           {/* Hover white card detail */}
-          <div className="grid grid-rows-[0fr] transition-all duration-500 ease-out group-hover:grid-rows-[1fr] group-focus-visible:grid-rows-[1fr]">
+          <div className="gallery-photo-detail">
             <div className="min-h-0 overflow-hidden">
-              <div className="flex flex-col px-2.5 py-2 sm:px-3 sm:py-2.5">
+              <div className="gallery-photo-detail-text flex flex-col px-2.5 py-2 sm:px-3 sm:py-2.5">
                 <div className="flex items-start gap-2">
                   <StampBadge
                     preset={item.badge}

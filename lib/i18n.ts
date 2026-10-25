@@ -117,9 +117,11 @@ export interface Copy {
     byDate: string;
     byPlace: string;
     shuffle: string;
-    /** Label for the curated (精选集 / featured) filter chip in the sort strip. */
+    /** Label for the curated (精选集 / featured) chip in the sort strip. It
+     *  PINS featured frames to the front rather than filtering them
+     *  (2026-10-25) — the wall still shows every photo. */
     featured: string;
-    /** Empty-state note when the curated filter has no featured photos yet. */
+    /** Empty-state note shown when the gallery has no photos at all. */
     featuredEmpty: string;
     /** Label for the column-count control at the right of the sort strip. */
     columns: string;
@@ -251,7 +253,7 @@ export const copy: Record<Lang, Copy> = {
       statCategories: "Categories",
       statLatest: "Latest",
       allLabel: "All",
-      search: "Search posts — statistics, physics, recipes…",
+      search: "Search posts — statistics, travel, recipes…",
       resultsTemplate: "Showing {shown} of {total} posts",
       newest: "Newest first",
       oldest: "Oldest first",
@@ -278,7 +280,7 @@ export const copy: Record<Lang, Copy> = {
       byPlace: "By place",
       shuffle: "Shuffle",
       featured: "Featured",
-      featuredEmpty: "No featured picks here yet — photos you mark as featured in items.json will show up in this collection.",
+      featuredEmpty: "No photos here yet — drop originals in and run npm run gallery:gen.",
       columns: "Columns",
       sortDir: "Toggle sort direction",
       dirNew: "Newest first",
@@ -422,7 +424,7 @@ export const copy: Record<Lang, Copy> = {
       byPlace: "按地点",
       shuffle: "随机",
       featured: "精选集",
-      featuredEmpty: "这里还没有精选照片——在 items.json 里把想放入精选集的照片标为 featured 即可。",
+      featuredEmpty: "这里还没有照片——把原图放进来并运行 npm run gallery:gen 即可。",
       columns: "列数",
       sortDir: "切换正逆序",
       dirNew: "从新到旧",

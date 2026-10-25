@@ -38,7 +38,10 @@ export function TravelSection({
           <SectionMark id="travel" />
           {s.travelSectionTitle}
         </h2>
-        <p className="ui-text mt-2 text-sm text-muted">
+        {/* Serif, not `.ui-text`: this is a sentence, not a control label.
+            2026-10-25 user report — it was the only running prose on the page
+            still set in the sans stack. */}
+        <p className="mt-2 text-sm text-muted">
           {hub.text}{" "}
           <a
             href={lang === "zh" ? "/travel/zh" : "/travel"}

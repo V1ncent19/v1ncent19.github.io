@@ -5,8 +5,8 @@
     "zh": "『Just Because!』圣地巡礼"
   },
   "blurb": {
-    "en": "A Anitabi for 'Just Because!",
-    "zh": "『Just Because!』圣地巡礼。"
+    "en": "'Just Because!' has always been one of my favorite anime. Finally, in the summer of 2026, I had time to go on an Anitabi to the sacred sites.",
+    "zh": "『Just Because!』一直是苯人最喜欢的 anime 之一。26年暑假终于有时间前往圣地巡礼了一番。"
   },
   "start": "2026-09-21",
   "end": "2026-09-21",
@@ -14,6 +14,8 @@
   "distanceKm": 17.6,
   "gpsPoints": 36,
   "beta": false,
+  "pinned": true,
+  "showPinnedBadge": false,
   "stops": {
     "en": [
       "藤沢",

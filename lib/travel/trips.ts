@@ -66,12 +66,12 @@ export interface TripCard {
   gpsPoints: number;
   beta: boolean;
   /**
-   * Pin the tile to the front of the /travel flow. Default **false**
-   * (2026-10-17): a new trip slots into the photo timeline at its own date,
-   * which is what a chronological wall should do. Only a trip whose page is a
-   * destination in its own right earns the pin.
+   * Pin the tile to the front of the /travel flow. Travel logs default to
+   * true (2026-10-25): they are featured navigation entries ahead of photos.
    */
   pinned?: boolean;
+  /** Optional visible pin icon, independent of featured placement. */
+  showPinnedBadge?: boolean;
   /**
    * Hub-card place chips (2026-09-26 "H+J" card enrichment) — display-only,
    * hand-curated; last entry conventionally summarizes the smaller stops.
@@ -146,6 +146,11 @@ function readTripCards(): TripCard[] {
           "Every trip card needs these fields (see lib/travel/trips.ts).",
       );
     }
+    for (const field of ["pinned", "showPinnedBadge"] as const) {
+      if (raw[field] !== undefined && typeof raw[field] !== "boolean") {
+        throw new Error(`${path.relative(process.cwd(), file)}: ${field} must be a boolean.`);
+      }
+    }
     /* The directory name is the URL segment and the hub tile's key, so a card
        whose `id` disagrees with its folder would produce a dead link that only
        fails at click time. Catch it here instead. */
@@ -165,6 +170,28 @@ function readTripCards(): TripCard[] {
 }
 
 export const tripCards: TripCard[] = readTripCards();
+
+/**
+ * The date a travel log is PUBLISHED — i.e. the date that card sorts and
+ * displays by on the home gateway, the /travel hub and the Blog index.
+ *
+ * It is `end`, not `start` (2026-10-25, user decision): a travel log can only
+ * be written once the trip is over, so its "post date" is the return day. The
+ * two are NOT interchangeable for sorting: a trip that departs 2025-12-15 and
+ * returns 2026-01-01 sorts under December while every other post dated
+ * 2025-12-31 would appear *above* it.
+ *
+ * Deliberately a function rather than a field on `TripCard`, so the manifest
+ * never carries the same fact twice: `start` / `end` stay the trip's real
+ * window (shown verbatim by TravelStory as "start → end"), and this derives
+ * the publication date from it.
+ *
+ * Do NOT use this for the ordered trip list (`cards.sort` above) — that one
+ * is "oldest departure first" on purpose, and the hub tiles keep that order.
+ */
+export function tripPostedAt(trip: TripCard): string {
+  return trip.end || trip.start;
+}
 
 /**
  * The hub card's stat line — ONE implementation, because the same numbers now

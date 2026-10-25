@@ -4,7 +4,7 @@ import { HubHoverLink } from "@/components/travel/hub-hover-link";
 import { GalleryView, type GalleryStoryTile } from "@/components/gallery/gallery-view";
 import { getGalleryItems, getTravel } from "@/lib/content";
 import { blogPostPath, getBlogPosts } from "@/lib/blog";
-import { tripCards, tripFacts } from "@/lib/travel/trips";
+import { tripCards, tripFacts, tripPostedAt } from "@/lib/travel/trips";
 import { copy } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -32,9 +32,11 @@ export default function TravelPage() {
   const storyTiles: GalleryStoryTile[] = tripCards.map((trip) => ({
     id: `story-trip-${trip.id}`,
     href: `/travel/${trip.id}`,
-    /* Anchor date for chronological numbering below (and for any future
-       unpinned trip tiles). */
-    date: trip.start,
+    travelLog: true,
+    /* Publication date — the RETURN day (2026-10-25): a trip tile sorts with
+       the blog feed, and a travel log is only published once the trip is over.
+       Chronological numbering below uses it. */
+    date: tripPostedAt(trip),
     title: trip.title.en,
     /* v2 (2026-09-26): basic metainfo only — the blurb excerpt is dropped
        (user request); hover circle-reveal cover mirrors the home gateway.
@@ -50,11 +52,9 @@ export default function TravelPage() {
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
     coverPos: trip.coverPos,
-    /* Pinning is per trip, declared in its own card.json (2026-10-17: was
-       hard-coded `true` for every trip, which pinned the pilgrimage tour as
-       well). An unpinned trip merges into the photo timeline at its own
-       start date. */
-    pinned: trip.pinned ?? false,
+    /* Travel logs are featured entry points by default, ahead of photos. */
+    pinned: trip.pinned ?? true,
+    showPinnedBadge: trip.showPinnedBadge ?? false,
   }));
 
   const paris = getBlogPosts().find((p) => p.slug === PARIS_SLUG);

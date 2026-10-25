@@ -192,7 +192,7 @@ public/assets/
   gallery/         badges/*.svg（手绘印章，页面元数据；build-badges 的输入源）
   photos/          ← 内容创作，按主题
     gallery/{large,thumb}/            相册墙两档入库 webp（同一批照片的派生）
-    gallery/original/                 48 张全分辨率原图（142 MB）—— **本地母版，git-ignored、不上线**
+    gallery/original/                 49 张全分辨率原图（145 MB）—— **本地母版兼管线源目录，git-ignored、不上线**
     blog_photo/                       散篇配图 + 菜谱（15 篇共 25 张）+ boxcox.png
     joke_photo/                       单帖多图（20 张）
     nihongo_photo/                    单帖多图（5 张）
@@ -215,6 +215,12 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 > **"不用人工维护" ≠ "构建产物"**：`public/` 里还有一类是**生成器产出但无可再生源**的文件
 > （巡礼页的 `route.json`、anitabi 快照）。它们放 `public/` 是因为没人手改，但**必须入库** —— 删掉就没了。
 > 判据不是"要不要维护"，而是"**能不能从仓库里重新跑出来**"。
+
+## 地图旅行日志公共框架（2026-10-24）
+
+两篇日志及中英文镜像已接入 `components/travel/log/TravelLogPage.tsx` → 类型适配器 → `TravelLogShell.tsx`。公共外壳统一沉浸/返回/幕布、1024px 断点、地图分隔拖拽和工具栏；`ChapterNavigation.tsx` 共用章节目录、进度条和跳转。两类正文与镜头策略独立，journal/pilgrimage 默认移动端地图高度分别为 40vh/58vh。
+
+每篇的数据入口在 `lib/travel/log/definitions/<id>.ts`；`TravelLog` 不再导入 PTES JSON。`TravelNav` 只做日期→章节适配，巡礼不再有单独的 `PilgrimageRail`。原 PTES 的 styled-jsx 样式已移至 `app/travel-journal.css`、`app/travel-navigation.css`，公共样式为 `app/travel-log.css`。完整职责、接口、新增流程与验收见 `FEATURE_TRAVEL_LOG.md`。
 
 ## 路由树（app/）
 
@@ -239,18 +245,21 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 
 | 目录 | 职责 | 关键点 |
 |---|---|---|
-| `components/travel/` | Travel 模块全部组件 | **ptes**：`TravelMap.tsx`（MapLibre 相机按游记关键帧移动；开场定位 Evanston–ORD；GPS 场景使用行程范围固定取景，避免跟随标点抖动；过渡窗口保持同一相邻帧对且视野约束同步渐变；basemap 持久化到 localStorage）、`TravelLog.tsx`（游记布局/幕布/样式主体，styled-jsx）、`TravelNav.tsx`（总进度条）、`TravelStory.tsx`（数据→布局装配）、`ResumeStoryButton.tsx`；**hub**：`hub-globe.tsx`（D3 正交投影地球仪）、`hub-hover-link.tsx`（地球↔列表共享 hotId 桥）；**巡礼**：`PilgrimageLog.tsx`（外壳，三状态合成一个 `view`）、`PilgrimageMap.tsx`（相机三态 + 亮线/光标 + 时间牌 + 弹窗）、`PilgrimageStory.tsx`（右栏滚动联动） |
-| `components/gallery/` | `gallery-view.tsx` 同文件承载照片画廊 + 游记 StoryTile + 排序条 | 被 `/travel` 消费（`/gallery` 路由 2026-09-28 已删）；排序条方向格移动端独立成行 |
+| `components/travel/` | Travel 模块全部组件 | **ptes**：`TravelMap.tsx`（MapLibre 相机按游记关键帧移动；开场定位 Evanston–ORD；GPS 场景使用行程范围固定取景，避免跟随标点抖动；过渡窗口保持同一相邻帧对且视野约束同步渐变；basemap 持久化到 localStorage）、`TravelLog.tsx`（journal 数据加载与控制器适配）、`TravelNav.tsx`（日期→公共章节导航适配）、`TravelStory.tsx`（数据→布局装配）、`ResumeStoryButton.tsx`；**hub**：`hub-globe.tsx`（D3 正交投影地球仪）、`hub-hover-link.tsx`（地球↔列表共享 hotId 桥）；**巡礼**：`PilgrimageLog.tsx`（巡礼交互适配，三状态合成一个 `view`）、`PilgrimageMap.tsx`（相机三态 + 亮线/光标 + 时间牌 + 弹窗）、`PilgrimageStory.tsx`（右栏滚动联动） |
+| `components/travel/log/` | 旅行日志公共组件 | `TravelLogPage`、`TravelLogShell`、`ChapterNavigation`、`MapToolbar`，详见 `FEATURE_TRAVEL_LOG.md` |
+| `components/gallery/` | `gallery-view.tsx` 同文件承载照片画廊 + 游记 StoryTile + 排序条；`gallery-hover.css` 仅负责照片 tile 的磨砂条展开、文字淡入与 hover/focus 动画 | 被 `/travel` 消费（`/gallery` 路由 2026-09-28 已删）；排序条方向格移动端独立成行 |
+| `lib/use-card-launch.ts` | 首页 GatewayLink 与画廊 StoryTile 的共享点击确认状态 | 跳转前清理 is-launching；在 pagehide/pageshow/popstate、effect 清理时取消计时器并复位。StoryTile 可启用 resetHoverOnReturn，返回后以 data-return-idle 抑制浏览器恢复的 hover/focus 封面，真实鼠标移动或重新 Tab 聚焦后恢复交互 |
 | `components/background/` | `spacetime-canvas.tsx` 时空背景（质量引力井 warp 网格） | 维护接口：CONFIG；各井的**位移向量累加后一次性施加**（不可逐井原地改写），网格向视口外延伸 **Σstrength** 防「引力拉伸露边界」；静态井按**影响半径**剔除而非元素包围盒 |
-| `components/layout/` | 导航、§ 锚点（`section-mark.tsx`）、页头、`lang-switch.tsx` | 全站 sticky 导航经 `.site-chrome-header{display:contents}` |
+| `components/layout/` | 导航、§ 锚点（`section-mark.tsx`）、页头、`lang-switch.tsx`；`desktop-nav.tsx` 负责单个胶囊底板随 hover/focus 移动 | 保留链接几何及字号，ResizeObserver/字体就绪后测量；当前栏目文字/小标记不随 hover 改变。全站 sticky 导航经 `.site-chrome-header{display:contents}` |
 | `components/about/` | About 分层信息 + travel-board（世界地图足迹）+ `travel-globe.tsx`（地球仪与引力井） | MARKER radius 持续调优 |
-| `lib/` | `i18n.ts`（双语 UI 字典）、`localized.ts`（`pick`/`pickList` 唯一回退）、`blog.ts`/`blog-travel.ts`/`content.ts`（内容装载；`blog-travel.ts` = 行程并入 Blog 索引）、`site.ts`、`theme.ts`（`useSyncExternalStore` 主题）、`lede-math.ts`（卡片摘要 KaTeX）、`travel/`（`trips.ts` trip 注册表 + `pilgrimage.ts` 巡礼领域模型 + `types.ts` + `use-story-controller.ts` 滚动状态机：弹簧缓动的文档阅读线共同驱动标点时间与地图镜头，单调三次插值平滑分节速度，章节坐标按布局缓存 + `gps.ts` + **`use-scrub-track.ts`** 进度条拖拽 hook（ref 驱动，禁 `useState`）+ **`scrub-chapters.ts`** 拖动比例 ↔ 章节换算 + **`map-split.tsx`** 移动端地图/文字分割 `useMapSplit`） | |
+| `lib/` | `i18n.ts`（双语 UI 字典）、`localized.ts`（`pick`/`pickList` 唯一回退）、`blog.ts`/`blog-travel.ts`/`content.ts`（内容装载；`blog-travel.ts` = 行程并入 Blog 索引）、`site.ts`、`theme.ts`（`useSyncExternalStore` 主题）、`lede-math.ts`（卡片摘要 KaTeX）、`travel/`（`trips.ts` trip 注册表 + **`tripPostedAt()`** = 游记发布日期（取 `end`，见 CONVENTIONS） + `pilgrimage.ts` 巡礼领域模型 + `types.ts` + `use-story-controller.ts` 滚动状态机：弹簧缓动的文档阅读线共同驱动标点时间与地图镜头，单调三次插值平滑分节速度，章节坐标按布局缓存 + `gps.ts` + **`use-scrub-track.ts`** 进度条拖拽 hook（ref 驱动，禁 `useState`）+ **`scrub-chapters.ts`** 拖动比例 ↔ 章节换算 + **`map-split.tsx`** 移动端地图/文字分割 `useMapSplit`） | |
+| `lib/travel/log/` | 旅行日志公共模型、数据校验、章节与布局接口 | `definitions/<id>.ts` 为每篇内容入口；`reading-geometry.ts`、`navigation.ts` 共用测量与跳转；`camera.ts` 定义镜头所有权 |
 | `content/` | `site/{profile.json,navigation.ts}`、`blog/*.md`、`travel/gallery/items.json`、`cv/`、`project/`、`travel/` | manifest 类文件「脚本生成 + 人工编辑」模式 |
 | `public/data/travel/<trip>/` | 两个 trip 的**生成器产物**都在这里，但入库策略不同 | **ptes**：`track.json` 是 `sync:data` 的产物，gitignored；**just-because**：`route.json` + `anitabi-212278.json` 无仓库内可再生源（GPS 原始导出在 gitignored 的 `assets-src/`；anitabi 是时点快照），**必须入库**。共同点：都不用人工维护。**隐私红线见 §数据管线** |
-| `scripts/` | 见下表「脚本清单」，共 14 个 | 四个挂 `prebuild`/`predev`（`badges → sync:data → check:refs → check:i18n`），其余手动跑 |
+| `scripts/` | 见下表「脚本清单」，共 15 个 | 四个挂 `prebuild`/`predev`（`badges → sync:data → check:refs → check:i18n`），其余手动跑 |
 | `assets-src/` | 原始素材（字体 OTF、**travel 原始 GPS 数据**） | 绝不进 public/，git-ignored（部分） |
 
-### 脚本清单（`package.json` 的 npm script）
+### 脚本清单（npm script 与手动工具）
 
 | 脚本 | 命令 | 何时跑 | 作用 |
 |---|---|---|---|
@@ -258,7 +267,10 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 | `sync-trip-data.mjs` | `npm run sync:data` | **prebuild/predev** | 按 `MIRRORED`/`KEEP` 清单把 trip JSON 镜像进 `public/data/travel/`，其余 prune |
 | `check-refs.mjs` | `npm run check:refs` | **prebuild/predev** | `content/` 里的 `/assets/…` 字符串引用解析不到 `public/` 就 exit 1 |
 | `check-i18n.mjs` | `npm run check:i18n` | **prebuild/predev** | 旧式双语键（`*_en`/`*_zh`/`*Zh`/`*En`）或两端全空的 `{en,zh}` → exit 1 |
-| `gallery.mjs` | `npm run gallery:gen` | 加照片时手动 | 相册两档 webp（thumb/large）+ `items.json` 合并（原图不再发布，**当前跑不起来，见 §数据管线**） |
+| `check-travel-log.mjs` | `node scripts/check-travel-log.mjs` | 改旅行日志后手动 | 四语言路由、布局、拖拽、导航、地图与错误兜底回归；需通过环境变量指定浏览器运行时 |
+| `check-card-launch.mjs` | `node scripts/check-card-launch.mjs` | 改卡片导航/返回后手动 | 首页及两篇旅行日志重复进入/返回、悬浮复位、计时器；运行环境见 FEATURE 文档 |
+| `check-travel-entry.mjs` | `node scripts/check-travel-entry.mjs` | 改源页/目标幕布交接后手动 | 逐帧检查蓝幕覆盖、同文档导航与横向溢出；支持 `--dark`、`--reduced --smoke` |
+| `gallery.mjs` | `npm run gallery:gen` | 加照片时手动 | 相册两档 webp（thumb/large）+ `items.json` 合并（原图不再发布；源目录 = `public/assets/photos/gallery/original/`） |
 | `subset-cjk-fonts.py` | — | 大改内容后手动 | GenWanMin2 TC 子集化 → `public/fonts/*.woff2` |
 | `subset-cactus.py` | — | 手动 | 单字替换用的独立子集（见 `CONVENTIONS.md` §5.2） |
 | `sanitize-trip-gps.py` | — | 新 trip **必须** | GPS 清洗（home anchor + radius），隐私红线 |
@@ -273,9 +285,10 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 
 ## 数据管线
 
-- **相册**：`GalleryPhoto/` 原图 → `npm run gallery:gen` → `public/assets/photos/gallery/{thumb,large}` + `content/travel/gallery/items.json`（人工字段保留）。详细流程见 `GALLERY_ADDING_PHOTOS.md`。⚠️ **`GalleryPhoto/` 源目录已不存在**，`gallery:gen` 会以「source dir not found」退出；`photos/gallery/original/`（142 MB）是当前唯一副本，**已决定不上线**（2026-10-18，下载按钮随之取消；见 `.gitignore` 注释）。
+- **相册**：`public/assets/photos/gallery/original/` 原图 → `npm run gallery:gen` → `public/assets/photos/gallery/{thumb,large}` + `content/travel/gallery/items.json`（人工字段保留）。详细流程见 `GALLERY_ADDING_PHOTOS.md`。**源目录 2026-10-25 移到树内**（原为仓库根 `GalleryPhoto/`，已不存在），脚本对源目录只读；该目录被 `.gitignore` 挡住，所以仍**不上线**（2026-10-18 决定，下载按钮随之取消；见 `.gitignore` 注释）。需要换源目录时用 `GALLERY_SRC=<dir>`，不改脚本。
 - **Badge**：`npm run badges`（prebuild/predev 自动）合成 `badge-art.generated.ts`；改图标后需手动重跑。
 - **中文字体**：`assets-src/fonts/GenWanMin2TC/` OTF → `scripts/subset-cjk-fonts.py` → `public/fonts/genwanmin2tc-{el,l,r,m,sb}.woff2`（对应 300/400/500/600/700，各 ~850 KB）；大改内容后用 venv python 重跑。
+- **英文字体（2026-10-25）**：`assets-src/fonts/EBGaramond/` 可变字体 woff2（上游 583 KB）→ `scripts/subset-ebgaramond.py` → `public/fonts/ebgaramond-{roman,italic}.woff2`（共 **106 KB**）。**可变轴 `wght 400–800` 必须保留**（子集化不能加 `--instance`），一个文件覆盖全站用到的 400/500/600/700。许可证 OFL 1.1，`EBGaramond-OFL.txt` 随字体一起放 `public/fonts/`（OFL 要求）。
 - **Travel GPS（隐私红线，最高优先）**：新增 trip = lab 预处理 → `scripts/sanitize-trip-gps.py` 清洗（home anchor 自动取轨迹首点、radius 3km 裁掉居家段并重排全部索引/bounds）→ 把结果拆两处：**人造内容（trip/scenes/attractions/diagnostics，~115 KB）直接放 `content/travel/<id>/`（import）；`track.json` 也放在同一层**，靠 `scripts/sync-trip-data.mjs` 的 `MIRRORED` 清单声明它需要 fetch —— **「要 URL」由清单表达，不由目录名表达**（早先的 `<id>/data/` 方案会把语义压在文件夹名上，且其 prune 曾清空过 `public/data/travel/ptes-2025/`）→ `npm run sync:data` 把它镜像到 `public/data/travel/<id>/`（产物，gitignored）→ `app/travel/<id>/page.tsx`(en+zh) + `content/travel/<id>/card.json`。**上网数据绝不含住址级 GPS；原始数据只留在 `assets-src/travel-data/`。注意 gitignored ≠ 私密：`public/` 里的一切仍然上网，只是不进版本控制。**
 - **引用完整性**：`npm run check:refs`（prebuild/predev 自动）扫描 `content/` 中所有 `/assets/…` 之类的路径字符串，解析不到 `public/` 就中断构建。字符串引用没有类型检查，写错只会静默出一张空白图。
 
@@ -284,6 +297,12 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 - Tailwind v4 + `app/globals.css` CSS-var tokens（主色 light `#1ba7c9` / dark `#3ccfff`）；语义组件类包裹卡片/按钮/tags。
 - 全站 90% 页面缩放：`:root --page-scale:0.9` + `html{font-size:calc(16px*var(--page-scale))}` —— 与 rem 元素做相对定位必须用 rem 任意值。
 - 中文衬线栈 `--font-serif-zh`（首位 GenWanMin2 TC）。
+- **字号阶梯分两层（2026-10-25）**：`--page-scale: 0.9` 会同比压缩**所有** rem 字号（默认 `text-xs` 的 0.75rem → 10.8px；`text-[10px]` 仍是字面 10px），所以 `globals.css` 里有一段 "Small-type tier"：
+  `@theme { --text-xs: 0.9rem; --text-sm: 1.02rem }`（12.96 / 14.69px）负责 `text-xs`/`text-sm` 及其变体，
+  再加一条 `html :is(.text-\[9px\], …, .text-\[11px\])` 把**不读主题变量的任意值 px** 一并抬到 12.96px。
+  ⚠️ 后者不可省：`text-[Npx]` 在构建产物里是字面 `font-size:10px`。
+  正文档与容器宽度不因小字档而改变；小字本身及徽标内边距仍可能影响局部换行，需验收。辅助标签使用独立语义类避开全局抬升；参数与首页/导航交互见 `FEATURE_HOME_NAVIGATION.md`。
+- **拉丁衬线栈 `--font-serif-latin` 首位是自托管 `"EB Garamond"`**（2026-10-25 起），后面才是 Palatino Linotype / Georgia / Times 作回退。Latin `@font-face` 按 400/500/600/700/800 字重分别注册，`size-adjust` = 0.47 / 各字重 x-height（111.11%–117.5%，共用两个变量字体文件 URL），保留英文大小。已移除 `body` 的全局 `font-size-adjust`，避免中文被缩至 91.44%；中文恢复原始尺寸，约比旧效果大 9.36%。不要叠加两种补偿。
 - 幕布/首帧级视觉用 `body::before` 伪元素 + body class 驱动（React hydration 安全），CSS 放 globals.css 而非 styled-jsx。
 - **阴影按控件尺寸分档（2026-10-17）**：`--shadow-lift`（第二层 32px 模糊）是**卡片**阴影，
   用在 44–64px 的按钮/胶囊上会变成脱离本体的光晕（用户报「download CV 悬浮阴影太大」）。

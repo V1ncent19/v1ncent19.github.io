@@ -39,6 +39,15 @@ REPO = Path(__file__).resolve().parent.parent
 SCAN_DIRS = ["content", "app", "components", "public/data"]
 SCAN_FILES = ["lib/i18n.ts", "lib/content.ts", "lib/blog.ts"]
 
+# Pinned characters, harvested from sources the scan cannot see. Re-running the
+# script REBUILDS every subset from scratch, so anything that is only in a
+# reader-submitted or third-party feed would silently drop out and fall through
+# to the system font. Keep this list in sync with what renders on screen.
+#   挖 掘 — used in the blog/guestbook prose (挖坑 / 挖掘), absent from the
+#            scanned sources at the time of the 2026-10-25 rollback.
+#   灣   — traditional 灣 (Taiwan / 海灣), same reason.
+PINNED_CHARS = "挖掘灣"
+
 # Always kept: CJK punctuation & symbols (U+3000–303F), fullwidth forms
 # (U+FF00–FFEF), common units and typographic marks.
 ALWAYS = (
@@ -71,7 +80,7 @@ FAMILIES = [
 
 
 def harvest_chars() -> str:
-    chars: set[str] = set(ALWAYS)
+    chars: set[str] = set(ALWAYS) | set(PINNED_CHARS)
     targets: list[Path] = []
     for d in SCAN_DIRS:
         targets.extend((REPO / d).rglob("*"))

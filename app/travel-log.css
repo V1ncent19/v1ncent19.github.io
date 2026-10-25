@@ -1,0 +1,271 @@
+/* Shared travel-log controls. Keep opacity-only back-label crossfade. */
+        /* Back to hub (2026-09-26 v6). <1024px keeps the v4 small circular
+           blue button. ≥1024px it is a full-height narrow strip flush with
+           the page's right edge: light gray, a hollow left-triangle at the
+           vertical centre; hover tints it light blue, nudges the width and
+           crossfades the triangle into a vertical label. Click plays a
+           right-to-left blue wipe, then hard-navigates to the hub. Mounts
+           after the trip data loads (client-side), long after the route-fade
+           entry transform has finished, so the fixed position is
+           viewport-true (no containing-block jump, no portal needed).
+           Desktop z-index stays BELOW the progress rail (30): in the
+           1024–1279 band the expanded strip would otherwise cover the rail's
+           ticks. */
+        .travel-log-back {
+          position: fixed;
+          top: 58px;
+          right: 14px;
+          z-index: 40;
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: var(--tl-accent);
+          color: var(--tl-on-accent);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 14px rgba(27, 167, 201, 0.35);
+          transition: background 0.2s ease, transform 0.25s ease,
+            box-shadow 0.2s ease, width 0.28s ease, border-radius 0.28s ease,
+            color 0.2s ease;
+        }
+        .travel-log-back:hover {
+          background: var(--tl-accent-strong);
+          transform: scale(1.07);
+          box-shadow: 0 6px 18px rgba(27, 167, 201, 0.45);
+        }
+        .travel-log-back:focus-visible {
+          outline: 2px solid rgba(27, 167, 201, 0.6);
+          outline-offset: 3px;
+        }
+        .travel-log-back-label {
+          display: none;
+        }
+        /* <900px the map is full-width and the basemap slider owns the map's
+           top-right corner — drop the button below that row */
+        @media (max-width: 1023px) {
+          .travel-log-back {
+            top: 58px;
+            right: 14px;
+            width: 42px;
+            height: 42px;
+          }
+        }
+        @media (min-width: 1024px) {
+          .travel-log-back {
+            --tl-back-duration: 220ms;
+            --tl-back-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+            top: 0;
+            bottom: 0;
+            right: 0;
+            height: auto;
+            /* v6 (2026-09-26): 48px at rest = 120% of the v5 40px; hover
+               nudges to 58px — enough for a feeling of confirmation, not a
+               protrusion (user 2026-09-26). */
+            width: 48px;
+            z-index: 25;
+            border-radius: 0;
+            background: var(--tl-strip);
+            color: var(--tl-strip-ink);
+            border-left: 1px solid var(--tl-hair);
+            /* SYMMETRIC BOX (v20, 2026-10-24: "未悬浮状态的左箭头的水平对齐
+               还是位置不对"). border-left: 1px with border-box sizing shrinks
+               the CONTENT box to 47px and shifts it 1px right, so the grid
+               column's centre lands at stripCx + 0.5. Both the chevron and
+               the label then centre perfectly INSIDE that column — which is
+               why every previous probe said "centred" (they compared against
+               the column) while the eye compared against the strip and saw
+               an offset. A transparent right border of the same width
+               restores the content box to 46px centred on the strip. */
+            border-right: 1px solid transparent;
+            box-shadow: none;
+            transition: width var(--tl-back-duration) var(--tl-back-ease),
+              background-color var(--tl-back-duration) var(--tl-back-ease),
+              color var(--tl-back-duration) var(--tl-back-ease);
+          }
+          .travel-log-back:hover {
+            width: 58px;
+            background: var(--tl-chip);
+            color: var(--tl-accent-strong);
+            transform: none;
+            box-shadow: none;
+          }
+          /* Crossfade WITHOUT motion (v12, 2026-10-24).
+             History: v9 (dfd956e) anchored both glyphs on one fixed point, so
+             the 26px chevron sat on top of the 20x126px label for the whole
+             220ms (measured 18.9 x 26.0 px intersection) and the label also
+             slid 4px while fading. v10 stacked them in two grid rows — the
+             overlap went away, but the label then started under the ARROW
+             and ran to the viewport top, leaving its ink centre 80px above
+             the strip's centre. v11 added align-self:center and called it
+             centred — it was NOT, and the amount was viewport-dependent
+             (measured ink centre 228.5px above the strip centre at 900px
+             tall, 363.5px at 1440px: the error grew with the window, which
+             is why it looked fine in one probe window and wrong in the
+             browser the user actually reads in).
+             ROOT CAUSE: the base rule sets display:flex + align-items:center.
+             The desktop block changed display to grid but never reset
+             align-items, so every row was sized to its CONTENT and packed
+             into the middle of a 900px-tall strip: rows were 7+126+14 =
+             147px, the grid box only 147px tall, and align-items:center then
+             parked that whole 147px block at the strip's centre. Row 1's
+             centre was therefore 70px above the midline, not on it.
+             FIX: stretch the tracks (no align-items on the grid), so row 1
+             really is the top half. Centring is then GEOMETRY, not a magic
+             offset — the label's centre is the strip's centre at every window
+             size, which is what "按比例居中" should mean. */
+          .travel-log-back {
+            display: grid;
+            grid-template-rows: 1fr 14px 1fr;
+            grid-template-columns: 1fr;
+            align-items: stretch;
+            /* No justify-self on the container: the arrow is the label's
+               sibling in the same column, so centring "the item" there does
+               nothing for the label. The label centres itself with
+               width:fit-content + margin-inline:auto (see .travel-log-back-label),
+               which is what actually moves the INK onto the axis.
+               And do NOT use justify-items here: lightningcss merges a
+               justify-items / align-items pair into place-items and silently
+               reorders the axes, which restores the row-collapsing centring. */
+          }
+          .travel-log-back-arrow {
+            grid-row: 2;
+            grid-column: 1;
+            align-self: center;
+            /* HORIZONTAL centring of the idle chevron (v19, 2026-10-24:
+               "未悬浮状态的左箭头的水平对齐还是位置不对，目前贴左").
+               The SVG is 26px wide in a 57px column and grid items default
+               to justify-self:start, so it sat flush against the strip's left
+               edge — the label was centred but the arrow was not, and since
+               the arrow is what you see at rest, the whole button read as
+               left-aligned. align-self only handles the BLOCK axis (vertical
+               here); the inline axis needs its own declaration. */
+            justify-self: center;
+            pointer-events: none;
+            transition: opacity var(--tl-back-duration) var(--tl-back-ease);
+          }
+          .travel-log-back-label {
+            /* the base rule hides the label with display:none at every
+               width — this block must explicitly re-show it, or the hover
+               crossfade animates an element that never paints (computed
+               opacity reads "1" regardless — v6 shipped with an invisible
+               label, spotted by the user 2026-09-26) */
+            display: block;
+            /* Span ALL THREE tracks, not just row 1.
+               v13 (2026-10-24, after the user reported this twice): putting
+               the label in row 1 and centring it there does NOT centre it on
+               the strip. Measured, and reproduced in a bare test page, so it
+               is the layout's behaviour rather than a stray rule: a
+               vertical-rl box in a 1fr row reported its centre 228.5px ABOVE
+               the strip centre and, worse, the error GREW with the window
+               (183.5px at 720 tall, 363.5px at 1440) — which is why it looked
+               right in one test window and wrong in the browser the user
+               actually reads in.
+               Spanning 1 / span 3 and centring gives offset EXACTLY 0 at every
+               size, because the item's containing block is then the whole
+               strip: its centre is the strip's centre by construction. No
+               magic number, and it survives any window height. It still
+               cannot touch the chevron — the label is capped to the top half
+               by max-height below, which keeps their boxes disjoint. */
+            grid-row: 1 / span 3;
+            grid-column: 1;
+            align-self: center;
+            max-height: calc(50% - 20px);
+            overflow: hidden;
+            /* vertical-lr, NOT vertical-rl (v18, 2026-10-24).
+               THE BUG THE USER KEPT REPORTING, and why every earlier attempt
+               "measured" as fixed: getBoundingClientRect on the LABEL reports
+               the BLOCK's box, and the block was (by construction) 0.5px from
+               the strip's centre — so every probe said "centred". The INK was
+               not. With vertical-rl the line box runs right-to-left, so the
+               single line starts flush against the label's RIGHT edge: the
+               15px-wide glyph column sat at x=1423..1438 in a 58px strip
+               (ink centre 19.5px right of the strip's centre), and the text
+               also ended up hard against the viewport's right edge — exactly
+               what "水平对齐也不对" meant. vertical-lr lays the line from the
+               LEFT edge instead, so the ink starts where the box starts.
+               Note this is a writing-direction issue, not an alignment one:
+               justify-self / text-align can move the BOX, they cannot change
+               which edge the line box starts from. */
+            writing-mode: vertical-lr;
+            /* AND the box must shrink to the glyph column. With the block
+               57px wide (= the whole strip), the line box fills it and has
+               nowhere to go: text-align centres lines inside the line box,
+               the line box fills the block, so the ink stayed 18.5px left.
+               width: fit-content makes the block exactly one glyph column
+               wide, and justify-self: center then puts THAT column on the
+               strip's centre — box centring and ink centring finally agree.
+               (Both numbers were measured, not guessed: 8.5px of padding +
+               15px glyph column = 23.5px from each side of the 58px strip,
+               using the label's own padding so the inset is not hard-coded
+               to today's text length.) */
+            width: fit-content;
+            padding-inline: 8px;
+            text-align: center;
+            /* Auto margins, not justify-self, for the shrunken box. Once the
+               block is size-fit it is also OFFSET-FREE inside its grid area,
+               and justify-self no longer reaches it (measured: box stayed
+               10.5px left). With auto margins the free space is split evenly,
+               which is the same guarantee and does not depend on how the
+               browser classifies a size-fit item. */
+            margin: 0 auto;
+            /* Explicit px, not inherit: the strip's inherited line-height
+               (15.3px x 1.65 ≈ 25px) leaks into the label and inflates the
+               natural height by ~6px, which clipped the bottom glyphs
+               ("to Travel") on a 600px-tall viewport. */
+            font-size: 12px;
+            line-height: 19px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity var(--tl-back-duration) var(--tl-back-ease);
+          }
+          .travel-log-back:hover .travel-log-back-arrow {
+            opacity: 0;
+          }
+          .travel-log-back:hover .travel-log-back-label {
+            opacity: 1;
+          }
+        }
+        /* Click handoff (v9, 2026-09-28 user feedback): faster (0.35→0.25s)
+           and the colour FADES as the sheet expands — it starts at the
+           strip's hover blue (#cfeaf5) and washes out to a very light blue
+           by the time the viewport is covered. The hold before navigation
+           shrinks to match (300ms). */
+        .travel-log-wipe {
+          position: fixed;
+          inset: 0;
+          z-index: 95;
+          background: var(--tl-chip);
+          transform-origin: right center;
+          animation: travel-log-wipe 0.25s ease-in forwards;
+          pointer-events: none;
+        }
+        @keyframes travel-log-wipe {
+          from {
+            transform: scaleX(0);
+            background-color: var(--tl-chip);
+          }
+          55% {
+            background-color: var(--tl-accent-soft-3);
+          }
+          to {
+            transform: scaleX(1);
+            background-color: var(--tl-accent-soft-2);
+          }
+        }
+
+/* Geometry is owned by the shell; variant styles keep their typography. */
+[data-travel-log] { display: flex; min-height: 100vh; --pj-land: var(--log-landing); --pj-band-top: var(--log-band-top); }
+[data-log-kind="journal"] { --tl-map-h-mobile: var(--log-map-height, var(--log-default-map-height)); }
+[data-travel-log] [data-log-map] { width: 46%; position: sticky; top: 0; height: 100vh; }
+.travel-log-back { font-family: var(--font-ui); text-decoration: none; }
+.travel-log-tools { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 4; }
+@media (max-width: 1023px) {
+  [data-travel-log] { flex-direction: column; }
+  [data-travel-log] [data-log-map] { width: 100%; height: var(--log-map-height, var(--log-default-map-height)); transition: none; }
+  [data-log-kind="pilgrimage"] .pj-map-col { --pj-map-h: var(--log-map-height, var(--log-default-map-height)); }
+  .travel-log-tools { right: 14px; gap: 6px; }
+}

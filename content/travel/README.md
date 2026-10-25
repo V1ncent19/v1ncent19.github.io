@@ -26,15 +26,19 @@ once emptied `public/data/travel/ptes-2025/`. See the script header.)
 
 `lib/travel/trips.ts` sweeps this directory for `card.json` — there is no
 central registry to edit. Adding a trip means: create the folder with a
-`card.json`, add `app/travel/<id>/page.tsx` + the `/zh` mirror. Cards are
+`card.json`, a definition in `lib/travel/log/definitions/<id>.ts`, and thin
+`app/travel/<id>/page.tsx` + `/zh` mirror routes. Cards are
 sorted by `start` (oldest first, `id` as tiebreak) so the order is stable.
 
-Two optional tile fields worth knowing (2026-10-17):
+Optional tile fields worth knowing (updated 2026-10-25):
 
-- `pinned: true` — pin the tile to the front of "Stories & frames". Default is
-  **false**: an unpinned trip merges into the photo timeline at its `start`
-  date, which is what a chronological wall should do. Only ptes-2025 is pinned;
-  just-because rides the timeline.
+- `pinned: true` — pin the tile to the front of "Stories & frames". Travel logs
+  now default to **true**: both ptes-2025 and just-because / Anitabi are featured
+  navigation entries ahead of the photo stream, independent of the photo
+  Featured toggle and sort mode. New travel logs receive this default too.
+- `showPinnedBadge: true` — show the visible pin icon independently of this
+  placement. Currently only ptes-2025 enables it; Anitabi stays featured
+  without the icon. New trips default to no visible pin icon.
 - `cardCta` / `cardMeta` / `cardFacts` — override the hub tile's CTA / eyebrow /
   stat line when the trip-log defaults would misdescribe the trip. Leave them
   out and every trip reads "Read the log" (中文 "阅读旅行志"), which is the
@@ -42,9 +46,15 @@ Two optional tile fields worth knowing (2026-10-17):
 
 ## The two shapes a trip can take
 
-Trips are **not** forced into one layout, because the two pages load their data
-completely differently — and that difference is forced by payload size, not by
-taste.
+Both shapes share the travel-log shell, chapter navigation, toolbar, transitions
+and mobile split. Their narrative rendering, GPS sampling and camera policies
+remain independent. Loading strategy follows payload size and does not determine
+page layout. See `structure_file/FEATURE_TRAVEL_LOG.md` for the framework and
+adding a new trip.
+
+Per-trip imports live in `lib/travel/log/definitions/<id>.ts`. The two thin
+route files select that definition and a language; shared components never
+import a particular trip's content.
 
 ### Trip-log shape (ptes-2025) — split by who edits the file
 
@@ -73,7 +83,7 @@ const MIRRORED = new Set(["ptes-2025/track.json"]);
 **The split follows "who edits it", not "what type of file it is".**
 
 - **Hand-written → imported.** `trip`/`scenes`/`attractions`/`diagnostics` are
-  ~115 KB together. `TravelLog` imports them, they land in the JS bundle, and
+  ~115 KB together. The journal definition imports them, they land in the JS bundle, and
   they need no URL and no copy — so there is exactly one copy and it is the one
   you open to edit.
 - **Machine output → fetched.** `track.json` is 1639 KB of GPS scrape output.
@@ -131,7 +141,7 @@ public/assets/photos/pilgrimage/just-because/
 ```
 
 The whole rendered payload is ~42 KB, so the page imports `page.json` directly
-and `loadPilgrimage()` validates its shape at build time — a malformed generator
+and `lib/travel/log/validate.ts` validates its shape at build time — a malformed generator
 run fails the build instead of shipping an empty map.
 
 **`page.json` is the one file here that mixes generated and hand-written

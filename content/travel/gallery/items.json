@@ -1184,6 +1184,30 @@
     "height": 1260
   },
   {
+    "id": "img-6308",
+    "source": "IMG_6308.jpeg",
+    "date": "2022-10-31",
+    "place": {
+      "en": "Beijing, China",
+      "zh": "中国-北京"
+    },
+    "placeLocal": {
+      "en": "Tsinghua University",
+      "zh": "清华大学"
+    },
+    "lat": 40.000933333333336,
+    "lon": 116.31696944444444,
+    "country_code": "",
+    "alt": "",
+    "featured": true,
+    "color": "",
+    "badge": "",
+    "thumb": "/assets/photos/gallery/thumb/img-6308.webp",
+    "large": "/assets/photos/gallery/large/img-6308.webp",
+    "width": 1001,
+    "height": 1680
+  },
+  {
     "id": "img-6309",
     "source": "IMG_6309.jpeg",
     "date": "2022-10-31",

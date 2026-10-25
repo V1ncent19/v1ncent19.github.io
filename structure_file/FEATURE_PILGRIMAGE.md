@@ -11,6 +11,10 @@
 
 ---
 
+## 公共框架接入（2026-10-24）
+
+公共部分以 `FEATURE_TRAVEL_LOG.md` 为准。路由通过 `lib/travel/log/definitions/just-because.ts` 加载并校验数据，再交给 `TravelLogPage`；`loadPilgrimage()` 已收拢至 `lib/travel/log/validate.ts`，不再在两个语言路由中复制。`PilgrimageLog` 继续负责 active/open/dismissed 与地图→正文请求，布局、幕布与返回由 `TravelLogShell` 负责。原 `PilgrimageRail` 已替换为公共 `ChapterNavigation`，直接消费同一 activeStopId。相机与照片正文逻辑保留独立。
+
 ## 0. 现状速览
 
 | 项 | 值 |
@@ -195,7 +199,7 @@ npm run pilgrimage:derive -- --limit 5 # 冒烟
 
 `overview` / `outro` 同形状：`{ _placeholder, title, text }`。`interludes[]` 可选（章节之间的插页）。
 
-**读法**：`lib/travel/pilgrimage.ts` 的 `loadPilgrimage()` 做显式形状校验 —— JSON import 推断出的是 `number[][]` 而非 `[number,number][]`，**不能硬 cast**；另外校验 `routeIdx` 存在。
+**读法**：`lib/travel/log/validate.ts` 的 `loadPilgrimage()` 做显式形状校验 —— JSON import 推断出的是 `number[][]` 而非 `[number,number][]`，**不能硬 cast**；另外校验 `routeIdx` 存在。
 
 ### 4.2 `public/data/travel/just-because/anitabi-212278.json`（快照，入库）
 
@@ -397,25 +401,27 @@ type CameraMode = "follow" | "overview" | "manual";
 
 ## 附录 D — 开屏幕布（entry curtain，2026-10-24 新增）
 
-两页共用同一套机制：进入页面时屏幕右侧有一条竖窄蓝带，等数据/地图就绪后**从右往左退场**，
-是「点返回按钮后蓝幕从右拉出」的**逆过程**。用户原话即按此描述提的需求。
+两页共用公共外壳中的同一套机制：先以全屏蓝色幕布覆盖页面，等数据/地图就绪后，幕布固定右边缘缩回，**从左向右揭开页面**。返回按钮则从右向左铺满视口。
 
-| 项 | ptes（`/travel/ptes-2025`） | anitabi（`/travel/just-because`） |
-|---|---|---|
-| body 启动类 | `tl-veil-boot` | `pj-boot` |
-| 释放类 | `tl-veil-open` | `pj-veil-open` |
-| 起始带宽 | `--veil-band: 0.055` | `--veil-band: 0.08` |
-| 就绪信号 | `<TravelStory>` 拿到 `trip` + `track` | `PilgrimageMap` 的 `onMapReady` |
-| 退场动画 | `tl-entry-open` 0.46s | `pj-entry-open` 0.5s |
+**此前“右侧竖窄蓝带”的实现已作废**：等待时只覆盖 5%–8%，并不符合全屏开幕；兜底还引用了未定义的关键帧。本轮同时修复了 Next Link 站内导航不执行解析期脚本的问题。
+
+| 项 | 两类日志共用 |
+|---|---|
+| body 启动/释放类 | journal: `tl-veil-boot` / `tl-veil-open`；pilgrimage: `pj-boot` / `pj-veil-open` |
+| 初始覆盖 | `inset: 0; transform: scaleX(1); transform-origin: right center` |
+| 正常收幕 | `travel-log-entry-open`，0.46s，从 scaleX(1) 到 scaleX(0) |
+| 兜底收幕 | `travel-log-entry-fallback`，延迟 3.5s，0.46s；等待和结束均保持对应关键帧 |
+| 启动时机 | 完整加载用解析期脚本；Next Link 导航用 `TravelLogShell` 的 `useLayoutEffect`，在绘制前挂类 |
+| 收尾 | 只认 `::before` 与两个幕布动画名；减少动态效果时不启动，运行时切换到 reduce 也立即清理 |
 
 **四条硬约束，动了就坏：**
 
-1. **幕布必须是 `body::before` 伪元素 + 解析期脚本加的类，绝不能是 React 节点。**
+1. **幕布必须是 `body::before` 伪元素，完整加载由解析期脚本加类，站内跳转由 layout effect 加类，绝不能是 React 节点。**
    水合前插进 DOM 的节点会撞 React 19（#418 → 重渲染 → 节点被删）；用 React
    渲染的 `position: fixed` 元素会挂到 boot 盒子上、够不到视口。
 2. **启动类只在 `prefers-reduced-motion: reduce` 之外才加**（`page.tsx` 里内联脚本判断），
    并且 CSS 侧对该媒体查询直接 `display: none` —— 幕布是纯装饰，不能挡残障用户的正文。
-3. **每个动画状态用独立的 keyframes 名**（`*-entry-pull` / `*-entry-open`）。
+3. **每个动画状态用独立的 keyframes 名**（`travel-log-entry-fallback` / `travel-log-entry-open`）。
    复用同一个名字只会给一个已跑完的动画**重新计时**，画面完全不动（v13 踩过）。
 4. **清理监听只认 `pseudoElement === "::before"` 且名字匹配的那两个动画**，
    否则页面上任何其它动画结束都会把类摘掉。

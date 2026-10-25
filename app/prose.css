@@ -91,10 +91,13 @@
   font-weight: 600;
 }
 
-/* Inline code chips (KaTeX output uses spans, so it is not affected). */
+/* Inline code chips (KaTeX output uses spans, so it is not affected).
+ * 0.9em landed at 13.77 px inside the 15.3 px body; 0.93em keeps the chip a
+ * visible step below the prose while the mono face stays readable (2026-10-25,
+ * raised together with the small-type tier in globals.css). */
 .prose code {
   font-family: var(--font-mono);
-  font-size: 0.84em;
+  font-size: 0.93em;
   background: var(--surface-tint);
   border-radius: var(--radius-sm);
   padding: 0.12em 0.35em;

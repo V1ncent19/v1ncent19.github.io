@@ -54,7 +54,7 @@ export function BlogPostView({ post }: { post: BlogPost }) {
         <header className="mt-6 border-b border-line pb-8">
           <div className="ui-text flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${tone.chip}`}
+              className={`post-category-tag inline-flex items-center gap-1.5 rounded-full ${tone.chip}`}
             >
               <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
               {s.blog.category[post.category]}

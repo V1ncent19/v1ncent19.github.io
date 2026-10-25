@@ -1,0 +1,111 @@
+/* Photo tiles only. Keep masonry FLIP's transform separate from hover's translate. */
+.gallery-photo-tile {
+  translate: 0 var(--photo-lift, 0px);
+  border-color: var(--photo-tile-border, var(--line));
+  box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+    var(--photo-tile-shadow, var(--shadow-sm, 0 1px 3px rgb(0 0 0 / 0.1)));
+  transition: translate var(--photo-surface-time, 200ms) var(--ease),
+    border-color var(--photo-surface-time, 200ms) var(--ease),
+    box-shadow var(--photo-surface-time, 200ms) var(--ease);
+}
+.gallery-photo-tile .gallery-photo-image {
+  transform: scale(var(--photo-zoom, 1));
+  transition: transform var(--photo-image-time, 220ms) var(--ease);
+}
+.gallery-photo-tile .gallery-photo-shade {
+  opacity: var(--photo-shade, 0.5);
+  transition: opacity var(--photo-shade-time, 180ms) var(--ease);
+}
+.gallery-photo-tile .gallery-photo-caption {
+  border-color: var(--photo-caption-border, rgb(255 255 255 / 0.15));
+  background-color: var(--photo-caption-bg, rgb(0 0 0 / 0.45));
+  border-radius: var(--photo-caption-radius, var(--radius-lg));
+  box-shadow: var(--photo-caption-shadow, var(--shadow-sm, 0 1px 3px rgb(0 0 0 / 0.1)));
+  transition: background-color var(--photo-surface-time, 200ms) var(--ease),
+    border-color var(--photo-surface-time, 200ms) var(--ease),
+    border-radius var(--photo-surface-time, 200ms) var(--ease),
+    box-shadow var(--photo-surface-time, 200ms) var(--ease);
+}
+.gallery-photo-tile .gallery-photo-rest {
+  display: grid;
+  grid-template-rows: var(--photo-rest-rows, 1fr);
+  transition: grid-template-rows var(--photo-surface-time, 200ms) var(--ease);
+}
+.gallery-photo-tile .gallery-photo-detail {
+  display: grid;
+  grid-template-rows: var(--photo-detail-rows, 0fr);
+  transition: grid-template-rows var(--photo-surface-time, 200ms) var(--ease);
+}
+.gallery-photo-tile .gallery-photo-rest-text {
+  opacity: var(--photo-rest-opacity, 1);
+  transition: opacity 100ms linear var(--photo-rest-delay, 70ms);
+}
+.gallery-photo-tile .gallery-photo-detail-text {
+  opacity: var(--photo-detail-opacity, 0);
+  transform: translateY(var(--photo-detail-offset, 4px));
+  transition: opacity var(--photo-text-time, 100ms) ease-out var(--photo-text-delay, 0ms),
+    transform var(--photo-text-move-time, 160ms) var(--ease) var(--photo-text-delay, 0ms);
+}
+
+/* One expanded appearance for keyboard and mouse; touch keeps tap-to-lightbox. */
+.gallery-photo-tile:focus-visible {
+  --photo-lift: -2px;
+  --photo-zoom: 1.03;
+  --photo-tile-border: var(--line-strong);
+  --photo-tile-shadow: var(--shadow-lift);
+  --photo-caption-bg: var(--surface);
+  --photo-caption-border: var(--line);
+  --photo-caption-radius: var(--radius-xl, 0.75rem);
+  --photo-caption-shadow: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
+  --photo-rest-rows: 0fr;
+  --photo-detail-rows: 1fr;
+  --photo-rest-opacity: 0;
+  --photo-rest-delay: 0ms;
+  --photo-detail-opacity: 1;
+  --photo-detail-offset: 0px;
+  --photo-text-delay: 70ms;
+  --photo-text-time: 190ms;
+  --photo-text-move-time: 210ms;
+  --photo-surface-time: 280ms;
+  --photo-image-time: 450ms;
+  --photo-shade: 0.8;
+  --photo-shade-time: 260ms;
+}
+@media (hover: hover) and (pointer: fine) {
+  .gallery-photo-tile:hover {
+    --photo-lift: -2px;
+    --photo-zoom: 1.03;
+    --photo-tile-border: var(--line-strong);
+    --photo-tile-shadow: var(--shadow-lift);
+    --photo-caption-bg: var(--surface);
+    --photo-caption-border: var(--line);
+    --photo-caption-radius: var(--radius-xl, 0.75rem);
+    --photo-caption-shadow: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
+    --photo-rest-rows: 0fr;
+    --photo-detail-rows: 1fr;
+    --photo-rest-opacity: 0;
+    --photo-rest-delay: 0ms;
+    --photo-detail-opacity: 1;
+    --photo-detail-offset: 0px;
+    --photo-text-delay: 70ms;
+    --photo-text-time: 190ms;
+    --photo-text-move-time: 210ms;
+    --photo-surface-time: 280ms;
+    --photo-image-time: 450ms;
+    --photo-shade: 0.8;
+    --photo-shade-time: 260ms;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-photo-tile { translate: none; transition: none; }
+  .gallery-photo-tile .gallery-photo-image,
+  .gallery-photo-tile .gallery-photo-detail-text { transform: none; }
+  .gallery-photo-tile .gallery-photo-image,
+  .gallery-photo-tile .gallery-photo-shade,
+  .gallery-photo-tile .gallery-photo-caption,
+  .gallery-photo-tile .gallery-photo-rest,
+  .gallery-photo-tile .gallery-photo-detail,
+  .gallery-photo-tile .gallery-photo-rest-text,
+  .gallery-photo-tile .gallery-photo-detail-text { transition: none; }
+}

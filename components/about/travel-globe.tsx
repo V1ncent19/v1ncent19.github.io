@@ -684,7 +684,7 @@ export function TravelGlobe({
           at the hot dot and toggles opacity (shared .map-tip treatment). */}
       <span
         ref={tipRef}
-        className="map-tip ui-text rounded-lg border border-line bg-surface px-2.5 py-1 text-[11px] font-medium text-ink shadow-md"
+        className="badge-text map-tip ui-text rounded-lg border border-line bg-surface px-2.5 py-1 font-medium text-ink shadow-md"
         style={{ opacity: 0 }}
       >
         {hotPoint?.name}

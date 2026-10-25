@@ -1,12 +1,12 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { RefObject } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import type { PilgrimageData } from "@/lib/travel/pilgrimage";
 import { CHAPTER_END, CHAPTER_START } from "@/lib/travel/pilgrimage";
+import { readingPanel } from "@/lib/travel/log/reading-geometry";
 import { MAP_SPLIT_EVENT } from "@/lib/travel/map-split";
-import { chapterAtFraction } from "@/lib/travel/scrub-chapters";
-import { useScrubTrack } from "@/lib/travel/use-scrub-track";
+import ChapterNavigation from "./log/ChapterNavigation";
+import { navigateToChapter } from "@/lib/travel/log/navigation";
 
 /**
  * Pilgrimage story column.
@@ -31,6 +31,7 @@ interface Props {
    *  is page copy rather than map UI (a zh mirror must not show an English
    *  instruction, and an en page must not show a Chinese one). */
   lang?: "en" | "zh";
+  activeStopId: string | null;
 }
 
 export default function PilgrimageStory({
@@ -39,6 +40,7 @@ export default function PilgrimageStory({
   focusStopId,
   focusNonce,
   lang = "en",
+  activeStopId,
 }: Props) {
   const { stops, overview, outro, interludes = [] } = data;
   /** The scrolling column. Every lookup goes through this element rather than
@@ -99,34 +101,7 @@ export default function PilgrimageStory({
    * Read live, on every call: the column moves when the layout settles, when
    * the phone's address bar collapses, and when the sticky map re-frames.
    */
-  const readPanel = () => {
-    const vh = window.innerHeight;
-    const col = containerRef.current;
-    const r = col ? col.getBoundingClientRect() : null;
-    if (!r || r.height < 1) return { top: 0, bottom: vh, height: vh };
-
-    // Visible span of the story column itself (clamped to the viewport). Once
-    // the reader has scrolled into it this is the whole viewport; before that
-    // it is the part below the map.
-    const colVisibleTop = Math.max(0, r.top);
-    const colVisibleBottom = Math.min(vh, r.bottom);
-
-    // The sticky map's bottom edge. It is 0 when the map is a full-height
-    // DESKTOP column that the story sits BESIDE rather than under — in which
-    // case subtracting it would leave an empty band and we keep the viewport.
-    const mapCol = containerRef.current?.closest(".pj-page")?.querySelector(".pj-map-col");
-    const mr = mapCol ? mapCol.getBoundingClientRect() : null;
-    const mapBottom = mr ? Math.max(0, Math.min(vh, mr.bottom)) : 0;
-    // Only treat the map as an overlay when it actually covers the top of the
-    // viewport AND leaves usable room below (the mobile sticky band). A
-    // full-height column (desktop) leaves none, so it is not an overlay.
-    const covered = mapBottom > 0 && mapBottom < vh - 120 ? mapBottom : 0;
-
-    const top = Math.max(colVisibleTop, covered);
-    const bottom = colVisibleBottom;
-    if (bottom - top < 120) return { top: 0, bottom: vh, height: vh };
-    return { top, bottom, height: Math.max(1, bottom - top) };
-  };
+  const readPanel = () => readingPanel(containerRef.current);
 
   useEffect(() => {
     // Query the DOM rather than trusting cached refs. `ref={register(id)}`
@@ -289,7 +264,7 @@ export default function PilgrimageStory({
     // section's own box against the CURRENT layout at scroll time, applies
     // `scroll-margin-top` from CSS (so the sticky map and any sticky header
     // stay clear), and exposes an `end` event. No formula, nothing to drift.
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    navigateToChapter(containerRef.current, focusStopId, "pilgrimage");
 
     let settled = false;
     let raf = 0;
@@ -403,13 +378,13 @@ export default function PilgrimageStory({
    *  range, biased by the reading band so the tick lights up when the chapter
    *  ARRIVES in the band rather than when it crosses the very top. */
   const railTicks = useMemo(() => {
-    const marks: { id: string; label: string }[] = [
-      { id: CHAPTER_START, label: lang === "zh" ? "开场" : "Opening" },
+    const marks: { id: string; sectionId: string; label: string }[] = [
+      { id: CHAPTER_START, sectionId: CHAPTER_START, label: lang === "zh" ? "开场" : "Opening" },
       ...stops.map((s, i) => ({
-        id: s.id,
+        id: s.id, sectionId: s.id,
         label: `${stopNo(i)} ${s.anitabi?.name ?? (lang === "zh" ? "圣地巡礼地点" : "Anitabi spot")}`,
       })),
-      { id: CHAPTER_END, label: lang === "zh" ? "完结" : "Finale" },
+      { id: CHAPTER_END, sectionId: CHAPTER_END, label: lang === "zh" ? "完结" : "Finale" },
     ];
     return marks;
   }, [stops, lang]);
@@ -425,7 +400,7 @@ export default function PilgrimageStory({
             for the finale (see CHAPTER_START / CHAPTER_END in PilgrimageMap).
             Before this, both blocks reported `null` and the line simply froze
             wherever the neighbouring photo had left it. */}
-        <section className="pj-overview" data-pj-stop={CHAPTER_START}>
+        <section className="pj-overview" data-pj-stop={CHAPTER_START} data-log-section={CHAPTER_START}>
           <p className="pj-kicker">Anitabi · 圣地巡礼</p>
           <h1>{data.title}</h1>
           <p className="pj-overview-meta">
@@ -500,7 +475,7 @@ export default function PilgrimageStory({
             ))}
             <section
               className="pj-stop"
-              data-pj-stop={s.id}
+              data-pj-stop={s.id} data-log-section={s.id}
             >
               <div className="pj-stop-head">
                 <span className="pj-stop-no">{stopNo(i)}</span>
@@ -533,7 +508,7 @@ export default function PilgrimageStory({
         ))}
 
         {/* ---- finale ---- */}
-        <section className="pj-outro" data-pj-stop={CHAPTER_END}>
+        <section className="pj-outro" data-pj-stop={CHAPTER_END} data-log-section={CHAPTER_END}>
           <p className="pj-kicker">Finale</p>
           <h2 className="pj-outro-title">{outro.title || "完结撒花 🎉"}</h2>
           <p className="pj-outro-line">
@@ -564,423 +539,7 @@ export default function PilgrimageStory({
           Desktop only (≥1024); below that the same component renders the
           horizontal bar pinned to the viewport bottom, exactly as TravelNav
           does for ptes. */}
-      <PilgrimageRail marks={railTicks} scopeRef={containerRef} lang={lang} />
+      <ChapterNavigation chapters={railTicks} scopeRef={containerRef} activeId={activeStopId} kind="pilgrimage" lang={lang} />
     </div>
-  );
-}
-
-/* ------------------------------------------------------------ progress rail */
-
-/**
- * Scroll progress + chapter jumps — the pilgrimage page's counterpart to the
- * trip log's `TravelNav`, deliberately the same object: 4px track, blue fill
- * at 55% opacity, 12px ticks with a tooltip, a monospace percentage head and a
- * back-to-top foot button. A reader moving between /travel/ptes-2025 and
- * /travel/just-because should recognise it instantly.
- *
- * Two layouts, same as ptes:
- *   ≥1024 — vertical rail in the story gutter, head = percentage, foot =
- *           back-to-top. Its x is MEASURED from the story column every frame
- *           (ptes learned this the hard way: hand-computed CSS constants broke
- *           silently once the pane width changed).
- *   <1024 — horizontal bar fixed to the viewport BOTTOM. ptes moved it there
- *           because a top bar overlaid the map's controls; on this page the
- *           map owns the top 58vh, so the same reasoning applies twice over.
- *
- * Ticks are positioned from the real DOM offsets of the sections, re-measured
- * on resize and whenever the document's height changes (36 lazy composites
- * land continuously, so a one-shot measure would drift).
- */
-function PilgrimageRail({
-  marks,
-  scopeRef,
-  lang,
-}: {
-  /** chapter ids in reading order — the SAME ids the sections carry */
-  marks: { id: string; label: string }[];
-  /** the scrolling column that owns the [data-pj-stop] sections */
-  scopeRef: RefObject<HTMLDivElement | null>;
-  lang: "en" | "zh";
-}) {
-  const railRef = useRef<HTMLDivElement | null>(null);
-  const boxRef = useRef<HTMLDivElement | null>(null);
-  const railFillRef = useRef<HTMLDivElement | null>(null);
-  const barTrackRef = useRef<HTMLDivElement | null>(null);
-  const barFillRef = useRef<HTMLDivElement | null>(null);
-  const pctRef = useRef<HTMLSpanElement | null>(null);
-  const topBtnRef = useRef<HTMLButtonElement | null>(null);
-  /** id → position along the track, 0…100 (%). */
-  const [ticks, setTicks] = useState<{ id: string; label: string; at: number }[]>([]);
-  /** The chapter currently in the reading band — lit tick. */
-  const [activeId, setActiveId] = useState<string | null>(null);
-  /** v16 (2026-10-24 user request): the chapter index drawer. Same object and
-   *  the same interaction as the trip log's ☰ ("anitabi页面也可以有一个目录按钮，
-   *  操作逻辑与ptes相同"): tap to open a right-hand sheet listing every chapter,
-   *  tap a row to jump to it, tap the scrim or press Escape to close. */
-  const [open, setOpen] = useState(false);
-
-  /* measure: section top → percentage of the scrollable range.
-     The 0.475 bias is ptes' constant (TravelNav), and it is right for the
-     reason it was right there: a section is "reached" when its top crosses the
-     middle of the viewport, not when the document has scrolled that far. */
-  useEffect(() => {
-    const measure = () => {
-      const root = scopeRef.current;
-      if (!root) return;
-      const vh = window.innerHeight;
-      // The band has to follow the DRAGGABLE split (2026-10-24): on a phone
-      // the map owns y = 0..mapH, so the reading band's centre is
-      // mapH + 0.35 x (vh - mapH), not 0.475 x vh. At the default 58vh the two
-      // agree to within half a percent; once the reader drags the split 150px
-      // they diverge by ~100px, which is enough for a neighbour's tick to light
-      // up instead of the chapter being read. Measured, never assumed.
-      const mapCol = root.closest(".pj-page")?.querySelector(".pj-map-col");
-      const mapH = mapCol
-        ? Math.min(vh, Math.max(0, mapCol.getBoundingClientRect().height))
-        : 0;
-      // A full-height column (desktop) is not an overlay: keep the viewport rule.
-      const stacked = mapH > 0 && mapH < vh - 120;
-      const bandY = stacked ? mapH + 0.35 * (vh - mapH) : vh * 0.475;
-      const max = Math.max(1, document.documentElement.scrollHeight - vh);
-      const next: { id: string; label: string; at: number }[] = [];
-      for (const m of marks) {
-        const el = root.querySelector<HTMLElement>(`[data-pj-stop="${CSS.escape(m.id)}"]`);
-        if (!el) continue;
-        const y = el.getBoundingClientRect().top + window.scrollY;
-        next.push({
-          id: m.id,
-          label: m.label,
-          at: Math.min(100, Math.max(0, ((y - bandY) / max) * 100)),
-        });
-      }
-      setTicks(next);
-    };
-    measure();
-    // Two signals, because neither alone is enough: ResizeObserver catches the
-    // lazy composites arriving (they change body height without a scroll), and
-    // the resize listener catches the viewport (which changes `max`).
-    const ro = new ResizeObserver(measure);
-    ro.observe(document.body);
-    window.addEventListener("resize", measure);
-    // A drag on the licence strip changes the map height WITHOUT resizing the
-    // body, so neither signal above fires; map-split.tsx dispatches this.
-    window.addEventListener(MAP_SPLIT_EVENT, measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-      window.removeEventListener(MAP_SPLIT_EVENT, measure);
-    };
-  }, [marks, scopeRef]);
-
-  /* per-frame: fill height, percentage text, read ticks, and the rail's x.
-     Deliberately imperative — this runs 60×/s and must not re-render React. */
-  useEffect(() => {
-    let raf = 0;
-    const step = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const f = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-      if (railFillRef.current) railFillRef.current.style.height = `${(f * 100).toFixed(2)}%`;
-      if (barFillRef.current) barFillRef.current.style.width = `${(f * 100).toFixed(2)}%`;
-      if (pctRef.current) pctRef.current.textContent = `${Math.round(f * 100)}%`;
-      topBtnRef.current?.classList.toggle("lit", f >= 0.98);
-
-      // A tick is "read" once the reader is past it. Recomputed every frame
-      // rather than stored in state: React would wipe the imperative classes
-      // on any unrelated re-render.
-      for (const container of [railRef.current, barTrackRef.current]) {
-        if (!container) continue;
-        // .pjr-mark are graduations, not chapter buttons — skip them, or the
-        // walk would tag each one `read`.
-        for (const el of Array.from(container.querySelectorAll<HTMLElement>(".pjr-tick"))) {
-          el.classList.toggle("read", parseFloat(el.dataset.at ?? "0") <= f * 100);
-        }
-      }
-
-      // Which chapter owns the band — the same band the observer and the
-      // landing offset use, so the lit tick always agrees with the lit section.
-      //
-      // The band is NOT a fixed slice of the viewport on a stacked layout: the
-      // sticky map owns the top of the screen and the reader can drag where it
-      // ends (lib/travel/map-split.tsx publishes that as --pj-band-top on the
-      // page root). Reading `vh * 0.35` here lit the wrong tick as soon as the
-      // split moved — measured: dragging the map from 58vh to 44vh left the
-      // rail highlighting the NEXT chapter, because the real band had moved up
-      // 78px while this window had not. On desktop the column is full-height,
-      // the hook writes nothing, and the fallback is the original 35%.
-      const root = scopeRef.current;
-      if (root) {
-        const vh = window.innerHeight;
-        const declaredBandTop = parseFloat(
-          getComputedStyle(root).getPropertyValue("--pj-band-top"),
-        );
-        const bandTop = Number.isFinite(declaredBandTop)
-          ? declaredBandTop
-          : vh * 0.35;
-        // The band is the first 65% of what is left below the map, which on a
-        // full-height column is 0.35vh…0.65vh — the original numbers.
-        const bandBottom = bandTop + (vh - bandTop) * 0.65;
-        let best: { id: string; score: number } | null = null;
-        for (const el of Array.from(root.querySelectorAll<HTMLElement>("[data-pj-stop]"))) {
-          const r = el.getBoundingClientRect();
-          const overlap = Math.min(r.bottom, bandBottom) - Math.max(r.top, bandTop);
-          if (overlap > 0 && (!best || overlap > best.score)) {
-            best = { id: el.dataset.pjStop ?? "", score: overlap };
-          }
-        }
-        // Only setState on an actual change — 60 setState/s would be a loop.
-        const nextActive = best?.id ?? null;
-        setActiveId((cur) => (cur === nextActive ? cur : nextActive));
-      }
-
-      // Rail x: mirror ptes' plan-A measurement. The axis sits in the gutter
-      // to the RIGHT of the text, so anchor to the column's right edge minus
-      // its padding, then step out by half the rail width. Measured, not
-      // guessed, so it survives any future change to .pj-inner's max-width.
-      if (boxRef.current && window.innerWidth >= 1024) {
-        const col = scopeRef.current;
-        if (col) {
-          const r = col.getBoundingClientRect();
-          const centre = r.right - 12;
-          const vw = document.documentElement.clientWidth || window.innerWidth;
-          const right = Math.max(10, vw - centre - 2);
-          boxRef.current.style.right = `${right.toFixed(1)}px`;
-        }
-      }
-
-      raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [scopeRef]);
-
-  const jumpTo = (id: string) => {
-    const el = scopeRef.current?.querySelector<HTMLElement>(
-      `[data-pj-stop="${CSS.escape(id)}"]`,
-    );
-    el?.scrollIntoView({ behavior: "smooth", block: "start" });
-    setOpen(false);
-  };
-
-  /* Mobile slider scrub (2026-10-24) — the trip log's .tnav-scrub, mirrored.
-     "进度条还是不要刻度了，做成一个普通的可拖动进度条就可以。不过在拖动的时候，
-     端点上可以浮现出一个方框，标示拖到的是哪个章节。"
-     Fraction is in the SCROLL domain, matching how the bar's fill is drawn.
-     behavior:"instant" is required: a smooth scroll restarted on every
-     pointermove never converges on the finger's position. */
-  const scrubTo = useCallback((fraction: number) => {
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    if (max <= 0) return;
-    window.scrollTo({ top: fraction * max, behavior: "instant" });
-  }, []);
-
-  const scrubBoxRef = useRef<HTMLDivElement>(null);
-  const scrubBoxTextRef = useRef<HTMLSpanElement>(null);
-
-  /** Same shape as the trip log's marks so chapterAtFraction can read both. */
-  const scrubMarks = useMemo(
-    () => ticks.map((t) => ({ no: t.id, left: t.at })),
-    [ticks]
-  );
-
-  /** DOM write, not state — the frame loop owns .read/.active here and a
-   *  re-render per pointermove would fight it. */
-  const paintScrub = useCallback(
-    (fraction: number) => {
-      const box = scrubBoxRef.current;
-      const track = barTrackRef.current;
-      const mark = chapterAtFraction(scrubMarks, fraction);
-      if (!box || !track || !mark) return;
-      const hit = ticks.find((t) => t.id === mark.no);
-      if (scrubBoxTextRef.current) scrubBoxTextRef.current.textContent = hit?.label ?? "";
-      const w = track.getBoundingClientRect().width;
-      // Keep the box inside the bar's rounded ends.
-      const inset = Math.min(52, w / 2);
-      box.style.left = `${Math.min(w - inset, Math.max(inset, fraction * w)).toFixed(1)}px`;
-      box.classList.add("is-on");
-    },
-    [scrubMarks, ticks]
-  );
-
-  const scrub = useScrubTrack({
-    onScrub: (f) => {
-      scrubTo(f);
-      paintScrub(f);
-    },
-    onRelease: (f) => {
-      scrubTo(f);
-      scrubBoxRef.current?.classList.remove("is-on");
-    },
-  });
-
-  // Escape closes the index sheet (same contract as the trip log's drawer).
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  const toTop = () => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
-  };
-
-  const renderTicks = (vertical: boolean) =>
-    ticks.map((t) => (
-      <button
-        key={t.id}
-        type="button"
-        className={
-          "pjr-tick" +
-          (t.id === activeId ? " active" : "") +
-          (!vertical ? (t.at > 88 ? " edge-r" : t.at < 12 ? " edge-l" : "") : "")
-        }
-        style={vertical ? { top: `${t.at}%` } : { left: `${t.at}%` }}
-        data-at={t.at}
-        onClick={() => jumpTo(t.id)}
-        aria-label={t.label}
-      >
-        <span className="pjr-tip">{t.label}</span>
-      </button>
-    ));
-
-  return (
-    <>
-      {/* vertical rail (desktop) */}
-      <div
-        ref={boxRef}
-        className="pjr-rail"
-        role="navigation"
-        aria-label={lang === "zh" ? "阅读进度" : "Reading progress"}
-      >
-        <span className="pjr-pct" ref={pctRef}>
-          0%
-        </span>
-        <div className="pjr-rail-track" ref={railRef}>
-          <div className="pjr-fill pjr-rail-fill" ref={railFillRef} />
-          {renderTicks(true)}
-        </div>
-        <button
-          type="button"
-          className="pjr-top"
-          ref={topBtnRef}
-          onClick={toTop}
-          aria-label={lang === "zh" ? "回到顶部" : "Back to top"}
-          title={lang === "zh" ? "回到顶部" : "Back to top"}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="14"
-            height="14"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="m6 14 6-6 6 6" />
-          </svg>
-        </button>
-      </div>
-
-      {/* horizontal bar (phone / tablet), pinned to the viewport bottom */}
-      <div
-        className="pjr-bar"
-        role="navigation"
-        aria-label={lang === "zh" ? "阅读进度" : "Reading progress"}
-      >
-        <div className="pjr-track" ref={barTrackRef}>
-          {/* Graduations: DESKTOP RAIL ONLY since 2026-10-24. On a phone the
-              bar is a plain slider — "进度条还是不要刻度了" — so the media
-              query below hides .pjr-mark and .pjr-tick together. They stay in
-              the DOM because the vertical rail reuses the same arrays. */}
-          {ticks.map((t) => (
-            <span
-              key={t.id}
-              className="pjr-mark"
-              /* round() snaps the percentage to a whole CSS pixel before the
-                 rule is drawn — without it the edge lands on a fractional
-                 device pixel and the ruler shows marks of differing width.
-                 See .tnav-mark in TravelNav.tsx for the measurements. */
-              style={{
-                left: `round(${Math.min(99.9, Math.max(0, t.at))}%, 1px)`,
-              }}
-              aria-hidden="true"
-            />
-          ))}
-          <div className="pjr-fill" ref={barFillRef} />
-          {/* Draggable surface (the whole tube). The chapter box is NOT in
-              here — .pjr-track clips (overflow:hidden), so a box above its
-              top edge would be invisible; see the note at the box below. */}
-          <div className="pjr-scrub" {...scrub.surfaceProps} />
-          {renderTicks(false)}
-        </div>
-        {/* Chapter box — a sibling of the tube, inside .pjr-bar. It has to be
-            OUT here: .pjr-track carries overflow:hidden, so anything placed
-            above its top edge is clipped away silently (measured correctly,
-            opacity 1, and completely invisible). Anchored off the bar's own
-            box; the bar's padding-top is the tube's top inset. */}
-        <div className="pjr-scrub-box" ref={scrubBoxRef} aria-hidden="true">
-          <span className="pjr-scrub-text" ref={scrubBoxTextRef} />
-        </div>
-
-        {/* v16: chapter index, left of the tube (the trip log puts it on the
-            right; here the reading direction is the same L→R fill, so the
-            button sits on the side the reader is heading towards). */}
-        <button
-          type="button"
-          className={`pjr-toc${open ? " is-open" : ""}`}
-          onClick={() => setOpen((v) => !v)}
-          aria-label={lang === "zh" ? "目录" : "Chapter index"}
-          aria-expanded={open}
-        >
-          ☰
-        </button>
-      </div>
-
-      {/* chapter index sheet — same interaction contract as the trip log's day
-          drawer: scrim tap / Escape / row tap all close it. */}
-      <div
-        className={`pjr-backdrop${open ? " open" : ""}`}
-        onClick={() => setOpen(false)}
-        aria-hidden="true"
-      />
-      <aside
-        className={`pjr-drawer${open ? " open" : ""}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={lang === "zh" ? "目录" : "Chapter index"}
-        aria-hidden={!open}
-      >
-        <div className="pjr-drawer-head">
-          <span>{lang === "zh" ? "目录" : "Chapter index"}</span>
-          <button
-            type="button"
-            className="pjr-drawer-x"
-            onClick={() => setOpen(false)}
-            aria-label={lang === "zh" ? "关闭" : "Close"}
-            tabIndex={open ? 0 : -1}
-          >
-            ×
-          </button>
-        </div>
-        <div className="pjr-list">
-          {ticks.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              className={`pjr-row${t.id === activeId ? " active" : ""}`}
-              onClick={() => jumpTo(t.id)}
-              tabIndex={open ? 0 : -1}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </aside>
-    </>
   );
 }

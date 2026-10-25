@@ -25,7 +25,8 @@ import { padBounds, localClockAt } from "@/lib/travel/gps";
 import type { StoryState } from "@/lib/travel/use-story-controller";
 import { applyTheme, readTheme } from "@/lib/theme";
 import type { Theme } from "@/lib/site";
-import { MAP_SPLIT, useMapSplit } from "@/lib/travel/map-split";
+import MapToolbar from "./log/MapToolbar";
+import { useMapSplit } from "@/lib/travel/map-split";
 import ResumeStoryButton from "./ResumeStoryButton";
 
 // Basemap is swappable without touching travel data (roadmap §24).
@@ -103,11 +104,7 @@ const SPECIAL_OPTIONS: {
   { id: "sat", label: "卫星影像", icon: "卫", style: ESRI_STYLE },
   { id: "topo", label: "地形图", icon: "地", style: TOPO_STYLE },
 ];
-const THEME_OPTIONS: { id: Theme; label: string; icon: string }[] = [
-  { id: "system", label: "跟随系统明暗", icon: "自" },
-  { id: "light", label: "浅色模式", icon: "昼" },
-  { id: "dark", label: "深色模式", icon: "夜" },
-];
+
 
 function isDarkTheme(): boolean {
   return (
@@ -622,12 +619,7 @@ export default function TravelMap({
   const [legendOpen, setLegendOpen] = useState(false);
   /** Draggable map/story split (mobile only) — same hook as the pilgrimage
    *  page; the licence strip at the map's bottom edge is the handle. */
-  const { mountColumn, renderHandle } = useMapSplit(
-    MAP_SPLIT.trip.storageKey,
-    MAP_SPLIT.trip.cssVar,
-    MAP_SPLIT.trip.defaultVh,
-  );
-  const finaleModeRef = useRef(false);
+  const { mountColumn, renderHandle } = useMapSplit();  const finaleModeRef = useRef(false);
   const modeRef = useRef(state.mode);
   // Site-integration note: was a render-phase ref write — moved to an effect.
   useEffect(() => {
@@ -881,7 +873,7 @@ export default function TravelMap({
 
       // explore mode: any direct manipulation pauses the story camera
       const explore = () => {
-        if (modeRef.current === "story") onUserInteract();
+        if (modeRef.current === "follow") onUserInteract();
       };
       map.on("dragstart", explore);
       map.on("wheel", explore);
@@ -1158,7 +1150,7 @@ export default function TravelMap({
   };
 
   useEffect(() => {
-    if (!mapCreated || state.mode !== "story") return;
+    if (!mapCreated || state.mode !== "follow") return;
     let raf = 0;
     // Re-sync after explore mode so a user-panned map does not resume from a
     // stale story-camera ref.
@@ -1324,28 +1316,13 @@ export default function TravelMap({
   );
 
   return (
-    <div className="map-pane" ref={mountColumn}>
+    <div className="map-pane" data-camera-mode={state.mode} ref={mountColumn}>
       <div ref={containerRef} className="map-container" />
       {/* v21 (2026-10-09 user request): two INDEPENDENT pills so page
           brightness and map form stop fighting. LEFT: 自/昼/夜, a 3-way radio
           (always one) wired to the site theme. RIGHT: 卫/地, a toggle (at most
           one, click again to clear) that overrides the basemap. */}
-      <div className="basemap-ctl">
-        <div className="bm-group" role="radiogroup" aria-label="页面明暗">
-          {THEME_OPTIONS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              role="radio"
-              aria-checked={themeMode === t.id}
-              className={"bm-btn" + (themeMode === t.id ? " on" : "")}
-              title={t.label}
-              onClick={() => switchTheme(t.id)}
-            >
-              {t.icon}
-            </button>
-          ))}
-        </div>
+      <MapToolbar mode={themeMode} onTheme={switchTheme} className="basemap-ctl" groupClass="bm-group" buttonClass="bm-btn">
         <div className="bm-group" role="group" aria-label="特殊底图">
           {SPECIAL_OPTIONS.map((b) => (
             <button
@@ -1360,7 +1337,7 @@ export default function TravelMap({
             </button>
           ))}
         </div>
-      </div>
+      </MapToolbar>
       <div className="map-overlay-top">
         <div className="timeline-indicator">
           <div className="timeline-day">{finaleActive ? "Finale" : (activeSceneDay ?? trip.start)}</div>
@@ -1396,7 +1373,7 @@ export default function TravelMap({
           </>
         )}
       </div>
-      {state.mode === "explore" && <ResumeStoryButton onResume={onResume} />}
+      {state.mode === "manual" && <ResumeStoryButton onResume={onResume} />}
 
       {/* Licence + data-source strip, pinned to the map's bottom edge.
           Same anatomy as the pilgrimage page's `.pj-attrib`: a translucent

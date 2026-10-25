@@ -5,8 +5,8 @@
     "zh": "伊比利亚 2025 — 圣诞"
   },
   "blurb": {
-    "en": "Two weeks over Christmas and New Year: Lisbon, Porto, Madrid, Barcelona and the towns between — the route grows as the story scrolls.",
-    "zh": "圣诞与新年的两周：里斯本、波尔图、马德里、巴塞罗那与沿途小城——轨迹随故事滚动而生长。"
+    "en": "Two weeks in Iberia for Christmas!",
+    "zh": "伊比利亚半岛的圣诞游~"
   },
   "start": "2025-12-15",
   "end": "2026-01-01",
@@ -15,6 +15,7 @@
   "gpsPoints": 21863,
   "beta": true,
   "pinned": true,
+  "showPinnedBadge": true,
   "stops": {
     "en": [
       "Lisbon",

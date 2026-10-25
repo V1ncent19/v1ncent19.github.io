@@ -20,14 +20,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  useCallback,
-  type CSSProperties,
-  type MouseEvent,
-  type ReactNode,
-} from "react";
+import { type CSSProperties, type ReactNode } from "react";
+import { useCardLaunch } from "@/lib/use-card-launch";
 
-/** How long the confirm stamp plays before the route actually changes. */
+/** Original stamp beat: rings pop around the existing hover arrow, then hold. */
 const CONFIRM_MS = 360;
 
 export function GatewayLink({
@@ -43,34 +39,10 @@ export function GatewayLink({
 }) {
   const router = useRouter();
 
-  const onClick = useCallback(
-    (event: MouseEvent<HTMLAnchorElement>) => {
-      if (
-        event.defaultPrevented ||
-        event.button !== 0 ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.shiftKey ||
-        event.altKey
-      ) {
-        return; // let the browser handle new-tab / modified clicks natively
-      }
-      event.preventDefault();
-
-      const link = event.currentTarget;
-      if (link.classList.contains("is-launching")) return;
-
-      const reduced = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      if (!reduced) link.classList.add("is-launching");
-      window.setTimeout(() => router.push(href), reduced ? 0 : CONFIRM_MS);
-    },
-    [href, router],
-  );
+  const { ref, onClick } = useCardLaunch({ delay: CONFIRM_MS, navigate: () => router.push(href) });
 
   return (
-    <Link href={href} style={style} className={className} onClick={onClick}>
+    <Link ref={ref} href={href} style={style} className={className} onClick={onClick}>
       {children}
     </Link>
   );

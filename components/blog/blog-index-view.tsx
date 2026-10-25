@@ -306,7 +306,7 @@ function Count({ active, children }: { active: boolean; children: ReactNode }) {
   return (
     <span
       className={[
-        "rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums",
+        "badge-pill badge-text-sm rounded-full font-bold tabular-nums",
         active ? "bg-on-brand/20 text-on-brand" : "bg-surface-sink text-muted",
       ].join(" ")}
     >
@@ -367,7 +367,7 @@ function PostCard({
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="ui-text flex items-center gap-2.5">
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${tone.chip}`}
+            className={`post-category-tag inline-flex items-center gap-1.5 rounded-full ${tone.chip}`}
           >
             <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
             {s.blog.category[post.category]}

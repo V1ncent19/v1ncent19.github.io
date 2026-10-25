@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./prose.css";
+import "./travel-journal.css";
+import "./travel-log.css";
+import "./travel-navigation.css";
 import "katex/dist/katex.min.css";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { SiteHeader } from "@/components/layout/site-header";

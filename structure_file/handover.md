@@ -1,7 +1,7 @@
 # Handover — 站点现状与新功能启动入口
 
-**最后更新：2026-10-24。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
-`ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_PILGRIMAGE.md`（巡礼页）。
+**最后更新：2026-10-25。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
+`ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_TRAVEL_LOG.md`（公共日志）、`FEATURE_PILGRIMAGE.md`（巡礼页）、`FEATURE_HOME_NAVIGATION.md`（首页、导航、标签与卡片）。
 
 ---
 
@@ -21,20 +21,35 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 - 评论 giscus（`@giscus/react`）；中文字体自托管子集化（GenWanMin2 TC + Cactus 深兜底）
 - 地图 MapLibre GL（`/travel` 地球仪、ptes-2025、just-because）
 
-## 3. 当前状态（2026-10-24）
+## 旅行日志重构（2026-10-24）
+
+两个日志已接入公共骨架、工具栏、章节导航、跳转与分隔拖拽；四个路由为薄入口。内容定义在 `lib/travel/log/definitions/`，正文和镜头仍分别维护。新增流程与验收命令见 `FEATURE_TRAVEL_LOG.md`。统一断点为 1024px，原 901–1023px 的 PTES 双栏调整为上下布局；默认比例和正文排版保持。此次不提交或发布。 开屏幕布随后修复为全屏覆盖后从左向右揭开；完整加载和 Next Link 导航均启动，动画过程验收使用 `check-travel-log.mjs --entry`。
+
+## 本轮收尾（2026-10-25）
+
+- 中英文首页保留原网格与悬浮效果、标题加一句说明；确认复用中央箭头，只呈现原版圆底与外圈。About 整组文字下移尚未实施，先前整体留白调整已撤销。
+- 桌面导航共用完整胶囊底板，下划线按文字居中、排除 Beta；Recent Posts 分类胶囊与 Blog 大小写一致；全站辅助徽标独立控制字号与留白，不修改正文与导航主文字字号。
+- Travel 卡片经同色源页蓝幕交接到日志幕布；浏览器返回清理确认与恢复悬浮状态，并保留本标签页画廊设置。两篇日志都是 featured，只有 PTES 显示置顶图标。用户撤回后续 Anitabi 幕布故障报告，未据此再改幕布。
+- 本地 Webpack 静态导出 70 页、类型、目标文件 lint、223 条资源引用检查通过；双语检查无错误，已有缺译提示保留。浏览器验收含 16 组导航、30 组字号比对、24 次卡片返回及明暗幕布交接，方法与限制见两份 FEATURE 文档及 `INTERACTION_AUDIT.md`。
+- 本轮未 commit、push 或发布。此处记录的是本地验收，不能作为线上版本状态。
+
+## 3. 当前状态（2026-10-25）
 
 | 项 | 状态 |
 |---|---|
 | **content/ 组织** | 已按路由段重排（`about/ blog/ cv/ project/ travel/ site/`），双语统一为 `{en,zh}` 一种写法 |
-| **public/assets/** | 已按页面归属重排（`about/ home/ cv/ project/ gallery/ photos/`）；相册原图层除外（142 MB，不上线、git-ignored） |
+| **public/assets/** | 已按页面归属重排（`about/ home/ cv/ project/ gallery/ photos/`）；相册原图层除外（145 MB，不上线、git-ignored，**同时充当 `gallery:gen` 的源目录**） |
 | **部署** | ✅ 2026-10-18 上线（`2f2b7b7`）：主路由全 200，相册 48 张缩略图正常，旧 Jekyll 路由（`/gallery/`）404 |
 | Travel hub | MapLibre 地球仪 + 游记 tiles + 「Stories & frames」相册墙 + 心愿单清单 + 双向 hover 联动 |
 | ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画），景点标点 73 个，正文 14.8k 字按 GPS 投放。**移动端进度条已改成可拖拽条（2026-10-24）** |
 | 巡礼地图 | `/travel/just-because`（+zh）已上线：36 个对比点 + 273 点环线 + 可缩放相机 + 滚动联动。**还差用户填 `outro` 与 36 条 `note`** |
 | 两页共用的进度条 | **移动端普通可拖拽条 + 拖动时浮出章节方框**（2026-10-24，v21，推翻 v17 水银温度计）；桌面竖轨圆点白环已修复。共享代码 `lib/travel/use-scrub-track.ts` + `lib/travel/scrub-chapters.ts` |
-| Blog 索引 | md 文章 + 游记卡合并（`lib/blog-travel.ts`，读取时合并，按日期倒序），无「假 md」 |
+| Blog 索引 | md 文章 + 游记卡合并（`lib/blog-travel.ts`，读取时合并，按日期倒序），无「假 md」。**游记卡日期用 `tripPostedAt()`（= `end`）** |
+| 相册 | 49 张（含 2026-10-25 新加的 `img-6308`），源目录 = `public/assets/photos/gallery/original/`。`thumb` 宽 640、`large` 长边 1680。**「精选集」= 置顶不是筛选**（2026-10-25），墙上永远 49 张全在 |
 | 双语 | 全站只有一种写法 + `npm run check:i18n` 守卫；`/project/zh/*` 曾显示英文摘要的 bug 已修 |
-| 遗留 | 底图合规、ptes-2025 隐私（两条都等用户拍板）；9 处 anitabi 标点歧义；中文子集需覆盖 `content/travel/` |
+| 字体 | **拉丁 = 自托管 EB Garamond 可变字体**（2026-10-25，106 KB / 2 文件，OFL）；中文 = GenWanMin2 TC 子集。Latin 按 400–800 字重分别注册并校准 `size-adjust`（111.11%–117.5%，共用两个 URL）保留英文大小；已移除 body 全局补偿，让中文恢复约 9.36% |
+| 字号 | **小字抬了一档，正文未动**（2026-10-25，用户选「保守档 B」）：`--text-xs` 12.96px / `--text-sm` 14.69px，另加一条 `html :is(...)` 把 9/9.5/10/10.5/11px 的任意值一并抬到 12.96px；`.prose code` 0.84em → 0.93em。辅助徽标另用语义字号与 padding，避开全局抬升；正文 token 与容器宽度保持，字体恢复可能改变中文换行。现行参数见 `FEATURE_HOME_NAVIGATION.md` |
+| 遗留 | 底图合规、ptes-2025 隐私（两条都等用户拍板）；9 处 anitabi 标点歧义；中文子集需覆盖 `content/travel/`；**行宽未修**——blog cpl 90.3、首页 105，超出舒适区 60–75，用户暂未采纳收窄方案 |
 
 ## 4. 发布（GitHub Pages）
 
@@ -45,7 +60,7 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 
 一次性前提（已配好，换仓库才需要）：Settings → Pages → Build and deployment → **Source = GitHub Actions**。
 
-当前线上：`main` 之外的 `nextjs-rebuild` 最新成功 run = `39081897536`（`2f2b7b7`）。之后每次 push
+2026-10-18 留存的部署验收快照（不是当前线上版本查询）：`nextjs-rebuild` 当时成功 run = `39081897536`（`2f2b7b7`）。之后每次 push
 都会重新构建；构建失败时线上**保持上一次成功的产物**（不会变空），所以「推了但页面没变」先查 Actions。
 
 ### 发布前自检：本地绿 ≠ CI 绿
@@ -116,17 +131,21 @@ prebuild 自动跑 `badges → sync:data → check:refs → check:i18n`，任何
   只给 160×8，而非 640×32）。要读渲染像素就把 clip 按 CSS 像素放大，别指望 dpr。
 - **样式表查不出层序问题**：两页 computed style 可以逐字段相同，而画面上一个「实心无边缘」、
   一个有白环 —— 差别只在绘制顺序。**视觉层级一律用 `document.elementsFromPoint()` 的栈顶
-  判定，或用 PNG 解码后的像素行**（见 `.workbuddy/memory/` 里手写解码器的做法）。
+  判定，或用 PNG 解码后的像素行**（直接检查截图像素，不依赖样式表推断绘制顺序）。
 - **找 `.read` / `.active` 元素要扫多个滚动位置**（0.15 / 0.25 / 0.35 …），单一位置经常
   一个都没有 → 探针拿到全白样本还"通过"。
 - `next dev` 在本环境会反复死掉，所以验收一律走 `out/`。
+- **相册网格是 round-robin 分列，DOM 顺序 ≠ 显示顺序**（2026-10-25）：`cols[i % columns].push(entry)`，
+  所以「DOM 里前 6 个 `[data-gid]`」是第 0–1 轮，不是排序结果的前 6 个。探针还原 `flow`
+  必须**每列轮流取一个**。另外行程卡（`story-*`）也带 `data-gid` 且排在最前，
+  判「是不是照片」要对照 `items.json` 的 id 集合 —— 曾因此误判「置顶没生效」，其实是探针的算法错。
 
 ## 6. 新功能怎么启动
 
-1. **先读**：本文件 → `ARCHITECTURE.md`（找相关模块现有实现）→ `.workbuddy/memory/MEMORY.md`（工程坑）。
+1. **先读**：本文件 → `ARCHITECTURE.md`（找相关模块现有实现）→ `CONVENTIONS.md` 和相关 `FEATURE_*.md`（规则与工程坑）。
 2. **守则**：多方案先问；不编造数据；移动端行为有显著变更先确认预期；不自动 commit/push。
-3. **实现**：改代码 → 走 §5 → 视觉改动用探针截图目视验收。
-4. **收尾**：追加 `.workbuddy/memory/<日期>.md`；定案落到 `structure_file/` 对应文档（分工见 `README.md`）。
+3. **实现**：改代码 → 走 §5 → 视觉改动用探针截图目视验收。纯文档整理只需核对引用、现行实现与 diff，不重复构建应用。
+4. **收尾**：更新本文件当前状态；定案落到 `structure_file/` 对应文档，试验/撤销与交互验收追加 `INTERACTION_AUDIT.md`（分工见 `README.md`）。
 
 ## 7. 文档地图
 
@@ -136,6 +155,8 @@ prebuild 自动跑 `badges → sync:data → check:refs → check:i18n`，任何
 | `handover.md` | 本文件 —— 进度与启动入口 |
 | `ARCHITECTURE.md` | 系统现状：创作内容地图、content 布局、双语模型、路由树、目录职责、脚本清单、数据管线、样式体系 |
 | `CONVENTIONS.md` | Agent 守则 + 锁定的 v1 设计基线 + 历次决策（含已作废条目）+ Typography |
-| `GALLERY_ADDING_PHOTOS.md` | 相册加照片的操作流程（照做即可；**注意 `GalleryPhoto/` 目前不存在**） |
+| `GALLERY_ADDING_PHOTOS.md` | 相册加照片的操作流程（照做即可；源目录 = `public/assets/photos/gallery/original/`，git-ignored） |
+| `FEATURE_HOME_NAVIGATION.md` | 首页、总导航、标签、卡片点击与返回的最终规则及验收边界 |
+| `FEATURE_TRAVEL_LOG.md` | 两类旅行日志公共骨架、独立边界、入口幕布与新增流程 |
 | `FEATURE_PILGRIMAGE.md` | 巡礼地图：现状、管线、数据格式、实现不变量、待办、轮次记录 |
 | `archive/` | 2026-09 初的重建规划原稿（Stitch 导出、迁移审计、实施规范），仅考古，**内容多已过时** |

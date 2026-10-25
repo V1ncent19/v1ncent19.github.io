@@ -308,7 +308,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
                     <div className="flex items-start gap-3">
                       <span
                         aria-hidden
-                        className="ui-text mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-surface font-mono text-[11px] font-semibold text-muted"
+                        className="badge-text ui-text mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-surface font-mono font-semibold text-muted"
                       >
                         {String(i + 1).padStart(2, "0")}
                       </span>
@@ -403,7 +403,7 @@ export function CvFolio({ lang }: { lang: Lang }) {
                         >
                           <div>
                             <div className="mb-2 flex items-center justify-between gap-2">
-                              <span className="ui-text rounded bg-surface px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted">
+                              <span className="badge-pill badge-text-sm ui-text rounded bg-surface font-bold uppercase tracking-wider text-muted">
                                 {s.project.type[note.meta.type]}
                               </span>
                               <ArrowUpRight
@@ -599,7 +599,7 @@ function TimelineEntry({
       <div className="min-w-0 flex-1 rounded-xl bg-surface-tint/70 px-4 py-3.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span
-            className={`ui-text rounded px-2 py-0.5 text-[11px] font-semibold tracking-wide ${
+            className={`badge-pill badge-text ui-text rounded font-semibold tracking-wide ${
               now ? "bg-brand text-on-brand" : "bg-surface text-muted"
             }`}
           >

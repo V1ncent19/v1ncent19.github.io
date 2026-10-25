@@ -9,6 +9,7 @@ import { site } from "@/lib/site";
 import { copy } from "@/lib/i18n";
 import { LangSwitch } from "@/components/layout/lang-switch";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { DesktopNav } from "./desktop-nav";
 
 /**
  * Two-part masthead, both parts shared verbatim by every page.
@@ -38,9 +39,10 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
  * menu expands in place (see the FAB block at the bottom).
  */
 function isActive(pathname: string, item: NavItem): boolean {
-  if (item.id === "home") return pathname === "/" || pathname === "/zh";
+  const path = normalizePath(pathname);
+  if (item.id === "home") return path === "/" || path === "/zh";
   return Object.values(item.href).some(
-    (href) => pathname === href || pathname.startsWith(`${href}/`),
+    (href) => path === normalizePath(href) || path.startsWith(`${normalizePath(href)}/`),
   );
 }
 
@@ -49,21 +51,12 @@ function uiLang(pathname: string): "en" | "zh" {
   return pathname.split("/").includes("zh") ? "zh" : "en";
 }
 
-function chipClasses(active: boolean) {
-  return [
-    "ui-text inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-lg px-4 text-[15px] font-medium leading-none transition-colors hover:no-underline",
-    active
-      ? "bg-surface-sink font-semibold text-brand"
-      : "text-muted hover:bg-surface-tint hover:text-ink",
-  ].join(" ");
-}
-
 /** Tiny "Beta" flag for nav items still in preview (currently Travel). */
 function NavBetaTag() {
   return (
     <sup
       aria-label="Beta"
-      className="ml-1 rounded-full bg-brand-soft px-1.5 py-px text-[9px] font-bold uppercase leading-[1.4] tracking-wider text-brand"
+      className="beta-badge ml-1 bg-brand-soft text-brand"
     >
       Beta
     </sup>
@@ -227,36 +220,10 @@ export function SiteHeader() {
             {/* Desktop: the full chip row (horizontally scrollable). Mobile:
                 only the current section's name — chapter switching lives in
                 the bottom-right FAB menu (2026-09-05 user brief). */}
-            <ul className="no-scrollbar hidden min-w-0 flex-1 items-center gap-1.5 overflow-x-auto md:flex">
-              {navItems.map((item) => {
-                const active = isActive(pathname, item);
-                // Keep the reader in the current UI language: nav chips point
-                // at the matching /…/zh target on Chinese pages and only the
-                // LangSwitch button ever crosses languages.
-                const target = item.href[lang];
-                return (
-                  <li key={item.id} className="shrink-0">
-                    <Link
-                      href={target}
-                      aria-current={active ? "page" : undefined}
-                      onClick={(e) => {
-                        // Clicking the chip for the very page we are on does not
-                        // navigate — make it scroll back to the top instead.
-                        if (normalizePath(target) === normalizePath(pathname)) {
-                          e.preventDefault();
-                          scrollTopSmooth();
-                        }
-                      }}
-                      className={chipClasses(active)}
-                    >
-                      {item.label[lang]}
-                      {/* Travel trip-log hub is Beta (2026-09-25) */}
-                      {item.id === "travel" ? <NavBetaTag /> : null}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+            <DesktopNav routeKey={pathname} onCurrentPage={scrollTopSmooth} entries={navItems.map(item => ({
+              id: item.id, href: item.href[lang], label: item.label[lang], active: isActive(pathname, item),
+              badge: item.id === "travel" ? <NavBetaTag /> : undefined,
+            }))} />
             <span className="flex min-w-0 flex-1 items-center gap-2 md:hidden">
               <span
                 aria-hidden

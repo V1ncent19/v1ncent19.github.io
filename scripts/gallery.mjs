@@ -2,19 +2,32 @@
 /**
  * npm run gallery:gen — local image pipeline for the Gallery.
  *
- * Reads full-resolution originals from ./GalleryPhoto (git-ignored local
- * master, 142 MB of 14 MP JPEGs — the originals themselves are never edited in
- * place), and:
+ * Reads full-resolution originals from
+ * public/assets/photos/gallery/original (git-ignored local master, ~145 MB of
+ * 14 MP JPEGs — the originals themselves are never edited in place), and:
  *   1. generates the two committed web tiers under
  *      public/assets/photos/gallery/thumb/<id>.webp  (~480px long edge) and
  *      public/assets/photos/gallery/large/<id>.webp  (~1680px long edge),
  *   2. maintains content/travel/gallery/items.json, the gallery manifest.
  *
- * ORIGINALS ARE NOT PUBLISHED (decision 2026-10-18). There is no third
- * "original" tier under public/ and no same-origin download button: publishing
- * the 142 MB tier was what broke the Pages deploy (run #12 — content/
- * referenced the folder, .gitignore hid it, CI failed check:refs), and a
- * 142 MB push was what repeatedly broke the user's network. The originals
+ * SOURCE DIR MOVED 2026-10-25 (user changed the project's file organisation):
+ * originals now live INSIDE the gallery asset tree at `.../gallery/original/`,
+ * sitting next to the two generated tiers, instead of the repo-root
+ * `GalleryPhoto/` that used to hold them. Consequences worth knowing:
+ *   - `original/` is matched by .gitignore line 103 (the
+ *     /public/assets/photos/[any]/original/ rule) and has ZERO tracked files —
+ *     verify with `git check-ignore -v` before touching the path. It must stay
+ *     ignored: committing it would mean a ~145 MB push (HTTP 408) AND a
+ *     check:refs failure in CI, which is exactly what broke run #12.
+ *   - The script never writes into SRC_DIR — it only reads. So using an
+ *     in-tree directory as the source is safe; being under `public/` does NOT
+ *     publish these files, because `.gitignore` keeps them out of the deploy.
+ *
+ * ORIGINALS ARE NOT PUBLISHED (decision 2026-10-18). There is no "original"
+ * tier referenced by the manifest and no same-origin download button:
+ * publishing the 145 MB tier was what broke the Pages deploy (run #12 —
+ * content/ referenced the folder, .gitignore hid it, CI failed check:refs), and
+ * a 145 MB push was what repeatedly broke the user's network. The originals
  * stay on disk as the ONLY master copy; the only way a row gets a download
  * button again is a hand-authored EXTERNAL `originalUrl` (http/https, e.g. a
  * cloud-drive/CDN link) — the merge keeps an external url and strips any
@@ -55,7 +68,13 @@ import sharp from "sharp";
 import exifr from "exifr";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SRC_DIR = path.join(root, "GalleryPhoto");
+const ASSET_ROOT = path.join(root, "public", "assets", "photos", "gallery");
+// 2026-10-25: originals moved into the gallery asset tree (see the header
+// note). Overridable so a one-off run against an older layout still works
+// without editing the file: `GALLERY_SRC=/path/to/originals npm run gallery:gen`.
+const SRC_DIR = process.env.GALLERY_SRC
+  ? path.resolve(process.env.GALLERY_SRC)
+  : path.join(ASSET_ROOT, "original");
 const MANIFEST = path.join(
   root,
   "content",
@@ -63,12 +82,32 @@ const MANIFEST = path.join(
   "gallery",
   "items.json",
 );
-const ASSET_ROOT = path.join(root, "public", "assets", "photos", "gallery");
 const THUMB_DIR = path.join(ASSET_ROOT, "thumb");
 const LARGE_DIR = path.join(ASSET_ROOT, "large");
 
-const THUMB_LONG = 480; // masonry grid
-const LARGE_LONG = 1680; // lightbox
+/* THUMB sizing is WIDTH-based, not long-edge based (2026-10-25).
+ *
+ * The masonry grid gives every tile the same CSS width (298 px at 1440 in the
+ * default 3-column layout, MIN_TILE = 148 at the narrow end), so the axis that
+ * has to be sharp is the HORIZONTAL one. The old rule resized with
+ * `{ width: 480, height: 480, fit: "inside" }`, i.e. it constrained the LONG
+ * edge — fine for landscape (long edge = width) but disastrous for portrait:
+ * a 3:5 phone photo came out 247 px wide, and the grid then UPSCALED it to
+ * 298 (596 on a 2x screen). Measured offender: `img-9834` at 247×480 natural
+ * shown at 298 CSS px. That is the "portrait thumbs look blurry" report.
+ *
+ * Now: width = THUMB_W exactly (no enlargement), height capped at THUMB_MAX_H
+ * so a freak panorama-tall source cannot produce a 3000 px-tall thumb. With
+ * the cap inactive, `fit: "outside"` is what keeps `withoutEnlargement` from
+ * shrinking small sources: sharp treats width+height with `inside` as "fit in
+ * this box", but we want "make it this wide unless that makes it too tall".
+ */
+const THUMB_W = 640; // masonry grid: covers 2x DPR at every tile width
+const THUMB_MAX_H = 1280; // ceiling for extreme portrait sources
+/* The lightbox is a fixed-height stage (`contain`), so it has the mirror-image
+ * constraint: the LONG edge is what the viewer sees, and 1680 is already
+ * capped by the widest screens. Kept as-is. */
+const LARGE_LONG = 1680;
 const QUALITY = 78;
 const MAX_ORPHANS = 20; // stop before 100s of stale warnings spam
 
@@ -193,7 +232,10 @@ function loc(prior, field) {
 async function main() {
   if (!fs.existsSync(SRC_DIR)) {
     console.error(`[gallery] source dir not found: ${SRC_DIR}`);
-    console.error("Put full-res originals in GalleryPhoto/ (git-ignored) and retry.");
+    console.error(
+      "Put full-res originals in public/assets/photos/gallery/original/ " +
+        "(git-ignored, next to thumb/ and large/), or point GALLERY_SRC at another dir.",
+    );
     process.exit(1);
   }
   const files = fs
@@ -226,11 +268,23 @@ async function main() {
       .resize({ width: LARGE_LONG, height: LARGE_LONG, fit: "inside", withoutEnlargement: true })
       .webp({ quality: QUALITY })
       .toFile(largeOut);
-    await sharp(srcAbs)
-      .autoOrient()
-      .resize({ width: THUMB_LONG, height: THUMB_LONG, fit: "inside", withoutEnlargement: true })
+    const thumbResized = sharp(srcAbs).autoOrient()
+      // Width-first (see THUMB_W): every tile is the same width, so the
+      // horizontal axis is the one that must not be upscaled.
+      //
+      // `fit: "outside"` — NOT "inside". Measured on sharp: for a 1000×1680
+      // portrait, both give 640×1075 (correct), but for a freak 800×4000
+      // source "inside" collapses back to 256×1280 (width-first defeated,
+      // exactly the blur we are fixing) while "outside" gives 640×3200.
+      .resize({ width: THUMB_W, fit: "outside", withoutEnlargement: true });
+    // Only then clamp the height, as a SECOND step, so it can never cancel the
+    // width guarantee for normal photos: an extreme panorama-tall frame trades
+    // a little width for a sane file, everything else stays exactly THUMB_W.
+    const thumbBuf = await thumbResized
+      .resize({ height: THUMB_MAX_H, fit: "inside", withoutEnlargement: true })
       .webp({ quality: QUALITY })
-      .toFile(thumbOut);
+      .toBuffer();
+    fs.writeFileSync(thumbOut, thumbBuf);
 
     const meta = await exifMeta(srcAbs);
     const { date, lat, lon } = meta;

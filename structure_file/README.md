@@ -4,8 +4,9 @@
 
 > **真相源优先级：代码 > 文档。**
 > 文档里写的路径、常量、命令，随时可能被下一轮改动甩在后面 —— 在照着做之前，
-> 先 `grep` 一眼确认（尤其是常量值和文件位置）。最后一次全量核对是 **2026-10-17**，
+> 先 `rg` 一眼确认（尤其是常量值和文件位置）。最后一次全量核对是 **2026-10-17**，
 > 2026-10-18 增补了「站点上线 + 相册原图不发布」两条结论。
+> **2026-10-25 专项收尾**：已核对旅行日志框架、首页卡片、导航、标签及返回过渡；最终规则见两份 FEATURE 文档，历史试验见交互走查。此日期不代表重新全量审计或部署。
 
 ## 读哪一份
 
@@ -15,6 +16,8 @@
 | 知道某个功能长什么样、文件在哪、数据怎么流 | `ARCHITECTURE.md` |
 | 知道「该怎么做」、哪些设计已锁死、哪些被推翻过 | `CONVENTIONS.md` |
 | 加相册照片 | `GALLERY_ADDING_PHOTOS.md` |
+| 改首页卡片 / 总导航 / 标签 / 卡片确认与返回 | `FEATURE_HOME_NAVIGATION.md` |
+| 改旅行日志公共框架 / 新增日志 | `FEATURE_TRAVEL_LOG.md` |
 | 改巡礼页（`/travel/just-because`） | `FEATURE_PILGRIMAGE.md` |
 | 查看全站交互走查与改进建议 | `INTERACTION_AUDIT.md` |
 | 想知道 2026-09 的原始设计意图 | `archive/`（**多已过时，只考古**） |
@@ -26,6 +29,8 @@ handover.md                  进度与入口
 ARCHITECTURE.md              系统现状
 CONVENTIONS.md               守则与基线
 GALLERY_ADDING_PHOTOS.md     相册 how-to
+FEATURE_HOME_NAVIGATION.md   首页、总导航、标签与卡片交互
+FEATURE_TRAVEL_LOG.md        旅行日志公共框架与新增流程
 FEATURE_PILGRIMAGE.md        巡礼页
 INTERACTION_AUDIT.md         全站交互走查与建议
 archive/                     旧规划原稿 + Stitch 导出（8 MB）
@@ -39,7 +44,7 @@ archive/                     旧规划原稿 + Stitch 导出（8 MB）
 | `ARCHITECTURE.md` | 系统**现在**由什么组成 | 时间线、待办清单 |
 | `CONVENTIONS.md` | 规则、基线、决策与作废记录 | 目录树（会有一百行） |
 
-一个功能只需要一份深文档。目前只有巡礼页够格独立成篇（`FEATURE_PILGRIMAGE.md`）；
+一个功能只需要一份深文档。首页、总导航与标签当前定稿见 `FEATURE_HOME_NAVIGATION.md`。旅行日志公共框架见 `FEATURE_TRAVEL_LOG.md`，巡礼细节见 `FEATURE_PILGRIMAGE.md`；
 ptes-2025 的细节散在 `ARCHITECTURE.md` §数据管线 与 `content/travel/README.md`。
 
 ## 改完之后，哪份文档要跟着改
@@ -47,14 +52,16 @@ ptes-2025 的细节散在 `ARCHITECTURE.md` §数据管线 与 `content/travel/R
 | 你改了什么 | 必须同步 |
 |---|---|
 | 新增/删除路由（`app/**/page.tsx`） | `ARCHITECTURE.md` 路由树；`content/site/navigation.ts`；`CONVENTIONS.md` 导航项 |
-| 新增/删除脚本、改 `prebuild` 链 | `ARCHITECTURE.md` 脚本清单；`package.json` |
+| 新增/删除脚本、改 `prebuild` 链 | `ARCHITECTURE.md` 脚本清单；npm 入口或构建链变化时同步 `package.json` |
 | 新增 trip（`content/travel/<id>/`） | `ARCHITECTURE.md` 数据管线；`content/travel/README.md`；blog 索引会自动多一条 |
 | 改双语字段写法 | `ARCHITECTURE.md` §双语模型 + `CONVENTIONS.md` §四 + `lib/localized.ts` |
 | 改 `public/` 目录归属 | `ARCHITECTURE.md` §`public/assets/` 布局（判据两条） |
 | 改巡礼页的交互/常量 | `FEATURE_PILGRIMAGE.md`（§5 实现 / §6 不变量）；**常量值以代码为准** |
 | 设计基线（配色、容器、缩放） | `CONVENTIONS.md` §二（锁死项，改之前先问用户） |
 | 改发布流程 / CI / 部署状态 | `handover.md` §4；`.github/workflows/deploy.yml` |
-| 本轮做了什么 | `.workbuddy/memory/<日期>.md`；跨轮教训 → `.workbuddy/memory/MEMORY.md` |
+| 改首页/导航/标签/卡片交互 | `FEATURE_HOME_NAVIGATION.md`；交互验收追加 `INTERACTION_AUDIT.md` |
+| 改旅行日志公共骨架/入口幕布 | `FEATURE_TRAVEL_LOG.md` |
+| 本轮做了什么 | `handover.md` 当前状态；最终规则落到对应 FEATURE；试验和验收留在 `INTERACTION_AUDIT.md` |
 
 ## 这份索引是怎么核对出来的
 

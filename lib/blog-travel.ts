@@ -27,7 +27,7 @@ import { copy, type Lang } from "@/lib/i18n";
 import { getBlogPosts, type BlogPostCard } from "@/lib/blog";
 import { toBlogCard } from "@/lib/lede-math";
 import { pick } from "@/lib/localized";
-import { tripCards, tripFacts, type TripCard } from "@/lib/travel/trips";
+import { tripCards, tripFacts, tripPostedAt, type TripCard } from "@/lib/travel/trips";
 
 /** One trip → one index card. Plain-text parts: a trip title has no math. */
 function tripCardAsPost(trip: TripCard, lang: Lang): BlogPostCard {
@@ -36,8 +36,10 @@ function tripCardAsPost(trip: TripCard, lang: Lang): BlogPostCard {
   return {
     slug: `travel/${trip.id}`,
     title,
-    /** Anchor date — the same one the /travel timeline sorts by. */
-    date: trip.start,
+    /** Publication date — the RETURN day, not the departure (2026-10-25: a
+     *  travel log is written after the trip ends, so it must sort with the
+     *  other posts by the day it could have been posted). See `tripPostedAt`. */
+    date: tripPostedAt(trip),
     category: "travel",
     lang,
     titleParts: [{ kind: "text", value: title }],

@@ -12,7 +12,9 @@ import {
   THEME_SERVER_SNAPSHOT,
 } from "@/lib/theme";
 import type { Theme } from "@/lib/site";
-import { MAP_SPLIT, useMapSplit } from "@/lib/travel/map-split";
+import { cameraAfterGesture, type CameraMode } from "@/lib/travel/log/camera";
+import MapToolbar from "./log/MapToolbar";
+import { useMapSplit } from "@/lib/travel/map-split";
 
 /**
  * Pilgrimage map — one map, zoom and pan enabled, auto-follow while reading.
@@ -61,7 +63,6 @@ const DARK_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.
 const FOLLOW_KEY = "pilgrimage-camera-mode";
 
 /** See the `cameraMode` state in PilgrimageMap. */
-type CameraMode = "follow" | "overview" | "manual";
 
 /** The mode the page boots into when the reader has no stored preference.
  *  "follow" (2026-10-24 user decision, reversed from the 2026-10-17
@@ -210,11 +211,7 @@ const TRAIL_DARK = "#5d7280";
 const STOP_LIGHT = "#e8722c";
 const STOP_DARK = "#ff9f4d";
 
-const THEME_OPTIONS: { id: Theme; label: string; icon: string }[] = [
-  { id: "system", label: "跟随系统明暗", icon: "自" },
-  { id: "light", label: "浅色模式", icon: "昼" },
-  { id: "dark", label: "深色模式", icon: "夜" },
-];
+
 
 interface Props {
   stops: PilgrimageStop[];
@@ -697,12 +694,7 @@ export default function PilgrimageMap({
   const mapRef = useRef<MLMap | null>(null);
   /** Draggable map/story split (mobile only). Writes --pj-map-h on the column;
    *  the strip at the map's bottom edge is the handle. See lib/travel/map-split. */
-  const { mountColumn, renderHandle } = useMapSplit(
-    MAP_SPLIT.pilgrimage.storageKey,
-    MAP_SPLIT.pilgrimage.cssVar,
-    MAP_SPLIT.pilgrimage.defaultVh,
-  );
-  /** Keeps the canvas matched to its container as the layout settles. */
+  const { mountColumn, renderHandle } = useMapSplit();  /** Keeps the canvas matched to its container as the layout settles. */
   const roRef = useRef<ResizeObserver | null>(null);
   /** The zoom produced by the one-time fitBounds. Every later camera move
    *  (follow, popup repositioning) reuses it, which is what keeps the scale
@@ -1224,8 +1216,8 @@ export default function PilgrimageMap({
     const onUser = () => {
       cameraOwnedRef.current = true;
       if (cameraModeRef.current === "follow" || cameraModeRef.current === "overview") {
-        cameraModeRef.current = "manual";
-        applyCameraMode("manual");
+        cameraModeRef.current = cameraAfterGesture();
+        applyCameraMode(cameraModeRef.current);
       }
     };
     m.on("dragstart", onUser);
@@ -1383,7 +1375,7 @@ export default function PilgrimageMap({
     : null;
 
   return (
-    <div className="pj-map-col" ref={mountColumn}>
+    <div className="pj-map-col" data-log-map data-camera-mode={cameraMode} ref={mountColumn}>
       {/* The MapLibre container deliberately carries NO styling class of ours.
           maplibre-gl.css ships `.maplibregl-map { position: relative }`, and an
           equal-specificity rule that loads later wins — so a `.pj-map` on the
@@ -1426,22 +1418,7 @@ export default function PilgrimageMap({
 
         {/* Controls, top-right: page brightness (a 3-way radio, same storage
             key as the site header) and the follow-camera toggle side by side. */}
-        <div className="pj-map-tools">
-          <div className="pj-tools-group" role="radiogroup" aria-label="页面明暗">
-            {THEME_OPTIONS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                role="radio"
-                aria-checked={themeMode === t.id}
-                className={"pj-tool-btn" + (themeMode === t.id ? " on" : "")}
-                title={t.label}
-                onClick={() => switchTheme(t.id)}
-              >
-                {t.icon}
-              </button>
-            ))}
-          </div>
+        <MapToolbar mode={themeMode} onTheme={switchTheme} className="pj-map-tools" groupClass="pj-tools-group" buttonClass="pj-tool-btn">
           <div className="pj-tools-group" role="group" aria-label="镜头模式">
             {/* ONE segmented control, one selection — exactly like the trip
                 log's 卫/地 pill. The previous version drew these as two
@@ -1469,7 +1446,7 @@ export default function PilgrimageMap({
               全
             </button>
           </div>
-        </div>
+        </MapToolbar>
       </div>
 
       {openStop && popupPos && (

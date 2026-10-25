@@ -4,7 +4,7 @@ import { HubHoverLink } from "@/components/travel/hub-hover-link";
 import { GalleryView, type GalleryStoryTile } from "@/components/gallery/gallery-view";
 import { getGalleryItems, getTravel } from "@/lib/content";
 import { blogPostPath, getBlogPosts } from "@/lib/blog";
-import { tripCards, tripFacts } from "@/lib/travel/trips";
+import { tripCards, tripFacts, tripPostedAt } from "@/lib/travel/trips";
 import { TranslationNotice } from "@/components/translation-notice";
 import { copy } from "@/lib/i18n";
 
@@ -32,8 +32,10 @@ export default function TravelZhPage() {
   const storyTiles: GalleryStoryTile[] = tripCards.map((trip) => ({
     id: `story-trip-${trip.id}`,
     href: `/travel/zh/${trip.id}`,
-    /* 时间序编号的锚点日期（见下方排序）。 */
-    date: trip.start,
+    travelLog: true,
+    /* 发布日期 = 返程日（2026-10-25）：游记要等行程完整结束才会写，
+       所以 tile 按返程日参与时间序编号与排序（见下方排序）。 */
+    date: tripPostedAt(trip),
     title: trip.title.zh,
     /* v2（2026-09-26）：只保留基本 metainfo——摘要小字删除（用户要求）；
        hover 圆形 reveal 封面对齐首页 gateway 卡。
@@ -47,9 +49,9 @@ export default function TravelZhPage() {
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
     coverPos: trip.coverPos,
-    /* 是否置顶由各游记自己的 card.json 声明（2026-10-17：原来是写死的
-       `true`，把巡礼页也一起钉住了）。不置顶的游记按出发日期并入时间线。 */
-    pinned: trip.pinned ?? false,
+    /* 旅行日志默认都是 featured 导航入口，排在照片流之前。 */
+    pinned: trip.pinned ?? true,
+    showPinnedBadge: trip.showPinnedBadge ?? false,
   }));
 
   const paris = getBlogPosts().find((p) => p.slug === PARIS_SLUG);

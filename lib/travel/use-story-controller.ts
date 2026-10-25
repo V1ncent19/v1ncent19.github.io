@@ -2,9 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TripInfo, TripTrack, TravelScene } from "./types";
+import { readingLine } from "./log/reading-geometry";
+import { MAP_SPLIT_EVENT } from "./map-split";
 import { interpolatePosition } from "./gps";
 
-export type StoryMode = "story" | "explore";
+import { cameraAfterGesture, type CameraMode } from "./log/camera";
+export type StoryMode = CameraMode;
 
 export interface StoryState {
   activeSceneId: string; // "__intro__" for the trip overview block
@@ -29,35 +32,7 @@ const INTRO = "__intro__";
 type Anchor = { y: number; t: number; slope: number };
 type SceneAnchor = { id: string; y: number };
 
-/** viewport line used for both scene activation and time sampling */
-const BAND = 0.475;
-
-/**
- * The same line, as a document-space y for the CURRENT layout.
- *
- * On desktop BAND x viewportHeight is exactly right: the map column is the
- * whole left half and the story column starts at y = 0, so "the middle of the
- * screen" is "the middle of the reading area".
- *
- * On a phone it is not. `.map-col` is sticky and owns the top of the viewport,
- * so the story only exists in the strip BELOW it — and since 2026-10-24 that
- * strip's top edge is draggable (lib/travel/map-split.tsx). Reading 0.475 x vh
- * there points INTO the map for anything under ~70vh, which makes the
- * controller activate the wrong scene. Measured per call (never cached): the
- * map's height changes mid-gesture.
- */
-function bandY(vh: number): number {
-  const mapCol =
-    typeof document === "undefined"
-      ? null
-      : document.querySelector(".travel-layout .map-col");
-  const mapH = mapCol
-    ? Math.min(vh, Math.max(0, mapCol.getBoundingClientRect().height))
-    : 0;
-  // A column that fills the viewport is the desktop split, not an overlay.
-  if (mapH <= 0 || mapH >= vh - 120) return vh * BAND;
-  return mapH + (vh - mapH) * 0.35;
-}
+const bandY = () => readingLine();
 
 // ---- damped follower (critically damped spring in document pixels) ----
 // Fast flings or content-thin sections move the scroll target far ahead;
@@ -145,7 +120,9 @@ export function useStoryController(
   scenes: TravelScene[]
 ) {
   const [activeSceneId, setActiveSceneId] = useState<string>(INTRO);
-  const [mode, setMode] = useState<StoryMode>("story");
+  const [mode, setMode] = useState<StoryMode>("follow");
+  const narrativeTimeRef = useRef(0);
+  const readTime = useCallback(() => narrativeTimeRef.current, []);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [readingY, setReadingY] = useState<number>(0);
 
@@ -182,7 +159,7 @@ export function useStoryController(
         s.running = false;
         setReadingY(s.y);
         const t = timeAtY(s.y, anchorsRef.current);
-        (window as unknown as Record<string, unknown>).__ttime = t;
+        narrativeTimeRef.current = t;
         setCurrentTime(t);
         return;
       }
@@ -209,7 +186,7 @@ export function useStoryController(
         s.y += s.v * h;
       }
       const t = timeAtY(s.y, anchorsRef.current);
-      (window as unknown as Record<string, unknown>).__ttime = t;
+      narrativeTimeRef.current = t;
       setReadingY(s.y);
       setCurrentTime(t);
       if (s.v === 0 && s.y === targetYRef.current) {
@@ -229,14 +206,14 @@ export function useStoryController(
   // frame of delay is invisible (the spring itself is rAF-driven).
   useEffect(() => {
     if (track && currentTime === 0 && track.points.length > 0) {
-      const y = window.scrollY + bandY(window.innerHeight);
+      const y = window.scrollY + bandY();
       targetYRef.current = y;
       springRef.current.y = y;
       const t = timeAtY(y, anchorsRef.current) || track.points[0].ts;
       const raf = requestAnimationFrame(() => {
         setReadingY(y);
         setCurrentTime(t);
-        (window as unknown as Record<string, unknown>).__ttime = t;
+        narrativeTimeRef.current = t;
       });
       return () => cancelAnimationFrame(raf);
     }
@@ -277,9 +254,11 @@ export function useStoryController(
     const ro = new ResizeObserver(() => rebuildAnchors());
     ro.observe(document.body);
     window.addEventListener("resize", rebuildAnchors);
+    window.addEventListener(MAP_SPLIT_EVENT, rebuildAnchors);
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", rebuildAnchors);
+      window.removeEventListener(MAP_SPLIT_EVENT, rebuildAnchors);
     };
   }, [trip, rebuildAnchors]);
 
@@ -287,7 +266,7 @@ export function useStoryController(
   const updateProgress = useCallback(() => {
     const sections = sceneAnchorsRef.current;
     if (sections.length > 0) {
-      const lineY = window.scrollY + bandY(window.innerHeight);
+      const lineY = window.scrollY + bandY();
       let lo = 0;
       let hi = sections.length;
       while (lo < hi) {
@@ -303,7 +282,7 @@ export function useStoryController(
     }
 
     if (anchorsRef.current.length < 2) return;
-    const y = window.scrollY + bandY(window.innerHeight);
+    const y = window.scrollY + bandY();
     capRef.current = Math.max(VMAX_FLOOR, Math.abs(y - springRef.current.y) / CATCH_SECONDS);
     targetYRef.current = y;
     kickSpring();
@@ -355,8 +334,8 @@ export function useStoryController(
     else sectionRefs.current.delete(id);
   }, []);
 
-  const enterExplore = useCallback(() => setMode("explore"), []);
-  const resumeStory = useCallback(() => setMode("story"), []);
+  const enterExplore = useCallback(() => setMode(cameraAfterGesture()), []);
+  const resumeStory = useCallback(() => setMode("follow"), []);
 
   const state: StoryState = {
     activeSceneId,
@@ -367,5 +346,5 @@ export function useStoryController(
     pointIdx: position.idx,
   };
 
-  return { state, registerSection, enterExplore, resumeStory };
+  return { state, registerSection, enterExplore, resumeStory, readTime };
 }

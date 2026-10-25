@@ -96,7 +96,7 @@ export function FactsBoard({
               >
                 <span
                   aria-hidden
-                  className={`flex h-10 w-10 flex-none -rotate-6 items-center justify-center rounded-md text-[11px] font-semibold tracking-wide transition-colors duration-300 ${
+                  className={`badge-text flex h-10 w-10 flex-none -rotate-6 items-center justify-center rounded-md font-semibold tracking-wide transition-colors duration-300 ${
                     open
                       ? "border border-solid border-brand bg-brand text-on-brand"
                       : "border border-dashed border-brand/60 text-brand group-hover:border-solid group-hover:bg-brand group-hover:text-on-brand"

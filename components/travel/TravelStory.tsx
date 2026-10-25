@@ -1,7 +1,9 @@
 "use client";
 
-import { Fragment, memo, useEffect, useMemo } from "react";
+import { Fragment, memo, useEffect, useMemo, useRef } from "react";
 import type { TravelScene, TripInfo } from "@/lib/travel/types";
+import { navigateToChapter } from "@/lib/travel/log/navigation";
+import type { LogLang } from "@/lib/travel/log/types";
 import TravelNav from "./TravelNav";
 
 function timeRange(s: TravelScene): string {
@@ -20,17 +22,22 @@ function TravelStory({
   scenes,
   registerSection,
   activeSceneId,
+  lang,
+  readTime,
 }: {
   trip: TripInfo;
   scenes: TravelScene[];
   registerSection: (id: string, el: HTMLElement | null) => void;
   activeSceneId: string;
+  lang: LogLang;
+  readTime: () => number;
 }) {
+  const scopeRef = useRef<HTMLDivElement>(null);
   // A (lit capsule): highlight when any unit of the day is active
-  const activeDayNo = useMemo(() => {
-    const m = activeSceneId.match(/^d(\d+)-/);
-    return m ? +m[1] : -1;
-  }, [activeSceneId]);
+  const activeDayNo = useMemo(
+    () => scenes.find(scene => scene.id === activeSceneId)?.dayNo ?? -1,
+    [scenes, activeSceneId],
+  );
 
   // Temporary review aid: number each visible narrative section in reading
   // order, skipping the non-rendered day-title anchors.
@@ -41,15 +48,12 @@ function TravelStory({
 
   // click a capsule to jump to its day, aligned like the nav drawer
   const jumpToDay = (no: number) => {
-    const el = document.querySelector(`[data-scene-id="d${no}-0"]`);
-    const target = el
-      ? el.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.475 + 4
-      : 0;
-    window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
+    const scene = scenes.find(s => s.dayNo === no);
+    if (scene) navigateToChapter(scopeRef.current, scene.id, "journal");
   };
 
   // B (day-progress fill): driven straight off the narrative spring
-  // (window.__ttime, written by useStoryController) with direct CSS-var
+  // (instance clock supplied by useStoryController) with direct CSS-var
   // writes — the story pane never re-renders on narrative time
   useEffect(() => {
     const ranges = new Map<number, [number, number]>();
@@ -69,7 +73,7 @@ function TravelStory({
     }
     let raf = 0;
     const step = () => {
-      const t = (window as unknown as Record<string, unknown>).__ttime;
+      const t = readTime();
       if (typeof t === "number") {
         document.querySelectorAll<HTMLElement>(".day-capsule[data-day-no]").forEach((el) => {
           const r = ranges.get(Number(el.dataset.dayNo));
@@ -83,7 +87,7 @@ function TravelStory({
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [scenes]);
+  }, [scenes, readTime]);
 
   // Pinned detection (2026-09-28 user request): the ACTIVE day capsule must
   // only grow/overhang once it is actually stuck at its sticky top — while it
@@ -161,16 +165,18 @@ function TravelStory({
   }
 
   return (
-    <div className="story-pane">
+    <div className="story-pane" ref={scopeRef}>
       <TravelNav
         trip={trip}
         scenes={scenes}
         activeSceneId={activeSceneId}
+        scopeRef={scopeRef}
+        lang={lang}
       />
       {/* ---- trip overview ---- */}
       <section
         className="scene-section intro"
-        data-scene-id="__intro__"
+        data-scene-id="__intro__" data-log-section="__intro__"
         ref={(el) => registerSection("__intro__", el)}
       >
         <div className="intro-inner">
@@ -262,7 +268,7 @@ function TravelStory({
                   )}
                   <section
                     className={`scene-section${s.unit === "title" ? " unit-title" : s.unit === "transit" ? " unit-transit" : ""}${active ? " active" : ""}`}
-                    data-scene-id={s.id}
+                    data-scene-id={s.id} data-log-section={s.id}
                     ref={(el) => registerSection(s.id, el)}
                   >
                     {s.unit !== "title" && (
@@ -350,7 +356,7 @@ function TravelStory({
       {/* ---- finale: the camera pulls back to the whole unfaded route ---- */}
       <section
         className={`scene-section finale${activeSceneId === "__finale__" ? " active" : ""}`}
-        data-scene-id="__finale__"
+        data-scene-id="__finale__" data-log-section="__finale__"
         ref={(el) => registerSection("__finale__", el)}
       >
         <p className="kicker">Finale</p>

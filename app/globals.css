@@ -82,6 +82,109 @@
   font-display: swap;
 }
 
+/* EB Garamond — the site's Latin serif (2026-10-25, user choice).
+   Replaces the `"Palatino Linotype", …` system stack. Registered as a
+   *variable* font (wght 400–800) so one file per style covers every weight the
+   layout asks for (`font-medium|semibold|bold` = 500/600/700). The upstream
+   variable pair is 583 KB; scripts/subset-ebgaramond.py cuts it to Latin
+   Basic + Latin-1 + Latin Extended-A + general punctuation + currency/arrow/
+   math blocks + Latin ligatures → ~106 KB for both styles. Source woff2 and
+   OFL text live in assets-src/fonts/EBGaramond/ (never deployed raw).
+
+   Keep the size compensation on these Latin faces only, registered once per
+   used weight (400/500/600/700/800). Both variable files have x-heights of
+   400/407/413/419/423 per 1000 em at these weights. Each size-adjust value
+   preserves the previous body-level ex-height 0.47 target: 0.47 / x-height.
+   All registrations reuse the same two URLs and cached font files.
+   The inherited body rule also shrank GenWanMin2 TC to 91.44% of its native
+   size (0.47 / 0.514), and affected UI fonts. Removing it restores Chinese
+   glyphs by ~9.36% without enlarging English embedded in Chinese content.
+   Do not combine the old body rule with size-adjust: it cancels this scaling.
+
+   No `local()` entry on purpose: EB Garamond is rarely installed on Windows
+   or macOS, and a locally-installed full-width build would silently differ
+   from this subset. The subset is small enough that caching wins. */
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  size-adjust: 117.5%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  size-adjust: 115.479115%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  size-adjust: 113.801453%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  size-adjust: 112.171838%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  size-adjust: 111.111111%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  size-adjust: 117.5%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
+  size-adjust: 115.479115%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 600;
+  font-style: italic;
+  size-adjust: 113.801453%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  size-adjust: 112.171838%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 800;
+  font-style: italic;
+  size-adjust: 111.111111%;
+  font-display: swap;
+}
+
 /* ---------------------------------------------------------------------------
  * Global page scale (2026-09-05)
  * Mimics ~90% browser zoom: the root font-size drives every rem-based length
@@ -97,6 +200,126 @@
 
 html {
   font-size: calc(16px * var(--page-scale));
+}
+
+/* ---------------------------------------------------------------------------
+ * Small-type tier (2026-10-25)
+ * --page-scale also divides every type size, which pushed the labels and
+ * metadata tier below the legibility floor: text-xs rendered 10.8 px and
+ * text-[10px] rendered 9 px. The reading sizes are fine at this density, so
+ * ONLY the two small steps are lifted — body copy, .prose and every container
+ * width stay byte-identical, which is why this cannot reflow the layout.
+ *   12.0 -> 12.96 px  (+8%)   text-xs (and every text-xs / sm / lg mix)
+ *   14.0 -> 14.69 px  (+5%)   text-sm
+ * Tailwind v4 resolves text-xs / text-sm from these two theme keys, so this
+ * replaces the old 0.75 / 0.875 rem steps everywhere with no class churn.
+ * The arbitrary bracket sizes (39 sites of text-[10px] / text-[11px] plus a
+ * few 9 / 9.5 / 10.5 px chrome chips) are NOT reached by these keys — verified
+ * in the built CSS, they stay literal px — so a second rule lifts them to
+ * parity with the new text-xs. See `html :is(...)` below. Both are needed.
+ * ------------------------------------------------------------------------- */
+@theme {
+  --text-xs: 0.9rem; /* 12.96 px at --page-scale 0.9 */
+  --text-sm: 1.02rem; /* 14.69 px */
+}
+
+/* Arbitrary `text-[Npx]` utilities compile to literal px (they are not theme
+ * lookups), so the sub-12 px ones cannot be moved through --text-*. Lift every
+ * step below 12 px onto the same 12.96 px as the new text-xs rather than
+ * bumping each by a percentage: these are tiny chrome labels (header BETA chip
+ * 9 px, gallery card badges 9.5 / 10.5 px) where a mere +8% would leave them
+ * unreadable. Listing the classes keeps the rule out of every other utility;
+ * the html scope out-ranks the single-class declaration. */
+html :is(.text-\[9px\], .text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .text-\[11px\]) {
+  font-size: 0.9rem;
+}
+
+/* Metadata badges use their own compact type/line-height, independent of
+   the small-type lift above. Keep filter buttons at their normal target size. */
+.post-category-tag {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  padding: 0.2rem 0.6rem;
+  white-space: nowrap;
+}
+
+/* Home feed labels and preview flags are supporting metadata. Do not add
+   arbitrary text-[9px]/text-[10px] utilities: the global lift would win. */
+.recent-post-tag {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+}
+/* Small auxiliary badges, independent of the global reading-size floor. */
+.badge-text {
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+.badge-text-sm {
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  padding: 0.2rem 0.55rem;
+}
+.beta-badge {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.16rem 0.45rem;
+}
+
+/* A single background follows desktop nav hover/focus without moving text. */
+.primary-nav-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 0;
+  height: 0;
+  border-radius: 9999px;
+  background: var(--surface-sink);
+  pointer-events: none;
+  opacity: 0;
+  transition: transform 200ms var(--ease), width 200ms var(--ease), height 200ms var(--ease), opacity 120ms linear;
+}
+.primary-nav-rail[data-indicator-ready] .primary-nav-link {
+  background-color: transparent;
+}
+.primary-nav-label {
+  position: relative;
+  display: inline-flex;
+  align-self: stretch;
+  align-items: center;
+}
+.primary-nav-link[aria-current="page"] .primary-nav-label::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 0.6rem;
+  height: 2px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: var(--brand);
+  opacity: 0.65;
+}
+@media (prefers-reduced-motion: reduce) {
+  .primary-nav-indicator { transition: none; }
 }
 
 /*
@@ -167,8 +390,8 @@ html {
      swallows all CJK text — Chinese silently rendered in the platform's
      default serif and the self-hosted webfonts never even loaded
      (document.fonts status stayed "unloaded"; found 2026-09-07). */
-  --font-serif-latin: "Palatino Linotype", "Book Antiqua", Palatino, Georgia,
-    "Times New Roman";
+  --font-serif-latin: "EB Garamond", "Palatino Linotype", "Book Antiqua",
+    Palatino, Georgia, "Times New Roman";
   /* "GenWanMin2 TC" (源雲明體丹) leads the zh stack (2026-09-07, user
      choice): Source-Han-based, so simplified codepoints are fully covered —
      no per-glyph mixing. Self-hosted as per-weight subset woff2 (see the
@@ -317,6 +540,8 @@ html {
     font-family: var(--font-serif-latin), var(--font-serif-zh);
     font-size: 1.0625rem; /* ~17px, comfortable for serif reading */
     line-height: 1.65;
+    /* Latin size compensation lives on its @font-face rules, so Chinese and
+       UI fonts retain their own metrics instead of inheriting an x-height target. */
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     transition: background-color var(--dur-fast) var(--ease),
@@ -906,10 +1131,22 @@ html:not([data-theme]) .ti-system {
   );
 }
 @media (hover: hover) {
-  .story-tile:hover .story-orb,
-  .story-tile:focus-within .story-orb {
+  .story-tile:not([data-return-idle]):hover {
+    translate: 0 -0.25rem;
+    border-color: var(--line-strong);
+    box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-lift);
+  }
+  .story-tile:not([data-return-idle]):hover .story-orb {
     clip-path: circle(142% at calc(100% - 34px) calc(100% - 34px));
   }
+}
+.story-tile:not([data-return-idle]):focus-visible .story-orb {
+  clip-path: circle(142% at calc(100% - 34px) calc(100% - 34px));
+}
+.story-tile[data-return-idle],
+.story-tile[data-return-idle] .story-orb {
+  transition: none;
 }
 .story-tile.is-launching {
   transform: scale(0.985);
@@ -939,19 +1176,27 @@ html:not([data-theme]) .ti-system {
 }
 
 /* ---- gateway title glass capsule (2026-09-05) ----
- * Frosted pill behind the card title ("Blog" & co.). The pill's LEFT edge is
- * aligned with the number chip above it (no negative left margin — the label
- * text sits padded inside, so pill and chip read as one aligned column); the
- * remaining padding is offset by negative margins so the resting layout is
- * unchanged. At rest it is fully transparent; on hover-capable pointers /
+ * Frosted pill behind the card title ("Blog" & co.). Home cards offset its
+ * left padding so the title text aligns with its description; other
+ * consumers retain the original capsule geometry. At rest it is fully
+ * transparent; on hover-capable pointers /
  * keyboard focus it frosts over (surface glass + blur) with the tone tint
  * fading in — same soft → vivid colour story as the number chip, and the
  * same 150ms timing so chip text and pill shift colour in lockstep. Touch
- * pointers never reveal the photo, so the pill stays transparent there too. */
+ * pointers use the existing scroll-driven .is-live treatment below. */
+/* Home gateway text: keep title and its single description in one column.
+   Scope the capsule offset so the travel story cards keep their own layout. */
+.gateway-copy { padding-top: 1rem; }
+.gateway-copy-featured { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.gateway-description { margin-top: 0.65rem; }
+.gateway-copy-compact .gateway-description { min-height: 3.3em; }
+.gateway-card .gw-title-pill { margin-left: calc(-0.85rem - 1px); }
+
 .gw-title-pill {
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 0.32rem 0.85rem;
   margin: -0.32rem -0.85rem -0.32rem 0;
   border: 1px solid transparent;
@@ -960,6 +1205,14 @@ html:not([data-theme]) .ti-system {
     background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
     border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Optical alignment of the featured title, without changing its line box.
+   Latin ink sits below its typographic center; the CJK ink is left-heavy. */
+.gateway-card .gw-title-pill[data-featured][lang="en"] h3 {
+  translate: 0.02em -0.1em;
+}
+.gateway-card .gw-title-pill[data-featured][lang="zh"] h3 {
+  translate: 0.05em 0.01em;
 }
 .gw-title-pill-tint {
   position: absolute;
@@ -1019,9 +1272,9 @@ html:not([data-theme]) .ti-system {
 
 /* ---- gateway launch confirm (2026-09-05) ----
  * GatewayLink holds a click for one beat; the `.is-launching` class it adds
- * plays this ack: the card presses down a touch and a tone-coloured chip
- * pops in with a drawn launch arrow — visible proof the click registered —
- * before the route changes (~360ms). Native click semantics are untouched:
+ * plays this ack: the card presses down, then the original soft disc and halo
+ * pop around the existing central hover arrow before navigation (~360ms).
+ * Travel story tiles keep the separate pop/draw treatment. Native click semantics:
  * modifier/middle clicks navigate immediately, no-JS visitors never see the
  * stamp, reduced-motion users navigate with no delay. */
 .gateway-stamp {
@@ -1046,16 +1299,58 @@ html:not([data-theme]) .ti-system {
   stroke-dasharray: 32;
   stroke-dashoffset: 32;
 }
+.gw-item .gateway-stamp-chip {
+  position: relative;
+  color: var(--confirm-tone);
+  opacity: 1;
+  transform: none;
+  box-shadow: none;
+}
+.gw-item .gateway-stamp-chip::before {
+  content: "";
+  position: absolute;
+  border-radius: inherit;
+  opacity: 0;
+  transform: scale(0.4);
+  inset: 0;
+  /* Original c752b37 graphics, animated separately from the shared arrow. */
+  background: var(--confirm-fill);
+  box-shadow:
+    0 6px 18px rgb(0 0 0 / 0.14),
+    0 0 0 4px color-mix(in srgb, var(--surface) 55%, transparent);
+}
+.gw-item .gateway-stamp-chip svg {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 180ms var(--ease), transform 180ms var(--ease);
+}
+.gw-item .gateway-stamp-chip svg path {
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+}
 .gw-item.is-launching .gateway-card {
   /* overrides the resting hover lift — a deliberate "pressed" settle */
+  translate: 0 0;
   transform: scale(0.985);
-  transition-duration: 0.18s;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  transition-duration: 180ms;
 }
-.gw-item.is-launching .gateway-stamp-chip {
-  animation: gw-stamp-pop 0.28s var(--ease) forwards;
+.gw-item:focus-visible .gateway-stamp-chip svg,
+.gw-item.is-live .gateway-stamp-chip svg,
+.gw-item.is-launching .gateway-stamp-chip svg {
+  opacity: 1;
+  transform: none;
 }
-.gw-item.is-launching .gateway-stamp-chip svg path {
-  animation: gw-arrow-draw 0.24s 0.08s var(--ease) forwards;
+@media (hover: hover) {
+  .gw-item:hover .gateway-stamp-chip svg {
+    opacity: 1;
+    transform: none;
+  }
+}
+.gw-item.is-launching .gateway-stamp-chip::before {
+  animation: gw-stamp-pop 280ms var(--ease) forwards;
 }
 @keyframes gw-stamp-pop {
   0% {
@@ -1078,9 +1373,18 @@ html:not([data-theme]) .ti-system {
 }
 @media (prefers-reduced-motion: reduce) {
   .gw-item.is-launching .gateway-card,
+  .gw-item .gateway-stamp-chip svg,
+  .gw-item.is-launching .gateway-stamp-chip::before,
   .gw-item.is-launching .gateway-stamp-chip svg path {
     animation: none;
     transition: none;
+  }
+  .gw-item.is-launching .gateway-card {
+    transform: none;
+  }
+  .gw-item.is-launching .gateway-stamp-chip::before {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -1413,6 +1717,14 @@ body.tl-immersive {
 body.tl-immersive .site-chrome-header,
 body.tl-immersive .site-chrome-footer {
   display: none;
+}
+body.tl-immersive {
+  overflow-x: clip;
+}
+body.tl-immersive .route-fade {
+  /* The travel curtain owns entry; a second transform displaces fixed maps. */
+  animation: none;
+  transform: none;
 }
 
 /* ---- Travel page entry curtains ----
@@ -2175,196 +2487,11 @@ body.pj-immersive .pj-page {
   color: var(--tl-faint);
 }
 
-/* ---- back to hub: shared trip-log geometry and colours ----
-   A circular button on narrow screens, and a full-height desktop strip.
-   Desktop content uses fixed right-edge anchors and one transition rhythm
-   so expanding the strip never adds a second movement to the crossfade. */
-.pj-back {
-  position: fixed;
-  top: 58px;
-  right: 14px;
-  z-index: 40;
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  /* A control — sans, stated explicitly (2026-10-24). */
-  font-family: var(--font-ui);
-  color: var(--tl-on-accent);
-  background: var(--tl-accent);
-  box-shadow: 0 4px 14px rgba(27, 167, 201, 0.35);
-  text-decoration: none;
-  transition: background 0.2s ease, transform 0.25s ease, box-shadow 0.2s ease,
-    width 0.28s ease, border-radius 0.28s ease, color 0.2s ease;
-}
-.pj-back:hover {
-  background: var(--tl-accent-strong);
-  transform: scale(1.07);
-  box-shadow: 0 6px 18px rgba(27, 167, 201, 0.45);
-}
-.pj-back:focus-visible {
-  outline: 2px solid rgba(27, 167, 201, 0.6);
-  outline-offset: 3px;
-}
-.pj-back-label {
-  display: none;
-}
-@media (min-width: 1024px) {
-  .pj-back {
-    --pj-back-duration: 220ms;
-    --pj-back-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-    top: 0;
-    bottom: 0;
-    right: 0;
-    height: auto;
-    width: 48px;
-    z-index: 25;
-    border-radius: 0;
-    background: var(--tl-strip);
-    color: var(--tl-strip-ink);
-    border-left: 1px solid var(--tl-hair);
-    /* Symmetric box — see the note on .tl-back-strip's border-right in
-       TravelLog. A lone border-left shifts the content box 0.5px right of
-       the strip's centre, so every child centred "correctly" inside the
-       column was still 0.5px off the strip. */
-    border-right: 1px solid transparent;
-    box-shadow: none;
-    transition:
-      width var(--pj-back-duration) var(--pj-back-ease),
-      background-color var(--pj-back-duration) var(--pj-back-ease),
-      color var(--pj-back-duration) var(--pj-back-ease);
-  }
-  .pj-back:hover {
-    width: 58px;
-    background: var(--tl-chip);
-    color: var(--tl-accent-strong);
-    transform: none;
-    box-shadow: none;
-  }
-  /* Crossfade WITHOUT motion (v12, 2026-10-24). dfd956e anchored both glyphs
-     on one fixed right-edge point (18.9 x 26.0px of overlap for the whole
-     220ms) and slid the label 4px while fading. Two more rounds were needed:
-     the label then sat 80px above the strip's centre, and the v11 fix
-     (align-self:center) was still off by a viewport-dependent amount (228.5px
-     at 900px tall, 363.5px at 1440px). Root cause was NOT the label: the base
-     .pj-back rule sets display:flex; align-items:center, and the grid block
-     never reset align-items — so rows were sized to content and the whole
-     147px block was packed into the middle of a 900px strip. Stretching the
-     tracks makes row 1 the real top half, and the label's centre IS the
-     strip's centre at any window size. See the trip log's .tl-back-strip for
-     the full note. Fade is opacity-only. */
-  .pj-back {
-    display: grid;
-    grid-template-rows: 1fr 14px 1fr;
-    grid-template-columns: 1fr;
-    /* No justify-self here: the arrow is the label's sibling in the same
-       column, and centring it individually does nothing for the label. The
-       label centres itself with width:fit-content + margin-inline:auto (see
-       .pj-back-label), which is what actually moves the INK onto the axis. */
-    align-items: stretch;
-  }
-  .pj-back-arrow {
-    grid-row: 2;
-    grid-column: 1;
-    align-self: center;
-    /* the inline axis needs its own declaration — grid items default to
-       justify-self:start, which pinned the 26px chevron to the left edge of
-       a 57px column. align-self only covers the block axis. */
-    justify-self: center;
-    pointer-events: none;
-    transition: opacity var(--pj-back-duration) var(--pj-back-ease);
-  }
-  .pj-back-label {
-    display: block;
-    /* span all three tracks and centre in them — the only placement that
-       centres exactly at every window height (row-1 + align-self was off by a
-       viewport-dependent amount; see the trip log's .tl-back-strip-label) */
-    grid-row: 1 / span 3;
-    grid-column: 1;
-    align-self: center;
-    max-height: calc(50% - 20px);
-    overflow: hidden;
-    /* vertical-lr, NOT vertical-rl — see the full note on the trip log's
-       .tl-back-strip-label. In short: vertical-rl starts the line against the
-       box's RIGHT edge, so the 15px glyph column sat 19.5px right of the
-       strip's centre and hard against the viewport edge, while the BLOCK's box
-       measured 0.5px from centre and every probe therefore reported "fixed". */
-    writing-mode: vertical-lr;
-    /* shrink the block to one glyph column, then let justify-self centre THAT
-       column — with a full-width block the line box fills it and text-align
-       has nothing to centre (measured: ink stayed 18.5px left of centre).
-       padding-inline keeps the inset from being tied to today's text. */
-    width: fit-content;
-    padding-inline: 8px;
-    text-align: center;
-    /* auto margins centre the shrunken box — justify-self stops reaching a
-       size-fit item (measured: box stayed 10.5px left of centre) */
-    margin: 0 auto;
-    /* explicit px, not inherit: the strip's inherited line-height leaks in
-       and inflates the word by ~6px, clipping the bottom glyphs on a
-       600px-tall viewport (2026-10-24) */
-    font-size: 12px;
-    line-height: 19px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity var(--pj-back-duration) var(--pj-back-ease);
-  }
-  .pj-back:hover .pj-back-arrow {
-    opacity: 0;
-  }
-  .pj-back:hover .pj-back-label {
-    opacity: 1;
-  }
-}
-
-/* Exit handoff, identical to the trip log's .tl-back-wipe: a sheet grows from
-   the RIGHT edge (where the strip lives) to cover the viewport in 0.25 s while
-   its colour washes from the strip's hover blue toward a pale tint, and the
-   navigation fires 300 ms later — one continuous gesture instead of an abrupt
-   swap. Root-level `position: fixed`, so it covers the sticky map column too. */
-.pj-back-wipe {
-  position: fixed;
-  inset: 0;
-  z-index: 95;
-  background: var(--tl-chip);
-  transform-origin: right center;
-  animation: pj-wipe 0.25s ease-in forwards;
-  pointer-events: none;
-}
-@keyframes pj-wipe {
-  from {
-    transform: scaleX(0);
-    background-color: var(--tl-chip);
-  }
-  55% {
-    background-color: var(--tl-accent-soft-3);
-  }
-  to {
-    transform: scaleX(1);
-    background-color: var(--tl-accent-soft-2);
-  }
-}
-
-/* ============================ entry curtain =============================
-   v19 (2026-10-24 user request): "与点击返回按钮之后的蓝幕从右边拉出相反
-   的过程" — the curtain now starts as a BAND ON THE RIGHT EDGE (the width of
-   the back strip, grown from the same origin) and retracts to nothing, which
-   is the literal time-reverse of .tl-back-wipe / .pj-back-wipe growing from
-   transform-origin:right to a full screen. It also means the native
-   "Loading trip data…" string is never visible: the sheet covers the
-   viewport from the very first paint (a body::before pseudo driven by a
-   parse-time class — see the hydration notes on body.tl-veil-boot::before).
-
-   Shared by BOTH travel pages. The trip log throws `tl-veil-boot`; the
-   pilgrimage page (`pj-boot`, added in its own inline script) opts into the
-   same sheet with a wider resting band because its tap targets and text are
-   denser. Each page releases with its own class so neither has to know
-   about the other. */
+/* Travel entry is the reverse of the return wipe: start with full coverage,
+   then retract to the RIGHT, revealing the page from LEFT to RIGHT.
+   Keep this on body::before so it paints before hydration and is unaffected
+   by RouteFade's temporary transform containing block. */
+body.travel-log-launch::before,
 body.tl-veil-boot::before,
 body.pj-boot::before {
   content: "";
@@ -2373,20 +2500,23 @@ body.pj-boot::before {
   z-index: 96;
   background: var(--tl-accent-soft-2, #eef9fd);
   transform-origin: right center;
-  transform: scaleX(var(--veil-band, 0.06));
+  transform: scaleX(1);
   pointer-events: none;
+  /* Covers the page throughout the delay; also works if hydration never runs. */
+  animation: travel-log-entry-fallback 0.46s ease-in 3.5s both;
 }
-/* the trip log's strip is 48px at rest; the pilgrimage page's is 48px too but
-   its curtain carries a wordmark, so it holds slightly wider */
-body.tl-veil-boot {
-  --veil-band: 0.055;
+body.travel-log-launch {
+  overflow-x: clip;
 }
-body.pj-boot {
-  --veil-band: 0.08;
+body.travel-log-launch::before {
+  background: #eef9fd;
+  animation: none;
+  pointer-events: auto;
 }
-/* the wordmark inside the band: hidden while covering, faded in as the band
-   regains its width. Drawn by a real element (a span the components render)
-   because pseudo-elements cannot be reached by hydration-safe text. */
+.dark body.travel-log-launch::before {
+  background: #0e2029;
+}
+/* Existing vertical wordmark, over the full sheet until it begins to open. */
 .tl-veil-band {
   position: fixed;
   top: 0;
@@ -2410,66 +2540,38 @@ body.pj-boot {
 body.tl-veil-boot .tl-veil-band,
 body.pj-boot .tl-veil-band {
   opacity: 1;
-  transition: opacity 0.18s linear;
+  animation: travel-log-entry-wordmark 0.18s linear 3.5s forwards;
+}
+/* A distinct animation name restarts at full coverage when readiness arrives.
+   This rule must follow the fallback shorthand and reset its 3.5s delay. */
+body.tl-veil-boot.tl-veil-open::before,
+body.pj-boot.pj-veil-open::before {
+  animation: travel-log-entry-open 0.46s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 body.tl-veil-boot.tl-veil-open .tl-veil-band,
 body.pj-boot.pj-veil-open .tl-veil-band {
   opacity: 0;
+  animation: none;
+  transition: opacity 0.18s linear;
 }
-/* release — the band collapses toward the right edge, the exact reverse of
-   the exit wipe expanding from it. Distinct keyframes name from the idle
-   state's so the animation always replays from 0 (the v13 lesson). */
-body.tl-veil-boot.tl-veil-open::before {
-  animation: tl-entry-open 0.46s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+@keyframes travel-log-entry-open {
+  from { transform: scaleX(1); background-color: var(--tl-accent-soft-2, #eef9fd); }
+  45% { background-color: var(--tl-accent-soft-3, #e2f4fb); }
+  to { transform: scaleX(0); background-color: var(--tl-chip, #cfeaf5); }
 }
-body.pj-boot.pj-veil-open::before {
-  animation: pj-entry-open 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+@keyframes travel-log-entry-fallback {
+  from { transform: scaleX(1); background-color: var(--tl-accent-soft-2, #eef9fd); }
+  45% { background-color: var(--tl-accent-soft-3, #e2f4fb); }
+  to { transform: scaleX(0); background-color: var(--tl-chip, #cfeaf5); }
 }
-@keyframes tl-entry-open {
-  from {
-    transform: scaleX(1);
-    background-color: var(--tl-accent-soft-2, #eef9fd);
-  }
-  55% {
-    background-color: var(--tl-accent-soft-3);
-  }
-  to {
-    transform: scaleX(0);
-    background-color: var(--tl-chip);
-  }
-}
-@keyframes pj-entry-open {
-  from {
-    transform: scaleX(1);
-    background-color: var(--tl-accent-soft-2, #eef9fd);
-  }
-  55% {
-    background-color: var(--tl-accent-soft-3);
-  }
-  to {
-    transform: scaleX(0);
-    background-color: var(--tl-chip);
-  }
-}
-/* JS-dead / slow-JS fallback, pure CSS so the curtain never holds the page
-   hostage (same contract as the v11 veil): if the release class never
-   arrives, self-retract after 3.5s. */
-body.tl-veil-boot::before,
-body.pj-boot::before {
-  animation: tl-entry-pull 0.46s ease-in 3.5s forwards;
-}
-body.tl-veil-boot.tl-veil-open::before,
-body.pj-boot.pj-veil-open::before {
-  animation-duration: 0.46s;
+@keyframes travel-log-entry-wordmark {
+  to { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
+  body.travel-log-launch::before,
   body.tl-veil-boot::before,
-  body.pj-boot::before {
-    display: none;
-  }
-  .tl-veil-band {
-    display: none;
-  }
+  body.pj-boot::before,
+  .tl-veil-band { display: none; }
 }
 
 .pj-loading {
