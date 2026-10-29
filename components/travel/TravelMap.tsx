@@ -28,6 +28,7 @@ import type { Theme } from "@/lib/site";
 import MapToolbar from "./log/MapToolbar";
 import { useMapSplit } from "@/lib/travel/map-split";
 import ResumeStoryButton from "./ResumeStoryButton";
+import { Mountain, Satellite, type LucideIcon } from "lucide-react";
 
 // Basemap is swappable without touching travel data (roadmap §24).
 const BASEMAP_STYLE =
@@ -98,11 +99,11 @@ const BASEMAP_KEY = "travel-basemap";
 const SPECIAL_OPTIONS: {
   id: Exclude<SpecialBasemap, "">;
   label: string;
-  icon: string;
+  Icon: LucideIcon;
   style: unknown;
 }[] = [
-  { id: "sat", label: "卫星影像", icon: "卫", style: ESRI_STYLE },
-  { id: "topo", label: "地形图", icon: "地", style: TOPO_STYLE },
+  { id: "sat", label: "卫星影像", Icon: Satellite, style: ESRI_STYLE },
+  { id: "topo", label: "地形图", Icon: Mountain, style: TOPO_STYLE },
 ];
 
 
@@ -1322,18 +1323,19 @@ export default function TravelMap({
           brightness and map form stop fighting. LEFT: 自/昼/夜, a 3-way radio
           (always one) wired to the site theme. RIGHT: 卫/地, a toggle (at most
           one, click again to clear) that overrides the basemap. */}
-      <MapToolbar mode={themeMode} onTheme={switchTheme} className="basemap-ctl" groupClass="bm-group" buttonClass="bm-btn">
+      <MapToolbar mode={themeMode} onTheme={switchTheme} lang={lang} className="basemap-ctl" groupClass="bm-group" buttonClass="bm-btn">
         <div className="bm-group" role="group" aria-label="特殊底图">
           {SPECIAL_OPTIONS.map((b) => (
             <button
               key={b.id}
               type="button"
               aria-pressed={specialBasemap === b.id}
-              className={"bm-btn" + (specialBasemap === b.id ? " on" : "")}
-              title={b.label}
+              aria-label={b.label}
+              data-tooltip={b.label}
+              className={"travel-log-icon-btn bm-btn" + (specialBasemap === b.id ? " on" : "")}
               onClick={() => switchBasemap(b.id)}
             >
-              {b.icon}
+              <b.Icon aria-hidden="true" strokeWidth={1.8} />
             </button>
           ))}
         </div>

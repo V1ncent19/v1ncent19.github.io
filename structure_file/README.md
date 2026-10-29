@@ -7,6 +7,7 @@
 > 先 `rg` 一眼确认（尤其是常量值和文件位置）。最后一次全量核对是 **2026-10-17**，
 > 2026-10-18 增补了「站点上线 + 相册原图不发布」两条结论。
 > **2026-10-25 专项收尾**：已核对旅行日志框架、首页卡片、导航、标签及返回过渡；最终规则见两份 FEATURE 文档，历史试验见交互走查。此日期不代表重新全量审计或部署。
+> **2026-10-28 Guatemala 专项**：新增 terrain 类型、私有输入/派生输出边界与异机接续说明，见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`。
 
 ## 读哪一份
 
@@ -18,6 +19,7 @@
 | 加相册照片 | `GALLERY_ADDING_PHOTOS.md` |
 | 改首页卡片 / 总导航 / 标签 / 卡片确认与返回 | `FEATURE_HOME_NAVIGATION.md` |
 | 改旅行日志公共框架 / 新增日志 | `FEATURE_TRAVEL_LOG.md` |
+| 改 Guatemala 三维地形日志 | `FEATURE_GUATEMALA_TERRAIN_LOG.md` |
 | 改巡礼页（`/travel/just-because`） | `FEATURE_PILGRIMAGE.md` |
 | 查看全站交互走查与改进建议 | `INTERACTION_AUDIT.md` |
 | 想知道 2026-09 的原始设计意图 | `archive/`（**多已过时，只考古**） |
@@ -31,6 +33,7 @@ CONVENTIONS.md               守则与基线
 GALLERY_ADDING_PHOTOS.md     相册 how-to
 FEATURE_HOME_NAVIGATION.md   首页、总导航、标签与卡片交互
 FEATURE_TRAVEL_LOG.md        旅行日志公共框架与新增流程
+FEATURE_GUATEMALA_TERRAIN_LOG.md  Guatemala 三维地形日志、数据边界与生成流程
 FEATURE_PILGRIMAGE.md        巡礼页
 INTERACTION_AUDIT.md         全站交互走查与建议
 archive/                     旧规划原稿 + Stitch 导出（8 MB）
@@ -44,7 +47,7 @@ archive/                     旧规划原稿 + Stitch 导出（8 MB）
 | `ARCHITECTURE.md` | 系统**现在**由什么组成 | 时间线、待办清单 |
 | `CONVENTIONS.md` | 规则、基线、决策与作废记录 | 目录树（会有一百行） |
 
-一个功能只需要一份深文档。首页、总导航与标签当前定稿见 `FEATURE_HOME_NAVIGATION.md`。旅行日志公共框架见 `FEATURE_TRAVEL_LOG.md`，巡礼细节见 `FEATURE_PILGRIMAGE.md`；
+一个功能只需要一份深文档。首页、总导航与标签当前定稿见 `FEATURE_HOME_NAVIGATION.md`。旅行日志公共框架见 `FEATURE_TRAVEL_LOG.md`，Guatemala 地形日志见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`，巡礼细节见 `FEATURE_PILGRIMAGE.md`；
 ptes-2025 的细节散在 `ARCHITECTURE.md` §数据管线 与 `content/travel/README.md`。
 
 ## 改完之后，哪份文档要跟着改
@@ -61,6 +64,7 @@ ptes-2025 的细节散在 `ARCHITECTURE.md` §数据管线 与 `content/travel/R
 | 改发布流程 / CI / 部署状态 | `handover.md` §4；`.github/workflows/deploy.yml` |
 | 改首页/导航/标签/卡片交互 | `FEATURE_HOME_NAVIGATION.md`；交互验收追加 `INTERACTION_AUDIT.md` |
 | 改旅行日志公共骨架/入口幕布 | `FEATURE_TRAVEL_LOG.md` |
+| 改 Guatemala 地形、镜头、照片弹窗或数据管线 | `FEATURE_GUATEMALA_TERRAIN_LOG.md`；涉及公共骨架时同时更新 `FEATURE_TRAVEL_LOG.md` |
 | 本轮做了什么 | `handover.md` 当前状态；最终规则落到对应 FEATURE；试验和验收留在 `INTERACTION_AUDIT.md` |
 
 ## 这份索引是怎么核对出来的

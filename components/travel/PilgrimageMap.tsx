@@ -15,6 +15,7 @@ import type { Theme } from "@/lib/site";
 import { cameraAfterGesture, type CameraMode } from "@/lib/travel/log/camera";
 import MapToolbar from "./log/MapToolbar";
 import { useMapSplit } from "@/lib/travel/map-split";
+import { LocateFixed, Map as MapIcon } from "lucide-react";
 
 /**
  * Pilgrimage map — one map, zoom and pan enabled, auto-follow while reading.
@@ -1427,23 +1428,25 @@ export default function PilgrimageMap({
                 way to tell which framing they were in. */}
             <button
               type="button"
-              className={"pj-tool-btn" + (cameraMode === "follow" ? " on" : "")}
+              className={"travel-log-icon-btn pj-tool-btn" + (cameraMode === "follow" ? " on" : "")}
               aria-pressed={cameraMode === "follow"}
+              aria-label="随阅读移动镜头"
+              data-tooltip="随阅读移动镜头"
               onClick={() => {
                 if (cameraMode !== "follow") toggleFollow();
               }}
-              title="随阅读移动镜头"
             >
-              随
+              <LocateFixed aria-hidden="true" strokeWidth={1.8} />
             </button>
             <button
               type="button"
-              className={"pj-tool-btn" + (cameraMode === "overview" ? " on" : "")}
+              className={"travel-log-icon-btn pj-tool-btn" + (cameraMode === "overview" ? " on" : "")}
               aria-pressed={cameraMode === "overview"}
+              aria-label="回到全貌（整条路线）"
+              data-tooltip="回到全貌（整条路线）"
               onClick={reframeOverview}
-              title="回到全貌（整条路线）"
             >
-              全
+              <MapIcon aria-hidden="true" strokeWidth={1.8} />
             </button>
           </div>
         </MapToolbar>

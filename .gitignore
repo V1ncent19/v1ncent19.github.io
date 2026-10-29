@@ -52,6 +52,12 @@ yarn-error.log*
 # scripts/pilgrimage-route.mjs) goes online.
 /assets-src/travel-data/
 
+# Guatemala travel-log photo masters — full-resolution phone originals with
+# EXIF capture coordinates and timestamps. Local input for
+# scripts/guatemala-travel.mjs only; the script publishes resized, metadata-free
+# WebP derivatives under public/assets/photos/travel/guatemala-2026/.
+/assets-src/guatemala-masters/
+
 # belt-and-braces: the whole-year GPS export was briefly parked under
 # public/assets/pilgrimage/just-because/gps_original/ before being moved to
 # assets-src/. public/ is copied verbatim into the static export, so keep this

@@ -9,6 +9,7 @@ export const LOG_HEIGHT_VAR = "--log-map-height";
 export const LOG_LAYOUTS = {
   journal: { defaultVh: 40 },
   pilgrimage: { defaultVh: 58 },
+  terrain: { defaultVh: 62 },
 } satisfies Record<LogKind, { defaultVh: number }>;
 
 export interface LogLayout {

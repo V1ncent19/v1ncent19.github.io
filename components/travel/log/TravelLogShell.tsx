@@ -9,6 +9,7 @@ import { clearTravelEntry } from "@/lib/travel/log/entry-transition";
 const TRANSITIONS = {
   journal: { immersive: ["tl-immersive"], boot: "tl-veil-boot", open: "tl-veil-open", beat: 200 },
   pilgrimage: { immersive: ["pj-immersive", "tl-immersive"], boot: "pj-boot", open: "pj-veil-open", beat: 180 },
+  terrain: { immersive: ["terrain-immersive", "tl-immersive"], boot: "terrain-boot", open: "terrain-veil-open", beat: 260 },
 } as const;
 const ENTRY_ANIMATIONS = ["travel-log-entry-open", "travel-log-entry-fallback"];
 

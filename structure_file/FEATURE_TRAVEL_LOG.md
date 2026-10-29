@@ -1,6 +1,6 @@
 # FEATURE — 统一地图旅行日志框架
 
-2026-10-24。适用 `/travel/ptes-2025/`、`/travel/just-because/` 及其 `/travel/zh/<id>/` 镜像。
+2026-10-24，2026-10-28 增补 terrain 类型。适用 `/travel/ptes-2025/`、`/travel/just-because/`、`/travel/guatemala-2026/` 及其 `/travel/zh/<id>/` 镜像。
 
 ## 组织边界
 
@@ -10,14 +10,14 @@
 路由 page.tsx
   → lib/travel/log/definitions/<id>.ts（本篇的内容、类型与加载地址）
   → components/travel/log/TravelLogPage.tsx（公共服务端入口）
-  → TravelLog / PilgrimageLog（内容类型适配器）
+  → TravelLog / PilgrimageLog / TerrainTravelLog（内容类型适配器）
   → TravelLogShell（公共外壳）
       ├─ TravelMap / PilgrimageMap（各自的轨迹和镜头）
       ├─ TravelStory / PilgrimageStory（各自的正文）
       └─ ChapterNavigation / MapToolbar / 返回按钮与幕布
 ```
 
-`TravelLog` 是可复用的 journal 类型适配器，内部不再导入 PTES 数据。新增 journal 不需要修改它。两种类型都由可序列化的 `TravelLogDefinition` 描述，判别字段为 `kind: "journal" | "pilgrimage"`。每篇定义单独导入自己的 JSON，避免中央注册表把所有旅行正文打进同一个内容模块。
+`TravelLog` 是可复用的 journal 类型适配器，内部不再导入 PTES 数据。新增 journal 不需要修改它。三种类型都由可序列化的 `TravelLogDefinition` 描述，判别字段为 `kind: "journal" | "pilgrimage" | "terrain"`。每篇定义单独导入自己的 JSON，避免中央注册表把所有旅行正文打进同一个内容模块。Guatemala 的专属实现与数据边界见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`。
 
 ## 公共部分
 
@@ -40,6 +40,7 @@
 
 - journal：日分组、时段、夜间分隔、景点文字；叙事时间插值、飞行/地面/缺失轨迹及关键帧镜头仍由原组件负责。
 - pilgrimage：对比图、插叙与评论；拍摄时间/`routeIdx` 定位、站点镜头、弹窗的 active/open/dismissed 状态仍独立。
+- terrain：三维 DEM、等高线、照片标点、章节相机与首尾环绕；公开派生数据和私有 GPS/EXIF 母版的边界仍独立。
 - 文档阅读百分比不等于旅行时间或路线百分比。导航按文档滚动范围计算，地图位置由各类型适配器计算。
 - PTES 的光标与镜头继续使用同一条缓动阅读线。正文日期进度通过实例内 `readTime()` 读取，已移除 `window.__ttime` 内部通信；原地图调试接口不参与正文通信。
 - 巡礼导航直接消费正文 observer 得出的当前章节，不再自行运行第二套章节评分。
@@ -64,7 +65,7 @@
 5. 大轨迹如果需要 URL，在 `scripts/sync-trip-data.mjs` 的 `MIRRORED` 明确声明。现有巡礼不可重建快照继续由 `KEEP` 保护，不改变原始数据归属。
 6. 检查数据引用、双语字段、类型、lint 和静态导出；再验证两种语言及断点两侧。新增已有类型不需要修改公共导航、布局、返回与幕布。
 
-新内容类型才需要扩展 `TravelLogDefinition`，提供自己的正文、旅行位置计算和地图组件；接入同一外壳、章节接口与工具栏。不要把新类型字段塞进旧类型的可选字段集合。
+新内容类型才需要扩展 `TravelLogDefinition`，提供自己的正文、旅行位置计算和地图组件；接入同一外壳、章节接口与工具栏。Guatemala 已按此方式加入 `terrain`。不要把新类型字段塞进旧类型的可选字段集合。
 
 首页/导航卡片的确认图形、返回规则和辅助标签参数另见 `FEATURE_HOME_NAVIGATION.md`；照片的 `featured` 不等于旅行日志的 `pinned`。
 

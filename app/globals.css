@@ -20,6 +20,348 @@
   font-style: normal;
   font-display: swap;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Acatenango terrain journal — a third travel-log grammar.
+   It keeps the shared pilgrimage shell/navigation, but the left column is a
+   pitched DEM surface and the right column advances a continuous route.
+   ═══════════════════════════════════════════════════════════════════════════ */
+body.terrain-immersive { background: var(--tl-paper); }
+.terrain-map-col {
+  --tl-attrib-h: 30px;
+  position: sticky;
+  top: 0;
+  width: 48%;
+  height: 100vh;
+  flex: 0 0 48%;
+  overflow: hidden;
+  border-right: 1px solid color-mix(in srgb, var(--tl-ink) 12%, transparent);
+  background: #e6e2d5;
+}
+.terrain-map-box { position: absolute; inset: 0 0 var(--tl-attrib-h); overflow: hidden; }
+.terrain-map-canvas { position: relative; width: 100%; height: 100%; }
+.terrain-map-canvas .maplibregl-canvas { outline: 0; }
+.terrain-map-status {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 4;
+  display: grid;
+  min-width: min(235px, calc(100% - 220px));
+  padding: 12px 15px 11px;
+  border: 1px solid color-mix(in srgb, var(--tl-ink) 13%, transparent);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--tl-paper) 78%, transparent);
+  box-shadow: 0 10px 32px rgba(18, 25, 22, 0.12);
+  backdrop-filter: blur(14px) saturate(1.25);
+  font-family: var(--font-ui);
+}
+.terrain-map-status span { color: var(--tl-accent); font-size: 10px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.terrain-map-status strong { margin-top: 3px; font-family: var(--font-mono); font-size: 21px; line-height: 1; color: var(--tl-ink); }
+.terrain-map-status small { margin-top: 5px; overflow: hidden; color: color-mix(in srgb, var(--tl-ink) 72%, transparent); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.terrain-map-tools { position: absolute; z-index: 4; top: 18px; right: 18px; display: flex; gap: 8px; }
+.terrain-surface-tools { display: flex; }
+.travel-log-icon-btn { position: relative; display: grid; place-items: center; }
+.travel-log-icon-btn > svg { display: block; width: 15px; height: 15px; }
+.travel-log-icon-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  z-index: 20;
+  width: max-content;
+  max-width: 13rem;
+  padding: 6px 9px;
+  border: 1px solid color-mix(in srgb, var(--tl-ink) 12%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--tl-paper) 94%, transparent);
+  box-shadow: 0 7px 20px rgba(18,25,22,.16);
+  color: var(--tl-ink);
+  opacity: 0;
+  font: 600 11px/1.25 var(--font-ui);
+  pointer-events: none;
+  transform: translate(-50%, -4px);
+  transition: opacity .16s ease, transform .16s ease;
+  white-space: nowrap;
+}
+.travel-log-icon-btn:hover::after,
+.travel-log-icon-btn:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+.terrain-map-tools > :last-child .travel-log-icon-btn:last-child::after,
+.pj-map-tools > :last-child .travel-log-icon-btn:last-child::after,
+.basemap-ctl > :last-child .travel-log-icon-btn:last-child::after {
+  right: 0;
+  left: auto;
+  transform: translate(0, -4px);
+}
+.terrain-map-tools > :last-child .travel-log-icon-btn:last-child:hover::after,
+.terrain-map-tools > :last-child .travel-log-icon-btn:last-child:focus-visible::after,
+.pj-map-tools > :last-child .travel-log-icon-btn:last-child:hover::after,
+.pj-map-tools > :last-child .travel-log-icon-btn:last-child:focus-visible::after,
+.basemap-ctl > :last-child .travel-log-icon-btn:last-child:hover::after,
+.basemap-ctl > :last-child .travel-log-icon-btn:last-child:focus-visible::after {
+  transform: translate(0, 0);
+}
+.terrain-map-photo {
+  position: absolute;
+  z-index: 3;
+  width: 160px;
+  box-sizing: border-box;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, white 72%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--tl-paper) 78%, transparent);
+  box-shadow: 0 16px 42px rgba(18, 20, 18, .28);
+  backdrop-filter: blur(12px);
+  animation: terrain-photo-in .3s cubic-bezier(.2,.8,.2,1) both;
+  pointer-events: none;
+}
+.terrain-photo-connector {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.terrain-photo-connector line {
+  fill: none;
+  stroke: #e56f2d;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--tl-paper) 80%, transparent));
+}
+.dark .terrain-photo-connector line { stroke: #ff9851; }
+.terrain-map-photo img { display: block; width: 100%; height: 112px; object-fit: cover; }
+.terrain-map-photo figcaption { padding: 7px 9px 8px; color: var(--tl-ink); font: 650 10px/1 var(--font-mono); }
+@keyframes terrain-photo-in { from { opacity: 0; transform: translateY(8px) scale(.94); } to { opacity: 1; transform: none; } }
+.terrain-place {
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--tl-ink) 22%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tl-paper) 78%, transparent);
+  box-shadow: 0 3px 12px rgba(18,25,22,.15);
+  color: var(--tl-ink);
+  font: 700 9px/1.2 var(--font-ui);
+  letter-spacing: .04em;
+  white-space: nowrap;
+  backdrop-filter: blur(7px);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+.terrain-place-fuego { color: #c84828; }
+.terrain-place-trail-start,
+.terrain-place-camp { color: var(--tl-accent); }
+.terrain-place-waypoint {
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.terrain-waypoint-icon {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--tl-accent) 70%, var(--tl-paper));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tl-paper) 90%, transparent);
+  box-shadow: 0 4px 14px rgba(18,25,22,.18);
+  transition: transform .25s var(--ease), background-color .25s var(--ease);
+}
+.terrain-waypoint-icon svg { width: 15px; height: 15px; }
+.terrain-waypoint-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: 34px;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--tl-accent) 38%, var(--tl-paper));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--tl-paper) 92%, transparent);
+  box-shadow: 0 7px 20px rgba(18,25,22,.17);
+  color: var(--tl-accent);
+  opacity: 0;
+  font: 700 9px/1.2 var(--font-ui);
+  letter-spacing: .03em;
+  pointer-events: none;
+  transform: translate(-50%, 7px) scale(.92);
+  transform-origin: 50% 100%;
+  transition: opacity .22s var(--ease), transform .28s var(--ease);
+  white-space: nowrap;
+}
+.terrain-waypoint-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  border-right: inherit;
+  border-bottom: inherit;
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+}
+.terrain-place-waypoint.is-near .terrain-waypoint-icon {
+  background: color-mix(in srgb, var(--tl-accent) 12%, var(--tl-paper));
+  transform: scale(1.08);
+}
+.terrain-place-waypoint.is-near .terrain-waypoint-bubble {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+.terrain-attrib {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: var(--tl-attrib-h);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .45rem;
+  padding: 5px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--tl-ink) 10%, transparent);
+  background: color-mix(in srgb, var(--tl-paper) 94%, transparent);
+  color: color-mix(in srgb, var(--tl-ink) 58%, transparent);
+  font: 9px/1.2 var(--font-ui);
+  touch-action: none;
+}
+.terrain-attrib a { color: inherit; text-decoration: none; }
+.terrain-attrib a:hover { color: var(--tl-accent); }
+
+.terrain-story-col {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 22vh;
+  font-family: var(--font-serif-latin), var(--font-serif-zh);
+}
+.terrain-inner {
+  max-width: 40rem;
+  margin: 0 auto;
+  /* Mirror PTES' dedicated rail lane: the wider right inset belongs to the
+     progress axis, so prose and photographs never compete with its ticks. */
+  padding: 0 4.5rem 0 2.5rem;
+}
+.terrain-hero,
+.terrain-scene,
+.terrain-outro { width: 100%; }
+.terrain-hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5rem 0 6rem;
+}
+.terrain-kicker { margin: 0 0 .8rem; color: var(--tl-accent); font: 750 11px/1.3 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; }
+.terrain-hero h1 { max-width: 9em; margin: 0; color: var(--tl-ink); font-family: var(--font-serif-zh), var(--font-serif-latin); font-size: clamp(2.25rem, 5.2vw, 4.3rem); font-weight: 650; line-height: 1.08; letter-spacing: -.035em; }
+.terrain-subtitle { margin: .75rem 0 0; color: color-mix(in srgb, var(--tl-ink) 66%, transparent); font: 650 13px/1.4 var(--font-ui); letter-spacing: .06em; }
+.terrain-intro { max-width: 35rem; margin: 2.1rem 0 0; color: color-mix(in srgb, var(--tl-ink) 80%, transparent); font-size: 1rem; line-height: 1.95; }
+.terrain-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin: 2.5rem 0 0; border: 1px solid var(--tl-paper-line); border-radius: 13px; overflow: hidden; background: var(--tl-paper-line); }
+.terrain-facts div { padding: 12px 14px; background: var(--tl-paper); }
+.terrain-facts dt { color: color-mix(in srgb, var(--tl-ink) 55%, transparent); font: 10px/1.3 var(--font-ui); }
+.terrain-facts dd { margin: 5px 0 0; color: var(--tl-ink); font: 700 13px/1.2 var(--font-mono); }
+.terrain-scroll-cue { margin-top: 2.8rem; color: var(--tl-accent); font: 18px/1 var(--font-ui); animation: terrain-cue 1.8s ease-in-out infinite; }
+@keyframes terrain-cue { 50% { transform: translateY(8px); opacity: .45; } }
+.terrain-chapter-block { position: relative; padding: 6.5rem 0 7rem; scroll-margin-top: 1rem; }
+.terrain-chapter-block + .terrain-chapter-block { border-top: 1px solid color-mix(in srgb, var(--tl-ink) 10%, transparent); }
+.terrain-chapter-bar {
+  position: sticky;
+  top: 18px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 13px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--tl-ink) 13%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tl-paper) 94%, transparent);
+  box-shadow: 0 5px 18px rgba(18,25,22,.08);
+  backdrop-filter: blur(12px) saturate(1.2);
+  color: var(--tl-ink);
+  font-family: var(--font-ui);
+  transition: width .3s var(--ease), margin .3s var(--ease), border-color .25s ease, box-shadow .25s ease;
+}
+.terrain-chapter-fill { position: absolute; inset: 0 auto 0 0; width: var(--chapter-fill, 0%); border-radius: inherit; background: color-mix(in srgb, var(--tl-accent) 12%, transparent); transition: width .14s linear, background .25s ease; }
+.terrain-chapter-block.done .terrain-chapter-fill { background: color-mix(in srgb, var(--tl-ink) 7%, transparent); }
+.terrain-chapter-dot,
+.terrain-chapter-label,
+.terrain-chapter-title,
+.terrain-chapter-bar time { position: relative; z-index: 1; }
+.terrain-chapter-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: color-mix(in srgb, var(--tl-ink) 26%, transparent); transition: background .25s ease, transform .25s ease; }
+.terrain-chapter-label { flex: none; color: color-mix(in srgb, var(--tl-ink) 76%, transparent); font-size: 11px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.terrain-chapter-title { min-width: 0; overflow: hidden; color: color-mix(in srgb, var(--tl-ink) 58%, transparent); font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.terrain-chapter-title::before { content: "·"; margin-right: 9px; color: color-mix(in srgb, var(--tl-ink) 24%, transparent); }
+.terrain-chapter-bar time { margin-left: auto; flex: none; color: color-mix(in srgb, var(--tl-ink) 48%, transparent); font: 650 9px/1.2 var(--font-mono); letter-spacing: .02em; }
+.terrain-chapter-bar.on { border-color: color-mix(in srgb, var(--tl-accent) 76%, transparent); box-shadow: 0 4px 20px color-mix(in srgb, var(--tl-accent) 20%, transparent); }
+.terrain-chapter-bar.on .terrain-chapter-dot { background: var(--tl-accent); transform: scale(1.35); }
+@media (min-width: 1280px) {
+  .terrain-chapter-block.pinned .terrain-chapter-bar { width: calc(100% + 2rem); margin-left: -1rem; margin-right: -1rem; }
+}
+.terrain-scene { padding: 2rem 0 0; }
+.terrain-scene-head { margin-bottom: 2rem; }
+.terrain-scene-head h2 { max-width: 12em; margin: 0; color: var(--tl-ink); font-size: clamp(1.8rem, 3.4vw, 2.7rem); font-weight: 620; line-height: 1.18; letter-spacing: -.025em; }
+.terrain-scene > p { margin: 0 0 1.25rem; color: color-mix(in srgb, var(--tl-ink) 86%, transparent); font-size: 1rem; line-height: 2; text-align: justify; text-wrap: pretty; }
+.terrain-photo-stack { display: grid; gap: 2.2rem; margin-top: 2.8rem; }
+.terrain-story-photo { position: relative; margin: 0; overflow: hidden; border-radius: 14px; background: var(--tl-chip); box-shadow: 0 18px 45px rgba(24,30,27,.12); }
+.terrain-story-photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease); }
+.terrain-story-photo:hover img { transform: scale(1.015); }
+.terrain-story-photo figcaption { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: end; gap: 1.5rem; padding: 2.8rem 1.15rem 1rem; background: linear-gradient(transparent, rgba(7,12,10,.78)); color: white; font: 12px/1.45 var(--font-ui); }
+.terrain-story-photo figcaption span { max-width: 75%; }
+.terrain-story-photo figcaption small { flex: none; font: 9px/1.3 var(--font-mono); opacity: .8; }
+.terrain-outro { min-height: 55vh; display: flex; flex-direction: column; justify-content: center; padding: 5rem 0; text-align: center; }
+.terrain-outro span { color: var(--tl-accent); font: 750 10px/1.4 var(--font-ui); letter-spacing: .2em; }
+.terrain-outro p { margin: .8rem 0 0; color: var(--tl-ink); font-size: 1.25rem; }
+
+@media (max-width: 1023px) {
+  .terrain-map-col {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    width: 100%;
+    height: var(--log-map-height, 62vh);
+    min-height: var(--log-map-height, 62vh);
+    border-right: 0;
+    border-bottom: 1px solid var(--tl-paper-line);
+  }
+  .terrain-story-col { padding-bottom: 9vh; }
+  .terrain-inner { padding: 0 1.25rem; }
+  .terrain-hero { min-height: 62vh; padding: 4rem 0; }
+  .terrain-chapter-block { padding: 4rem 0 5rem; scroll-margin-top: var(--log-landing, 560px); }
+  .terrain-chapter-bar { top: calc(var(--log-map-height, 62vh) + 12px); }
+  .terrain-map-status { top: 12px; left: 12px; min-width: min(190px, calc(100% - 190px)); padding: 9px 11px; }
+  .terrain-map-status strong { font-size: 17px; }
+  .terrain-map-tools { top: 12px; right: 12px; }
+  .terrain-map-tools .pj-tool-btn { width: 28px; }
+  .terrain-map-photo { width: 126px; }
+  .terrain-map-photo img { height: 86px; }
+}
+@media (max-width: 560px) {
+  .terrain-map-status { width: 145px; min-width: 145px; max-width: 145px; }
+  .terrain-map-tools {
+    width: 185px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  [data-log-kind="terrain"] .travel-log-back { top: 100px; right: 14px; }
+  .terrain-facts { grid-template-columns: 1fr; }
+  .terrain-story-photo figcaption { display: block; }
+  .terrain-story-photo figcaption span { display: block; max-width: none; }
+  .terrain-story-photo figcaption small { display: block; margin-top: .35rem; }
+  .terrain-place-agua,
+  .terrain-place-antigua { display: none; }
+}
 @font-face {
   font-family: "GenWanMin2 TC";
   src:
@@ -2200,7 +2542,9 @@ body.pj-immersive .pj-page {
 .pj-inner {
   max-width: 40rem;
   margin: 0 auto;
-  padding: 0 2.5rem;
+  /* Anitabi shares PTES' reserved right gutter instead of placing the rail
+     against the normal prose inset. */
+  padding: 0 4.5rem 0 2.5rem;
 }
 
 /* overview */
@@ -2493,7 +2837,8 @@ body.pj-immersive .pj-page {
    by RouteFade's temporary transform containing block. */
 body.travel-log-launch::before,
 body.tl-veil-boot::before,
-body.pj-boot::before {
+body.pj-boot::before,
+body.terrain-boot::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -2538,18 +2883,21 @@ body.travel-log-launch::before {
   pointer-events: none;
 }
 body.tl-veil-boot .tl-veil-band,
-body.pj-boot .tl-veil-band {
+body.pj-boot .tl-veil-band,
+body.terrain-boot .tl-veil-band {
   opacity: 1;
   animation: travel-log-entry-wordmark 0.18s linear 3.5s forwards;
 }
 /* A distinct animation name restarts at full coverage when readiness arrives.
    This rule must follow the fallback shorthand and reset its 3.5s delay. */
 body.tl-veil-boot.tl-veil-open::before,
-body.pj-boot.pj-veil-open::before {
+body.pj-boot.pj-veil-open::before,
+body.terrain-boot.terrain-veil-open::before {
   animation: travel-log-entry-open 0.46s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 body.tl-veil-boot.tl-veil-open .tl-veil-band,
-body.pj-boot.pj-veil-open .tl-veil-band {
+body.pj-boot.pj-veil-open .tl-veil-band,
+body.terrain-boot.terrain-veil-open .tl-veil-band {
   opacity: 0;
   animation: none;
   transition: opacity 0.18s linear;
@@ -2571,6 +2919,7 @@ body.pj-boot.pj-veil-open .tl-veil-band {
   body.travel-log-launch::before,
   body.tl-veil-boot::before,
   body.pj-boot::before,
+  body.terrain-boot::before,
   .tl-veil-band { display: none; }
 }
 

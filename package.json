@@ -16,6 +16,9 @@
     "anitabi:images": "node scripts/anitabi-images.mjs",
     "pilgrimage:photos": "node scripts/pilgrimage-photos.mjs",
     "pilgrimage:derive": "node scripts/pilgrimage-derive.mjs",
+    "guatemala:build": "node scripts/guatemala-travel.mjs",
+    "guatemala:terrain": "node scripts/guatemala-terrain.mjs && node scripts/guatemala-terrain-style.mjs && node scripts/guatemala-contours.mjs",
+    "guatemala:contours": "node scripts/guatemala-contours.mjs",
     "prebuild": "npm run badges && npm run sync:data && npm run check:refs && npm run check:i18n",
     "predev": "npm run badges && npm run sync:data && npm run check:refs && npm run check:i18n"
   },

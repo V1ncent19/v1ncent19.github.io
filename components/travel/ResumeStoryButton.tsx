@@ -17,6 +17,7 @@ export default function ResumeStoryButton({ onResume }: { onResume: () => void }
           border: none;
           background: #ffffff;
           color: #1f2937;
+          font-family: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
           font-size: 15px;
           font-weight: 500;
           padding: 10px 26px;

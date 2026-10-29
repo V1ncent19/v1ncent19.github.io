@@ -1,0 +1,37 @@
+{
+  "id": "guatemala-2026",
+  "title": {
+    "en": "Acatenango — While Fuego Was Awake",
+    "zh": "在火山醒着的时候"
+  },
+  "blurb": {
+    "en": "A two-day climb from Antigua to Acatenango, crossing the saddle toward an erupting Fuego before returning to Antigua.",
+    "zh": "从 Antigua 出发攀登 Acatenango，横越鞍部靠近仍在喷发的 Fuego，再沿云雾林下山并返回 Antigua 的两日火山行。"
+  },
+  "start": "2026-05-31",
+  "end": "2026-06-01",
+  "days": 2,
+  "distanceKm": 73.6,
+  "gpsPoints": 906,
+  "beta": false,
+  "pinned": true,
+  "showPinnedBadge": false,
+  "stops": {
+    "en": ["Antigua", "Acatenango", "Fuego"],
+    "zh": ["安提瓜", "阿卡特南戈", "富埃戈"]
+  },
+  "cover": "/assets/photos/travel/guatemala-2026/img-0813.webp",
+  "coverPos": "center 44%",
+  "cardMeta": {
+    "en": "Interactive 3D terrain log",
+    "zh": "三维地形互动游记"
+  },
+  "cardCta": {
+    "en": "Climb the route",
+    "zh": "沿路线登山"
+  },
+  "cardFacts": {
+    "en": ["2 days", "3,617 m", "25 photos"],
+    "zh": ["2 天", "最高 3,617 m", "25 张照片"]
+  }
+}

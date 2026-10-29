@@ -1,5 +1,23 @@
 import type { PilgrimageData } from "../pilgrimage";
 import type { Attraction, TravelScene, TripInfo } from "../types";
+import type { TerrainTravelData } from "../terrain";
+
+export function loadTerrain(raw: unknown): TerrainTravelData {
+  const data = raw as TerrainTravelData;
+  const bad: string[] = [];
+  if (!Array.isArray(data.route?.points) || data.route.points.length < 2) bad.push("route.points");
+  if (data.route?.points?.some(point => !Array.isArray(point) || point.length !== 4 || !point.every(Number.isFinite)))
+    bad.push("route.points entries");
+  if (!Array.isArray(data.photos) || data.photos.some(photo => !photo.id || !photo.src ||
+    !Number.isFinite(photo.lat) || !Number.isFinite(photo.lon) || !Number.isInteger(photo.routeIndex)))
+    bad.push("photos");
+  if (!Array.isArray(data.scenes) || !data.scenes.length || data.scenes.some(scene =>
+    !scene.id || !Array.isArray(scene.route) || scene.route.length !== 2 ||
+    scene.route.some(index => !Number.isInteger(index) || index < 0 || index >= (data.route?.points?.length ?? 0))))
+    bad.push("scenes");
+  if (bad.length) throw new Error(`Malformed terrain travel data: ${bad.join(", ")}`);
+  return data;
+}
 
 export function loadPilgrimage(raw: unknown): PilgrimageData {
   const d = raw as PilgrimageData;

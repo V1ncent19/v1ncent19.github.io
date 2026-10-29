@@ -44,9 +44,9 @@ Optional tile fields worth knowing (updated 2026-10-25):
   out and every trip reads "Read the log" (中文 "阅读旅行志"), which is the
   house default since 2026-10-17.
 
-## The two shapes a trip can take
+## The three shapes a trip can take
 
-Both shapes share the travel-log shell, chapter navigation, toolbar, transitions
+All three shapes share the travel-log shell, chapter navigation, toolbar, transitions
 and mobile split. Their narrative rendering, GPS sampling and camera policies
 remain independent. Loading strategy follows payload size and does not determine
 page layout. See `structure_file/FEATURE_TRAVEL_LOG.md` for the framework and
@@ -163,6 +163,20 @@ The hand-made composites (36 JPG masters, ~30 MB) live in
 the only copy of that work. The raw phone photos they were composited from are
 gone. `photos.json` (the position source of truth) stays gitignored under
 `assets-src/travel-data/pilgrimage/`.
+
+### Terrain shape (guatemala-2026) — public derivatives, private masters
+
+`story.json` is the hand-maintained narrative and camera source. `data.json`
+combines it with a cropped 906-point route and photo placement metadata.
+`TerrainTravelLog` imports that payload at build time; the DEM, contour GeoJSON
+and re-encoded WebP photos are served from `public/assets/`.
+
+The year-long GPS file and full-resolution phone originals remain ignored under
+`assets-src/travel-data/` and `assets-src/guatemala-masters/`. They are required
+only for `npm run guatemala:build`; ordinary prose, camera and UI editing works
+from the committed derivatives. See
+`structure_file/FEATURE_GUATEMALA_TERRAIN_LOG.md` for the complete pipeline,
+privacy boundary and second-device workflow.
 
 ## Generator pipeline (pilgrimage)
 

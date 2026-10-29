@@ -1,7 +1,7 @@
 # Handover — 站点现状与新功能启动入口
 
-**最后更新：2026-10-25。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
-`ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_TRAVEL_LOG.md`（公共日志）、`FEATURE_PILGRIMAGE.md`（巡礼页）、`FEATURE_HOME_NAVIGATION.md`（首页、导航、标签与卡片）。
+**最后更新：2026-10-28。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
+`ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_TRAVEL_LOG.md`（公共日志）、`FEATURE_GUATEMALA_TERRAIN_LOG.md`（Guatemala 三维地形日志）、`FEATURE_PILGRIMAGE.md`（巡礼页）、`FEATURE_HOME_NAVIGATION.md`（首页、导航、标签与卡片）。
 
 ---
 
@@ -10,7 +10,7 @@
 Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代旧 Jekyll 站：
 全部主路由（Home / About / CV / Blog / Project / Travel / Guestbook）上线真实内容，中文 `/zh` 覆盖主路由
 （`/about/zh` 是亲笔原文，其余挂机翻声明条）。
-**Travel 是当前最重的模块**：hub（地球仪 + 游记 tiles + 相册墙 + 心愿单）、ptes-2025 互动游记、just-because 巡礼地图。
+**Travel 是当前最重的模块**：hub（地球仪 + 游记 tiles + 相册墙 + 心愿单）、ptes-2025 互动游记、just-because 巡礼地图、guatemala-2026 三维地形游记。
 2026-10-17 整棵新树（含 213 MB `public/assets/`）入库；**2026-10-18 首次部署成功并覆盖旧站**
 （commit `2f2b7b7` / Actions run `39081897536` success，线上 `tuoruipeng.com` 已是新站，旧 Jekyll 的 `/gallery/` 等路由 404）。发布方式见 §4。
 
@@ -33,6 +33,13 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 - 本地 Webpack 静态导出 70 页、类型、目标文件 lint、223 条资源引用检查通过；双语检查无错误，已有缺译提示保留。浏览器验收含 16 组导航、30 组字号比对、24 次卡片返回及明暗幕布交接，方法与限制见两份 FEATURE 文档及 `INTERACTION_AUDIT.md`。
 - 本轮未 commit、push 或发布。此处记录的是本地验收，不能作为线上版本状态。
 
+## Guatemala 三维地形日志（2026-10-28）
+
+- 新增 `/travel/guatemala-2026/` 与中文镜像，接入公共日志外壳的新 `terrain` 类型；中文正文、9 个章节、906 点路线、25 张去元数据照片与一张 Starbucks 占位图已可运行。
+- 地图使用本地 Terrarium DEM、素色贴图与平滑 100 m 等高线，支持三维跟随、手动探索后恢复、卫星切换、首尾环绕、山峰/营地/起点标记及滚动联动照片框。
+- 全年 GPS 与带 EXIF 的原图仅在 `assets-src/` 私有目录，均被 `.gitignore` 拦截；分支只提交裁切路线、位置展示数据、去元数据 WebP 与地形派生资源。另一台设备可直接继续正文、镜头和界面工作，重生成照片/路线才需私下复制母版。
+- 完整职责、生成命令、交互不变量与异机接续见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`。本轮开发分支不触发 Pages；只有 `nextjs-rebuild` 会部署。
+
 ## 3. 当前状态（2026-10-25）
 
 | 项 | 状态 |
@@ -43,6 +50,7 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 | Travel hub | MapLibre 地球仪 + 游记 tiles + 「Stories & frames」相册墙 + 心愿单清单 + 双向 hover 联动 |
 | ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画），景点标点 73 个，正文 14.8k 字按 GPS 投放。**移动端进度条已改成可拖拽条（2026-10-24）** |
 | 巡礼地图 | `/travel/just-because`（+zh）已上线：36 个对比点 + 273 点环线 + 可缩放相机 + 滚动联动。**还差用户填 `outro` 与 36 条 `note`** |
+| Guatemala 地形日志 | `/travel/guatemala-2026`（+zh）本地完成首轮：三维地形 + 等高线 + 906 点路线 + 25 张发布照片 + 9 章节镜头；当前在独立非部署分支继续打磨，线上尚未发布 |
 | 两页共用的进度条 | **移动端普通可拖拽条 + 拖动时浮出章节方框**（2026-10-24，v21，推翻 v17 水银温度计）；桌面竖轨圆点白环已修复。共享代码 `lib/travel/use-scrub-track.ts` + `lib/travel/scrub-chapters.ts` |
 | Blog 索引 | md 文章 + 游记卡合并（`lib/blog-travel.ts`，读取时合并，按日期倒序），无「假 md」。**游记卡日期用 `tripPostedAt()`（= `end`）** |
 | 相册 | 49 张（含 2026-10-25 新加的 `img-6308`），源目录 = `public/assets/photos/gallery/original/`。`thumb` 宽 640、`large` 长边 1680。**「精选集」= 置顶不是筛选**（2026-10-25），墙上永远 49 张全在 |
@@ -157,6 +165,7 @@ prebuild 自动跑 `badges → sync:data → check:refs → check:i18n`，任何
 | `CONVENTIONS.md` | Agent 守则 + 锁定的 v1 设计基线 + 历次决策（含已作废条目）+ Typography |
 | `GALLERY_ADDING_PHOTOS.md` | 相册加照片的操作流程（照做即可；源目录 = `public/assets/photos/gallery/original/`，git-ignored） |
 | `FEATURE_HOME_NAVIGATION.md` | 首页、总导航、标签、卡片点击与返回的最终规则及验收边界 |
-| `FEATURE_TRAVEL_LOG.md` | 两类旅行日志公共骨架、独立边界、入口幕布与新增流程 |
+| `FEATURE_TRAVEL_LOG.md` | 三类旅行日志公共骨架、独立边界、入口幕布与新增流程 |
+| `FEATURE_GUATEMALA_TERRAIN_LOG.md` | Guatemala 三维地形日志：交互、镜头、照片、私有输入与派生资源管线 |
 | `FEATURE_PILGRIMAGE.md` | 巡礼地图：现状、管线、数据格式、实现不变量、待办、轮次记录 |
 | `archive/` | 2026-09 初的重建规划原稿（Stitch 导出、迁移审计、实施规范），仅考古，**内容多已过时** |

@@ -1,6 +1,7 @@
 import type { TripCard } from "../trips";
 import type { Attraction, TravelScene, TripInfo } from "../types";
 import type { PilgrimageData } from "../pilgrimage";
+import type { TerrainTravelData } from "../terrain";
 
 /** Serializable page definitions: no component imports or browser state here. */
 interface LogBase {
@@ -25,7 +26,12 @@ export interface PilgrimageDefinition extends LogBase {
   data: PilgrimageData;
 }
 
-export type TravelLogDefinition = JournalDefinition | PilgrimageDefinition;
+export interface TerrainDefinition extends LogBase {
+  kind: "terrain";
+  data: TerrainTravelData;
+}
+
+export type TravelLogDefinition = JournalDefinition | PilgrimageDefinition | TerrainDefinition;
 export type LogKind = TravelLogDefinition["kind"];
 export type LogLang = "en" | "zh";
 
