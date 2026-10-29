@@ -14,7 +14,7 @@
   "distanceKm": 17.6,
   "gpsPoints": 36,
   "beta": false,
-  "pinned": true,
+  "featured": true,
   "showPinnedBadge": false,
   "stops": {
     "en": [

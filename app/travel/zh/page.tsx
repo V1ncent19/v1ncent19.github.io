@@ -11,7 +11,7 @@ import { copy } from "@/lib/i18n";
 export const metadata: Metadata = {
   title: "旅行志",
   description:
-    "可拖拽的足迹地球就在标题旁——其下是混排瀑布流：钉住的互动游记（Beta）置顶，巴黎餐馆简评按日期落进 2024-03-20 处，其后是精选照片墙。",
+    "可拖拽的足迹地球就在标题旁——其下是混排瀑布流：精选互动游记与精选照片按同一套日期规则排列。",
 };
 
 /* The Paris cuisine blog post surfaced as a story tile (image-less, so no
@@ -21,8 +21,8 @@ const PARIS_SLUG = "fr2024-cuisine";
 /**
  * /travel/zh — 中文版 hub（2026-09-25 v3，与 EN 页同构）：地球放在页头标题
  * 右侧（不单开 § 足迹小节——打开即见地球与瀑布流两个主元素），清单以折叠
- * 图例行收在页头下方（TravelBoard hideGlobe 模式）；瀑布流最前是纯排版
- * 无图游记文字卡，其后照片墙与 /gallery/zh 完全同体验。Trip 正文目前是
+ * 图例行收在页头下方（TravelBoard hideGlobe 模式）；纯排版游记文字卡与
+ * 照片墙共用精选/日期排序及 /gallery/zh 的交互。Trip 正文目前是
  * 双语混合原始数据，中文卡链到 /travel/zh/<id>（同一 TravelLog）。
  */
 export default function TravelZhPage() {
@@ -49,8 +49,10 @@ export default function TravelZhPage() {
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
     coverPos: trip.coverPos,
-    /* 旅行日志默认都是 featured 导航入口，排在照片流之前。 */
-    pinned: trip.pinned ?? true,
+    /* 真正的 pinned 高于精选带（目前仅 PTES）。 */
+    pinned: trip.pinned ?? false,
+    /* 旅行日志与 featured 照片进入同一条按日期排序的精选带。 */
+    featured: trip.featured ?? true,
     showPinnedBadge: trip.showPinnedBadge ?? false,
   }));
 
@@ -68,14 +70,14 @@ export default function TravelZhPage() {
       /* 三张故事卡统一 CTA 文案（2026-10-17 用户要求）。 */
       cta: "阅读旅行志",
       cover: "/assets/photos/gallery/thumb/img-0462.webp",
-      /* 不置顶：按日期并入照片时间线。 */
+      /* 非精选：按日期并入普通照片时间线。 */
       date: "2024-03-20",
     });
   }
 
   /* 编号按时间序跨全部游记 tile 统一分配（2026-09-26 用户要求）：按锚点
      日期排序后发 01、02……——巴黎食记（2024-03）为 01，伊比利亚志
-     （2025-12）为 02，置顶卡在视觉上仍排在最前。 */
+     （2025-12）为 02。 */
   const numbered = storyTiles
     .slice()
     .sort((a, b) => (a.date ?? "").localeCompare(b.date ?? ""));
@@ -116,8 +118,7 @@ export default function TravelZhPage() {
           </HubHoverLink>
         </header>
 
-        {/* ---- 游记与照片：无图游记文字卡置顶，其后照片墙与 /gallery/zh
-            同体验。 ---- */}
+        {/* ---- 游记与照片：文字卡与照片共用精选/日期排序和画廊交互。 ---- */}
         <section className="mt-12" aria-label="游记与照片">
           <div className="mb-6 border-b border-line pb-3">
             <h2 className="flex scroll-mt-28 items-center gap-3.5 text-2xl font-semibold tracking-tight">
@@ -125,7 +126,7 @@ export default function TravelZhPage() {
               游记与照片
             </h2>
             <p className="mt-3 max-w-[62ch] leading-relaxed text-muted">
-              被钉住的旅行志排在最前；食记按日期落进照片流。每一张照片都能点开背后的故事、坐标与原图下载。
+              精选旅行志与精选照片按同一套日期规则排列；食记也按日期落进照片流。每一张照片都能点开背后的故事、坐标与原图下载。
             </p>
           </div>
           <GalleryView

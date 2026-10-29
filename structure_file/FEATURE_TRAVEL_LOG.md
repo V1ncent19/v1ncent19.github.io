@@ -1,6 +1,6 @@
 # FEATURE — 统一地图旅行日志框架
 
-2026-10-24，2026-10-28 增补 terrain 类型。适用 `/travel/ptes-2025/`、`/travel/just-because/`、`/travel/guatemala-2026/` 及其 `/travel/zh/<id>/` 镜像。
+2026-10-24，2026-10-28 增补 terrain 类型，2026-10-29 统一开场组件。适用 `/travel/ptes-2025/`、`/travel/just-because/`、`/travel/guatemala-2026/` 及其 `/travel/zh/<id>/` 镜像。
 
 ## 组织边界
 
@@ -27,6 +27,8 @@
 | `TravelLogShell.tsx` | 公共框架、返回、离场动画、幕布就绪/超时/失败处理、加载与错误状态、布局 context |
 | `ChapterNavigation.tsx` | 一份章节测量、阅读百分比、桌面轨道、移动端拖拽提示、目录与返回顶部逻辑；保留两套正文边栏的视觉 skin |
 | `MapToolbar.tsx` | 公共主题控件与定位；地图专属按钮通过 children 接入 |
+| `TravelLogFacts.tsx` | 三列开场元数据窗格；每种日志提供自己的 label/value，但不再复制结构和样式 |
+| `TravelLogScrollCue.tsx` | 中英文开场阅读提示、双箭头动效与减少动态效果兜底；三种日志共用 |
 | `lib/travel/log/layout.tsx` | 1024px 断点、两类默认高度、按旅行 ID 的存储配置 |
 | `lib/travel/log/reading-geometry.ts` | 地图遮挡后的正文可见区域、导航阅读线、文档进度与连续拖拽 |
 | `lib/travel/log/navigation.ts` | 正文元素查询与 `navigateToChapter()`；支持 journal 阅读线落点和 pilgrimage CSS 落点策略 |
@@ -46,6 +48,8 @@
 - 巡礼导航直接消费正文 observer 得出的当前章节，不再自行运行第二套章节评分。
 - 手动探索不因后续滚动恢复；显式恢复回到当前阅读位置；巡礼查看全程后保持 overview。
 - 入场幕布完整加载时由解析期脚本设置 body 类，Next Link 导航由 `useLayoutEffect` 在绘制前补齐；统一通过 `body::before` 绘制。禁止水合前插入真实 DOM 幕布。动画监听同时检查名称与 `pseudoElement`，失败及超时应释放幕布，卸载须清理类。
+- 三种日志的开场必须使用同一套 `TravelLogFacts` 与 `TravelLogScrollCue`。元数据内容可以不同：PTES 显示天数/里程/GPS，Anitabi 显示时长/路线点/对比图，Guatemala 显示最高点/爬升/路线点。
+- 不提供正文自动播放：地图镜头与不同密度的文字、图片、视频没有一套始终舒适的统一速度。开场只提示手动滚动，让现有 observer 按真实阅读位置更新地图；不要另建地图时间轴。
 
 ## 布局与样式
 
@@ -58,7 +62,7 @@
 
 ## 新增一篇旅行日志
 
-1. 创建 `content/travel/<id>/card.json`；目录名与卡片 `id` 一致。此后各索引自动发现它。旅行日志 `pinned` 默认 true（featured 排位），`showPinnedBadge` 默认 false（可见图标）；目前只有 PTES 开启图标，Anitabi 仍为 featured。两者可选字段均校验为布尔值；不要为了隐藏图标取消 featured 排位。
+1. 创建 `content/travel/<id>/card.json`；目录名与卡片 `id` 一致。此后各索引自动发现它。旅行日志 `featured` 默认 true，与精选照片按返程日进入同一条时间线；`pinned` 默认 false，是高于精选带的独立最高优先级，目前仅 PTES 使用；`showPinnedBadge` 默认 false，只控制可见图标。三个可选字段均校验为布尔值。
 2. 按现有 journal 或 pilgrimage 模型准备本篇内容。正文保留自己的创作语言；公共界面语言由路由传入。
 3. 创建 `lib/travel/log/definitions/<id>.ts`，直接导入本篇小文件、调用对应校验器并提供 `kind/id/card/wordmark`。journal 另提供 `trip/scenes/attractions/trackUrl`，pilgrimage 提供 `data`。浏览器标题不同于卡片标题时可提供 `pageTitles`。
 4. 添加两个薄入口：`app/travel/<id>/page.tsx`、`app/travel/zh/<id>/page.tsx`，只导入定义和 `TravelLogPage`，分别传 `lang="en"` / `"zh"`；metadata 调用 `logMetadata()`。
@@ -67,7 +71,7 @@
 
 新内容类型才需要扩展 `TravelLogDefinition`，提供自己的正文、旅行位置计算和地图组件；接入同一外壳、章节接口与工具栏。Guatemala 已按此方式加入 `terrain`。不要把新类型字段塞进旧类型的可选字段集合。
 
-首页/导航卡片的确认图形、返回规则和辅助标签参数另见 `FEATURE_HOME_NAVIGATION.md`；照片的 `featured` 不等于旅行日志的 `pinned`。
+首页/导航卡片的确认图形、返回规则和辅助标签参数另见 `FEATURE_HOME_NAVIGATION.md`；Travel hub 的优先级是 `pinned` → `featured` → 当前日期/地点/随机排序。
 
 ## 验收方法
 

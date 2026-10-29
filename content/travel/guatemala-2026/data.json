@@ -5451,6 +5451,7 @@
   "photos": [
     {
       "id": "starbucks-placeholder",
+      "kind": "photo",
       "src": "/assets/photos/gallery/large/img-0563.webp",
       "width": 1120,
       "height": 1680,
@@ -5462,6 +5463,7 @@
     },
     {
       "id": "img-0758",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0758.webp",
       "width": 2200,
       "height": 1650,
@@ -5473,6 +5475,7 @@
     },
     {
       "id": "img-0581",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0581.webp",
       "width": 2200,
       "height": 1650,
@@ -5484,6 +5487,7 @@
     },
     {
       "id": "img-0583",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0583.webp",
       "width": 1650,
       "height": 2200,
@@ -5495,6 +5499,7 @@
     },
     {
       "id": "img-0587",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0587.webp",
       "width": 2200,
       "height": 1650,
@@ -5506,6 +5511,7 @@
     },
     {
       "id": "img-0590",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0590.webp",
       "width": 2200,
       "height": 1650,
@@ -5517,6 +5523,7 @@
     },
     {
       "id": "img-0593",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0593.webp",
       "width": 2200,
       "height": 1650,
@@ -5528,6 +5535,7 @@
     },
     {
       "id": "img-0597",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0597.webp",
       "width": 1650,
       "height": 2200,
@@ -5539,6 +5547,7 @@
     },
     {
       "id": "img-0601",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0601.webp",
       "width": 1650,
       "height": 2200,
@@ -5550,6 +5559,7 @@
     },
     {
       "id": "img-0602",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0602.webp",
       "width": 1650,
       "height": 2200,
@@ -5561,6 +5571,7 @@
     },
     {
       "id": "img-0611",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0611.webp",
       "width": 2200,
       "height": 1650,
@@ -5572,6 +5583,7 @@
     },
     {
       "id": "img-0616",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0616.webp",
       "width": 1650,
       "height": 2200,
@@ -5583,6 +5595,7 @@
     },
     {
       "id": "img-0637",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0637.webp",
       "width": 1650,
       "height": 2200,
@@ -5594,6 +5607,7 @@
     },
     {
       "id": "img-0650",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0650.webp",
       "width": 1650,
       "height": 2200,
@@ -5605,6 +5619,7 @@
     },
     {
       "id": "img-0656",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0656.webp",
       "width": 2200,
       "height": 1650,
@@ -5616,6 +5631,7 @@
     },
     {
       "id": "img-0661",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0661.webp",
       "width": 1650,
       "height": 2200,
@@ -5627,6 +5643,7 @@
     },
     {
       "id": "img-0698",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0698.webp",
       "width": 2200,
       "height": 1650,
@@ -5637,7 +5654,32 @@
       "routeIndex": 407
     },
     {
+      "id": "img-0703",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0703.webp",
+      "width": 2200,
+      "height": 1650,
+      "shotAt": "2026-05-31T17:45:04-06:00",
+      "lat": 14.4822389,
+      "lon": -90.8804472,
+      "altitudeM": 3609,
+      "routeIndex": 407
+    },
+    {
+      "id": "img-0741",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0741.webp",
+      "width": 2200,
+      "height": 1650,
+      "shotAt": "2026-05-31T18:31:23-06:00",
+      "lat": 14.4822194,
+      "lon": -90.8804556,
+      "altitudeM": 3613,
+      "routeIndex": 408
+    },
+    {
       "id": "img-0754",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0754.webp",
       "width": 2200,
       "height": 1650,
@@ -5648,7 +5690,34 @@
       "routeIndex": 408
     },
     {
+      "id": "video-0772",
+      "kind": "video",
+      "src": "/assets/photos/travel/guatemala-2026/video-0772-poster.webp",
+      "videoSrc": "/assets/photos/travel/guatemala-2026/video-0772.mp4",
+      "width": 900,
+      "height": 1600,
+      "durationS": 14.9,
+      "shotAt": "2026-05-31T18:53:07-06:00",
+      "lat": 14.4822,
+      "lon": -90.8804,
+      "altitudeM": 3609,
+      "routeIndex": 408
+    },
+    {
+      "id": "img-0784",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0784.webp",
+      "width": 1650,
+      "height": 2200,
+      "shotAt": "2026-05-31T21:01:53-06:00",
+      "lat": 14.4949861,
+      "lon": -90.873,
+      "altitudeM": 3588,
+      "routeIndex": 472
+    },
+    {
       "id": "img-0786",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0786.webp",
       "width": 1650,
       "height": 2200,
@@ -5660,6 +5729,7 @@
     },
     {
       "id": "img-0787",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0787.webp",
       "width": 2200,
       "height": 1650,
@@ -5670,7 +5740,32 @@
       "routeIndex": 472
     },
     {
+      "id": "img-0790",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0790.webp",
+      "width": 1650,
+      "height": 2200,
+      "shotAt": "2026-05-31T21:38:51-06:00",
+      "lat": 14.4950361,
+      "lon": -90.8728028,
+      "altitudeM": 3587,
+      "routeIndex": 472
+    },
+    {
+      "id": "img-0799",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0799.webp",
+      "width": 2200,
+      "height": 1650,
+      "shotAt": "2026-05-31T21:57:49-06:00",
+      "lat": 14.494975,
+      "lon": -90.8727944,
+      "altitudeM": 3584,
+      "routeIndex": 472
+    },
+    {
       "id": "img-0813",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0813.webp",
       "width": 1650,
       "height": 2200,
@@ -5681,7 +5776,34 @@
       "routeIndex": 478
     },
     {
+      "id": "video-eruption-0454",
+      "kind": "video",
+      "src": "/assets/photos/travel/guatemala-2026/video-eruption-0454-poster.webp",
+      "videoSrc": "/assets/photos/travel/guatemala-2026/video-eruption-0454.mp4",
+      "width": 1600,
+      "height": 1200,
+      "durationS": 10.86,
+      "shotAt": "2026-06-01T04:54:34-06:00",
+      "lat": 14.4949694,
+      "lon": -90.8728111,
+      "altitudeM": 3579,
+      "routeIndex": 478
+    },
+    {
+      "id": "img-0831",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0831.webp",
+      "width": 1932,
+      "height": 2200,
+      "shotAt": "2026-06-01T04:54:47-06:00",
+      "lat": 14.4949694,
+      "lon": -90.8728111,
+      "altitudeM": 3579,
+      "routeIndex": 478
+    },
+    {
       "id": "img-0842",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0842.webp",
       "width": 2200,
       "height": 1650,
@@ -5693,6 +5815,7 @@
     },
     {
       "id": "img-0872",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0872.webp",
       "width": 2200,
       "height": 1650,
@@ -5704,6 +5827,7 @@
     },
     {
       "id": "img-0882",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0882.webp",
       "width": 1650,
       "height": 2200,
@@ -5714,7 +5838,20 @@
       "routeIndex": 482
     },
     {
+      "id": "img-0887",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0887.webp",
+      "width": 2200,
+      "height": 1650,
+      "shotAt": "2026-06-01T07:50:12-06:00",
+      "lat": 14.4952417,
+      "lon": -90.8722528,
+      "altitudeM": 3578,
+      "routeIndex": 485
+    },
+    {
       "id": "img-0888",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0888.webp",
       "width": 2200,
       "height": 1650,
@@ -5725,7 +5862,20 @@
       "routeIndex": 485
     },
     {
+      "id": "img-0891",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0891.webp",
+      "width": 2200,
+      "height": 1650,
+      "shotAt": "2026-06-01T08:29:22-06:00",
+      "lat": 14.5139139,
+      "lon": -90.8712472,
+      "altitudeM": 3442,
+      "routeIndex": 558
+    },
+    {
       "id": "img-0893",
+      "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0893.webp",
       "width": 1650,
       "height": 2200,
@@ -5932,8 +6082,20 @@
           "caption": "观景平台距离火山口已经非常近。"
         },
         {
+          "id": "img-0703",
+          "caption": "站在 Fuego 观景平台，喷烟的火山口就在身后。"
+        },
+        {
+          "id": "img-0741",
+          "caption": "日落前的云海铺满火山西侧的天空。"
+        },
+        {
           "id": "img-0754",
           "caption": "日落后的火山坡面，只剩云海与喷发的光。"
+        },
+        {
+          "id": "video-0772",
+          "caption": "暮色中的 Fuego 持续喷烟，熔岩沿山坡滚落。"
         }
       ]
     },
@@ -5961,12 +6123,24 @@
       ],
       "photos": [
         {
+          "id": "img-0784",
+          "caption": "回到营地后，大家围着头灯和热食补充体力。"
+        },
+        {
           "id": "img-0786",
           "caption": "回到营地后，夜色让每一次熔岩喷发都格外清楚。"
         },
         {
           "id": "img-0787",
           "caption": "月光、云层与整夜没有停下来的 Fuego。"
+        },
+        {
+          "id": "img-0790",
+          "caption": "星空下的一次喷发，把火山口和飞散的熔岩一并照亮。"
+        },
+        {
+          "id": "img-0799",
+          "caption": "云层贴着 Fuego 山腰，红光从雾中渗出。"
         }
       ]
     },
@@ -5997,6 +6171,14 @@
         {
           "id": "img-0813",
           "caption": "凌晨 04:38，一次巨大的连续性喷发照亮整条山坡。"
+        },
+        {
+          "id": "video-eruption-0454",
+          "caption": "凌晨的大喷发持续铺满火山口，雷鸣般的声音随后抵达。"
+        },
+        {
+          "id": "img-0831",
+          "caption": "黎明前的大喷发，熔岩沿整条山坡散开。"
         },
         {
           "id": "img-0842",
@@ -6037,8 +6219,16 @@
           "caption": "清晨营地里的同行者。"
         },
         {
+          "id": "img-0887",
+          "caption": "下山前回望 Agua，云海仍停在山腰之下。"
+        },
+        {
           "id": "img-0888",
           "caption": "下山前最后一次回望 Agua 与云海。"
+        },
+        {
+          "id": "img-0891",
+          "caption": "沿北坡下降，林线和热带植被逐渐重新出现。"
         },
         {
           "id": "img-0893",

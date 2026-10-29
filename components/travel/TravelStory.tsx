@@ -5,6 +5,8 @@ import type { TravelScene, TripInfo } from "@/lib/travel/types";
 import { navigateToChapter } from "@/lib/travel/log/navigation";
 import type { LogLang } from "@/lib/travel/log/types";
 import TravelNav from "./TravelNav";
+import TravelLogFacts from "./log/TravelLogFacts";
+import TravelLogScrollCue from "./log/TravelLogScrollCue";
 
 function timeRange(s: TravelScene): string {
   return `${s.startTime.slice(11, 16)} – ${s.endTime.slice(11, 16)}`;
@@ -183,29 +185,15 @@ function TravelStory({
           <p className="kicker">Travel log</p>
           <h1>{trip.title}</h1>
           <p className="intro-meta">
-            {trip.start} → {trip.end} · {trip.days.length} days · {trip.stats.distanceKm.toLocaleString()} km ·{" "}
-            {trip.stats.points.toLocaleString()} GPS points
+            {trip.start} → {trip.end}
           </p>
-          <p className="intro-hint">
-            Scroll the journal to start the trip and read the story.
-          </p>
+          <TravelLogFacts items={[
+            { label: lang === "zh" ? "行程天数" : "Days", value: trip.days.length.toLocaleString() },
+            { label: lang === "zh" ? "总里程" : "Distance", value: `${trip.stats.distanceKm.toLocaleString()} km` },
+            { label: lang === "zh" ? "GPS 轨迹点" : "GPS points", value: trip.stats.points.toLocaleString() },
+          ]} />
         </div>
-        {/* v12 (2026-09-28 user request): bottom scroll cue. The intro used to
-            end with the Day 0 capsule peeking in — odd as a first impression.
-            A downward double chevron (user pick) with a looping drop animation
-            plus "Scroll to read" now anchors the boot screen and teaches the
-            reading gesture. Reduced motion: static chevrons. */}
-        <div className="intro-scroll-hint" aria-hidden="true">
-          <span className="hint-chevrons">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m6 8 6 6 6-6" />
-            </svg>
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m6 8 6 6 6-6" />
-            </svg>
-          </span>
-          <span className="hint-text">Scroll to read</span>
-        </div>
+        <TravelLogScrollCue lang={lang} />
       </section>
 
       {/* ---- scenes, one sticky-capsule block per day ---- */}

@@ -30,8 +30,8 @@
  *
  * ORDER: sorted by `start` date, oldest first, with `id` as the tiebreak so
  * the result is deterministic. This module's order no longer decides the hub's
- * visual order — app/travel/page.tsx re-sorts its tiles by their anchor date
- * and applies the `pinned` flag itself — so the sort here only needs to be
+ * visual order — the travel hub merges story tiles with photos by their anchor
+ * date and applies the `featured` band itself — so the sort here only needs to be
  * *stable and predictable*, which makes diffs and debugging sane.
  *
  * PRIVACY: `card.json` and the other imported JSONs are build-time content and
@@ -65,11 +65,10 @@ export interface TripCard {
   distanceKm: number;
   gpsPoints: number;
   beta: boolean;
-  /**
-   * Pin the tile to the front of the /travel flow. Travel logs default to
-   * true (2026-10-25): they are featured navigation entries ahead of photos.
-   */
+  /** Keep this trip above the featured band on the Travel hub. */
   pinned?: boolean;
+  /** Join the same curated band as featured gallery photos. */
+  featured?: boolean;
   /** Optional visible pin icon, independent of featured placement. */
   showPinnedBadge?: boolean;
   /**
@@ -146,7 +145,7 @@ function readTripCards(): TripCard[] {
           "Every trip card needs these fields (see lib/travel/trips.ts).",
       );
     }
-    for (const field of ["pinned", "showPinnedBadge"] as const) {
+    for (const field of ["pinned", "featured", "showPinnedBadge"] as const) {
       if (raw[field] !== undefined && typeof raw[field] !== "boolean") {
         throw new Error(`${path.relative(process.cwd(), file)}: ${field} must be a boolean.`);
       }

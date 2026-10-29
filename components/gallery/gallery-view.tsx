@@ -44,8 +44,8 @@ type ReturnView = { mode: SortMode; dir: "asc" | "desc"; featuredFirst: boolean;
 const returnViews = new Map<string, ReturnView>();
 
 /**
- * A non-photo "story" card pinned to the front of the masonry flow (2026-09-25
- * travel hub): trip logs and blog posts rendered as tiles that look native in
+ * A non-photo "story" card in the masonry flow (2026-09-25 travel hub): trip
+ * logs and blog posts rendered as tiles that look native in
  * the waterfall but navigate to their post instead of opening the lightbox.
  * Deliberately image-less (user decision): a typographic card — big index
  * numeral + serif title + meta + call-to-action on a tinted surface — reads as
@@ -67,18 +67,18 @@ export interface GalleryStoryTile {
   cta?: string;
   /** Small pill under the title, e.g. "Beta". */
   badge?: string;
-  /**
-   * Pin the tile to the very front of the flow (2026-09-25 user request) and
-   * stamp a "pinned" marker on the card. Pinned tiles ignore sort/filter.
-   */
+  /** Keep the tile above every featured and regular entry. */
   pinned?: boolean;
+  /**
+   * Place the tile in the same curated band as featured photos. Featured
+   * stories still obey the active date sort inside that band.
+   */
+  featured?: boolean;
   /** Draw the pin icon only when explicitly requested; does not affect order. */
   showPinnedBadge?: boolean;
   /**
-   * YYYY-MM-DD anchor for unpinned tiles: in date-sorted mode they are merged
-   * into the photo stream at this date (2026-09-25 user request — the Paris
-   * food diary sits at 2024-03-20 in the timeline, not on top). In other sort
-   * modes (place/shuffle) unpinned tiles ride up front after the pinned ones.
+   * YYYY-MM-DD anchor used to merge the tile into the photo stream in date
+   * mode (2026-09-25 user request — the Paris food diary sits at 2024-03-20).
    */
   date?: string;
   /**
@@ -339,12 +339,7 @@ export function GalleryView({
    * like the /gallery page.
    */
   embedded?: boolean;
-  /**
-   * Story cards pinned ahead of the photos in the flow (2026-09-25, travel
-   * hub). Deliberately NOT affected by the sort chips / curated filter /
-   * shuffle: they are navigation, not part of the browsable collection, and
-   * must keep their lead position however the photos are rearranged.
-   */
+  /** Story cards that share the masonry flow and its date/featured ordering. */
   storyTiles?: GalleryStoryTile[];
 }) {
   const s = copy[lang];
@@ -491,71 +486,70 @@ export function GalleryView({
   }, [containerW, prefCols]);
 
   /**
-   * The full tile flow. Pinned story cards always lead (regardless of sort/
-   * filter — they are navigation); unpinned stories carry a `date` and are
-   * merged into the photo stream at that date in date-sorted mode (2026-09-25
-   * user request: the Paris food diary sits at its 2024-03-20 spot in the
-   * timeline). In place/shuffle modes unpinned stories ride up front right
-   * after the pinned ones. Photos keep their index INTO `ordered` so the
-   * lightbox (which indexes `ordered`) stays untouched by the story inserts.
+   * The full tile flow has three priorities: pinned stories, the featured
+   * band, then regular entries. Inside those bands every entry obeys the active
+   * date/place/shuffle order. Photos keep their index INTO `ordered` so the
+   * lightbox (which indexes `ordered`) stays untouched by story inserts.
    */
   type FlowEntry =
     | { kind: "story"; story: GalleryStoryTile }
     | { kind: "photo"; item: GalleryItem; photoIndex: number };
 
   const flow = useMemo<FlowEntry[]>(() => {
-    const pinned = storyTiles.filter((s) => s.pinned);
-    const loose = storyTiles.filter((s) => !s.pinned);
-    if (mode !== "date" || loose.length === 0) {
-      return [
-        ...storyTiles.map((story) => ({ kind: "story" as const, story })),
-        ...ordered.map((item, photoIndex) => ({
-          kind: "photo" as const,
-          item,
-          photoIndex,
-        })),
-      ];
-    }
-    const flip = dir === "asc" ? 1 : -1;
-    // Stories keep the same chronological direction as the photos around them.
-    const stories = [...loose].sort(
-      (a, b) => (a.date || "").localeCompare(b.date || "") * flip,
-    );
-    const flow: FlowEntry[] = pinned.map((story) => ({
+    const photos: FlowEntry[] = ordered.map((item, photoIndex) => ({
+      kind: "photo" as const,
+      item,
+      photoIndex,
+    }));
+    const stories: FlowEntry[] = storyTiles.map((story) => ({
       kind: "story" as const,
       story,
     }));
-    /* The curated pin (2026-10-25) puts non-chronological items at the front,
-     * so the date-merge below must not run over them: comparing a pinned
-     * 2026-08 featured photo against a story dated 2024-03 would make the
-     * `while` loop dump several stories in the middle of the featured band and
-     * scramble its order. The featured band is emitted as one intact run, and
-     * only the photos AFTER it are merged with stories by date. */
-    const firstUnfeatured = ordered.findIndex((i) => i.featured !== true);
-    const pinnedCount =
-      !featuredFirst ? 0 : firstUnfeatured === -1 ? ordered.length : firstUnfeatured;
-    let s = 0;
-    ordered.forEach((item, photoIndex) => {
-      if (photoIndex < pinnedCount) {
-        flow.push({ kind: "photo", item, photoIndex });
-        return;
-      }
-      // desc: a story leads every photo strictly older than it (equal dates:
-      // the photo of that day stays first). asc mirrors the comparison.
-      while (
-        s < stories.length &&
-        (flip === -1
-          ? (item.date || "") <= (stories[s].date || "")
-          : (item.date || "") >= (stories[s].date || ""))
-      ) {
-        flow.push({ kind: "story", story: stories[s] });
-        s += 1;
-      }
-      flow.push({ kind: "photo", item, photoIndex });
-    });
-    stories.slice(s).forEach((story) => flow.push({ kind: "story", story }));
-    return flow;
-  }, [storyTiles, ordered, mode, dir, featuredFirst]);
+    const dateOf = (entry: FlowEntry) =>
+      entry.kind === "story" ? entry.story.date || "" : entry.item.date || "";
+    const placeOf = (entry: FlowEntry) =>
+      entry.kind === "story"
+        ? entry.story.tags?.[0]?.toLowerCase() || ""
+        : pick(entry.item.place, lang).toLowerCase();
+    const isPinned = (entry: FlowEntry) =>
+      entry.kind === "story" && entry.story.pinned === true;
+    const isFeatured = (entry: FlowEntry) =>
+      entry.kind === "story"
+        ? entry.story.featured === true
+        : entry.item.featured === true;
+
+    let sorted: FlowEntry[];
+    if (mode === "shuffle") {
+      // Photos already carry the lightbox's seeded shuffle order. Insert the
+      // stories at seeded positions without changing that relative photo order.
+      sorted = [...photos];
+      const rnd = mulberry32(shuffleNonce ^ 0x53a9f17b);
+      shuffleList(stories, shuffleNonce ^ 0x2742e51d).forEach((story) => {
+        sorted.splice(Math.floor(rnd() * (sorted.length + 1)), 0, story);
+      });
+    } else {
+      const flip = dir === "asc" ? 1 : -1;
+      sorted = [...photos, ...stories].sort((a, b) => {
+        if (mode === "place") {
+          const pa = placeOf(a);
+          const pb = placeOf(b);
+          if (!pa && pb) return 1;
+          if (pa && !pb) return -1;
+          if (pa !== pb) return (pa < pb ? -1 : 1) * flip;
+        }
+        return dateOf(a).localeCompare(dateOf(b)) * flip;
+      });
+    }
+
+    const pinned = sorted.filter(isPinned);
+    const unpinned = sorted.filter((entry) => !isPinned(entry));
+    if (!featuredFirst) return [...pinned, ...unpinned];
+    return [
+      ...pinned,
+      ...unpinned.filter(isFeatured),
+      ...unpinned.filter((entry) => !isFeatured(entry)),
+    ];
+  }, [storyTiles, ordered, mode, dir, featuredFirst, lang, shuffleNonce]);
 
   /** Round-robin split of the flow into columns (see header note). */
   const columnList = useMemo(() => {

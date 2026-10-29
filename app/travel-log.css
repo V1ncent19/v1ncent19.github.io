@@ -263,9 +263,84 @@
 [data-travel-log] [data-log-map] { width: 46%; position: sticky; top: 0; height: 100vh; }
 .travel-log-back { font-family: var(--font-ui); text-decoration: none; }
 .travel-log-tools { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 4; }
+
+/* Opening-screen primitives shared by journal, pilgrimage and terrain logs. */
+.travel-log-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 2rem 0 0;
+  overflow: hidden;
+  border: 1px solid var(--tl-paper-line);
+  border-radius: 13px;
+  background: var(--tl-paper-line);
+}
+.travel-log-facts div { padding: 12px 14px; background: var(--tl-paper); }
+.travel-log-facts dt {
+  color: color-mix(in srgb, var(--tl-ink) 55%, transparent);
+  font: 10px/1.3 var(--font-ui);
+}
+.travel-log-facts dd {
+  margin: 5px 0 0;
+  color: var(--tl-ink);
+  font: 700 13px/1.2 var(--font-mono);
+}
+.travel-log-scroll-cue {
+  width: 100%;
+  margin-top: 1.6rem;
+  font-family: var(--font-ui);
+}
+.travel-log-scroll-copy {
+  margin: 0;
+  color: var(--tl-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.travel-log-scroll-motion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.25rem;
+}
+.travel-log-scroll-chevrons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--tl-accent);
+}
+.travel-log-scroll-chevrons svg {
+  display: block;
+  margin: -6px 0;
+  animation: travel-log-hint-drop 1.5s ease-in-out infinite;
+}
+.travel-log-scroll-chevrons svg:last-child { animation-delay: .2s; }
+.travel-log-scroll-label {
+  margin-top: 12px;
+  color: var(--tl-strip-ink);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.intro > .travel-log-scroll-cue {
+  align-self: center;
+  margin-top: 0;
+  margin-bottom: 34px;
+}
+@keyframes travel-log-hint-drop {
+  0% { transform: translateY(-5px); opacity: 0; }
+  30%, 55% { transform: translateY(0); opacity: 1; }
+  75%, 100% { transform: translateY(5px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .travel-log-scroll-chevrons svg { animation: none; opacity: .85; transform: none; }
+}
 @media (max-width: 1023px) {
   [data-travel-log] { flex-direction: column; }
   [data-travel-log] [data-log-map] { width: 100%; height: var(--log-map-height, var(--log-default-map-height)); transition: none; }
   [data-log-kind="pilgrimage"] .pj-map-col { --pj-map-h: var(--log-map-height, var(--log-default-map-height)); }
   .travel-log-tools { right: 14px; gap: 6px; }
+}
+@media (max-width: 560px) {
+  .travel-log-facts { grid-template-columns: 1fr; }
 }

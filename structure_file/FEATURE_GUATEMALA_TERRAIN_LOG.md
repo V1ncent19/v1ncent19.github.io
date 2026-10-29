@@ -1,6 +1,6 @@
 # FEATURE — Guatemala 三维地形旅行日志
 
-2026-10-28。适用 `/travel/guatemala-2026/` 与 `/travel/zh/guatemala-2026/`。
+2026-10-28，2026-10-29 更新开场与章节交接。适用 `/travel/guatemala-2026/` 与 `/travel/zh/guatemala-2026/`。
 本篇是旅行日志公共框架中的第三种内容类型 `kind: "terrain"`；正文目前为中文，路由语言只控制公共按钮、提示与 metadata。
 
 ## 页面组成
@@ -19,16 +19,26 @@ app/travel/{,zh/}guatemala-2026/page.tsx
 
 - `card.json`：Travel / Blog 卡片；
 - `story.json`：唯一应手工维护的标题、段落、分段时间、照片编排与相机关键帧；
-- `data.json`：`guatemala:build` 根据私有 GPS、照片 EXIF 与 `story.json` 生成的页面数据。当前为 906 个路线点、9 个场景、25 张发布照片加 1 张 Starbucks 占位图。
+- `data.json`：`guatemala:build` 根据私有 GPS、照片 EXIF、视频 QuickTime metadata 与 `story.json` 生成的页面数据。当前为 906 个路线点、9 个场景、33 张发布照片、2 段视频加 1 张 Starbucks 占位图。
 
 `lib/travel/terrain.ts` 定义路线、照片、场景、地点与相机数据形状；`lib/travel/log/validate.ts` 在构建期验证数据。不要把 Guatemala 的字段塞进 journal 或 pilgrimage 的可选字段。
+
+## 滚动与渲染性能约束
+
+- 正文滚动仍以 DOM 阅读位置为唯一时间轴；路线进度更新最多约 30 次/秒，章节或照片切换不延迟。
+- 蓝色进度线按四分之一个路线采样点更新；不要在每个滚动事件中重建整条 GeoJSON。
+- 照片窗避让最多抽样 140 个路线点，移动中最多约 25 次/秒，`moveend` 再做一次最终定位。相机画面校正最多抽样 96 点。
+- 地形与 hillshade 使用指向同一组 Terrarium 瓦片的独立 DEM source；这是 MapLibre 为避免三维地形与阴影互相影响画质所建议的配置，不要为了省 source 强行合并。
+- 等高线 GeoJSON 约 6.6 MB；客户端以 `tolerance`、`buffer` 和 `maxzoom` 控制切片开销。若低配设备仍有明显首屏压力，下一步应把等高线预切成矢量瓦片，而不是继续提高滚动限频。
 
 ## 交互与视觉不变量
 
 - 地图默认跟随正文；用户手动拖动、缩放或旋转后进入 manual，并浮出 `Resume story` 恢复按钮。
 - 章节标题与进度导航使用 PTES 的动态标题、吸顶和跳转几何；章节跳转后仍必须恢复滚动驱动的地图。
+- 章节标题的留白属于正文，不属于 sticky 容器；上一标题保持扩展和吸顶，直到被下一标题以 PTES 相同的 26px 节奏自然顶走。不要在章节 wrapper 的底部留 padding，否则标题会提前失去吸顶约束。
 - 相机按场景关键帧移动。山上以偏东侧向西、较低俯角展示高差；Fuego 往返、下山和完成总览保持连贯的东北—西南 / 东西向构图。具体数值以 `story.json` 与 `TerrainMap.tsx` 为准。
 - 首尾总览可自动环绕；手动操作立即停止环绕。山峰标签面向屏幕，不应随三维地面倾斜或在环绕时抖动。
+- 开屏直接以总览相机初始化；地图、地形、路线和标记在幕布后等待首个 idle（1.8 秒兜底），就绪后立即启动环绕，再通知公共外壳揭幕。不得先显示章节相机、回缩、停顿后才环绕。
 - 地图默认是素色三维地形与平滑的 100 m 等高线；可切换卫星模式。工具栏只显示图标，文字在 hover / focus tooltip 中出现。
 - 路线使用全站旅行日志的蓝色；照片标点与照片框连接虚线使用橙色。照片框应靠近对应点、避开主要路线；连接线必须从真实地理点连到框边缘。
 - `Trail start` 与 `Camp` 在总览中只显示图标，路线进行到附近时才浮出标签。
@@ -40,7 +50,7 @@ app/travel/{,zh/}guatemala-2026/page.tsx
 
 ```
 assets-src/travel-data/2026.01.01-2026.12.31.csv  全年 GPS，含不应公开的位置
-assets-src/guatemala-masters/*.jpg                手机原图，含 EXIF GPS 与时间
+assets-src/guatemala-masters/*.{jpg,jpeg,MOV,mov} 手机照片/视频原片，含 EXIF/QuickTime GPS 与时间
 ```
 
 另一台设备仅继续编辑正文、镜头和界面时，不需要这些母版：本分支提交了已经裁切、简化的路线和去元数据派生图。只有重新选照片或重建路线时，才需通过私密渠道把母版复制到相同的忽略目录。
@@ -50,18 +60,23 @@ assets-src/guatemala-masters/*.jpg                手机原图，含 EXIF GPS �
 ```
 content/travel/guatemala-2026/data.json
 public/assets/photos/travel/guatemala-2026/*.webp
+public/assets/photos/travel/guatemala-2026/*.mp4
 public/assets/terrain/guatemala/                   Terrarium DEM，z8–z14
 public/assets/terrain/guatemala-tint/              素色贴图
 public/assets/terrain/guatemala-contours.geojson   平滑 100 m 等高线
 ```
 
-发布照片由 Sharp 重新编码成最长边 2200px、quality 84 的 WebP；生成器会拒绝仍含 EXIF/XMP 的输出。`data.json` 仍包含为地图展示所需的照片位置、拍摄时间与裁切后的路线，因此它是公开数据，不应混入全年 GPS。
+发布照片由 Sharp 重新编码成最长边 2200px、quality 84 的 WebP；视频由 `ffmpeg-static` 转为最长边 1600px 的 H.264/AAC MP4，并另取 WebP poster 供地图浮窗显示。生成器剥离媒体 metadata，并拒绝仍含 EXIF/XMP 的图片输出。`data.json` 仍包含为地图展示所需的媒体位置、拍摄时间与裁切后的路线，因此它是公开数据，不应混入全年 GPS。
+
+视频 `8E332595-6A9E-44EF-8F91-A3843F77DAB3.mov` 没有位置 atom，且导出时间为 UTC+8；其时间换算后对应营地 04:54 的连续喷发，生成器在 `VIDEO_CONFIG` 中把它锚定到同一分钟的营地照片位置。`IMG_0772.MOV` 则直接使用自带的 18:53、Fuego 观景平台 QuickTime GPS。
+
+Travel 卡片日期由 `card.json.end`（`2026-06-01`）参与 `tripPostedAt()` 排序；当前卡片同时把 `2026.06.01` / `June 1, 2026` 放进 `cardFacts`，避免列表只有统计量却看不到完成日期。
 
 ## 生成命令
 
 | 命令 | 输入 | 输出 / 何时运行 |
 |---|---|---|
-| `npm run guatemala:build` | 私有全年 GPS、照片母版、`story.json` | 重建 `data.json` 与照片 WebP；改正文后通常不必跑，改时间/照片/GPS 时才跑 |
+| `npm run guatemala:build` | 私有全年 GPS、照片/视频母版、`story.json` | 重建 `data.json`、照片 WebP、视频 MP4 与 poster；改正文后通常不必跑，改时间/媒体/GPS 时才跑 |
 | `npm run guatemala:terrain` | AWS Mapzen Terrarium tiles | 下载 DEM，再生成素色贴图与等高线；需要网络，日常镜头编辑不跑 |
 | `npm run guatemala:contours` | 已存在的本地 DEM | 仅重建等高线 |
 

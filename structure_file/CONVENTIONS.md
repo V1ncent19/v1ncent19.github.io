@@ -99,7 +99,7 @@
   - ⚠️ **子集是「字符集快照」，不是「只增不减」**：每次重跑都从零重建，**只保留当时扫描得到的字**。2026-10-25 核对发现 `75edc94` 重新生成 m/r/sb 时把 挖 / 掘 / 灣 三个字弄丢了（2282 → 2398 字形，多 119 少 3），已用 `git checkout 9c122fc -- public/fonts/genwanmin2tc-{m,r,sb}.woff2` 字节级还原，并在脚本里加了 `PINNED_CHARS = "挖掘灣"` 兜底（并入 `harvest_chars()` 的初始集合）。
   - **改字重映射 / 重跑子集之前先备份 woff2，跑完 diff cmap**：`set(new.getBestCmap()) - set(old.getBestCmap())` 的两个方向都要看，`old - new` 非空就是这次掉字。
 - ⚠️ **`.travel-layout` 是 sans 作用域**（`TravelLog.tsx`）。该布局里的正文元素必须**显式**声明衬线栈，否则继承 sans 违反 §44。现状：`.scene-body p` 与 `.excerpt` 显式 `var(--font-serif-latin), var(--font-serif-zh)`；chip/表头/控件保持 sans。
-- ⚠️ **页面根节点不要设 `font-family`**。巡礼页的 `.pj-page` 曾写 `var(--font-ui)`，整页正文/评论/概述全部静默变无衬线，而标题因为各自**又**声明了一遍衬线所以没坏 —— 表象是「标题衬线、正文无衬线」，扫一遍看不出来（2026-10-24 修）。现在 `.pj-page` 与 `body` 一致是衬线，UI 例外逐个元素显式声明（`.pj-kicker`、`.pj-overview-meta`、`.pj-intro-hint`、`.pj-scroll-hint .hint-text`、`.pj-time-plate`、`.pj-tool-btn`、`.pj-back`、`.pj-outro-hint`、`.pjr-tip`，以及两页共用、声明在基础规则里的 `.pj-attrib / .map-attrib`）。**新加巡礼页元素时直接在自己的规则里写清楚**，别去父级加一行。
+- ⚠️ **页面根节点不要设 `font-family`**。巡礼页的 `.pj-page` 曾写 `var(--font-ui)`，整页正文/评论/概述全部静默变无衬线，而标题因为各自**又**声明了一遍衬线所以没坏 —— 表象是「标题衬线、正文无衬线」，扫一遍看不出来（2026-10-24 修）。现在 `.pj-page` 与 `body` 一致是衬线，UI 例外逐个元素显式声明（`.pj-kicker`、`.pj-overview-meta`、公共 `.travel-log-scroll-*` / `.travel-log-facts`、`.pj-time-plate`、`.pj-tool-btn`、`.pj-back`、`.pj-outro-hint`、`.pjr-tip`，以及两页共用、声明在基础规则里的 `.pj-attrib / .map-attrib`）。**新加巡礼页元素时直接在自己的规则里写清楚**，别去父级加一行。
 
 ### 5.1 中西文混排空格（硬规范，但**没有自动检查**了）
 
@@ -180,17 +180,22 @@
   统一走 `lib/travel/trips.ts` 的 `tripPostedAt(trip)`，**不要再在三处各自写 `trip.start`**。
   两处**不**改：`TravelStory` 里 `{trip.start} → {trip.end}` 是行程窗口本身，
   `readTripCards()` 的 `cards.sort((a,b) => a.start…)` 是「**最早出发的排最前**」
-  的行程顺序（hub tile 依赖它），都不是发布日期。原文案「last departure first」见该函数注释。
+  的稳定注册表顺序，hub 会另按发布日期排序；二者都不是发布日期显示逻辑。
 - **相册「精选集」是置顶，不是筛选**（2026-10-25 定案，**推翻 2026-09-05「精选行不再置顶」**）。
   开着的时候 `featured: true` 的行排在最前、其余照片接在后面，**墙上永远显示全部**。
   实现是 `ordered` 里一次稳定分区（`filter(featured)` ++ `filter(!featured)`），
   **不要再写 `items.filter(i => i.featured)`** —— 那会让新加的、`featured: false` 的照片
   从墙面上消失（2026-10-25 加 `img-6308` 时正是这个假象被当成「图没进去」）。
-  配套的第二处：`flow` 里「按日期把行程卡插进照片流」的 `while` 循环**必须跳过置顶段**
-  （`pinnedCount`），否则拿 2026-08 的精选图去比 2024-03 的行程卡，会把几张行程卡倒进
-  精选段中间、把顺序打散。三次排序模式下精选段都是完整 20 张、日期倒序，已验。
-- **旅行日志默认都是 featured 导航入口**（2026-10-25）：ptes-2025 与 just-because / Anitabi 均置顶在照片流之前；新日志 pinned 默认 true。照片精选开关、日期/地点/随机排序不把这些日志入口混回普通照片。
-- featured 排位与可见置顶图标分开：`pinned` 控制排位，`showPinnedBadge` 控制图标（默认 false）。目前仅 PTES 显示图标，Anitabi 仍排在前方但不显示。
+  `flow` 先把照片与 StoryTile 按当前模式排成一条序列，再依次做 pinned / featured 稳定
+  分区。不要把全部游记重新做成独立置顶队列，否则会脱离同日的精选照片，造成
+  Acatenango 一类排序错误。
+- **旅行日志默认都是 featured 导航入口**（2026-10-29 修正语义）：card 使用
+  `featured: true`，与 `featured` 照片进入同一精选带，并按 `tripPostedAt()` 的日期一起排序；
+  它们不是独立置顶区。关闭精选开关后，游记与全部照片合成一条完整日期时间线。
+- **三层优先级固定为 `pinned` → `featured` → 当前排序**：`pinned` 是最高优先级且不受
+  精选开关影响，目前仅 PTES 使用；其余日志不要因为是导航入口就自动 pinned。
+  `featured` 控制精选带归属，`showPinnedBadge` 只控制可见图标（默认 false）。目前仅 PTES
+  显示图标。
 - 返回条带、图例、tile hover、胶囊吸顶、幕布动画等交互均已逐项定稿（v7–v14.1）；动这些区域前**必读 `FEATURE_TRAVEL_LOG.md`、`FEATURE_PILGRIMAGE.md` 及 `FEATURE_HOME_NAVIGATION.md` 对应条目**，避免推翻已拍板细节。
 - **返回条 hover 只动 opacity，不动位移**（2026-10-24 定案，v13）：ptes 的
   `.tl-back-*` 与 just-because 的 `.pj-back-*` 都是两行网格

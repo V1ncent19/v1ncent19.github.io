@@ -14,7 +14,7 @@
   "distanceKm": 73.6,
   "gpsPoints": 906,
   "beta": false,
-  "pinned": true,
+  "featured": true,
   "showPinnedBadge": false,
   "stops": {
     "en": ["Antigua", "Acatenango", "Fuego"],
@@ -31,7 +31,7 @@
     "zh": "沿路线登山"
   },
   "cardFacts": {
-    "en": ["2 days", "3,617 m", "25 photos"],
-    "zh": ["2 天", "最高 3,617 m", "25 张照片"]
+    "en": ["June 1, 2026", "3,617 m", "33 photos · 2 videos"],
+    "zh": ["2026.06.01", "最高 3,617 m", "33 张照片 · 2 段视频"]
   }
 }

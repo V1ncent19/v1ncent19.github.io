@@ -30,14 +30,15 @@ central registry to edit. Adding a trip means: create the folder with a
 `app/travel/<id>/page.tsx` + `/zh` mirror routes. Cards are
 sorted by `start` (oldest first, `id` as tiebreak) so the order is stable.
 
-Optional tile fields worth knowing (updated 2026-10-25):
+Optional tile fields worth knowing (updated 2026-10-29):
 
-- `pinned: true` — pin the tile to the front of "Stories & frames". Travel logs
-  now default to **true**: both ptes-2025 and just-because / Anitabi are featured
-  navigation entries ahead of the photo stream, independent of the photo
-  Featured toggle and sort mode. New travel logs receive this default too.
-- `showPinnedBadge: true` — show the visible pin icon independently of this
-  placement. Currently only ptes-2025 enables it; Anitabi stays featured
+- `pinned: true` — keep the trip above both the featured and regular bands.
+  This is a separate, highest-priority state; currently only ptes-2025 uses it.
+- `featured: true` — place the log in the same curated band as featured photos.
+  Travel logs default to **true** and share the active date order with those
+  photos; they are not a separate pinned queue.
+- `showPinnedBadge: true` — show the visible pin icon independently of the
+  featured placement. Currently only ptes-2025 enables it; Anitabi stays featured
   without the icon. New trips default to no visible pin icon.
 - `cardCta` / `cardMeta` / `cardFacts` — override the hub tile's CTA / eyebrow /
   stat line when the trip-log defaults would misdescribe the trip. Leave them

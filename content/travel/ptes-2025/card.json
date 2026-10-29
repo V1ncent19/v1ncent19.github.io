@@ -15,6 +15,7 @@
   "gpsPoints": 21863,
   "beta": true,
   "pinned": true,
+  "featured": true,
   "showPinnedBadge": true,
   "stops": {
     "en": [

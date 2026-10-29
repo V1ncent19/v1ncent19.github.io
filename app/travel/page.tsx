@@ -10,7 +10,7 @@ import { copy } from "@/lib/i18n";
 export const metadata: Metadata = {
   title: "Travel",
   description:
-    "A draggable globe of every place visited, right beside the title — then a masonry flow that leads with the pinned interactive trip log (Beta), slots the Paris restaurant notes into its 2024-03-20 spot, and continues as the curated photo wall.",
+    "A draggable globe of every place visited, right beside the title — then a masonry flow where featured interactive trip logs and featured photos share one chronological collection.",
 };
 
 /* The Paris cuisine blog post surfaced as a story tile (image-less, so no
@@ -22,8 +22,8 @@ const PARIS_SLUG = "fr2024-cuisine";
  * the page title (no separate § Places section — both main elements, globe
  * and waterfall, are visible on arrival), the checklist stays below as a
  * collapsed one-row legend (TravelBoard in hideGlobe mode), and the masonry
- * flow leads with typographic story tiles (no covers) followed by the photo
- * wall (same tiles, toolbar and lightbox as /gallery).
+ * flow mixes typographic story tiles with the photo wall under one shared
+ * featured/date order (same tiles, toolbar and lightbox as /gallery).
  */
 export default function TravelPage() {
   const galleryItems = getGalleryItems();
@@ -52,8 +52,10 @@ export default function TravelPage() {
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
     coverPos: trip.coverPos,
-    /* Travel logs are featured entry points by default, ahead of photos. */
-    pinned: trip.pinned ?? true,
+    /* A true pin outranks the featured band (currently PTES only). */
+    pinned: trip.pinned ?? false,
+    /* Travel logs join featured photos in the same date-sorted band. */
+    featured: trip.featured ?? true,
     showPinnedBadge: trip.showPinnedBadge ?? false,
   }));
 
@@ -70,7 +72,7 @@ export default function TravelPage() {
       facts: ["2024.03.20"],
       /* One CTA wording across every story tile (user 2026-10-17). */
       cta: "Read the log",
-      /* Not pinned: it rides the photo timeline at its own date. Louvre
+      /* Not featured: it rides the regular photo timeline at its own date. Louvre
          sunset thumb for the hover orb (2026-09-26). */
       cover: "/assets/photos/gallery/thumb/img-0462.webp",
       date: "2024-03-20",
@@ -79,8 +81,7 @@ export default function TravelPage() {
 
   /* Numbering is chronological across ALL story tiles (2026-09-26 user
      request): sort a shallow copy by anchor date and hand out 01, 02, … —
-     the Paris diary (2024-03) is 01, the Iberia log (2025-12) is 02, even
-     though the pinned tile still leads the flow visually. */
+     the Paris diary (2024-03) is 01 and the Iberia log (2025-12) is 02. */
   const numbered = storyTiles
     .slice()
     .sort((a, b) => (a.date ?? "").localeCompare(b.date ?? ""));
@@ -124,9 +125,8 @@ export default function TravelPage() {
           </HubHoverLink>
         </header>
 
-        {/* ---- Stories & frames: image-less story tiles lead, then the
-            /gallery experience embedded in place (same tiles, toolbar,
-            lightbox). ---- */}
+        {/* ---- Stories & frames: story tiles and photos share the embedded
+            gallery's featured/date ordering, toolbar and lightbox. ---- */}
         <section className="mt-12" aria-label="Stories and frames">
           <div className="mb-6 border-b border-line pb-3">
             <h2 className="flex scroll-mt-28 items-center gap-3.5 text-2xl font-semibold tracking-tight">
@@ -134,9 +134,9 @@ export default function TravelPage() {
               Stories &amp; frames
             </h2>
             {/* <p className="mt-3 max-w-[62ch] leading-relaxed text-muted">
-              The pinned trip log leads; the food diary sits at its own date in
-              the stream. Every frame opens its story, coordinates and
-              full-resolution download.
+              Featured trip logs and photos share one chronological collection;
+              the food diary sits at its own date in the stream. Every frame
+              opens its story, coordinates and full-resolution download.
             </p> */}
           </div>
           <GalleryView

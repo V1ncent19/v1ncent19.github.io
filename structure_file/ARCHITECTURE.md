@@ -247,7 +247,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 | 目录 | 职责 | 关键点 |
 |---|---|---|
 | `components/travel/` | Travel 模块全部组件 | **ptes**：`TravelMap.tsx`、`TravelLog.tsx`、`TravelNav.tsx`、`TravelStory.tsx`；**hub**：`hub-globe.tsx`、`hub-hover-link.tsx`；**巡礼**：`PilgrimageLog.tsx`、`PilgrimageMap.tsx`、`PilgrimageStory.tsx`；**Guatemala terrain**：`TerrainTravelLog.tsx`（适配器）、`TerrainStory.tsx`（正文）、`TerrainMap.tsx`（DEM、等高线、路线、照片与章节镜头）。三类共用 `ResumeStoryButton.tsx` |
-| `components/travel/log/` | 旅行日志公共组件 | `TravelLogPage`、`TravelLogShell`、`ChapterNavigation`、`MapToolbar`，详见 `FEATURE_TRAVEL_LOG.md` |
+| `components/travel/log/` | 旅行日志公共组件 | `TravelLogPage`、`TravelLogShell`、`ChapterNavigation`、`MapToolbar`、`TravelLogFacts`、`TravelLogScrollCue`，详见 `FEATURE_TRAVEL_LOG.md` |
 | `components/gallery/` | `gallery-view.tsx` 同文件承载照片画廊 + 游记 StoryTile + 排序条；`gallery-hover.css` 仅负责照片 tile 的磨砂条展开、文字淡入与 hover/focus 动画 | 被 `/travel` 消费（`/gallery` 路由 2026-09-28 已删）；排序条方向格移动端独立成行 |
 | `lib/use-card-launch.ts` | 首页 GatewayLink 与画廊 StoryTile 的共享点击确认状态 | 跳转前清理 is-launching；在 pagehide/pageshow/popstate、effect 清理时取消计时器并复位。StoryTile 可启用 resetHoverOnReturn，返回后以 data-return-idle 抑制浏览器恢复的 hover/focus 封面，真实鼠标移动或重新 Tab 聚焦后恢复交互 |
 | `components/background/` | `spacetime-canvas.tsx` 时空背景（质量引力井 warp 网格） | 维护接口：CONFIG；各井的**位移向量累加后一次性施加**（不可逐井原地改写），网格向视口外延伸 **Σstrength** 防「引力拉伸露边界」；静态井按**影响半径**剔除而非元素包围盒 |

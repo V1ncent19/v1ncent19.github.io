@@ -72,6 +72,8 @@ const WAYPOINT_IDS = new Set(["trail-start", "camp"]);
 const WAYPOINT_REVEAL_METERS = 420;
 const PHOTO_ACCENT_LIGHT = "#e56f2d";
 const PHOTO_ACCENT_DARK = "#ff9851";
+const MAX_CAMERA_PROJECTION_SAMPLES = 96;
+const MAX_POPUP_ROUTE_SAMPLES = 140;
 
 type PhotoPopupPlacement = {
   x: number;
@@ -148,9 +150,15 @@ function pointAt(data: TerrainTravelData, index: number) {
   return [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t] as const;
 }
 
-function progressCoordinates(data: TerrainTravelData, index: number): [number, number][] {
-  const end = Math.max(0, Math.min(data.route.points.length - 1, index));
-  const whole = data.route.points.slice(0, Math.floor(end) + 1).map(point => [point[0], point[1]] as [number, number]);
+function evenlySample<T>(values: readonly T[], maxSamples: number): T[] {
+  if (values.length <= maxSamples) return [...values];
+  const last = values.length - 1;
+  return Array.from({ length: maxSamples }, (_, index) => values[Math.round(index * last / (maxSamples - 1))]);
+}
+
+function progressCoordinates(data: TerrainTravelData, routeCoordinates: readonly [number, number][], index: number): [number, number][] {
+  const end = Math.max(0, Math.min(routeCoordinates.length - 1, index));
+  const whole = routeCoordinates.slice(0, Math.floor(end) + 1);
   const p = pointAt(data, end);
   if (end % 1 && whole.length) whole.push([p[0], p[1]]);
   return whole.length > 1 ? whole : [whole[0], whole[0]].filter(Boolean) as [number, number][];
@@ -192,6 +200,8 @@ function styleFor(dark: boolean): StyleSpecification {
         encoding: "terrarium",
         attribution: "Mapzen Terrain Tiles / AWS Open Data",
       },
+      // MapLibre recommends a distinct source for hillshade when the same DEM
+      // also drives 3D terrain; sharing it can reduce render quality.
       "guatemala-hillshade": {
         type: "raster-dem",
         tiles: ["/assets/terrain/guatemala/{z}/{x}/{y}.png"],
@@ -212,6 +222,9 @@ function styleFor(dark: boolean): StyleSpecification {
       "guatemala-contour-lines": {
         type: "geojson",
         data: "/assets/terrain/guatemala-contours.geojson",
+        maxzoom: 14,
+        buffer: 48,
+        tolerance: 0.75,
       },
       "terrain-frame": { type: "geojson", data: frame },
       "terrain-frame-mask": { type: "geojson", data: mask },
@@ -333,17 +346,20 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   const activeCamera = overviewScene ? COMPLETE_CAMERA : activeScene.camera;
   const cameraSceneId = intro ? TERRAIN_INTRO_SCENE_ID : complete ? TERRAIN_COMPLETE_SCENE_ID : activeScene.id;
   const activePhoto = data.photos.find(photo => photo.id === reading.photoId) ?? null;
-  const current = pointAt(data, reading.routeIndex);
+  const current = useMemo(() => pointAt(data, reading.routeIndex), [data, reading.routeIndex]);
+  const routeRenderIndex = Math.round(reading.routeIndex * 4) / 4;
 
   useEffect(() => { readingRef.current = reading; }, [reading]);
   useEffect(() => { onReadyRef.current = onMapReady; }, [onMapReady]);
   useEffect(() => { onNavigateRef.current = onNavigateScene; }, [onNavigateScene]);
 
+  const routeCoordinates = useMemo(() => data.route.points.map(point => [point[0], point[1]] as [number, number]), [data.route.points]);
+  const popupRouteSamples = useMemo(() => evenlySample(data.route.points, MAX_POPUP_ROUTE_SAMPLES), [data.route.points]);
   const routeFeature = useMemo(() => ({
     type: "Feature" as const,
     properties: {},
-    geometry: { type: "LineString" as const, coordinates: data.route.points.map(point => [point[0], point[1]]) },
-  }), [data.route.points]);
+    geometry: { type: "LineString" as const, coordinates: routeCoordinates },
+  }), [routeCoordinates]);
   const photoFeatures = useMemo(() => ({
     type: "FeatureCollection" as const,
     features: data.photos.map(photo => ({ type: "Feature" as const, properties: { id: photo.id }, geometry: { type: "Point" as const, coordinates: [photo.lon, photo.lat] } })),
@@ -353,18 +369,22 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
     let map: MLMap | null = null;
     let resizeObserver: ResizeObserver | null = null;
     let resizeFrame = 0;
+    let readyFallback = 0;
+    let releaseReady: (() => void) | null = null;
     let cancelled = false;
     void (async () => {
       const maplibre = await import("maplibre-gl");
       if (cancelled || !holderRef.current) return;
-      const first = data.scenes[0].camera;
       map = new maplibre.Map({
         container: holderRef.current,
         style: styleFor(document.documentElement.classList.contains("dark")),
-        center: first.center,
-        zoom: first.zoom,
-        pitch: first.pitch,
-        bearing: first.bearing,
+        // The opening curtain hides tile preparation. Start at the overview
+        // itself so the first revealed frame never has to fly back out from
+        // the Antigua chapter camera.
+        center: COMPLETE_CAMERA.center,
+        zoom: COMPLETE_CAMERA.zoom,
+        pitch: COMPLETE_CAMERA.pitch,
+        bearing: COMPLETE_CAMERA.bearing,
         maxPitch: 82,
         minZoom: 8.5,
         maxZoom: 16,
@@ -405,10 +425,22 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
         });
         map.on("mouseenter", "photo-points", () => { if (map) map.getCanvas().style.cursor = "pointer"; });
         map.on("mouseleave", "photo-points", () => { if (map) map.getCanvas().style.cursor = ""; });
-        readyRef.current = true;
-        setFollow(true);
-        setReady(true);
-        onReadyRef.current();
+        let released = false;
+        releaseReady = () => {
+          if (released || cancelled) return;
+          released = true;
+          window.clearTimeout(readyFallback);
+          previousCameraSceneRef.current = TERRAIN_INTRO_SCENE_ID;
+          readyRef.current = true;
+          setFollow(true);
+          setReady(true);
+          onReadyRef.current();
+        };
+        // Wait for the terrain and route to paint while the entry sheet is
+        // still closed. The fallback prevents a slow tile from blocking the
+        // article indefinitely; TravelLogShell adds one final reveal beat.
+        map.once("idle", releaseReady);
+        readyFallback = window.setTimeout(releaseReady, 1_800);
       });
       const manual = () => setFollow(false);
       map.on("dragstart", manual);
@@ -426,6 +458,8 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
     return () => {
       cancelled = true;
       cancelAnimationFrame(resizeFrame);
+      window.clearTimeout(readyFallback);
+      if (map && releaseReady) map.off("idle", releaseReady);
       resizeObserver?.disconnect();
       mapRef.current = null;
       map?.remove();
@@ -436,10 +470,16 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
     if (!ready) return;
     const map = mapRef.current;
     if (!map) return;
-    const coords = progressCoordinates(data, intro ? data.route.points.length - 1 : reading.routeIndex);
+    const coords = progressCoordinates(data, routeCoordinates, intro ? routeCoordinates.length - 1 : routeRenderIndex);
     (map.getSource("progress") as GeoJSONSource | undefined)?.setData({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: coords } });
+  }, [ready, data, routeCoordinates, intro, routeRenderIndex]);
+
+  useEffect(() => {
+    if (!ready) return;
+    const map = mapRef.current;
+    if (!map) return;
     (map.getSource("cursor") as GeoJSONSource | undefined)?.setData({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [current[0], current[1]] } });
-  }, [ready, data, intro, reading.routeIndex, current]);
+  }, [ready, current]);
 
   useEffect(() => {
     if (!ready || !holderRef.current) return;
@@ -457,6 +497,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map || !follow) return;
+    if (overviewScene && previousCameraSceneRef.current === cameraSceneId) return;
     // A progress-rail jump can cross several chapters before smooth scrolling
     // settles. Stop the superseded camera so the next composed transition
     // starts from the currently rendered view instead of an obsolete target.
@@ -531,7 +572,8 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
         offset: targetOffset,
         duration: 0,
       });
-      const projected = segment.map(point => projectTerrainPoint(map, [point[0], point[1]]));
+      const projected = evenlySample(segment, MAX_CAMERA_PROJECTION_SAMPLES)
+        .map(point => projectTerrainPoint(map, [point[0], point[1]]));
       const xs = projected.map(point => point.x);
       const ys = projected.map(point => point.y);
       const routeX = (Math.min(...xs) + Math.max(...xs)) / 2;
@@ -570,7 +612,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
       map.easeTo(cameraOptions);
     }
     previousCameraSceneRef.current = cameraSceneId;
-  }, [ready, follow, activeCamera, activeScene, cameraSceneId, data.route.points, data.scenes]);
+  }, [ready, follow, overviewScene, activeCamera, activeScene, cameraSceneId, data.route.points, data.scenes]);
 
   // Reaching the finale turns the fixed overview into a slow orbit around the
   // full route. The chapter camera settles first; direct map interaction exits
@@ -580,10 +622,12 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
     if (!ready || !map || !follow || !overviewScene) return;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) return;
-    const orbitStart = performance.now() + COMPLETE_ORBIT_DELAY_MS;
+    const orbitStart = performance.now() + (intro ? 0 : COMPLETE_ORBIT_DELAY_MS);
     let frame = 0;
+    let lastOrbitUpdate = 0;
     const orbit = (now: number) => {
-      if (now >= orbitStart) {
+      if (now >= orbitStart && now - lastOrbitUpdate >= 32) {
+        lastOrbitUpdate = now;
         const phase = ((now - orbitStart) % COMPLETE_ORBIT_MS) / COMPLETE_ORBIT_MS;
         map.setBearing(COMPLETE_CAMERA.bearing + phase * 360);
       }
@@ -591,7 +635,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
     };
     frame = requestAnimationFrame(orbit);
     return () => cancelAnimationFrame(frame);
-  }, [ready, follow, overviewScene]);
+  }, [ready, follow, overviewScene, intro]);
 
   useEffect(() => {
     if (!ready) return;
@@ -638,6 +682,9 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map || !activePhoto) { setPopup(null); return; }
+    let placementFrame = 0;
+    let placementTimer = 0;
+    let lastPlacement = 0;
     const place = () => {
       const point = projectTerrainPoint(map, [activePhoto.lon, activePhoto.lat]);
       const width = holderRef.current?.clientWidth ?? 0;
@@ -645,7 +692,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
       const popupWidth = width <= 560 ? 126 : 160;
       // Includes the card border; keep in sync with .terrain-map-photo.
       const popupHeight = width <= 560 ? 113 : 139;
-      const routePixels = data.route.points.map(routePoint => projectTerrainPoint(map, [routePoint[0], routePoint[1]]));
+      const routePixels = popupRouteSamples.map(routePoint => projectTerrainPoint(map, [routePoint[0], routePoint[1]]));
       const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
       const overlayRoot = holderRef.current?.parentElement;
       const holderRect = holderRef.current?.getBoundingClientRect();
@@ -711,7 +758,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
       };
       const best = candidates.reduce((winner, candidate) => score(candidate) < score(winner) ? candidate : winner);
       const { corner, connectorLength } = geometry(best);
-      setPopup({
+      const next = {
         x: best.x,
         y: best.y,
         markerX: point.x,
@@ -719,12 +766,41 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
         cornerX: corner.x,
         cornerY: corner.y,
         connected: connectorLength > 30,
+      };
+      setPopup(previous => previous
+        && previous.connected === next.connected
+        && Math.abs(previous.x - next.x) < 0.75
+        && Math.abs(previous.y - next.y) < 0.75
+        && Math.abs(previous.markerX - next.markerX) < 0.75
+        && Math.abs(previous.markerY - next.markerY) < 0.75
+        ? previous : next);
+    };
+    const schedulePlace = () => {
+      if (placementFrame || placementTimer) return;
+      const wait = Math.max(0, 40 - (performance.now() - lastPlacement));
+      if (wait > 0) {
+        placementTimer = window.setTimeout(() => {
+          placementTimer = 0;
+          schedulePlace();
+        }, wait);
+        return;
+      }
+      placementFrame = requestAnimationFrame(() => {
+        placementFrame = 0;
+        lastPlacement = performance.now();
+        place();
       });
     };
     place();
-    map.on("move", place);
-    return () => { map.off("move", place); };
-  }, [ready, activePhoto, data.route.points]);
+    map.on("move", schedulePlace);
+    map.on("moveend", place);
+    return () => {
+      cancelAnimationFrame(placementFrame);
+      window.clearTimeout(placementTimer);
+      map.off("move", schedulePlace);
+      map.off("moveend", place);
+    };
+  }, [ready, activePhoto, popupRouteSamples]);
 
   return <div className="terrain-map-col" data-log-map ref={mountColumn} data-follow={follow ? "true" : "false"}>
     <div className="terrain-map-box"><div ref={holderRef} className="terrain-map-canvas" />
@@ -752,6 +828,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
       {activePhoto && popup && <figure className="terrain-map-photo" style={{ left: popup.x, top: popup.y }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={activePhoto.src} alt="" />
+        {activePhoto.kind === "video" && <span className="terrain-map-photo-video" aria-hidden="true">▶</span>}
         <figcaption>{activePhoto.shotAt.slice(11, 16)} · {activePhoto.altitudeM.toLocaleString()} m</figcaption>
       </figure>}
     </div>

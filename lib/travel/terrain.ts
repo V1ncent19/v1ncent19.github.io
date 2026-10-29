@@ -21,9 +21,13 @@ export interface TerrainRoute {
 
 export interface TerrainPhoto {
   id: string;
+  kind: "photo" | "video";
   src: string;
+  /** Browser-friendly derivative; `src` remains the map/poster image. */
+  videoSrc?: string;
   width: number;
   height: number;
+  durationS?: number;
   shotAt: string;
   lat: number;
   lon: number;

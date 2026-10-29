@@ -7,6 +7,8 @@ import { readingPanel } from "@/lib/travel/log/reading-geometry";
 import { MAP_SPLIT_EVENT } from "@/lib/travel/map-split";
 import ChapterNavigation from "./log/ChapterNavigation";
 import { navigateToChapter } from "@/lib/travel/log/navigation";
+import TravelLogFacts from "./log/TravelLogFacts";
+import TravelLogScrollCue from "./log/TravelLogScrollCue";
 
 /**
  * Pilgrimage story column.
@@ -405,9 +407,13 @@ export default function PilgrimageStory({
           <h1>{data.title}</h1>
           <p className="pj-overview-meta">
             {data.subtitle} · {data.route.startedAtLocal.slice(11, 16)}–
-            {data.route.endedAtLocal.slice(11, 16)} · {(data.route.durationSec / 3600).toFixed(1)} h ·{" "}
-            {stops.length} 张对比图
+            {data.route.endedAtLocal.slice(11, 16)}
           </p>
+          <TravelLogFacts items={[
+            { label: lang === "zh" ? "巡礼时长" : "Duration", value: `${(data.route.durationSec / 3600).toFixed(1)} h` },
+            { label: lang === "zh" ? "路线记录" : "Route samples", value: data.route.pointCount.toLocaleString() },
+            { label: lang === "zh" ? "对比图" : "Comparisons", value: stops.length.toLocaleString() },
+          ]} />
           <div className="pj-overview-body">
             {overview.text ? (
               overview.text
@@ -420,47 +426,7 @@ export default function PilgrimageStory({
               </p>
             )}
           </div>
-          {/* Two-layer scroll cue, exactly ptes' boot screen (2026-10-17 user
-              request: "scroll 指引应该用和 ptes 相同的 …"): a sentence, then a
-              centred column of two stroked chevrons looping through a drop
-              animation above an uppercase, letter-spaced label. The English
-              page reuses ptes' verbatim wording; the zh mirror says the same
-              thing in Chinese, because the sentence is page copy and this page
-              is bilingual by construction (lang comes from the route). */}
-          <p className="pj-intro-hint">
-            {lang === "zh"
-              ? "向下滚动，沿着这条路线开始这趟旅程，一路读下去。"
-              : "Scroll the journal to start the trip and read the story."}
-          </p>
-          <div className="pj-scroll-hint" aria-hidden="true">
-            <span className="hint-chevrons">
-              <svg
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="m6 8 6 6 6-6" />
-              </svg>
-              <svg
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="m6 8 6 6 6-6" />
-              </svg>
-            </span>
-            <span className="hint-text">{lang === "zh" ? "向下滚动" : "Scroll to read"}</span>
-          </div>
+          <TravelLogScrollCue lang={lang} />
         </section>
 
         {/* ---- stops ---- */}

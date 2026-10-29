@@ -6,8 +6,10 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import exifr from "exifr";
+import ffmpegPath from "ffmpeg-static";
 import sharp from "sharp";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -17,6 +19,21 @@ const TRIP = path.join(ROOT, "content", "travel", "guatemala-2026");
 const STORY = path.join(TRIP, "story.json");
 const OUT = path.join(TRIP, "data.json");
 const PHOTO_OUT = path.join(ROOT, "public", "assets", "photos", "travel", "guatemala-2026");
+
+const VIDEO_CONFIG = {
+  "IMG_0772.MOV": { id: "video-0772", posterAtS: 3 },
+  // This clip was exported in UTC+8 and carries no location atom. Its instant
+  // matches the 04:54 camp photos, so publish it at the camp fix rather than
+  // leaking the source/export metadata into the shipped derivative.
+  "8E332595-6A9E-44EF-8F91-A3843F77DAB3.mov": {
+    id: "video-eruption-0454",
+    posterAtS: 2.5,
+    shotAt: "2026-06-01T04:54:34-06:00",
+    lat: 14.4949694,
+    lon: -90.8728111,
+    altitudeM: 3579,
+  },
+};
 
 const START_ISO = "2026-05-31T06:00:00-06:00";
 const END_ISO = "2026-06-01T13:05:00-06:00";
@@ -107,7 +124,89 @@ function nearestRouteIndex(route, epoch) {
   return best;
 }
 
-async function buildPhotos(route) {
+function runFfmpeg(args, label, { expectFailure = false } = {}) {
+  if (!ffmpegPath) throw new Error("ffmpeg-static did not provide an executable");
+  const result = spawnSync(ffmpegPath, args, { encoding: "utf8", maxBuffer: 24 * 1024 * 1024 });
+  if (!expectFailure && result.status !== 0) {
+    throw new Error(`${label} failed:\n${result.stderr || result.stdout}`);
+  }
+  return `${result.stdout || ""}\n${result.stderr || ""}`;
+}
+
+function parseQuickTimeLocation(text) {
+  const value = /com\.apple\.quicktime\.location\.ISO6709:\s*([^\r\n]+)/.exec(text)?.[1]?.trim();
+  const match = value && /^([+-]\d+(?:\.\d+)?)([+-]\d+(?:\.\d+)?)([+-]\d+(?:\.\d+)?)?\/$/.exec(value);
+  if (!match) return null;
+  return { lat: Number(match[1]), lon: Number(match[2]), altitudeM: Math.round(Number(match[3] || 0)) };
+}
+
+function normaliseQuickTimeInstant(value) {
+  if (!value) return null;
+  const normalised = value.replace(/([+-]\d{2})(\d{2})$/, "$1:$2");
+  return Number.isFinite(Date.parse(normalised)) ? normalised : null;
+}
+
+function inspectVideo(source) {
+  const text = runFfmpeg(["-hide_banner", "-i", source], `Inspect ${path.basename(source)}`, { expectFailure: true });
+  const creation = /com\.apple\.quicktime\.creationdate:\s*([^\r\n]+)/.exec(text)?.[1]?.trim();
+  const duration = /Duration:\s*(\d{2}):(\d{2}):(\d{2}(?:\.\d+)?)/.exec(text);
+  return {
+    shotAt: normaliseQuickTimeInstant(creation),
+    durationS: duration ? Number(duration[1]) * 3600 + Number(duration[2]) * 60 + Number(duration[3]) : 0,
+    location: parseQuickTimeLocation(text),
+  };
+}
+
+async function buildVideo(name, route) {
+  const source = path.join(MASTERS, name);
+  const config = VIDEO_CONFIG[name] || {};
+  const inspected = inspectVideo(source);
+  const idMatch = /img[_-](\d+)/i.exec(name);
+  const id = config.id || (idMatch ? `video-${idMatch[1]}` : null);
+  if (!id) throw new Error(`Add VIDEO_CONFIG metadata for ${name}`);
+  const shotAt = config.shotAt || inspected.shotAt;
+  const location = config.lat != null
+    ? { lat: config.lat, lon: config.lon, altitudeM: config.altitudeM }
+    : inspected.location;
+  if (!shotAt || !location) throw new Error(`${name} is missing a usable capture time or location`);
+
+  const videoDest = path.join(PHOTO_OUT, `${id}.mp4`);
+  const posterDest = path.join(PHOTO_OUT, `${id}-poster.webp`);
+  const sourceMtime = fs.statSync(source).mtimeMs;
+  if (!fs.existsSync(videoDest) || fs.statSync(videoDest).mtimeMs < sourceMtime) {
+    runFfmpeg([
+      "-y", "-hide_banner", "-loglevel", "error", "-i", source,
+      "-map", "0:v:0", "-map", "0:a:0?", "-map_metadata", "-1", "-map_chapters", "-1", "-sn", "-dn",
+      "-vf", "scale=1600:1600:force_original_aspect_ratio=decrease",
+      "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-pix_fmt", "yuv420p",
+      "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", videoDest,
+    ], `Transcode ${name}`);
+  }
+  if (!fs.existsSync(posterDest) || fs.statSync(posterDest).mtimeMs < sourceMtime) {
+    runFfmpeg([
+      "-y", "-hide_banner", "-loglevel", "error", "-ss", String(config.posterAtS || 2), "-i", videoDest,
+      "-frames:v", "1", "-vf", "scale=1600:1600:force_original_aspect_ratio=decrease", "-c:v", "libwebp", "-quality", "84", posterDest,
+    ], `Poster ${name}`);
+  }
+  const meta = await sharp(posterDest).metadata();
+  if (meta.exif || meta.xmp) throw new Error(`${id}-poster.webp retained metadata`);
+  return {
+    id,
+    kind: "video",
+    src: `/assets/photos/travel/guatemala-2026/${id}-poster.webp`,
+    videoSrc: `/assets/photos/travel/guatemala-2026/${id}.mp4`,
+    width: meta.width,
+    height: meta.height,
+    durationS: Number(inspected.durationS.toFixed(2)),
+    shotAt,
+    lat: Number(location.lat.toFixed(7)),
+    lon: Number(location.lon.toFixed(7)),
+    altitudeM: Math.round(location.altitudeM),
+    routeIndex: nearestRouteIndex(route, Date.parse(shotAt) / 1000),
+  };
+}
+
+async function buildMedia(route) {
   fs.mkdirSync(PHOTO_OUT, { recursive: true });
   const files = fs.readdirSync(MASTERS).filter(name => /\.(jpe?g)$/i.test(name));
   const photos = [];
@@ -131,6 +230,7 @@ async function buildPhotos(route) {
     if (meta.exif || meta.xmp) throw new Error(`${id}.webp retained metadata`);
     photos.push({
       id,
+      kind: "photo",
       src: `/assets/photos/travel/guatemala-2026/${id}.webp`,
       width: meta.width,
       height: meta.height,
@@ -141,11 +241,15 @@ async function buildPhotos(route) {
       routeIndex: nearestRouteIndex(route, epoch),
     });
   }
+  for (const name of fs.readdirSync(MASTERS).filter(name => /\.mov$/i.test(name))) {
+    photos.push(await buildVideo(name, route));
+  }
   photos.sort((a, b) => a.shotAt.localeCompare(b.shotAt));
 
   const placeholderEpoch = Date.parse("2026-05-31T07:00:00-06:00") / 1000;
   photos.unshift({
     id: "starbucks-placeholder",
+    kind: "photo",
     src: "/assets/photos/gallery/large/img-0563.webp",
     width: 1120,
     height: 1680,
@@ -163,7 +267,7 @@ function indexAt(route, iso) {
 }
 
 const route = routeFromGps();
-const photos = await buildPhotos(route);
+const photos = await buildMedia(route);
 const trailStartPhoto = photos.find(photo => photo.id === "img-0758");
 const campPhoto = photos.find(photo => photo.id === "img-0637");
 if (!trailStartPhoto || !campPhoto) throw new Error("Trail-start or camp reference photo is missing");
@@ -209,4 +313,4 @@ const data = {
 
 fs.mkdirSync(TRIP, { recursive: true });
 fs.writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
-console.log(`[guatemala] ${route.points.length} route points, ${photos.length} photos, ${route.distanceKm} km`);
+console.log(`[guatemala] ${route.points.length} route points, ${photos.length} media items, ${route.distanceKm} km`);

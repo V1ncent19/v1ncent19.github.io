@@ -9,6 +9,8 @@ export function loadTerrain(raw: unknown): TerrainTravelData {
   if (data.route?.points?.some(point => !Array.isArray(point) || point.length !== 4 || !point.every(Number.isFinite)))
     bad.push("route.points entries");
   if (!Array.isArray(data.photos) || data.photos.some(photo => !photo.id || !photo.src ||
+    !["photo", "video"].includes(photo.kind) ||
+    (photo.kind === "video" && (!photo.videoSrc || !Number.isFinite(photo.durationS))) ||
     !Number.isFinite(photo.lat) || !Number.isFinite(photo.lon) || !Number.isInteger(photo.routeIndex)))
     bad.push("photos");
   if (!Array.isArray(data.scenes) || !data.scenes.length || data.scenes.some(scene =>

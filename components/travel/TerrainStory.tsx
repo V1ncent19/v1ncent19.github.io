@@ -5,6 +5,8 @@ import type { LogChapter, LogLang } from "@/lib/travel/log/types";
 import { TERRAIN_COMPLETE_SCENE_ID, TERRAIN_INTRO_SCENE_ID, type TerrainTravelData } from "@/lib/travel/terrain";
 import type { TerrainReadingState } from "./TerrainTravelLog";
 import ChapterNavigation from "./log/ChapterNavigation";
+import TravelLogFacts from "./log/TravelLogFacts";
+import TravelLogScrollCue from "./log/TravelLogScrollCue";
 import { MAP_SPLIT_EVENT } from "@/lib/travel/map-split";
 
 function clamp01(value: number) { return Math.max(0, Math.min(1, value)); }
@@ -39,6 +41,7 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
 
   useEffect(() => {
     let raf = 0;
+    let lastEmitAt = 0;
     const measure = () => {
       raf = 0;
       const root = rootRef.current;
@@ -76,7 +79,14 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
       }
       const next = { sceneId: scene?.id ?? (intro ? TERRAIN_INTRO_SCENE_ID : TERRAIN_COMPLETE_SCENE_ID), routeIndex, photoId };
       const previous = lastRef.current;
-      if (previous.sceneId !== next.sceneId || previous.photoId !== next.photoId || Math.abs(previous.routeIndex - next.routeIndex) > 0.08) {
+      const identityChanged = previous.sceneId !== next.sceneId || previous.photoId !== next.photoId;
+      const routeChanged = Math.abs(previous.routeIndex - next.routeIndex) > 0.18;
+      const now = performance.now();
+      // Fast wheel/trackpad input can emit a scroll event for every display
+      // frame. Cap React/MapLibre handoffs at ~30 fps while keeping chapter
+      // and photo changes immediate.
+      if (identityChanged || (routeChanged && now - lastEmitAt >= 32)) {
+        lastEmitAt = now;
         lastRef.current = next;
         onReading(next);
       }
@@ -102,6 +112,7 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
   useEffect(() => {
     let raf = 0;
     const updatePinned = () => {
+      raf = 0;
       const root = rootRef.current;
       if (root) {
         for (const block of root.querySelectorAll<HTMLElement>(".terrain-chapter-block")) {
@@ -111,10 +122,21 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
           block.classList.toggle("pinned", Math.abs(bar.getBoundingClientRect().top - stickyTop) <= 2);
         }
       }
-      raf = requestAnimationFrame(updatePinned);
     };
-    raf = requestAnimationFrame(updatePinned);
-    return () => cancelAnimationFrame(raf);
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(updatePinned); };
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    window.addEventListener(MAP_SPLIT_EVENT, schedule);
+    const observer = new ResizeObserver(schedule);
+    if (rootRef.current) observer.observe(rootRef.current);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener(MAP_SPLIT_EVENT, schedule);
+    };
   }, []);
 
   const activeSceneIndex = data.scenes.findIndex(scene => scene.id === reading.sceneId);
@@ -122,16 +144,18 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
   return <div className="terrain-story-col">
     <div className="terrain-inner" ref={rootRef}>
     <header className="terrain-hero" data-terrain-scene={TERRAIN_INTRO_SCENE_ID}>
+      <div className="terrain-hero-content">
       <p className="terrain-kicker">{data.dateLabel} · Guatemala</p>
       <h1>{data.title}</h1>
       <p className="terrain-subtitle">{data.subtitle}</p>
       <p className="terrain-intro">{data.introduction}</p>
-      <dl className="terrain-facts">
-        <div><dt>{lang === "zh" ? "最高海拔" : "Highest point"}</dt><dd>{data.route.maxAltitudeM.toLocaleString()} m</dd></div>
-        <div><dt>{lang === "zh" ? "累计爬升" : "Elevation gain"}</dt><dd>{data.route.ascentM.toLocaleString()} m</dd></div>
-        <div><dt>{lang === "zh" ? "路线记录" : "Route samples"}</dt><dd>{data.route.points.length}</dd></div>
-      </dl>
-      <span className="terrain-scroll-cue" aria-hidden="true">↓</span>
+      <TravelLogFacts items={[
+        { label: lang === "zh" ? "最高海拔" : "Highest point", value: `${data.route.maxAltitudeM.toLocaleString()} m` },
+        { label: lang === "zh" ? "累计爬升" : "Elevation gain", value: `${data.route.ascentM.toLocaleString()} m` },
+        { label: lang === "zh" ? "路线记录" : "Route samples", value: data.route.points.length.toLocaleString() },
+      ]} />
+      </div>
+      <TravelLogScrollCue lang={lang} />
     </header>
 
     <main className="terrain-scenes">
@@ -158,9 +182,13 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
               {scene.photos.map(item => {
                 const photo = photos.get(item.id);
                 if (!photo) return null;
-                return <figure key={item.id} data-terrain-photo={item.id} className="terrain-story-photo" style={{ aspectRatio: `${photo.width} / ${photo.height}` }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={photo.src} width={photo.width} height={photo.height} loading={sceneIndex < 2 ? "eager" : "lazy"} alt={item.caption} />
+                return <figure key={item.id} data-terrain-photo={item.id} className={`terrain-story-photo${photo.kind === "video" ? " is-video" : ""}`} style={{ aspectRatio: `${photo.width} / ${photo.height}` }}>
+                  {photo.kind === "video" && photo.videoSrc
+                    ? <video src={photo.videoSrc} poster={photo.src} width={photo.width} height={photo.height} controls playsInline preload="metadata" aria-label={item.caption} />
+                    : <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={photo.src} width={photo.width} height={photo.height} loading={sceneIndex < 2 ? "eager" : "lazy"} alt={item.caption} />
+                    </>}
                   <figcaption><span>{item.caption}</span><small>{photo.shotAt.slice(11, 16)} · {photo.altitudeM.toLocaleString()} m</small></figcaption>
                 </figure>;
               })}
