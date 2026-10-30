@@ -5462,6 +5462,30 @@
       "routeIndex": 68
     },
     {
+      "id": "img-0530",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0530.webp",
+      "width": 2200,
+      "height": 1650,
+      "shotAt": "2026-05-31T06:30:34-06:00",
+      "lat": 14.5597333,
+      "lon": -90.7342306,
+      "altitudeM": 1536,
+      "routeIndex": 42
+    },
+    {
+      "id": "img-0555",
+      "kind": "photo",
+      "src": "/assets/photos/travel/guatemala-2026/img-0555.webp",
+      "width": 1650,
+      "height": 2200,
+      "shotAt": "2026-05-31T06:40:10-06:00",
+      "lat": 14.5593944,
+      "lon": -90.7343056,
+      "altitudeM": 1541,
+      "routeIndex": 56
+    },
+    {
       "id": "img-0758",
       "kind": "photo",
       "src": "/assets/photos/travel/guatemala-2026/img-0758.webp",
@@ -5911,8 +5935,16 @@
       ],
       "photos": [
         {
+          "id": "img-0530",
+          "caption": "晨光里的圣卡塔利娜拱门，把街尽头的 Agua 火山框进正中央。"
+        },
+        {
+          "id": "img-0555",
+          "caption": "街角的人们趁着空街和晨光拍照，小镇也正一点点热闹起来。"
+        },
+        {
           "id": "starbucks-placeholder",
-          "caption": "Antigua 清晨。黄色拱门照片补入前，暂以 Starbucks 的庭院照片占位。"
+          "caption": "集合前绕去 Antigua 的 Starbucks，等待小镇与营地慢慢醒来。"
         }
       ]
     },

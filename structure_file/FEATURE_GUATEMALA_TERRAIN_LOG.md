@@ -19,7 +19,7 @@ app/travel/{,zh/}guatemala-2026/page.tsx
 
 - `card.json`：Travel / Blog 卡片；
 - `story.json`：唯一应手工维护的标题、段落、分段时间、照片编排与相机关键帧；
-- `data.json`：`guatemala:build` 根据私有 GPS、照片 EXIF、视频 QuickTime metadata 与 `story.json` 生成的页面数据。当前为 906 个路线点、9 个场景、33 张发布照片、2 段视频加 1 张 Starbucks 占位图。
+- `data.json`：`guatemala:build` 根据私有 GPS、照片 EXIF、视频 QuickTime metadata 与 `story.json` 生成的页面数据。当前为 906 个路线点、9 个场景、35 张发布照片、2 段视频加 1 张 Starbucks 占位图。
 
 `lib/travel/terrain.ts` 定义路线、照片、场景、地点与相机数据形状；`lib/travel/log/validate.ts` 在构建期验证数据。不要把 Guatemala 的字段塞进 journal 或 pilgrimage 的可选字段。
 
