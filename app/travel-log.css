@@ -259,7 +259,7 @@
 
 /* Geometry is owned by the shell; variant styles keep their typography. */
 [data-travel-log] { display: flex; min-height: 100vh; --pj-land: var(--log-landing); --pj-band-top: var(--log-band-top); }
-[data-log-kind="journal"] { --tl-map-h-mobile: var(--log-map-height, var(--log-default-map-height)); }
+[data-log-kind="journal"], [data-log-kind="reconstructed"] { --tl-map-h-mobile: var(--log-map-height, var(--log-default-map-height)); }
 [data-travel-log] [data-log-map] { width: 46%; position: sticky; top: 0; height: 100vh; }
 .travel-log-back { font-family: var(--font-ui); text-decoration: none; }
 .travel-log-tools { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 4; }

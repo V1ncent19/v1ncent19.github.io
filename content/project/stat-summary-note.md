@@ -29,9 +29,9 @@ The statistics course summary actually started from the exam cheatsheets during 
 
 Since it's written as a reminder, I may not contain some basic knowledge like calculus, linear algebra, etc. Besides, for consistency within the file and familiarity for myself, I might not use some commonly used notations (an example may be the size of the designed matrix: I use $$n\times (p+1)$$ while some others use $$n\times p$$). Please check the denotation section in case of confusion.
 
-这份课程笔记是我在[清华大学统计学辅修课程](http://www.stat.tsinghua.edu.cn/programs/undergraduate-programs/)中所有课程的笔记总结。这份笔记是从初概/统推课的考试 cheatsheet 发展而来的，之后经过几轮完善并不断加入新课的笔记，逐步成为了现在的笔记系列——每一个章节对应着统辅里的一门课，其中囊括了一些重要的知识点、容易令人困惑的问题、我自己的一些迷思、实用外链等内容。
+这份课程笔记是我在[清华大学统计学辅修课程](http://www.stat.tsinghua.edu.cn/programs/undergraduate-programs/)中所有课程的笔记总结。这份笔记是从初概 / 统推课的考试 cheatsheet 发展而来的，之后经过几轮完善并不断加入新课的笔记，逐步成为了现在的笔记系列——每一个章节对应着统辅里的一门课，其中囊括了一些重要的知识点、容易令人困惑的问题、我自己的一些迷思、实用外链等内容。
 
-在排版上的基本思想是便于查阅而不是便于学习，所以章节内的内容顺序很多都与统辅课上稍有不同，改成了我比较喜欢/习惯的组织模式，章节顺序也是简单地按照我上课的顺序排列。为了弥补排版顺序对内容切割的影响，文中提供了交叉引用、文末提供了索引，方便在知识之间进行链接。在具体内容上，在源头上这是应用统计学辅修课程笔记的整理，所以很多时候一些背景知识我不一定会提及，同时出于我自己的习惯或行文的一致性，有时候我习惯的记号：
+在排版上的基本思想是便于查阅而不是便于学习，所以章节内的内容顺序很多都与统辅课上稍有不同，改成了我比较喜欢 / 习惯的组织模式，章节顺序也是简单地按照我上课的顺序排列。为了弥补排版顺序对内容切割的影响，文中提供了交叉引用、文末提供了索引，方便在知识之间进行链接。在具体内容上，在源头上这是应用统计学辅修课程笔记的整理，所以很多时候一些背景知识我不一定会提及，同时出于我自己的习惯或行文的一致性，有时候我习惯的记号：
 
 1. 和通用的记号不完全一致，如回归中的设计矩阵维度我喜欢用 $$n\times (p+1)$$，正态分布上分位数我喜欢用 $$N_{\alpha }$$；
 2. 有时候引入一些我在物理专业中已经熟悉的记号，如涉及态的内积用 $\langle$bra$\vert$ $\vert$ket$\rangle$，Fourier 用 $\fallingdotseq$；
@@ -41,7 +41,7 @@ Since it's written as a reminder, I may not contain some basic knowledge like ca
 
 ### Announcement
 
-另外，我在考虑将这份东西译成中文，方便一些没有那么习惯使用英语的同学/刚入门统计需要一些中英对照的同学阅读，同时也对内容进行一些充实，如果有人有兴趣加入/也有想要分享的板块/有任何建议，欢迎[联系我](mailto:v1ncent19@outlook.com)。
+另外，我在考虑将这份东西译成中文，方便一些没有那么习惯使用英语的同学 / 刚入门统计需要一些中英对照的同学阅读，同时也对内容进行一些充实，如果有人有兴趣加入 / 也有想要分享的板块 / 有任何建议，欢迎[联系我](mailto:v1ncent19@outlook.com)。
 
 ## Acknowledgments
 

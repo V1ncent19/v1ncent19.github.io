@@ -45,13 +45,20 @@ Optional tile fields worth knowing (updated 2026-10-29):
   out and every trip reads "Read the log" (中文 "阅读旅行志"), which is the
   house default since 2026-10-17.
 
-## The three shapes a trip can take
+## The four shapes a trip can take
 
-All three shapes share the travel-log shell, chapter navigation, toolbar, transitions
+All four shapes share the travel-log shell, chapter navigation, toolbar, transitions
 and mobile split. Their narrative rendering, GPS sampling and camera policies
 remain independent. Loading strategy follows payload size and does not determine
 page layout. See `structure_file/FEATURE_TRAVEL_LOG.md` for the framework and
 adding a new trip.
+
+`france-2024` uses the reconstructed shape: reviewed handwritten text and
+time anchors are imported at build time; `routes.json` keeps all original
+geometry empty, while separate walking, railway and metro candidates carry
+their source and review status. The metro builder filters IDFM track segments
+by their opening dates so later extensions cannot enter the March 2024 map.
+See `france-2024/README.md` for rebuild commands and the private-source boundary.
 
 Per-trip imports live in `lib/travel/log/definitions/<id>.ts`. The two thin
 route files select that definition and a language; shared components never

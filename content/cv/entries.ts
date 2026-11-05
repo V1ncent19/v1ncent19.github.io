@@ -267,7 +267,7 @@ export const cvHonors: Honor[] = [
   },
   {
     title: { en: "Ma Yuehan Cup — Shooting", zh: "马约翰杯 · 射击" },
-    sub: { en: "第64届马约翰杯 · 10 m air rifle 4th & air gun 5th", zh: "第64届马约翰杯 · 10 米气步枪第 4 名 & 气手枪第 5 名" },
+    sub: { en: "第 64 届马约翰杯 · 10 m air rifle 4th & air gun 5th", zh: "第 64 届马约翰杯 · 10 米气步枪第 4 名 & 气手枪第 5 名" },
     year: "2021",
   },
 ];

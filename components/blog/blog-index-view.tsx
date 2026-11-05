@@ -41,14 +41,14 @@ function formatDate(iso: string, lang: Lang): string {
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return iso;
   return lang === "zh"
-    ? `${y}年${m}月${d}日`
+    ? `${y} 年 ${m} 月 ${d} 日`
     : `${EN_MONTHS[m - 1]} ${d}, ${y}`;
 }
 
 function formatMonth(iso: string, lang: Lang): string {
   const [y, m] = iso.split("-").map(Number);
   if (!y || !m) return iso;
-  return lang === "zh" ? `${y}年${m}月` : `${EN_MONTHS[m - 1]} ${y}`;
+  return lang === "zh" ? `${y} 年 ${m} 月` : `${EN_MONTHS[m - 1]} ${y}`;
 }
 
 function fmt(template: string, vars: Record<string, string | number>): string {

@@ -1,8 +1,9 @@
 "use client";
 
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { applyTheme, nextTheme, readTheme, THEME_LABEL } from "@/lib/theme";
 import type { Theme } from "@/lib/site";
+import SystemAppearanceIcon from "./system-appearance-icon";
 
 /**
  * Single-button light/dark/system theme control.
@@ -19,8 +20,8 @@ import type { Theme } from "@/lib/site";
  * lib/theme.ts so the trip pages' own 自/昼/夜 control (the map's left pill in
  * components/travel/TravelMap.tsx) shares the exact same storage key.
  *
- * Icons are three stacked lucide glyphs; CSS in globals.css shows exactly one
- * via `html[data-theme="…"]` (☀ light, ☾ dark, ⛶ system).
+ * CSS in globals.css shows one icon per mode: sun, moon, or a monitor with a
+ * half-light screen for the system setting.
  */
 /** Which icons map to which mode (class suffix matches globals.css rules). */
 const ICON: Record<Theme, string> = {
@@ -65,7 +66,7 @@ export function ThemeToggle() {
         aria-hidden="true"
         strokeWidth={1.8}
       />
-      <Monitor
+      <SystemAppearanceIcon
         className={`${ICON.system} ti-ico h-5 w-5`}
         aria-hidden="true"
         strokeWidth={1.8}

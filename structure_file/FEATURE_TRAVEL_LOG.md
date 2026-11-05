@@ -1,6 +1,6 @@
 # FEATURE — 统一地图旅行日志框架
 
-2026-10-24，2026-10-28 增补 terrain 类型，2026-10-29 统一开场组件。适用 `/travel/ptes-2025/`、`/travel/just-because/`、`/travel/guatemala-2026/` 及其 `/travel/zh/<id>/` 镜像。
+2026-10-24，2026-10-28 增补 terrain 类型，2026-10-29 统一开场组件，2026-10-30 增补 reconstructed 类型。适用 `/travel/ptes-2025/`、`/travel/just-because/`、`/travel/guatemala-2026/`、`/travel/france-2024/` 及其 `/travel/zh/<id>/` 镜像。
 
 ## 组织边界
 
@@ -10,14 +10,14 @@
 路由 page.tsx
   → lib/travel/log/definitions/<id>.ts（本篇的内容、类型与加载地址）
   → components/travel/log/TravelLogPage.tsx（公共服务端入口）
-  → TravelLog / PilgrimageLog / TerrainTravelLog（内容类型适配器）
+  → TravelLog / PilgrimageLog / TerrainTravelLog / ReconstructedTravelLog（内容类型适配器）
   → TravelLogShell（公共外壳）
-      ├─ TravelMap / PilgrimageMap（各自的轨迹和镜头）
-      ├─ TravelStory / PilgrimageStory（各自的正文）
+      ├─ 各类型的地图组件（各自的证据、轨迹和镜头）
+      ├─ 各类型的正文组件
       └─ ChapterNavigation / MapToolbar / 返回按钮与幕布
 ```
 
-`TravelLog` 是可复用的 journal 类型适配器，内部不再导入 PTES 数据。新增 journal 不需要修改它。三种类型都由可序列化的 `TravelLogDefinition` 描述，判别字段为 `kind: "journal" | "pilgrimage" | "terrain"`。每篇定义单独导入自己的 JSON，避免中央注册表把所有旅行正文打进同一个内容模块。Guatemala 的专属实现与数据边界见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`。
+`TravelLog` 是可复用的 journal 类型适配器，内部不再导入 PTES 数据。新增 journal 不需要修改它。四种类型都由可序列化的 `TravelLogDefinition` 描述，判别字段为 `kind: "journal" | "pilgrimage" | "terrain" | "reconstructed"`。每篇定义单独导入自己的 JSON，避免中央注册表把所有旅行正文打进同一个内容模块。Guatemala 的专属实现与数据边界见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`；法国手稿重建见 `PLAN_FRANCE_2024_LOG.md`。
 
 ## 公共部分
 
@@ -43,17 +43,18 @@
 - journal：日分组、时段、夜间分隔、景点文字；叙事时间插值、飞行/地面/缺失轨迹及关键帧镜头仍由原组件负责。
 - pilgrimage：对比图、插叙与评论；拍摄时间/`routeIdx` 定位、站点镜头、弹窗的 active/open/dismissed 状态仍独立。
 - terrain：三维 DEM、等高线、照片标点、章节相机与首尾环绕；公开派生数据和私有 GPS/EXIF 母版的边界仍独立。
+- reconstructed：无 GPS 手稿的逐日正文、时刻表与二维地点标点。公开地点坐标和私有手稿/住址分离；核对账本只供构建标点顺序，归档路线形状不导入页面。地图不绘连接线，标点可点击定位正文。
 - 文档阅读百分比不等于旅行时间或路线百分比。导航按文档滚动范围计算，地图位置由各类型适配器计算。
 - PTES 的光标与镜头继续使用同一条缓动阅读线。正文日期进度通过实例内 `readTime()` 读取，已移除 `window.__ttime` 内部通信；原地图调试接口不参与正文通信。
 - 巡礼导航直接消费正文 observer 得出的当前章节，不再自行运行第二套章节评分。
 - 手动探索不因后续滚动恢复；显式恢复回到当前阅读位置；巡礼查看全程后保持 overview。
 - 入场幕布完整加载时由解析期脚本设置 body 类，Next Link 导航由 `useLayoutEffect` 在绘制前补齐；统一通过 `body::before` 绘制。禁止水合前插入真实 DOM 幕布。动画监听同时检查名称与 `pseudoElement`，失败及超时应释放幕布，卸载须清理类。
-- 三种日志的开场必须使用同一套 `TravelLogFacts` 与 `TravelLogScrollCue`。元数据内容可以不同：PTES 显示天数/里程/GPS，Anitabi 显示时长/路线点/对比图，Guatemala 显示最高点/爬升/路线点。
+- 四种日志的开场必须使用同一套 `TravelLogFacts` 与 `TravelLogScrollCue`。元数据内容可以不同：PTES 显示天数/里程/GPS，Anitabi 显示时长/路线点/对比图，Guatemala 显示最高点/爬升/路线点，France 显示天数/文字章节/GPS 缺失。
 - 不提供正文自动播放：地图镜头与不同密度的文字、图片、视频没有一套始终舒适的统一速度。开场只提示手动滚动，让现有 observer 按真实阅读位置更新地图；不要另建地图时间轴。
 
 ## 布局与样式
 
-- `<1024px` 上下排列，`≥1024px` 左右排列；桌面地图宽 46%。移动端 journal 默认 40vh、pilgrimage 默认 58vh。
+- `<1024px` 上下排列，`≥1024px` 左右排列；桌面地图宽 46%。移动端 journal 默认 40vh、pilgrimage 默认 58vh、reconstructed 默认 48vh。
 - 默认值唯一配置在 `LOG_LAYOUTS`；静态首帧的 CSS 默认值通过外壳发布。旧变量只作为现有正文样式的兼容接口。
 - 分隔条范围保持 50px 至视口高度的 85%；拖动阈值 6px；存储键为 `travel-log-split:<旅行 id>`，不同旅行互不覆盖。现有两篇定义声明了旧存储键，已有拖拽尺寸继续作为回退读取，新拖动写入新键。
 - 公共高度为 `--log-map-height`，公共落点为 `--log-landing` / `--log-band-top`，同时写入地图列与公共祖先。提交手势后发布 `MAP_SPLIT_EVENT`，导航和叙事控制器重新测量。
@@ -63,13 +64,15 @@
 ## 新增一篇旅行日志
 
 1. 创建 `content/travel/<id>/card.json`；目录名与卡片 `id` 一致。此后各索引自动发现它。旅行日志 `featured` 默认 true，与精选照片按返程日进入同一条时间线；`pinned` 默认 false，是高于精选带的独立最高优先级，目前仅 PTES 使用；`showPinnedBadge` 默认 false，只控制可见图标。三个可选字段均校验为布尔值。
-2. 按现有 journal 或 pilgrimage 模型准备本篇内容。正文保留自己的创作语言；公共界面语言由路由传入。
+2. 按现有 journal、pilgrimage、terrain 或 reconstructed 模型准备本篇内容。正文保留自己的创作语言；公共界面语言由路由传入。reconstructed 的地点精度单独标记，不从地点顺序自动补出地图轨迹。
 3. 创建 `lib/travel/log/definitions/<id>.ts`，直接导入本篇小文件、调用对应校验器并提供 `kind/id/card/wordmark`。journal 另提供 `trip/scenes/attractions/trackUrl`，pilgrimage 提供 `data`。浏览器标题不同于卡片标题时可提供 `pageTitles`。
 4. 添加两个薄入口：`app/travel/<id>/page.tsx`、`app/travel/zh/<id>/page.tsx`，只导入定义和 `TravelLogPage`，分别传 `lang="en"` / `"zh"`；metadata 调用 `logMetadata()`。
 5. 大轨迹如果需要 URL，在 `scripts/sync-trip-data.mjs` 的 `MIRRORED` 明确声明。现有巡礼不可重建快照继续由 `KEEP` 保护，不改变原始数据归属。
 6. 检查数据引用、双语字段、类型、lint 和静态导出；再验证两种语言及断点两侧。新增已有类型不需要修改公共导航、布局、返回与幕布。
 
 新内容类型才需要扩展 `TravelLogDefinition`，提供自己的正文、旅行位置计算和地图组件；接入同一外壳、章节接口与工具栏。Guatemala 已按此方式加入 `terrain`。不要把新类型字段塞进旧类型的可选字段集合。
+
+France 的 reconstructed 页面只绘地点标点。`routes.json` 的 135 段核对账本仅在构建时提供每日地点顺序；路线和地铁几何文件是未导入页面的归档候选。景点为无编号蓝色圆点，餐饮为陶土色方点，交通为中性点；餐馆评论从既有博客原文构建，按到访顺序嵌入每日正文，以陶土色激活条与景点区分，原博客链接集中在文末。正文按同一地点或事件合章，中法双语原题进入章节标题；来源 ID 留在数据中供追溯，不显示于正文。详见 `content/travel/france-2024/README.md`。
 
 首页/导航卡片的确认图形、返回规则和辅助标签参数另见 `FEATURE_HOME_NAVIGATION.md`；Travel hub 的优先级是 `pinned` → `featured` → 当前日期/地点/随机排序。
 
@@ -108,3 +111,8 @@ Travel gallery 的 StoryTile 使用 Next Link/router.push，不再通过 window.
 - `useLayoutEffect` 补齐 Next Link 进入时的启动类。监听仍过滤 `::before` 与动画名；迟到的就绪信号不能重新挂幕布；运行中切换 reduce 时立即清理。
 - 验收命令 `node scripts/check-travel-log.mjs --entry`：1440px/390px × 两篇 × 两种语言，采样真实 CSS 动画的起始/中间/结束阶段，检查全屏覆盖、右侧固定原点、覆盖范围单调缩小、返回动画反向、清理后不残留类；另外检查真实 Blog Next Link 同文档导航、阻止应用脚本后的 CSS-only 退场、减少动态效果。
 - 此修复补上了上一轮静态截图无法检查的动画过程验证。类型、lint 和 Webpack 静态导出通过。
+
+## 开屏幕布收尾（2026-11-04）
+
+- 蓝幕仍固定右边缘、从左向右揭开。单段缓动的两次尝试分别使末尾窄边停留过久、或让近乎匀速的边缘突然穿过屏幕。现用 0.58s 分段曲线：起步短暂加速，中段移动，进入最后一段前减速；边缘仅越过右缘 1% 后结束。
+- 末端颜色由较深的蓝色改为接近开场的浅蓝，减弱窄边的视觉重量；不使用末端透明度淡出。正常进入与无 JS 兜底采用相同曲线；返回幕布保持原方向与时长。逐帧验收允许结尾 `scaleX` 为负值，用于确认边缘已移出视口。

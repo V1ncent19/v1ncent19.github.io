@@ -73,6 +73,8 @@ yarn-error.log*
 # `original/` block below). Never rewrite or delete those files in place: they
 # are the only copy and they are not in version control.
 /GalleryPhoto/
+__pycache__/
+*.pyc
 
 # pilgrimage photo masters — full-resolution ORIGINAL phone shots that still
 # carry EXIF GPS. Local master only, never published. Nothing currently lives

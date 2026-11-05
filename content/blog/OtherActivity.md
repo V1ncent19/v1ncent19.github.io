@@ -21,7 +21,7 @@ I also took part in voluntary work in organization and order maintainence of exa
 ### Others
 
 Other voluntary work includes
-- Blood donation (400ml * 1 + 200ml * 2 up to now). I think blood donation is of great significance, especially considering the situation of the blood resources in China.
+- Blood donation (400 ml * 1 + 200 ml * 2 up to now). I think blood donation is of great significance, especially considering the situation of the blood resources in China.
 - Volunteer @ Campus Hospital of Tsinghua University. Help guiding patients and offering other assistance.
 - Volunteer for nucleic acid test / vaccination.
 - Volunteer @ Science popularization classroom in [China Science and Technology Museum](https://cstm.cdstm.cn/ywb/). 

@@ -33,6 +33,8 @@ export interface TerrainPhoto {
   lon: number;
   altitudeM: number;
   routeIndex: number;
+  /** Keep the story image but omit a known-bad location from the map. */
+  mapVisible?: boolean;
 }
 
 export interface TerrainScenePhoto {
@@ -42,7 +44,8 @@ export interface TerrainScenePhoto {
 
 export interface TerrainScene {
   id: string;
-  eyebrow: string;
+  /** Optional secondary chapter label; title alone can name a scene. */
+  eyebrow?: string;
   title: string;
   time: string;
   /** Inclusive indices into TerrainRoute.points. */

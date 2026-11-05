@@ -460,12 +460,13 @@ export const copy: Record<Lang, Copy> = {
   },
 };
 
-/** "2024-09-20" → "Sep 2024" (en) / "2024年9月" (zh). Graceful for odd input. */
+/** "2024-09-20" → "Sep 2024" (en) / "2024 年 9 月" (zh). Graceful for odd input. */
 export function formatMonth(date: string, lang: Lang): string {
   const parts = date.split("-").map(Number);
   if (parts.length < 2 || !parts[0] || !parts[1]) return date;
+  if (lang === "zh") return `${parts[0]} 年 ${parts[1]} 月`;
   const label = new Date(parts[0], parts[1] - 1, 1).toLocaleDateString(
-    lang === "zh" ? "zh-CN" : "en-US",
+    "en-US",
     { year: "numeric", month: "short" },
   );
   return label;

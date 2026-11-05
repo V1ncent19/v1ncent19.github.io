@@ -218,7 +218,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 
 ## 地图旅行日志公共框架（2026-10-24）
 
-三篇日志及中英文镜像已接入 `components/travel/log/TravelLogPage.tsx` → 类型适配器 → `TravelLogShell.tsx`。公共外壳统一沉浸/返回/幕布、1024px 断点、地图分隔拖拽和工具栏；`ChapterNavigation.tsx` 共用章节目录、进度条和跳转。journal / pilgrimage / terrain 的正文与镜头策略独立，Guatemala 细节见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`。
+四篇日志及中英文镜像已接入 `components/travel/log/TravelLogPage.tsx` → 类型适配器 → `TravelLogShell.tsx`。公共外壳统一沉浸/返回/幕布、1024px 断点、地图分隔拖拽和工具栏；`ChapterNavigation.tsx` 共用章节目录、进度条和跳转。journal / pilgrimage / terrain / reconstructed 的正文与镜头策略独立，Guatemala 细节见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`，France 手稿重建见 `PLAN_FRANCE_2024_LOG.md`。
 
 每篇的数据入口在 `lib/travel/log/definitions/<id>.ts`；`TravelLog` 不再导入 PTES JSON。`TravelNav` 只做日期→章节适配，巡礼不再有单独的 `PilgrimageRail`。原 PTES 的 styled-jsx 样式已移至 `app/travel-journal.css`、`app/travel-navigation.css`，公共样式为 `app/travel-log.css`。完整职责、接口、新增流程与验收见 `FEATURE_TRAVEL_LOG.md`。
 
@@ -235,6 +235,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 /travel/ptes-2025(+/zh)  互动游记（粘性地图 + 文字流 + 幕布动画 + 总进度条）
 /travel/just-because(+/zh) 巡礼地图（MapLibre + 36 站滚动联动 + 可缩放相机）
 /travel/guatemala-2026(+/zh) 三维地形游记（DEM + 等高线 + GPS 路线 + 照片/章节滚动联动）
+/travel/france-2024(+/zh) 手稿重建游记（12 天正文、时刻表、地点及逐段路网候选；无当次 GPS）
 /guestbook, /guestbook/zh 留言板（giscus，term 固定 "index"，勿动）
 /zh/*                    双语镜像（`bilingualBases` 由 `navItems` 推导，不再手工维护）
 ```
@@ -283,6 +284,9 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 | `pilgrimage-map.mjs` | — | 上游数据变了 | 组装 `content/travel/just-because/page.json` |
 | `guatemala-travel.mjs` | `npm run guatemala:build` | 换 GPS、照片、分段时间时 | 私有全年 GPS + EXIF 原图 → 裁切路线、去元数据 WebP 与 `data.json` |
 | `guatemala-terrain.mjs` + `guatemala-terrain-style.mjs` + `guatemala-contours.mjs` | `npm run guatemala:terrain` | 地形范围/样式变化时 | 下载 Terrarium DEM，生成素色贴图和平滑等高线；需要网络，不进 prebuild |
+| `build-france-2024.py` / `build-france-2024-places.py` | `python scripts/<file>` | 私有核对稿或地点匹配变化后手动 | 生成公开正文、路段账本与可公开地点，不发布手稿或住处门牌 |
+| `build-france-2024-route-pilot.py` / `build-france-2024-metro.py` | `python scripts/<file>` | 归档工具；当前页面不运行 | 从公开缓存生成步行、铁路、地铁候选形状；本人已决定 France 页面只显示地点标点，这些形状不再导入站点 |
+| `check-france-2024.mjs` | `node scripts/check-france-2024.mjs` | France 页面改动后手动 | 中英文 × 桌面／手机地图、逐段选择、形状数量与溢出检查 |
 
 巡礼全套见 `FEATURE_PILGRIMAGE.md`；相册见 `GALLERY_ADDING_PHOTOS.md`。
 

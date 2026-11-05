@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import type { GeoJSONSource, Map as MLMap, StyleSpecification } from "maplibre-gl";
+import type { GeoJSONSource, Map as MLMap, Marker as MLMarker, StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LogLang } from "@/lib/travel/log/types";
 import { TERRAIN_COMPLETE_SCENE_ID, TERRAIN_INTRO_SCENE_ID, type TerrainTravelData } from "@/lib/travel/terrain";
@@ -73,17 +73,7 @@ const WAYPOINT_REVEAL_METERS = 420;
 const PHOTO_ACCENT_LIGHT = "#e56f2d";
 const PHOTO_ACCENT_DARK = "#ff9851";
 const MAX_CAMERA_PROJECTION_SAMPLES = 96;
-const MAX_POPUP_ROUTE_SAMPLES = 140;
-
-type PhotoPopupPlacement = {
-  x: number;
-  y: number;
-  markerX: number;
-  markerY: number;
-  cornerX: number;
-  cornerY: number;
-  connected: boolean;
-};
+type PhotoFocusMarker = { marker: MLMarker; element: HTMLDivElement; frame: number; timer: number };
 
 function distanceMeters(a: readonly [number, number], b: readonly [number, number]) {
   const radians = Math.PI / 180;
@@ -302,12 +292,53 @@ function styleFor(dark: boolean): StyleSpecification {
       { id: "route-shadow", type: "line", source: "route", paint: { "line-color": dark ? "#07110f" : "#f7f2e8", "line-width": 4.2, "line-opacity": 0.78 } },
       { id: "route-full", type: "line", source: "route", paint: { "line-color": dark ? "#78b7c9" : "#729cac", "line-width": 1.55, "line-opacity": 0.82, "line-dasharray": [1.2, 1.4] } },
       { id: "route-progress", type: "line", source: "progress", paint: { "line-color": dark ? "#3ccfff" : "#1ba7c9", "line-width": 2.95, "line-opacity": 0.98 } },
-      { id: "photo-halo", type: "circle", source: "photos", paint: { "circle-radius": 6.2, "circle-color": dark ? "#18110d" : "#fff8ef", "circle-opacity": 0.92 } },
-      { id: "photo-points", type: "circle", source: "photos", paint: { "circle-radius": 3.5, "circle-color": dark ? PHOTO_ACCENT_DARK : PHOTO_ACCENT_LIGHT, "circle-stroke-width": 0 } },
+      { id: "photo-halo", type: "circle", source: "photos", paint: { "circle-radius": 4.5, "circle-color": dark ? "#18110d" : "#fff8ef", "circle-opacity": 0.92 } },
+      { id: "photo-points", type: "circle", source: "photos", paint: { "circle-radius": 2.6, "circle-color": dark ? PHOTO_ACCENT_DARK : PHOTO_ACCENT_LIGHT, "circle-stroke-width": 0 } },
       { id: "cursor-halo", type: "circle", source: "cursor", paint: { "circle-radius": 10, "circle-color": dark ? "#3ccfff" : "#1ba7c9", "circle-opacity": 0.2 } },
       { id: "cursor-dot", type: "circle", source: "cursor", paint: { "circle-radius": 5.2, "circle-color": dark ? "#75ddf7" : "#1ba7c9", "circle-stroke-color": dark ? "#171d1c" : "#fffaf0", "circle-stroke-width": 2 } },
+      { id: "photo-hit", type: "circle", source: "photos", paint: { "circle-radius": 10, "circle-color": PHOTO_ACCENT_LIGHT, "circle-opacity": 0 } },
     ],
   };
+}
+
+function syncPhotoFocus(map: MLMap, maplibre: typeof import("maplibre-gl"), markers: Map<string, PhotoFocusMarker>, activeId: string | null, photos: TerrainTravelData["photos"]) {
+  for (const [id, entry] of markers) {
+    if (id === activeId) continue;
+    cancelAnimationFrame(entry.frame);
+    entry.element.classList.remove("is-active");
+    if (!entry.timer) {
+      entry.timer = window.setTimeout(() => {
+        entry.marker.remove();
+        markers.delete(id);
+      }, 340);
+    }
+  }
+  if (!activeId) return;
+  let entry = markers.get(activeId);
+  if (!entry) {
+    const photo = photos.find(item => item.id === activeId && item.mapVisible !== false);
+    if (!photo) return;
+    const element = document.createElement("div");
+    element.className = "terrain-photo-focus";
+    element.setAttribute("aria-hidden", "true");
+    const emphasis = document.createElement("span");
+    emphasis.className = "terrain-photo-focus-emphasis";
+    const dot = document.createElement("span");
+    dot.className = "terrain-photo-focus-dot";
+    emphasis.append(dot);
+    element.append(emphasis);
+    const marker = new maplibre.Marker({ element, anchor: "center", pitchAlignment: "viewport", rotationAlignment: "viewport", subpixelPositioning: true })
+      .setLngLat([photo.lon, photo.lat]).addTo(map);
+    entry = { marker, element, frame: 0, timer: 0 };
+    markers.set(activeId, entry);
+    // Flush the hidden style so the next frame produces a real CSS transition.
+    void element.offsetWidth;
+  }
+  window.clearTimeout(entry.timer);
+  entry.timer = 0;
+  cancelAnimationFrame(entry.frame);
+  const activeEntry = entry;
+  entry.frame = requestAnimationFrame(() => activeEntry.element.classList.add("is-active"));
 }
 
 function ContourIcon() {
@@ -326,7 +357,11 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   onNavigateScene: (id: string) => void;
 }) {
   const holderRef = useRef<HTMLDivElement>(null);
+  const compassNeedleRef = useRef<HTMLSpanElement>(null);
   const mapRef = useRef<MLMap | null>(null);
+  const maplibreRef = useRef<typeof import("maplibre-gl") | null>(null);
+  const photoFocusMarkersRef = useRef(new Map<string, PhotoFocusMarker>());
+  const followingRef = useRef(true);
   const readyRef = useRef(false);
   const readingRef = useRef(reading);
   const onReadyRef = useRef(onMapReady);
@@ -335,7 +370,6 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   const [ready, setReady] = useState(false);
   const [follow, setFollow] = useState(true);
   const [surface, setSurface] = useState<"topo" | "satellite">("topo");
-  const [popup, setPopup] = useState<PhotoPopupPlacement | null>(null);
   const theme = useSyncExternalStore(subscribeTheme, getThemeSnapshot, () => THEME_SERVER_SNAPSHOT);
   const dark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
   const { mountColumn, renderHandle } = useMapSplit();
@@ -345,7 +379,6 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   const overviewScene = intro || complete;
   const activeCamera = overviewScene ? COMPLETE_CAMERA : activeScene.camera;
   const cameraSceneId = intro ? TERRAIN_INTRO_SCENE_ID : complete ? TERRAIN_COMPLETE_SCENE_ID : activeScene.id;
-  const activePhoto = data.photos.find(photo => photo.id === reading.photoId) ?? null;
   const current = useMemo(() => pointAt(data, reading.routeIndex), [data, reading.routeIndex]);
   const routeRenderIndex = Math.round(reading.routeIndex * 4) / 4;
 
@@ -354,7 +387,6 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   useEffect(() => { onNavigateRef.current = onNavigateScene; }, [onNavigateScene]);
 
   const routeCoordinates = useMemo(() => data.route.points.map(point => [point[0], point[1]] as [number, number]), [data.route.points]);
-  const popupRouteSamples = useMemo(() => evenlySample(data.route.points, MAX_POPUP_ROUTE_SAMPLES), [data.route.points]);
   const routeFeature = useMemo(() => ({
     type: "Feature" as const,
     properties: {},
@@ -362,7 +394,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   }), [routeCoordinates]);
   const photoFeatures = useMemo(() => ({
     type: "FeatureCollection" as const,
-    features: data.photos.map(photo => ({ type: "Feature" as const, properties: { id: photo.id }, geometry: { type: "Point" as const, coordinates: [photo.lon, photo.lat] } })),
+    features: data.photos.filter(photo => photo.mapVisible !== false).map(photo => ({ type: "Feature" as const, properties: { id: photo.id }, geometry: { type: "Point" as const, coordinates: [photo.lon, photo.lat] } })),
   }), [data.photos]);
 
   useEffect(() => {
@@ -372,9 +404,14 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
     let readyFallback = 0;
     let releaseReady: (() => void) | null = null;
     let cancelled = false;
+    const photoFocusMarkers = photoFocusMarkersRef.current;
+    const syncCompass = () => {
+      if (map && compassNeedleRef.current) compassNeedleRef.current.style.transform = `rotate(${-map.getBearing()}deg)`;
+    };
     void (async () => {
       const maplibre = await import("maplibre-gl");
       if (cancelled || !holderRef.current) return;
+      maplibreRef.current = maplibre;
       map = new maplibre.Map({
         container: holderRef.current,
         style: styleFor(document.documentElement.classList.contains("dark")),
@@ -392,6 +429,8 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
         attributionControl: false,
       });
       mapRef.current = map;
+      map.on("rotate", syncCompass);
+      syncCompass();
       map.touchZoomRotate.disableRotation();
       map.on("load", () => {
         if (!map) return;
@@ -418,13 +457,13 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
             subpixelPositioning: true,
           }).setLngLat([place.lon, place.lat]).addTo(map);
         }
-        map.on("click", "photo-points", event => {
+        map.on("click", "photo-hit", event => {
           const id = String(event.features?.[0]?.properties?.id ?? "");
           const scene = data.scenes.find(item => item.photos.some(photo => photo.id === id));
           if (scene) onNavigateRef.current(scene.id);
         });
-        map.on("mouseenter", "photo-points", () => { if (map) map.getCanvas().style.cursor = "pointer"; });
-        map.on("mouseleave", "photo-points", () => { if (map) map.getCanvas().style.cursor = ""; });
+        map.on("mouseenter", "photo-hit", () => { if (map) map.getCanvas().style.cursor = "pointer"; });
+        map.on("mouseleave", "photo-hit", () => { if (map) map.getCanvas().style.cursor = ""; });
         let released = false;
         releaseReady = () => {
           if (released || cancelled) return;
@@ -432,6 +471,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
           window.clearTimeout(readyFallback);
           previousCameraSceneRef.current = TERRAIN_INTRO_SCENE_ID;
           readyRef.current = true;
+          followingRef.current = true;
           setFollow(true);
           setReady(true);
           onReadyRef.current();
@@ -442,7 +482,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
         map.once("idle", releaseReady);
         readyFallback = window.setTimeout(releaseReady, 1_800);
       });
-      const manual = () => setFollow(false);
+      const manual = () => { followingRef.current = false; setFollow(false); };
       map.on("dragstart", manual);
       map.on("wheel", manual);
       map.on("touchstart", manual);
@@ -461,6 +501,14 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
       window.clearTimeout(readyFallback);
       if (map && releaseReady) map.off("idle", releaseReady);
       resizeObserver?.disconnect();
+      for (const { marker, frame, timer } of photoFocusMarkers.values()) {
+        cancelAnimationFrame(frame);
+        window.clearTimeout(timer);
+        marker.remove();
+      }
+      photoFocusMarkers.clear();
+      maplibreRef.current = null;
+      map?.off("rotate", syncCompass);
       mapRef.current = null;
       map?.remove();
     };
@@ -626,6 +674,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
     let frame = 0;
     let lastOrbitUpdate = 0;
     const orbit = (now: number) => {
+      if (!followingRef.current) return;
       if (now >= orbitStart && now - lastOrbitUpdate >= 32) {
         lastOrbitUpdate = now;
         const phase = ((now - orbitStart) % COMPLETE_ORBIT_MS) / COMPLETE_ORBIT_MS;
@@ -681,137 +730,39 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!ready || !map || !activePhoto) { setPopup(null); return; }
-    let placementFrame = 0;
-    let placementTimer = 0;
-    let lastPlacement = 0;
-    const place = () => {
-      const point = projectTerrainPoint(map, [activePhoto.lon, activePhoto.lat]);
-      const width = holderRef.current?.clientWidth ?? 0;
-      const height = holderRef.current?.clientHeight ?? 0;
-      const popupWidth = width <= 560 ? 126 : 160;
-      // Includes the card border; keep in sync with .terrain-map-photo.
-      const popupHeight = width <= 560 ? 113 : 139;
-      const routePixels = popupRouteSamples.map(routePoint => projectTerrainPoint(map, [routePoint[0], routePoint[1]]));
-      const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
-      const overlayRoot = holderRef.current?.parentElement;
-      const holderRect = holderRef.current?.getBoundingClientRect();
-      const blockers = holderRect ? Array.from(overlayRoot?.querySelectorAll<HTMLElement>(
-        ".terrain-map-status, .terrain-map-tools, .terrain-place, .resume-story, .maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right",
-      ) ?? []).map(element => {
-        const rect = element.getBoundingClientRect();
-        return {
-          left: rect.left - holderRect.left - 8,
-          right: rect.right - holderRect.left + 8,
-          top: rect.top - holderRect.top - 8,
-          bottom: rect.bottom - holderRect.top + 8,
-        };
-      }) : [];
-      const candidateAt = (x: number, y: number, ring: number) => {
-        const placedX = clamp(x, 10, Math.max(10, width - popupWidth - 10));
-        const placedY = clamp(y, 72, Math.max(72, height - popupHeight - 10));
-        return { x: placedX, y: placedY, ring, clampDistance: Math.hypot(placedX - x, placedY - y) };
-      };
-      const candidates = [12, 48].flatMap((gap, ring) => [
-        candidateAt(point.x + gap, point.y - popupHeight - gap, ring),
-        candidateAt(point.x - popupWidth - gap, point.y - popupHeight - gap, ring),
-        candidateAt(point.x + gap, point.y + gap, ring),
-        candidateAt(point.x - popupWidth - gap, point.y + gap, ring),
-        candidateAt(point.x + gap, point.y - popupHeight / 2, ring),
-        candidateAt(point.x - popupWidth - gap, point.y - popupHeight / 2, ring),
-        candidateAt(point.x - popupWidth / 2, point.y - popupHeight - gap, ring),
-        candidateAt(point.x - popupWidth / 2, point.y + gap, ring),
-      ]);
-      const geometry = (candidate: { x: number; y: number }) => {
-        const corners = [
-          { x: candidate.x, y: candidate.y },
-          { x: candidate.x + popupWidth, y: candidate.y },
-          { x: candidate.x, y: candidate.y + popupHeight },
-          { x: candidate.x + popupWidth, y: candidate.y + popupHeight },
-        ];
-        const corner = corners.reduce((nearest, currentCorner) =>
-          Math.hypot(currentCorner.x - point.x, currentCorner.y - point.y)
-            < Math.hypot(nearest.x - point.x, nearest.y - point.y) ? currentCorner : nearest);
-        return { corner, connectorLength: Math.hypot(corner.x - point.x, corner.y - point.y) };
-      };
-      const score = (candidate: { x: number; y: number; ring: number; clampDistance: number }) => {
-        const left = candidate.x;
-        const right = candidate.x + popupWidth;
-        const top = candidate.y;
-        const bottom = candidate.y + popupHeight;
-        const { connectorLength } = geometry(candidate);
-        let penalty = connectorLength * 1.6 + candidate.ring * 28 + candidate.clampDistance * 45;
-        for (const routePoint of routePixels) {
-          if (Math.hypot(routePoint.x - point.x, routePoint.y - point.y) < 22) continue;
-          const dx = Math.max(left - routePoint.x, 0, routePoint.x - right);
-          const dy = Math.max(top - routePoint.y, 0, routePoint.y - bottom);
-          const distance = Math.hypot(dx, dy);
-          if (distance === 0) penalty += 60_000;
-          else if (distance < 18) penalty += (18 - distance) * 70;
-        }
-        for (const blocker of blockers) {
-          const overlapWidth = Math.max(0, Math.min(right, blocker.right) - Math.max(left, blocker.left));
-          const overlapHeight = Math.max(0, Math.min(bottom, blocker.bottom) - Math.max(top, blocker.top));
-          if (overlapWidth && overlapHeight) penalty += 80_000 + overlapWidth * overlapHeight;
-        }
-        return penalty;
-      };
-      const best = candidates.reduce((winner, candidate) => score(candidate) < score(winner) ? candidate : winner);
-      const { corner, connectorLength } = geometry(best);
-      const next = {
-        x: best.x,
-        y: best.y,
-        markerX: point.x,
-        markerY: point.y,
-        cornerX: corner.x,
-        cornerY: corner.y,
-        connected: connectorLength > 30,
-      };
-      setPopup(previous => previous
-        && previous.connected === next.connected
-        && Math.abs(previous.x - next.x) < 0.75
-        && Math.abs(previous.y - next.y) < 0.75
-        && Math.abs(previous.markerX - next.markerX) < 0.75
-        && Math.abs(previous.markerY - next.markerY) < 0.75
-        ? previous : next);
-    };
-    const schedulePlace = () => {
-      if (placementFrame || placementTimer) return;
-      const wait = Math.max(0, 40 - (performance.now() - lastPlacement));
-      if (wait > 0) {
-        placementTimer = window.setTimeout(() => {
-          placementTimer = 0;
-          schedulePlace();
-        }, wait);
-        return;
-      }
-      placementFrame = requestAnimationFrame(() => {
-        placementFrame = 0;
-        lastPlacement = performance.now();
-        place();
-      });
-    };
-    place();
-    map.on("move", schedulePlace);
-    map.on("moveend", place);
-    return () => {
-      cancelAnimationFrame(placementFrame);
-      window.clearTimeout(placementTimer);
-      map.off("move", schedulePlace);
-      map.off("moveend", place);
-    };
-  }, [ready, activePhoto, popupRouteSamples]);
+    const maplibre = maplibreRef.current;
+    if (!ready || !map || !maplibre) return;
+    syncPhotoFocus(map, maplibre, photoFocusMarkersRef.current, reading.photoId, data.photos);
+  }, [ready, reading.photoId, data.photos]);
+
+
+  const orientNorth = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    followingRef.current = false;
+    setFollow(false);
+    map.stop();
+    map.resetNorth({ duration: 450 });
+  };
 
   return <div className="terrain-map-col" data-log-map ref={mountColumn} data-follow={follow ? "true" : "false"}>
     <div className="terrain-map-box"><div ref={holderRef} className="terrain-map-canvas" />
       <div className="terrain-map-status">
-        <span>{intro ? (lang === "zh" ? "开场 · 全程" : "Opening · Full route")
-          : complete ? (lang === "zh" ? "完结 · 全程" : "Finale · Full route") : activeScene?.eyebrow}</span>
+        <span className={!intro && !complete && !activeScene?.eyebrow ? "is-title" : undefined}>{intro ? (lang === "zh" ? "开场 · 全程" : "Opening · Full route")
+          : complete ? (lang === "zh" ? "完结 · 全程" : "Finale · Full route") : activeScene?.eyebrow || activeScene?.title}</span>
         <strong>{Math.round(current[2]).toLocaleString()} m</strong>
         <small>{intro ? (lang === "zh" ? "Antigua—Fuego 路线总览" : "Antigua—Fuego route overview")
-          : complete ? (lang === "zh" ? "Antigua—Fuego 往返" : "Antigua—Fuego return") : activeScene?.title}</small>
+          : complete ? (lang === "zh" ? "Antigua—Fuego 往返" : "Antigua—Fuego return") : activeScene?.eyebrow ? activeScene.title : activeScene?.time}</small>
       </div>
-      <MapToolbar mode={theme} onTheme={(mode: Theme) => applyTheme(mode)} lang={lang} className="terrain-map-tools" groupClass="pj-tools-group" buttonClass="pj-tool-btn">
+      <MapToolbar mode={theme} onTheme={(mode: Theme) => applyTheme(mode)} lang={lang} className="terrain-map-tools" groupClass="pj-tools-group" buttonClass="pj-tool-btn" leading={
+        <div className="pj-tools-group terrain-compass-group">
+          <button type="button" className="travel-log-icon-btn pj-tool-btn terrain-map-compass" onClick={orientNorth}
+            aria-label={lang === "zh" ? "地图指南针：点击转为正北" : "Map compass: orient north"}
+            data-tooltip={lang === "zh" ? "转为正北" : "Orient north"}>
+            <span ref={compassNeedleRef} className="terrain-map-compass-needle" aria-hidden="true"><span>N</span><svg viewBox="0 0 12 20"><path d="M6 1 10 15 6 12 2 15Z" /></svg></span>
+          </button>
+        </div>
+      }>
         <div className="terrain-surface-tools pj-tools-group" role="group" aria-label={lang === "zh" ? "地形表面" : "Terrain surface"}>
           <button type="button" className={`travel-log-icon-btn pj-tool-btn${surface === "topo" ? " on" : ""}`} aria-pressed={surface === "topo"}
             aria-label={lang === "zh" ? "素色等高线地形" : "Plain contour terrain"} data-tooltip={lang === "zh" ? "素色等高线地形" : "Plain contour terrain"}
@@ -821,16 +772,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
             onClick={() => setSurface("satellite")}><Satellite aria-hidden="true" strokeWidth={1.8} /></button>
         </div>
       </MapToolbar>
-      {!follow && <ResumeStoryButton onResume={() => setFollow(true)} />}
-      {activePhoto && popup?.connected && <svg className="terrain-photo-connector" aria-hidden="true">
-        <line x1={popup.markerX} y1={popup.markerY} x2={popup.cornerX} y2={popup.cornerY} />
-      </svg>}
-      {activePhoto && popup && <figure className="terrain-map-photo" style={{ left: popup.x, top: popup.y }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={activePhoto.src} alt="" />
-        {activePhoto.kind === "video" && <span className="terrain-map-photo-video" aria-hidden="true">▶</span>}
-        <figcaption>{activePhoto.shotAt.slice(11, 16)} · {activePhoto.altitudeM.toLocaleString()} m</figcaption>
-      </figure>}
+      {!follow && <ResumeStoryButton onResume={() => { followingRef.current = true; setFollow(true); }} />}
     </div>
     {renderHandle({ className: "terrain-attrib", children: <>
       <a href={data.attribution.terrainHref} target="_blank" rel="noopener noreferrer">{data.attribution.terrain}</a>

@@ -37,8 +37,8 @@ export const FACT_GROUPS: Record<Lang, FactGroup[]> = {
           An esports audience — a fan of <L href="https://g2esports.com/">G2 ESPORTS</L>{" "}
           and of <L href="https://twitter.com/G2Caps">Rasmus &quot;Caps&quot; Winther</L>.
         </>,
-        <>Also a player: CS2 / HoK / DSP / KSP / Civilization 6 / CoD.</>,
-        <>Recently: The Artisan of Glimmith / Iron Nest. </>
+        <>Also a player: 『CS2』 / 『HoK』 / 『DSP』 / 『KSP』 / 『Civilization 6』 / 『CoD』.</>,
+        <>Recently: 『The Artisan of Glimmith』 / 『Iron Nest』. </>
       ],
     },
     {
@@ -127,12 +127,12 @@ export const FACT_GROUPS: Record<Lang, FactGroup[]> = {
       tag: "电竞与游戏",
       items: [
         <>
-          LoL &amp; CS2 赛事观众，<L href="https://g2esports.com/">G2 ESPORTS</L>{" "}
+          『LoL』 &amp; 『CS2』赛事观众，<L href="https://g2esports.com/">G2 ESPORTS</L>{" "}
           队粉，<L href="https://twitter.com/G2Caps">Rasmus &quot;Caps&quot; Winther</L>{" "}
           个人粉。
         </>,
-        <>游戏也打：CS2 / 农 / 戴森球计划 / KSP / 文明6 / 使命召唤。 </>,
-        <>近期：The Artisan of Glimmith / 铁巢重炮。</>
+        <>游戏也打：『CS2』 / 『农』 / 『戴森球计划』 / 『KSP』 / 『文明 6』 / 『使命召唤』。 </>,
+        <>近期：『The Artisan of Glimmith』 / 『铁巢重炮』。</>
       ],
     },
     {

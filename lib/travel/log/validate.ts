@@ -11,10 +11,11 @@ export function loadTerrain(raw: unknown): TerrainTravelData {
   if (!Array.isArray(data.photos) || data.photos.some(photo => !photo.id || !photo.src ||
     !["photo", "video"].includes(photo.kind) ||
     (photo.kind === "video" && (!photo.videoSrc || !Number.isFinite(photo.durationS))) ||
-    !Number.isFinite(photo.lat) || !Number.isFinite(photo.lon) || !Number.isInteger(photo.routeIndex)))
+    !Number.isFinite(photo.lat) || !Number.isFinite(photo.lon) || !Number.isInteger(photo.routeIndex) ||
+    (photo.mapVisible !== undefined && typeof photo.mapVisible !== "boolean")))
     bad.push("photos");
   if (!Array.isArray(data.scenes) || !data.scenes.length || data.scenes.some(scene =>
-    !scene.id || !Array.isArray(scene.route) || scene.route.length !== 2 ||
+    !scene.id || !scene.title || !Array.isArray(scene.route) || scene.route.length !== 2 ||
     scene.route.some(index => !Number.isInteger(index) || index < 0 || index >= (data.route?.points?.length ?? 0))))
     bad.push("scenes");
   if (bad.length) throw new Error(`Malformed terrain travel data: ${bad.join(", ")}`);

@@ -10,6 +10,7 @@ export const LOG_LAYOUTS = {
   journal: { defaultVh: 40 },
   pilgrimage: { defaultVh: 58 },
   terrain: { defaultVh: 62 },
+  reconstructed: { defaultVh: 48 },
 } satisfies Record<LogKind, { defaultVh: number }>;
 
 export interface LogLayout {

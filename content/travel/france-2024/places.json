@@ -1,0 +1,1461 @@
+{
+  "schemaVersion": 1,
+  "places": [
+    {
+      "id": "ams-centraal",
+      "label": "阿姆斯特丹中央车站",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.9005805,
+        52.378901
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/4290854847",
+      "aliases": [
+        "阿姆斯特丹中央车站"
+      ],
+      "returnedName": "Amsterdam Centraal",
+      "osmId": "node/4290854847"
+    },
+    {
+      "id": "arc",
+      "label": "凯旋门",
+      "city": "Paris",
+      "coordinates": [
+        2.2950372,
+        48.8737791
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/226413508",
+      "aliases": [
+        "凯旋门"
+      ],
+      "returnedName": "Arc de Triomphe",
+      "osmId": "way/226413508"
+    },
+    {
+      "id": "architecture",
+      "label": "建筑与遗产之城",
+      "city": "Paris",
+      "coordinates": [
+        2.288981,
+        48.8628901
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/1296750671",
+      "aliases": [
+        "建筑与遗产之城"
+      ],
+      "returnedName": "Cité de l'architecture et du patrimoine",
+      "osmId": "node/1296750671"
+    },
+    {
+      "id": "augustiner-heumarkt",
+      "label": "Augustiner am Heumarkt",
+      "city": "Cologne",
+      "coordinates": [
+        6.961194,
+        50.9367864
+      ],
+      "precision": "public-business-address",
+      "coordinateBasis": "Author-reviewed public business address or unique venue; one-time current OpenStreetMap match, not a 2024 observation",
+      "sourceUrl": "https://www.openstreetmap.org/node/427087677",
+      "aliases": [
+        "Augustiner午餐"
+      ],
+      "returnedName": "Augustiner",
+      "osmId": "node/427087677"
+    },
+    {
+      "id": "bir-hakeim",
+      "label": "比尔阿克姆桥",
+      "city": "Paris",
+      "coordinates": [
+        2.2875477,
+        48.8557254
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/183602168",
+      "aliases": [
+        "比尔阿克姆桥"
+      ],
+      "returnedName": "Pont de Bir-Hakeim",
+      "osmId": "way/183602168"
+    },
+    {
+      "id": "bnf",
+      "label": "BnF 黎塞留馆",
+      "city": "Paris",
+      "coordinates": [
+        2.3381642,
+        48.8672823
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/545655",
+      "aliases": [
+        "BnF黎塞留馆"
+      ],
+      "returnedName": "Bibliothèque nationale de France, Richelieu",
+      "osmId": "relation/545655"
+    },
+    {
+      "id": "camondo",
+      "label": "卡蒙多博物馆",
+      "city": "Paris",
+      "coordinates": [
+        2.3123464,
+        48.8791733
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/68353844",
+      "aliases": [
+        "卡蒙多博物馆"
+      ],
+      "returnedName": "Musée Nissim de Camondo",
+      "osmId": "way/68353844"
+    },
+    {
+      "id": "canal-museum",
+      "label": "运河博物馆",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.8862198,
+        52.3678921
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/4909411075",
+      "aliases": [
+        "运河博物馆"
+      ],
+      "returnedName": "Grachtenhuis",
+      "osmId": "node/4909411075"
+    },
+    {
+      "id": "cdg",
+      "label": "巴黎戴高乐机场",
+      "city": "Paris",
+      "coordinates": [
+        2.54782,
+        49.00975
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "French civil aviation airport reference point",
+      "sourceUrl": "https://piaf.stac.aviation-civile.gouv.fr/airports/table",
+      "aliases": [
+        "CDG机场"
+      ],
+      "returnedName": "巴黎戴高乐机场",
+      "osmId": null
+    },
+    {
+      "id": "chez-gladines",
+      "label": "Chez Gladines",
+      "city": "Paris",
+      "coordinates": [
+        2.3463862,
+        48.8599164
+      ],
+      "aliases": [
+        "Chez Gladines／Les Halles"
+      ],
+      "sourceUrl": "https://www.openstreetmap.org/node/3176500820",
+      "returnedName": "Gladines, 11 bis Rue des Halles, Paris",
+      "osmId": "node/3176500820",
+      "precision": "public-business-address",
+      "coordinateBasis": "User-reviewed business address; one-time OpenStreetMap Nominatim match"
+    },
+    {
+      "id": "chocolate",
+      "label": "巧克力博物馆",
+      "city": "Cologne",
+      "coordinates": [
+        6.9644356,
+        50.9319828
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/334606061",
+      "aliases": [
+        "巧克力博物馆"
+      ],
+      "returnedName": "Schokoladenmuseum",
+      "osmId": "way/334606061"
+    },
+    {
+      "id": "conciergerie",
+      "label": "古监狱",
+      "city": "Paris",
+      "coordinates": [
+        2.3460263,
+        48.8559492
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/910390736",
+      "aliases": [
+        "古监狱"
+      ],
+      "returnedName": "Conciergerie",
+      "osmId": "node/910390736"
+    },
+    {
+      "id": "dam",
+      "label": "水坝广场",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.8923511,
+        52.3731162
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/94756489",
+      "aliases": [
+        "水坝广场／皇宫"
+      ],
+      "returnedName": "Dam",
+      "osmId": "way/94756489"
+    },
+    {
+      "id": "decorative-arts",
+      "label": "装饰艺术馆",
+      "city": "Paris",
+      "coordinates": [
+        2.3329513,
+        48.8631692
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/247584452",
+      "aliases": [
+        "装饰艺术馆"
+      ],
+      "returnedName": "Musée des Arts Décoratifs",
+      "osmId": "node/247584452"
+    },
+    {
+      "id": "eiffel",
+      "label": "埃菲尔铁塔",
+      "city": "Paris",
+      "coordinates": [
+        2.2945006,
+        48.8582599
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/5013364",
+      "aliases": [
+        "埃菲尔铁塔"
+      ],
+      "returnedName": "Tour Eiffel",
+      "osmId": "way/5013364"
+    },
+    {
+      "id": "farina",
+      "label": "Farina 香水博物馆",
+      "city": "Cologne",
+      "coordinates": [
+        6.9579305,
+        50.9377446
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/48359832",
+      "aliases": [
+        "Farina香水博物馆"
+      ],
+      "returnedName": "Duftmuseum im Farina-Haus",
+      "osmId": "way/48359832"
+    },
+    {
+      "id": "fontainebleau",
+      "label": "枫丹白露宫",
+      "city": "Fontainebleau",
+      "coordinates": [
+        2.699851,
+        48.4021166
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/655065732",
+      "aliases": [
+        "枫丹白露宫"
+      ],
+      "returnedName": "Château de Fontainebleau",
+      "osmId": "way/655065732"
+    },
+    {
+      "id": "fontainebleau-station",
+      "label": "Fontainebleau–Avon 站",
+      "city": "Fontainebleau",
+      "coordinates": [
+        2.7262485,
+        48.4149019
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/262518387",
+      "aliases": [
+        "Fontainebleau–Avon站",
+        "Fontainebleau–Avon站（返程）"
+      ],
+      "returnedName": "Gare de Fontainebleau - Avon",
+      "osmId": "way/262518387"
+    },
+    {
+      "id": "gare-lyon",
+      "label": "巴黎里昂站",
+      "city": "Paris",
+      "coordinates": [
+        2.3748001,
+        48.8443818
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/1161318094",
+      "aliases": [
+        "Gare de Lyon",
+        "Gare de Lyon（返程）"
+      ],
+      "returnedName": "Gare de Lyon",
+      "osmId": "way/1161318094"
+    },
+    {
+      "id": "gare-nord",
+      "label": "巴黎北站",
+      "city": "Paris",
+      "coordinates": [
+        2.3572124,
+        48.8795666
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/5364676905",
+      "aliases": [
+        "巴黎北站"
+      ],
+      "returnedName": "Gare du Nord (Métro)",
+      "osmId": "node/5364676905"
+    },
+    {
+      "id": "gros-horloge",
+      "label": "大时钟",
+      "city": "Rouen",
+      "coordinates": [
+        1.0912622,
+        49.441528
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/63205872",
+      "aliases": [
+        "大时钟"
+      ],
+      "returnedName": "Gros-Horloge",
+      "osmId": "way/63205872"
+    },
+    {
+      "id": "guimet",
+      "label": "吉美亚洲艺术博物馆",
+      "city": "Paris",
+      "coordinates": [
+        2.2935933,
+        48.865379
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/79641993",
+      "aliases": [
+        "吉美亚洲艺术博物馆"
+      ],
+      "returnedName": "Musée Guimet",
+      "osmId": "way/79641993"
+    },
+    {
+      "id": "henner",
+      "label": "Henner 博物馆",
+      "city": "Paris",
+      "coordinates": [
+        2.3076969,
+        48.8830349
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/12770227249",
+      "aliases": [
+        "Henner博物馆"
+      ],
+      "returnedName": "Musée national Jean-Jacques Henner",
+      "osmId": "node/12770227249"
+    },
+    {
+      "id": "hohenzollern",
+      "label": "霍亨索伦桥",
+      "city": "Cologne",
+      "coordinates": [
+        6.9657041,
+        50.9414376
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/268130024",
+      "aliases": [
+        "霍亨索伦桥"
+      ],
+      "returnedName": "Hohenzollernbrücke",
+      "osmId": "way/268130024"
+    },
+    {
+      "id": "hotel-ville",
+      "label": "巴黎市政厅",
+      "city": "Paris",
+      "coordinates": [
+        2.3525276,
+        48.8564263
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/284089",
+      "aliases": [
+        "巴黎市政厅"
+      ],
+      "returnedName": "Hôtel de ville",
+      "osmId": "relation/284089"
+    },
+    {
+      "id": "hugo",
+      "label": "雨果故居",
+      "city": "Paris",
+      "coordinates": [
+        2.3661358,
+        48.854799
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/254033221",
+      "aliases": [
+        "雨果故居"
+      ],
+      "returnedName": "Maison de Victor Hugo",
+      "osmId": "node/254033221"
+    },
+    {
+      "id": "institut-de-france",
+      "label": "Institut de France",
+      "city": "Paris",
+      "coordinates": [
+        2.3372581,
+        48.8568375
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/967665",
+      "aliases": [
+        "法兰西学院"
+      ],
+      "returnedName": "Institut de France",
+      "osmId": "relation/967665"
+    },
+    {
+      "id": "invalides",
+      "label": "荣军院",
+      "city": "Paris",
+      "coordinates": [
+        2.3133431,
+        48.8559537
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/1463538",
+      "aliases": [
+        "荣军院／拿破仑墓"
+      ],
+      "returnedName": "Hôtel des Invalides",
+      "osmId": "relation/1463538"
+    },
+    {
+      "id": "invalides-rer-c",
+      "label": "Invalides RER C站",
+      "city": "Paris",
+      "coordinates": [
+        2.312513554925956,
+        48.862884804555264
+      ],
+      "aliases": [
+        "Invalides站（RER C返程下车）"
+      ],
+      "sourceUrl": "https://www.data.gouv.fr/datasets/gares-et-stations-du-reseau-ferre-dile-de-france-par-ligne",
+      "coordinateBasis": "Île-de-France Mobilités public RER C station point; station area, not the actual exit",
+      "precision": "landmark-or-station-area",
+      "returnedName": "Invalides RER C",
+      "osmId": null
+    },
+    {
+      "id": "koln-dom",
+      "label": "科隆大教堂",
+      "city": "Cologne",
+      "coordinates": [
+        6.958138,
+        50.9413035
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/4532022",
+      "aliases": [
+        "科隆大教堂"
+      ],
+      "returnedName": "Kölner Dom",
+      "osmId": "way/4532022"
+    },
+    {
+      "id": "koln-hbf",
+      "label": "科隆中央车站",
+      "city": "Cologne",
+      "coordinates": [
+        6.9590705,
+        50.9427839
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/2399559029",
+      "aliases": [
+        "科隆中央车站",
+        "科隆中央车站（返程）"
+      ],
+      "returnedName": "Köln Hauptbahnhof",
+      "osmId": "node/2399559029"
+    },
+    {
+      "id": "koln-triangle",
+      "label": "KölnTriangle",
+      "city": "Cologne",
+      "coordinates": [
+        6.9718364,
+        50.9403829
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/13396033603",
+      "aliases": [
+        "KölnTriangle"
+      ],
+      "returnedName": "KölnTriangle Cologne View",
+      "osmId": "node/13396033603"
+    },
+    {
+      "id": "la-jacobine",
+      "label": "La Jacobine",
+      "city": "Paris",
+      "coordinates": [
+        2.3389536,
+        48.8533357
+      ],
+      "precision": "public-business-address",
+      "coordinateBasis": "Author-reviewed public business address or unique venue; one-time current OpenStreetMap match, not a 2024 observation",
+      "sourceUrl": "https://www.openstreetmap.org/node/2613703963",
+      "aliases": [
+        "La Jacobine午餐"
+      ],
+      "returnedName": "La Jacobine",
+      "osmId": "node/2613703963"
+    },
+    {
+      "id": "le-bois",
+      "label": "Le Bois",
+      "city": "Paris",
+      "coordinates": [
+        2.2739247,
+        48.8575669
+      ],
+      "aliases": [
+        "Le Bois午餐"
+      ],
+      "sourceUrl": "https://www.openstreetmap.org/node/5273855845",
+      "returnedName": "Le Bois, 29 Rue Bois-le-Vent, Paris",
+      "osmId": "node/5273855845",
+      "precision": "public-business-address",
+      "coordinateBasis": "User-reviewed business address; one-time OpenStreetMap Nominatim match"
+    },
+    {
+      "id": "le-florentin",
+      "label": "Le Florentin",
+      "city": "Paris",
+      "coordinates": [
+        2.3244768,
+        48.867659
+      ],
+      "precision": "public-business-address",
+      "coordinateBasis": "Author-reviewed public business address or unique venue; one-time current OpenStreetMap match, not a 2024 observation",
+      "sourceUrl": "https://www.openstreetmap.org/node/683398128",
+      "aliases": [
+        "Le Florentin晚餐"
+      ],
+      "returnedName": "",
+      "osmId": "node/683398128"
+    },
+    {
+      "id": "louvre",
+      "label": "卢浮宫",
+      "city": "Paris",
+      "coordinates": [
+        2.3380277,
+        48.8611473
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/7515426",
+      "aliases": [
+        "卢浮宫（首次入馆）",
+        "卢浮宫（第二次入馆）",
+        "装饰艺术馆／卢浮宫外晚霞区域"
+      ],
+      "returnedName": "Musée du Louvre",
+      "osmId": "relation/7515426"
+    },
+    {
+      "id": "louvre-poste",
+      "label": "卢浮宫邮局",
+      "city": "Paris",
+      "coordinates": [
+        2.3438048,
+        48.8647175
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/29560121",
+      "aliases": [
+        "卢浮宫邮局"
+      ],
+      "returnedName": "Poste centrale du Louvre",
+      "osmId": "way/29560121"
+    },
+    {
+      "id": "luxembourg",
+      "label": "卢森堡公园",
+      "city": "Paris",
+      "coordinates": [
+        2.3364148,
+        48.8467228
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/128206209",
+      "aliases": [
+        "卢森堡公园"
+      ],
+      "returnedName": "Jardin du Luxembourg",
+      "osmId": "way/128206209"
+    },
+    {
+      "id": "madeleine",
+      "label": "玛德莱娜教堂",
+      "city": "Paris",
+      "coordinates": [
+        2.3245425,
+        48.8701338
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/54180046",
+      "aliases": [
+        "玛德莱娜教堂"
+      ],
+      "returnedName": "Église de la Madeleine",
+      "osmId": "way/54180046"
+    },
+    {
+      "id": "marine",
+      "label": "海军府",
+      "city": "Paris",
+      "coordinates": [
+        2.3235045,
+        48.8669402
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/1060822",
+      "aliases": [
+        "海军府"
+      ],
+      "returnedName": "Hôtel de la Marine",
+      "osmId": "relation/1060822"
+    },
+    {
+      "id": "maritime",
+      "label": "国家海事博物馆",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.9149527,
+        52.372005
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/1287492683",
+      "aliases": [
+        "国家海事博物馆"
+      ],
+      "returnedName": "Het Scheepvaartmuseum",
+      "osmId": "way/1287492683"
+    },
+    {
+      "id": "marmottan",
+      "label": "玛蒙丹·莫奈美术馆",
+      "city": "Paris",
+      "coordinates": [
+        2.2672558,
+        48.8594112
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/83422695",
+      "aliases": [
+        "玛蒙丹·莫奈美术馆"
+      ],
+      "returnedName": "Musée Marmottan Monet",
+      "osmId": "way/83422695"
+    },
+    {
+      "id": "melies",
+      "label": "梅里爱博物馆",
+      "city": "Paris",
+      "coordinates": [
+        2.3826352,
+        48.8369987
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/78271385",
+      "aliases": [
+        "梅里爱博物馆"
+      ],
+      "returnedName": "Cinémathèque Française",
+      "osmId": "way/78271385"
+    },
+    {
+      "id": "monceau",
+      "label": "蒙索公园",
+      "city": "Paris",
+      "coordinates": [
+        2.3088732,
+        48.879374
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/2826933",
+      "aliases": [
+        "蒙索公园"
+      ],
+      "returnedName": "Parc Monceau",
+      "osmId": "relation/2826933"
+    },
+    {
+      "id": "monnaie",
+      "label": "货币博物馆",
+      "city": "Paris",
+      "coordinates": [
+        2.3384956,
+        48.8564015
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/967664",
+      "aliases": [
+        "货币博物馆"
+      ],
+      "returnedName": "Hôtel de la Monnaie",
+      "osmId": "relation/967664"
+    },
+    {
+      "id": "montparnasse",
+      "label": "蒙帕纳斯",
+      "city": "Paris",
+      "coordinates": [
+        2.3219721,
+        48.8421098
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/16406633",
+      "aliases": [
+        "蒙帕纳斯附近（未登塔）"
+      ],
+      "returnedName": "Tour Montparnasse",
+      "osmId": "way/16406633"
+    },
+    {
+      "id": "munttoren",
+      "label": "铸币塔",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.8932124,
+        52.3670603
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/57862728",
+      "aliases": [
+        "铸币塔"
+      ],
+      "returnedName": "Munttoren",
+      "osmId": "way/57862728"
+    },
+    {
+      "id": "notre-dame",
+      "label": "巴黎圣母院",
+      "city": "Paris",
+      "coordinates": [
+        2.3500501,
+        48.8529371
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/201611261",
+      "aliases": [
+        "巴黎圣母院外"
+      ],
+      "returnedName": "Cathédrale Notre-Dame de Paris",
+      "osmId": "way/201611261"
+    },
+    {
+      "id": "opera",
+      "label": "巴黎歌剧院",
+      "city": "Paris",
+      "coordinates": [
+        2.3319654,
+        48.8714332
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/3462104314",
+      "aliases": [
+        "巴黎歌剧院"
+      ],
+      "returnedName": "Palais Garnier",
+      "osmId": "node/3462104314"
+    },
+    {
+      "id": "orangerie",
+      "label": "橘园美术馆",
+      "city": "Paris",
+      "coordinates": [
+        2.3226602,
+        48.8637655
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/54188996",
+      "aliases": [
+        "橘园美术馆"
+      ],
+      "returnedName": "Musée de l'Orangerie",
+      "osmId": "way/54188996"
+    },
+    {
+      "id": "orsay",
+      "label": "奥赛美术馆",
+      "city": "Paris",
+      "coordinates": [
+        2.3265849,
+        48.8599179
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/63178753",
+      "aliases": [
+        "奥赛美术馆"
+      ],
+      "returnedName": "Musée d'Orsay",
+      "osmId": "way/63178753"
+    },
+    {
+      "id": "palais-royal",
+      "label": "皇家宫殿",
+      "city": "Paris",
+      "coordinates": [
+        2.3362042,
+        48.8635847
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/3300400",
+      "aliases": [
+        "皇家宫殿",
+        "Palais Royal–Musée du Louvre站"
+      ],
+      "returnedName": "Palais Royal",
+      "osmId": "relation/3300400"
+    },
+    {
+      "id": "pantheon",
+      "label": "先贤祠",
+      "city": "Paris",
+      "coordinates": [
+        2.3460507,
+        48.8461947
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/16407465",
+      "aliases": [
+        "先贤祠"
+      ],
+      "returnedName": "Panthéon",
+      "osmId": "way/16407465"
+    },
+    {
+      "id": "pedra-alta-marbeuf",
+      "label": "Pedra Alta Marbeuf",
+      "city": "Paris",
+      "coordinates": [
+        2.3039956,
+        48.8689425
+      ],
+      "precision": "public-business-address",
+      "coordinateBasis": "Author-reviewed public business address or unique venue; one-time current OpenStreetMap match, not a 2024 observation",
+      "sourceUrl": "https://www.openstreetmap.org/node/10163864349",
+      "aliases": [
+        "Pedra Alta午餐（25 Rue Marbeuf）"
+      ],
+      "returnedName": "",
+      "osmId": "node/10163864349"
+    },
+    {
+      "id": "pere-lachaise",
+      "label": "拉雪兹公墓",
+      "city": "Paris",
+      "coordinates": [
+        2.3940087,
+        48.8611296
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/13859706",
+      "aliases": [
+        "拉雪兹公墓"
+      ],
+      "returnedName": "Cimetière du Père-Lachaise",
+      "osmId": "way/13859706"
+    },
+    {
+      "id": "petit-palais",
+      "label": "小皇宫",
+      "city": "Paris",
+      "coordinates": [
+        2.3153496,
+        48.866042
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/2778854",
+      "aliases": [
+        "小皇宫"
+      ],
+      "returnedName": "Petit Palais, Musée des beaux-arts de la Ville de Paris",
+      "osmId": "relation/2778854"
+    },
+    {
+      "id": "picasso",
+      "label": "毕加索博物馆",
+      "city": "Paris",
+      "coordinates": [
+        2.3621152,
+        48.8598698
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/57745741",
+      "aliases": [
+        "毕加索博物馆"
+      ],
+      "returnedName": "Musée national Picasso-Paris",
+      "osmId": "way/57745741"
+    },
+    {
+      "id": "pierre-herme-opera",
+      "label": "Pierre Hermé Opéra",
+      "city": "Paris",
+      "coordinates": [
+        2.3330811,
+        48.8683415
+      ],
+      "precision": "public-business-address",
+      "coordinateBasis": "Author-reviewed public business address or unique venue; one-time current OpenStreetMap match, not a 2024 observation",
+      "sourceUrl": "https://www.openstreetmap.org/node/9634431844",
+      "aliases": [
+        "Pierre Hermé Opéra店"
+      ],
+      "returnedName": "",
+      "osmId": "node/9634431844"
+    },
+    {
+      "id": "pompidou",
+      "label": "蓬皮杜中心",
+      "city": "Paris",
+      "coordinates": [
+        2.3524221,
+        48.8604964
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/55503397",
+      "aliases": [
+        "蓬皮杜中心"
+      ],
+      "returnedName": "Centre Georges Pompidou",
+      "osmId": "way/55503397"
+    },
+    {
+      "id": "pont-alexandre",
+      "label": "亚历山大三世桥",
+      "city": "Paris",
+      "coordinates": [
+        2.3135181,
+        48.8634697
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/183620685",
+      "aliases": [
+        "亚历山大三世桥"
+      ],
+      "returnedName": "Pont Alexandre III",
+      "osmId": "way/183620685"
+    },
+    {
+      "id": "pont-alma",
+      "label": "Pont de l’Alma",
+      "city": "Paris",
+      "coordinates": [
+        2.2999572,
+        48.8625636
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/270191328",
+      "aliases": [
+        "Pont de l’Alma站"
+      ],
+      "returnedName": "Pont de l'Alma",
+      "osmId": "node/270191328"
+    },
+    {
+      "id": "poste-museum",
+      "label": "邮政博物馆",
+      "city": "Paris",
+      "coordinates": [
+        2.317219,
+        48.8414555
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/993828548",
+      "aliases": [
+        "邮政博物馆"
+      ],
+      "returnedName": "Musée de la Poste",
+      "osmId": "node/993828548"
+    },
+    {
+      "id": "rembrandthuis",
+      "label": "伦勃朗故居",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.9012497,
+        52.3693692
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/250624673",
+      "aliases": [
+        "伦勃朗故居"
+      ],
+      "returnedName": "Rembrandthuis",
+      "osmId": "node/250624673"
+    },
+    {
+      "id": "rembrandtplein",
+      "label": "伦勃朗广场",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.8966112,
+        52.365988
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/470612445",
+      "aliases": [
+        "伦勃朗像"
+      ],
+      "returnedName": "Rembrandtplein",
+      "osmId": "way/470612445"
+    },
+    {
+      "id": "rijksmuseum",
+      "label": "荷兰国立博物馆",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.8850395,
+        52.3598431
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/29989787",
+      "aliases": [
+        "荷兰国立博物馆"
+      ],
+      "returnedName": "Rijksmuseum",
+      "osmId": "way/29989787"
+    },
+    {
+      "id": "rodin",
+      "label": "罗丹美术馆",
+      "city": "Paris",
+      "coordinates": [
+        2.315867,
+        48.8547473
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/472159547",
+      "aliases": [
+        "罗丹美术馆"
+      ],
+      "returnedName": "Musée Rodin",
+      "osmId": "way/472159547"
+    },
+    {
+      "id": "rouen-art",
+      "label": "鲁昂美术馆",
+      "city": "Rouen",
+      "coordinates": [
+        1.0942239,
+        49.4448162
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/13530619691",
+      "aliases": [
+        "鲁昂美术馆"
+      ],
+      "returnedName": "Musée des Beaux-Arts",
+      "osmId": "node/13530619691"
+    },
+    {
+      "id": "rouen-cathedral",
+      "label": "鲁昂大教堂",
+      "city": "Rouen",
+      "coordinates": [
+        1.0948212,
+        49.440288
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/63420359",
+      "aliases": [
+        "鲁昂大教堂"
+      ],
+      "returnedName": "Cathédrale Notre-Dame",
+      "osmId": "way/63420359"
+    },
+    {
+      "id": "rouen-joan",
+      "label": "圣女贞德塔",
+      "city": "Rouen",
+      "coordinates": [
+        1.0943947,
+        49.4464685
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/64181280",
+      "aliases": [
+        "圣女贞德塔"
+      ],
+      "returnedName": "Tour Jeanne d'Arc",
+      "osmId": "way/64181280"
+    },
+    {
+      "id": "rouen-station",
+      "label": "鲁昂站",
+      "city": "Rouen",
+      "coordinates": [
+        1.0942235,
+        49.4492443
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/2076751841",
+      "aliases": [
+        "鲁昂站",
+        "鲁昂站（返程）"
+      ],
+      "returnedName": "Rouen Rive-Droite",
+      "osmId": "node/2076751841"
+    },
+    {
+      "id": "sacre-coeur",
+      "label": "圣心堂",
+      "city": "Paris",
+      "coordinates": [
+        2.3430153,
+        48.8868058
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/23762981",
+      "aliases": [
+        "蒙马特／圣心堂外（夕阳）",
+        "圣心堂（夜访）"
+      ],
+      "returnedName": "Basilique du Sacré-Cœur",
+      "osmId": "way/23762981"
+    },
+    {
+      "id": "saint-augustin",
+      "label": "圣奥古斯丁教堂",
+      "city": "Paris",
+      "coordinates": [
+        2.3188772,
+        48.8762078
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/67501490",
+      "aliases": [
+        "圣奥古斯丁教堂"
+      ],
+      "returnedName": "Église Saint-Augustin",
+      "osmId": "way/67501490"
+    },
+    {
+      "id": "saint-eustache",
+      "label": "圣厄斯塔什教堂",
+      "city": "Paris",
+      "coordinates": [
+        2.3451276,
+        48.8633997
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/53762963",
+      "aliases": [
+        "圣厄斯塔什教堂"
+      ],
+      "returnedName": "Église Saint-Eustache",
+      "osmId": "way/53762963"
+    },
+    {
+      "id": "saint-lazare",
+      "label": "巴黎圣拉扎尔站",
+      "city": "Paris",
+      "coordinates": [
+        2.3250674,
+        48.8770414
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/727994377",
+      "aliases": [
+        "巴黎Saint-Lazare站",
+        "圣拉扎尔车站"
+      ],
+      "returnedName": "Gare Saint-Lazare",
+      "osmId": "way/727994377"
+    },
+    {
+      "id": "saint-maclou",
+      "label": "Saint-Maclou 教堂",
+      "city": "Rouen",
+      "coordinates": [
+        1.0983808,
+        49.4397819
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/64201546",
+      "aliases": [
+        "Saint-Maclou教堂"
+      ],
+      "returnedName": "Église Saint-Maclou",
+      "osmId": "way/64201546"
+    },
+    {
+      "id": "saint-michel",
+      "label": "圣米歇尔喷泉",
+      "city": "Paris",
+      "coordinates": [
+        2.3436351,
+        48.8532876
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/257628954",
+      "aliases": [
+        "圣米歇尔喷泉／换乘区域"
+      ],
+      "returnedName": "Fontaine Saint-Michel",
+      "osmId": "node/257628954"
+    },
+    {
+      "id": "saint-michel-rer",
+      "label": "Saint-Michel–Notre-Dame 站",
+      "city": "Paris",
+      "coordinates": [
+        2.3456233,
+        48.8534102
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OSM public station node N270191809",
+      "sourceUrl": "https://www.openstreetmap.org/node/270191809",
+      "aliases": [
+        "Saint-Michel–Notre-Dame站"
+      ],
+      "returnedName": "Saint-Michel–Notre-Dame 站",
+      "osmId": null
+    },
+    {
+      "id": "sainte-chapelle",
+      "label": "圣礼拜堂",
+      "city": "Paris",
+      "coordinates": [
+        2.3449941,
+        48.8553933
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/3344870",
+      "aliases": [
+        "圣礼拜堂"
+      ],
+      "returnedName": "Sainte-Chapelle",
+      "osmId": "relation/3344870"
+    },
+    {
+      "id": "shakespeare-bookshop",
+      "label": "Shakespeare and Company",
+      "city": "Paris",
+      "coordinates": [
+        2.3471123,
+        48.8525747
+      ],
+      "precision": "public-business-address",
+      "coordinateBasis": "Author-reviewed public business address or unique venue; one-time current OpenStreetMap match, not a 2024 observation",
+      "sourceUrl": "https://www.openstreetmap.org/node/251373380",
+      "aliases": [
+        "莎士比亚书店"
+      ],
+      "returnedName": "Shakespeare and Company",
+      "osmId": "node/251373380"
+    },
+    {
+      "id": "the-pantry",
+      "label": "The Pantry",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.8849563,
+        52.3634594
+      ],
+      "precision": "public-business-address",
+      "coordinateBasis": "Author-reviewed public business address or unique venue; one-time current OpenStreetMap match, not a 2024 observation",
+      "sourceUrl": "https://www.openstreetmap.org/node/2730035759",
+      "aliases": [
+        "The Pantry午餐"
+      ],
+      "returnedName": "The Pantry",
+      "osmId": "node/2730035759"
+    },
+    {
+      "id": "trocadero",
+      "label": "特罗卡德罗",
+      "city": "Paris",
+      "coordinates": [
+        2.2880959,
+        48.8623703
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/595908371",
+      "aliases": [
+        "特罗卡德罗花园",
+        "Trocadéro广场"
+      ],
+      "returnedName": "Place du Trocadéro",
+      "osmId": "way/595908371"
+    },
+    {
+      "id": "van-gogh",
+      "label": "梵高博物馆",
+      "city": "Amsterdam",
+      "coordinates": [
+        4.88109,
+        52.3583673
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/6577680",
+      "aliases": [
+        "梵高博物馆"
+      ],
+      "returnedName": "Van Gogh Museum",
+      "osmId": "relation/6577680"
+    },
+    {
+      "id": "versailles",
+      "label": "凡尔赛宫",
+      "city": "Versailles",
+      "coordinates": [
+        2.1202853,
+        48.8044252
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/relation/1149002",
+      "aliases": [
+        "凡尔赛宫"
+      ],
+      "returnedName": "Château de Versailles",
+      "osmId": "relation/1149002"
+    },
+    {
+      "id": "zaandijk-station",
+      "label": "Zaandijk Zaanse Schans 站",
+      "city": "Zaanse",
+      "coordinates": [
+        4.8051566,
+        52.4692791
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/node/4185358281",
+      "aliases": [
+        "Zaandijk Zaanse Schans站",
+        "Zaandijk Zaanse Schans站（返程）"
+      ],
+      "returnedName": "Zaandijk Zaanse Schans",
+      "osmId": "node/4185358281"
+    },
+    {
+      "id": "zaanse",
+      "label": "桑斯安斯风车村",
+      "city": "Zaanse",
+      "coordinates": [
+        4.8179761,
+        52.4750534
+      ],
+      "precision": "landmark-or-station-area",
+      "coordinateBasis": "OpenStreetMap Nominatim public landmark centroid; manually reviewed",
+      "sourceUrl": "https://www.openstreetmap.org/way/177095326",
+      "aliases": [
+        "Pier - best photos of the mills／风车村观光区"
+      ],
+      "returnedName": "Zaanse Schans",
+      "osmId": "way/177095326"
+    }
+  ]
+}

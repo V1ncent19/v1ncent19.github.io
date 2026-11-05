@@ -1,0 +1,1367 @@
+{
+  "schemaVersion": 2,
+  "title": "2024 欧洲春游",
+  "subtitle": "初めてのひとりたび",
+  "intro": "2024 年三月，趁着签证还没过期，进行了本人的首次一人旅！这次旅行的主要目的地是法国巴黎，并混搭了一些周边的城市。当时用纸笔记下了许多有趣的时刻和感受，如今重读，仍能想起当时的所见所闻。感恩如今 GenAI 帮我做成电子化存档，虽然路线信息好像确实电子化的不太好，不过至少文字档识别的还是很成功的，希望各位读者们看个开心。",
+  "dateLabel": "2024.03.14 — 03.25",
+  "days": [
+    {
+      "id": "day-0314",
+      "date": "2024-03-14",
+      "title": "初到巴黎",
+      "subtitle": "Arrival in Paris",
+      "city": "巴黎入城",
+      "mapSources": [
+        "IMG_3056"
+      ],
+      "blocks": [
+        {
+          "id": "s3039-02",
+          "title": "戴高乐国际机场 Paris Charles de Gaulle",
+          "text": "内部挺新，机场内部的导向牌几乎都是法英中文三语的，完全不用担心迷路，宾至如归了属于是。机场有若干个航站楼，通过轻轨连接，过关排好久，累坏了。机场看到了 Paris vous aime 的标语，同时发现候机区有免费的 PS5 玩。采购了各类票券，卖我手机卡的店主十分热情。",
+          "sourceIds": [
+            "S3039-02"
+          ],
+          "focusPlaceId": "cdg"
+        },
+        {
+          "id": "s3039-03",
+          "title": "奥赛美术馆 Musée d’Orsay",
+          "text": "完全是印象派爱好者天堂，看到了海量久仰大名的画作，包括但不限于：『奥林匹亚』（马奈）、『草地午餐』（马奈）、『煎饼磨坊的舞会』（雷诺阿）、『芭蕾舞课』（德加）、『议会大楼』（莫奈）、『鲁昂大教堂』（莫奈）、『睡莲』（莫奈）、『圣维克多山』（塞尚）、『在阿尔的卧室』（梵高）、『自画像』（梵高）、『星夜』（梵高）、『母亲的画像』（惠斯勒）、『晚祷』（米勒）、『拾穗者』（米勒）、『罗马人的堕落』（托马·库图尔）、『加歇医生像』（梵高），etc。\n\n还有一些雕塑作品，正好出门前恶补了不少西方艺术史知识，多少能看明白一些。\nbtw 还切身体会到博物馆会 alter 展品，我第一次去（3.14）有『煎饼磨坊的舞会』，第二次去（3.21）就没有了。\n值得吐槽的是博物馆的动线设计太逆天了，根本没法以舒服的动线逛前两层（可能是因为是火车站改建而来吧。）",
+          "sourceIds": [
+            "S3039-03",
+            "S3039-04"
+          ],
+          "focusPlaceId": "orsay"
+        },
+        {
+          "id": "s3039-05",
+          "title": "罗丹美术馆 Musée Rodin",
+          "text": "只能记得『沉思者』和『地狱之门』，以及放在宅子里的『吻』，其它的只能赏试欣赏一下（说的好像前几个就会鉴赏似的 lol）。但的确能感到雕塑中的力量感，对技巧上对不同材质的表现。\n美术馆由宅邸和庭院构成，在庭中漫步感觉挺好的。",
+          "sourceIds": [
+            "S3039-05"
+          ],
+          "focusPlaceId": "rodin"
+        },
+        {
+          "id": "s3040-01",
+          "title": "蒙马特高地 et 圣心堂 Montmartre et Basilique du Sacré-Cœur",
+          "text": "于傍晚时分前往，见到了美丽的夕阳，坐在巴黎城天上很好拍照了巴黎的城市结构。在教堂前的台阶上浅坐了几十分钟，挺惬意的。",
+          "sourceIds": [
+            "S3040-01"
+          ],
+          "focusPlaceId": "sacre-coeur"
+        }
+      ],
+      "events": [],
+      "note": "旅程细则记录，按首次到访时间排序。",
+      "weather": "14 Thu 晴，少云。",
+      "headerSourceIds": [
+        "S3039-01"
+      ]
+    },
+    {
+      "id": "day-0315",
+      "date": "2024-03-15",
+      "title": "凡尔赛与卢浮宫",
+      "subtitle": "Versailles and the Louvre",
+      "city": "凡尔赛＋巴黎",
+      "mapSources": [
+        "IMG_3057"
+      ],
+      "blocks": [
+        {
+          "id": "s3040-02",
+          "title": "圣米歇尔喷泉 Fontaine Saint-Michel",
+          "text": "在去凡尔赛宫的路上遇到的，由于要在宇宙中心 Châtelet 转 RER，出站即见。",
+          "sourceIds": [
+            "S3040-02"
+          ],
+          "focusPlaceId": "saint-michel"
+        },
+        {
+          "id": "s3040-03",
+          "title": "凡尔赛宫 Château de Versailles",
+          "text": "真是来了才知道奢华（虽然事实很明显比不过歌剧院，但胜在规模惊人）！能欣赏到典型的建筑、雕刻的装饰艺术，学习到波旁王朝时期凡尔赛宫的扩建史。\n印象较深的是某厅的顶画，向上望真的就像望见天堂，透视和色彩运用都极好。照片完全展现不出的震撼。\n\n皇家花园大得逆天，耐着性子往特里亚农宫走了一下，结果证明收获较小。要是有钱的话就应该租个车坐着／骑着转转应该不错。\n原来以前地理还是历史课本上的那个雕像—水池—宫殿的照片，是凡尔赛宫的背面。\n预约系统是真是好。犹记十年前来法兰西时，去卢浮宫没开门，去凡尔赛宫排长队，而现在只要做好预约／买好通票就都走直进，不得不感叹一句科技改变生活。",
+          "sourceIds": [
+            "S3040-03",
+            "S3040-04"
+          ],
+          "focusPlaceId": "versailles"
+        },
+        {
+          "id": "s3040-05",
+          "title": "荣军院 et 拿破仑一世墓 L’hôtel des Invalides et Tombeau de Napoléon 1er",
+          "text": "荣军院，指的是荣休军人院，本来是伤残军医院。很气派的一群建筑，前半是军博，后半是拿破仑墓。对法兰西这样武德充沛（尤指近代）的国家，军事博物馆还是挺有看点的，一进门（庭院）就昔时气派的拿破仑像。四周是不同时期的分展，还看了一下戴高乐纪念馆。\n拿破仑一世墓的建筑所在也是一座教堂，穹顶正下方的坑室是拿破仑的棺椁，四周一圈是法国的其它军事名人，从中沿。\n别出了约瑟夫、拿破仑、沃邦元帅、福煦（其棺椁竟被雕刻成了一队一战制服的士兵抬棺的样子）。可惜戴高乐似乎不葬在这里，但确实有好多名人了。在此地必须说一句“此处禁止乳髪”。",
+          "sourceIds": [
+            "S3040-05",
+            "S3041-01"
+          ],
+          "focusPlaceId": "invalides"
+        },
+        {
+          "id": "s3041-02",
+          "title": "亚历山大三世桥 Pont Alexandre III",
+          "text": "装饰十分精美，可惜当日阳光不好，感觉未能彰显其恢宏。",
+          "sourceIds": [
+            "S3041-02"
+          ],
+          "focusPlaceId": "pont-alexandre"
+        },
+        {
+          "id": "s3041-03",
+          "title": "小皇宫 Petit Palais",
+          "text": "展览倒是没看出什么由头，但里面有个小花园挺不错的，有很多刚抽枝开花的植物。",
+          "sourceIds": [
+            "S3041-03"
+          ],
+          "focusPlaceId": "petit-palais"
+        },
+        {
+          "id": "s3041-04",
+          "title": "海军府 Hôtel de la Marine",
+          "text": "平心而论较为平庸，想看建筑／装饰／了解其历史都有更好的替代，但总之顺路一看也还不错，在几个房可以俯瞰协和广场。",
+          "sourceIds": [
+            "S3041-04"
+          ],
+          "focusPlaceId": "marine"
+        },
+        {
+          "id": "s3041-05",
+          "title": "卢浮宫博物馆 Musée du Louvre",
+          "text": "虽然只能看懂一些绘画和雕塑，但还是感到收获丰厚，见到了大量知名画作如『蒙娜丽莎』、『迦拿的婚礼』、『美杜莎之筏』、『大宫女』、『拿破仑一世加冕』、『荷拉斯兄弟之誓』、『马拉之死』、『岩间圣母』、『弗朗索瓦一世像』、『巴别塔』、『画家和他的妻子』、『自画像』（伦勃朗）、『自画像』（德拉克洛瓦），尤其是其中的学院派巨幅画都十分令人印象深刻。其它藏品还有『马赛骏马』、『汉谟拉比法典』、『萨莫色雷斯的胜利女神』、『断臂的维纳斯』、法老石棺、若干近东文明壁画等，都十分久仰大名，一共去了两次，总计超过十几个小时，有选择性加走马观花才勉强看得差不多，的确是规模庞大，私下里感觉除了古埃及文物稍欠，基本是吊打大都会了（注：近现代画作到奥赛去了），十分值得花时间探索。且卢浮宫毕竟是从前的王宫城堡，内部装饰也是毫无疑问的到位。\n在卢浮宫还看到了很多人在此临摹，许多人水平挺高。\n『自由引导人民』在修复！！好急！！",
+          "sourceIds": [
+            "S3041-05",
+            "S3041-06"
+          ],
+          "focusPlaceId": "louvre"
+        }
+      ],
+      "events": [
+        {
+          "id": "T00",
+          "time": "22:00",
+          "text": "22:00 晚餐：Le Florentin",
+          "note": null
+        }
+      ],
+      "weather": "15 Fri 小雨多云"
+    },
+    {
+      "id": "day-0316",
+      "date": "2024-03-16",
+      "title": "铁塔与博物馆们",
+      "subtitle": "The Eiffel Tower and Museums",
+      "city": "巴黎西侧＋西岱岛",
+      "mapSources": [
+        "IMG_3058"
+      ],
+      "blocks": [
+        {
+          "id": "s3042-01",
+          "title": "卢浮宫邮局 La Poste du Louvre",
+          "text": "应该是一个比较大的邮局，里面有一些相关附设（邮票展览，还有一部展示邮车），在邮票展柜疯狂剁手，真·又好看又便宜。",
+          "sourceIds": [
+            "S3042-01"
+          ],
+          "focusPlaceId": "louvre-poste"
+        },
+        {
+          "id": "s3042-02",
+          "title": "玛蒙丹·莫奈美术馆 Musée Marmottan Monet",
+          "text": "由于地下展厅的入口改在了书店里面，差点逆天错过重头戏。地上部分是一些装饰艺术和中世纪艺术和少量风景画。地下则是重量级，有多幅莫奈『睡莲』，及那幅『日出·印象』，并看到了一幅很喜欢的风景画（莫奈），里面时晚洒下河面的描绘好绝。",
+          "sourceIds": [
+            "S3042-02"
+          ],
+          "focusPlaceId": "marmottan"
+        },
+        {
+          "id": "s3042-03",
+          "title": "吉美亚洲艺术博物馆 Musée national des arts asiatiques – Guimet",
+          "text": "刚一进门那个有点多头蛇（但又不知道具体是什么）的东西真是令人印象深刻！往里走的大厅有很多精美石雕，柬埔寨果然被法兰西深耕多年…… （后续：大学习了一波关于高棉的知识，并在 2025 年暑假因此急头白脸去了一趟柬埔寨看吴哥窟）\n博物馆内部按地理分展区，发现其实中国区并不大，我觉得展品也不算出彩了（和我逛美国博物馆的印象相符）（也和我本人的印象相符），可见中国文明／艺术很可能并不就算多重要／关键的一东西。看过以后去超大英博物馆能否改变这一印象。\n顶层有鸟类陶瓷雕展览怪有趣的。",
+          "sourceIds": [
+            "S3042-03"
+          ],
+          "focusPlaceId": "guimet"
+        },
+        {
+          "id": "s3042-04",
+          "title": "建筑与遗产之城／夏乐宫 Cité de l’architecture et du Patrimoine",
+          "text": "建筑与雕塑艺术爱好者狂喜！！里面有大量建筑雕刻复刻件（主要是各类柱子、教堂门楣及拱顶、装饰浮雕等，也有一些对建筑的结构的科普），感觉似乎都是 1:1 复刻，都好漂亮精致！里面还看到了凯旋门的其它设计稿。\n二楼则有更多建筑内部展示、现代建筑模型等，从中心火车北站、BNF 黎塞留馆、歌剧院、世博会展馆、萨伏伊别墅等。\n从博物馆的窗户看出去可获得完美的铁塔视角，毕竟投卡德候本就是观塔最佳地嘛（之一）。",
+          "sourceIds": [
+            "S3042-04"
+          ],
+          "focusPlaceId": "architecture"
+        },
+        {
+          "id": "s3043-01",
+          "title": "Bir Hakeim 桥 Pont de Bir-Hakeim",
+          "text": "『盗梦空间』的那坐桥，有甚佳的铁塔视野，值得一提的是作为一座两用桥，桥的上层是地铁六号线。",
+          "sourceIds": [
+            "S3043-01"
+          ],
+          "focusPlaceId": "bir-hakeim"
+        },
+        {
+          "id": "s3043-02",
+          "title": "埃菲尔铁塔 - 特卡德罗 - 战神广场 Tour Eiffel",
+          "text": "为了迎接 24 奥运，铁塔附近一大片都在装修，少了很多观赏视角。铁塔的确是当之无愧的巴黎象征，只有看到它才能感到到了巴黎（乐）。经过实操从各个方向在各个时间都观赏了铁塔。\n援引一位 up 的观点，并不一定总要看到铁塔的全貌，那样它太具象了。在城市漫步时偶然抬头瞥见铁塔一角，我更能发现它和巴黎这座城市的互动。\n\n一共看到了若干次整点闪灯，第一次看是去放下的 airbnb 放好李出来，当时不知道要闪 5 分钟，在那摄影了好久。\n我发现雨后的铁塔夜景是最有韵味的，尤其是在铁塔正面的桥面上，地上的积水映出斑驳的倒影，非常有点印象派的味道。\n另外值得点明的是巴黎其它能全观铁塔的位置：\n\n- 铁塔东边的 Rue de l’Université 和 Rue Saint-Dominique，选择住在这附近让我有了很多捕捉超绝街景的机会。\n- 老佛爷百货楼顶的观景天台\n- 荣军院东北角壕沟外\n- 凯旋门顶\n- 杜乐丽花园\n- 蓬皮杜中心四／五楼\n- 蒙马特高地\n- 蒙帕纳斯观景台（未去）\n- Bir Hakeim 桥",
+          "sourceIds": [
+            "S3043-02",
+            "S3043-03",
+            "S3043-04"
+          ],
+          "focusPlaceId": "eiffel"
+        },
+        {
+          "id": "s3043-05",
+          "title": "巴黎圣母院 Cathédrale Notre-Dame de Paris",
+          "text": "遗憾的是圣母院仍在维修，据说是年底重开，只能说是时机错过了，但要说站在教堂前立面下还能回忆起小时候第一次来时的震撼。\n某次傍晚经过的时候在门前广场遇到了一个小姐姐在拍街头头版报纸，十分有意思，领取了两张。",
+          "sourceIds": [
+            "S3043-05"
+          ],
+          "focusPlaceId": "notre-dame"
+        }
+      ],
+      "events": [
+        {
+          "id": "T16-01",
+          "time": "08:30",
+          "text": "08:30 卢浮宫邮局 · La Poste du Louvre",
+          "note": null
+        },
+        {
+          "id": "T16-02",
+          "time": "10:00",
+          "text": "10:00 玛蒙丹·莫奈美术馆 · Musée Marmottan Monet",
+          "note": null
+        },
+        {
+          "id": "T16-03",
+          "time": "12:30",
+          "text": "12:30 午餐 · Le Bois",
+          "note": null
+        },
+        {
+          "id": "T16-04",
+          "time": "13:30",
+          "text": "13:30 吉美亚洲艺术博物馆 · Musée national des arts asiatiques – Guimet",
+          "note": null
+        },
+        {
+          "id": "T16-05",
+          "time": "15:30",
+          "text": "15:30 建筑与遗产之城 · Cité de l’architecture et du patrimoine",
+          "note": null
+        },
+        {
+          "id": "T16-06",
+          "time": "17:30",
+          "text": "17:30 特罗卡德罗花园 · Jardins du Trocadéro",
+          "note": null
+        },
+        {
+          "id": "T16-07",
+          "time": "17:50",
+          "text": "17:50 Pont de Bir-Hakeim",
+          "note": null
+        },
+        {
+          "id": "T16-08",
+          "time": "18:30",
+          "text": "18:30 埃菲尔铁塔 · Tour Eiffel",
+          "note": null
+        },
+        {
+          "id": "T16-09",
+          "time": "20:30",
+          "text": "20:30 晚餐 · Chez Gladines",
+          "note": null
+        },
+        {
+          "id": "T16-10",
+          "time": "21:30",
+          "text": "21:30 西岱岛 · Île de la Cité",
+          "note": null
+        },
+        {
+          "id": "T16-11",
+          "time": "21:40",
+          "text": "21:40 巴黎圣母院 · Cathédrale Notre-Dame de Paris（到访性质待核）",
+          "note": null
+        }
+      ],
+      "weather": "16 Sat 晴"
+    },
+    {
+      "id": "day-0317",
+      "date": "2024-03-17",
+      "title": "雨中巴黎",
+      "subtitle": "Paris in the Rain",
+      "city": "巴黎多馆",
+      "mapSources": [
+        "IMG_3059"
+      ],
+      "blocks": [
+        {
+          "id": "s3044-01",
+          "title": "橘园美术馆 Musée de l’Orangerie",
+          "text": "天哪这里是天堂吗.jpg。有两个 chambre 的巨幅睡莲。在观赏凳上坐了好久，实在美丽。\n在橘园里遇到了一对亲子团，挺融洽的。\n还有一些毕加索、马蒂斯的画，和一个极迷惑的当代艺术展，里面是各种形式的白色画幅，倒还挺有意思的。",
+          "sourceIds": [
+            "S3044-01"
+          ],
+          "focusPlaceId": "orangerie"
+        },
+        {
+          "id": "s3044-02",
+          "title": "玛德莱娜教堂 Église de la Madeleine",
+          "text": "极其宏伟的希腊式教堂，与对岸的波旁宫遥相呼应，进入后发现一连串的穹顶天窗十分壮观，让人想到万神殿。\n当天恰好在做弥撒，是我首次目睹此类活动，在唱圣歌时管风琴一响，鸡皮疙瘩就起来了。难怪教堂宗教音乐要用管风琴，那种管风音乐在教堂内回荡谐振的感觉真像是让每个人都在共振，的确是产生了某种神圣感。",
+          "sourceIds": [
+            "S3044-02"
+          ],
+          "focusPlaceId": "madeleine"
+        },
+        {
+          "id": "s3044-03",
+          "title": "圣奥古斯丁教堂 Église Saint-Augustin",
+          "text": "也是一座相当辉煌的教堂，其穹顶上的顶是红褐色的，不知是什么金属。",
+          "sourceIds": [
+            "S3044-03"
+          ],
+          "focusPlaceId": "saint-augustin"
+        },
+        {
+          "id": "s3044-04",
+          "title": "巴黎歌剧院 Palais Garnier - L’opéra",
+          "text": "神中神，建筑和装饰艺术的巅峰之所，从质量上说无出其右。在里面来回走了好几遍，真是流连忘返啊。\n剧场的天顶是夏加尔的创作，不得不说夏加尔的用色和风格真的独特，好爱那个天顶。",
+          "sourceIds": [
+            "S3044-04"
+          ],
+          "focusPlaceId": "opera"
+        },
+        {
+          "id": "s3044-05",
+          "title": "古监狱 Conciergerie",
+          "text": "内容不多，主要是展示其作为大革命时期监狱的历史，包括血腥玛丽的关押和处刑。导览器和场景的 VR 互动很好玩，也是稍微补充了趣味性了。",
+          "sourceIds": [
+            "S3044-05"
+          ],
+          "focusPlaceId": "conciergerie"
+        },
+        {
+          "id": "s3045-01",
+          "title": "货币博物馆 Monnaie de Paris",
+          "text": "布展很用心的博物馆，介绍了货币制造和设计等方面，学到了不少。在入馆时会发放一枚空白币，进去后在一个展馆可以自己体验一次硬币的压铸过程。\n纪念品商店完全是我这种硬币爱好者的捕捉器，都设计的好漂亮。",
+          "sourceIds": [
+            "S3045-01"
+          ],
+          "focusPlaceId": "monnaie"
+        },
+        {
+          "id": "s3045-02",
+          "title": "巴黎市政厅 Hôtel de Ville",
+          "text": "一座带有一定荷兰风格（？）的建筑物，总之从外面相当漂亮，当时还有巴黎奥运的相关外饰也设计得不错。门前广场有个街头舞者在表演，感觉跳得不错，很会和观众互动。刚好我到访的几次都是周末，所以无从参观，有点遗憾。",
+          "sourceIds": [
+            "S3045-02"
+          ],
+          "focusPlaceId": "hotel-ville"
+        },
+        {
+          "id": "s3045-03",
+          "title": "蓬皮杜中心 Centre Pompidou",
+          "text": "现代艺术！我看不懂但我大受震撼.jpg。应该说我的艺术鉴赏能力就仅到后印象为止了，进现代艺术场门只能尝试感受一下。蒙德里安的『New York City』还是留下了很深印象的，站在画前我感受到一种神秘的框架感。其它能认出的还有夏加尔、康定斯基、杜尚、波洛克等知名画家的作品。引用一位艺术 up 主给自己说：“艺术最主要的不是看懂，而是理解”。真的站在这些现代艺术作品前，很多时候我很难说“鉴赏”出了其中的美，但是作品传达出的一些东西，或“对”或“不对”，仍是真实的。\n\n另外蓬皮杜中心四、五层的夜景真是很好，可以从东侧看到整个巴黎城区。蓬皮杜中心本身的建筑也很有特色，采购了张建筑本身的明片，何尝不是一种买椟还珠呢。",
+          "sourceIds": [
+            "S3045-03",
+            "S3045-04"
+          ],
+          "focusPlaceId": "pompidou"
+        },
+        {
+          "id": "s3045-05",
+          "title": "圣心堂 Basilique du Sacré-Cœur de Montmartre",
+          "text": "在夜晚时进入了圣心堂内部，穹顶内的壁顶画十分好看。圣心堂的夜间外景也别有味道，和第一次来访时的夕阳景观构成了两幅相应而各有特点的印象。",
+          "sourceIds": [
+            "S3045-05"
+          ],
+          "focusPlaceId": "sacre-coeur"
+        }
+      ],
+      "events": [
+        {
+          "id": "T17-01",
+          "time": "09:00",
+          "text": "09:00 橘园美术馆 · Musée de l’Orangerie",
+          "note": null
+        },
+        {
+          "id": "T17-02",
+          "time": "10:30",
+          "text": "10:30 玛德莱娜教堂 · Église de la Madeleine",
+          "note": null
+        },
+        {
+          "id": "T17-03",
+          "time": "11:00",
+          "text": "11:00 圣奥古斯丁教堂 · Église Saint-Augustin",
+          "note": null
+        },
+        {
+          "id": "T17-04",
+          "time": "11:20",
+          "text": "11:20 圣拉扎尔车站 · Gare Saint-Lazare",
+          "note": null
+        },
+        {
+          "id": "T17-06",
+          "time": "13:00",
+          "text": "13:00 巴黎歌剧院 · Palais Garnier",
+          "note": null
+        },
+        {
+          "id": "T17-05",
+          "time": null,
+          "text": "下午茶 · Pierre Hermé（歌剧院后；具体时间未记）",
+          "note": "原时刻表写 12:40 午餐；作者后续确认是歌剧院后的下午茶。"
+        },
+        {
+          "id": "T17-07",
+          "time": "15:30",
+          "text": "15:30 古监狱 · Conciergerie",
+          "note": null
+        },
+        {
+          "id": "T17-08",
+          "time": "17:00",
+          "text": "17:00 巴黎造币厂／货币博物馆 · Monnaie de Paris",
+          "note": null
+        },
+        {
+          "id": "T17-09",
+          "time": "18:30",
+          "text": "18:30 莎士比亚书店 · Shakespeare and Company",
+          "note": null
+        },
+        {
+          "id": "T17-10",
+          "time": "18:40",
+          "text": "18:40 巴黎圣母院 · Cathédrale Notre-Dame de Paris（到访性质待核）",
+          "note": null
+        },
+        {
+          "id": "T17-11",
+          "time": "19:00",
+          "text": "19:00 巴黎市政厅 · Hôtel de Ville",
+          "note": null
+        },
+        {
+          "id": "T17-12",
+          "time": "19:10",
+          "text": "19:10 蓬皮杜中心 · Centre Pompidou",
+          "note": null
+        },
+        {
+          "id": "T17-13",
+          "time": "21:40",
+          "text": "21:40 圣心堂 · Basilique du Sacré-Cœur de Montmartre",
+          "note": null
+        },
+        {
+          "id": "T17-14",
+          "time": "22:30",
+          "text": "22:30 晚餐 · Bouillon Julien",
+          "note": null
+        }
+      ],
+      "weather": "17 Sun 雨／多云"
+    },
+    {
+      "id": "day-0318",
+      "date": "2024-03-18",
+      "title": "左岸",
+      "subtitle": "The Left Bank",
+      "city": "枫丹白露＋巴黎",
+      "mapSources": [
+        "IMG_3060"
+      ],
+      "blocks": [
+        {
+          "id": "s3046-01",
+          "title": "枫丹白露宫 Château de Fontainebleau",
+          "text": "知名的枫丹白露宫，距市中心近一小时火车程，当日天气排常好，能够获得阳光穿过云间的斑驳影像。到的时间略有点早，但开馆其实延迟了，门口贴的还未开馆告示我居然基本能看懂，法文还真是没白学。由于有博物馆通票，不用存包，使得我成为了当日第一个进馆的游客，在里面自由穿行还挺爽的。不过内部倒是没有很多过于特别的东西，基本是凡尔赛的缩减版。\n较值得一提的是枫丹白露的花园，非常和谐舒适，而且在英吉利花园中看到了极好看的树（花），法国这园艺审美的确在线。\n最后提一嘴的是馆里一队参观的小朋友，气氛好好捏。",
+          "sourceIds": [
+            "S3046-01"
+          ],
+          "focusPlaceId": "fontainebleau"
+        },
+        {
+          "id": "s3046-02",
+          "title": "凯旋门 Arc de Triomphe",
+          "text": "实在是壮观，门上的浮雕也都极好，正面右侧的『马赛曲』是真正的慷慨激昂，在内部顶层的陈列室还有雕塑局部。门的正下方是一战阵亡将士纪念碑，晚上来的时候有长明火点亮。\n登门的旋转梯实在有点晕，幸好我体能还行。顶层的视野十分好，向着巴黎的各个方向都一览无余，尤其是沿着香榭丽舍大街眺望尽头的协和广场和再远处的卢浮宫。夜景也很美，值得一提的是香街上的塔吊也用红白蓝颜色的灯光作了装饰。沿着香街另一侧的军团大街能望见拉德芳斯新凯旋门，那里肯定也有人在往这边眺望。",
+          "sourceIds": [
+            "S3046-02"
+          ],
+          "focusPlaceId": "arc"
+        },
+        {
+          "id": "s3046-03",
+          "title": "邮政博物馆 Musée de la Poste",
+          "text": "主要看点在见历上两百年的邮票发行收藏，结合法国／世界当代史品鉴能读出很多有趣的东西，比如维希法国时期大量贝当邮票。还看到了和苏联“联名”的票和北京奥运会的票。\n纪念品商店的冰箱贴神中神！买了一个“Rêver l’universe”的，设计的真好。买纪念币送了个“La Poste”的小袋子，那几天就拎着这个才装纪念币了，差点装不下（乐）。",
+          "sourceIds": [
+            "S3046-03"
+          ],
+          "focusPlaceId": "poste-museum"
+        },
+        {
+          "id": "s3047-01",
+          "title": "先贤祠 Panthéon",
+          "text": "建筑本身是一座顶级好看的希腊式教堂，门口的立柱神中神，内部的结构感也是顶级。穹顶下悬垂挂的是一个巨大的傅科摆（绝对是我见过最大的）。\n通向地下墓穴的地方写着“Aux écrivains morts pour la France”。地下葬着诸多名人，包括：卢梭、伏尔泰、居里夫妇、雨果、左拉（这俩的棺椁面对面摆放），大仲马、朗之万，确实都是鼎鼎大名。",
+          "sourceIds": [
+            "S3047-01"
+          ],
+          "focusPlaceId": "pantheon"
+        },
+        {
+          "id": "s3047-02",
+          "title": "卢森堡公园 Jardin du Luxembourg",
+          "text": "感到傍晚来并不是一个最佳的 timing，公园中央的池子边有很多躺椅（实测躺起来超绝舒服），估计在阳光明媚的日子来躺着发呆会挺好的。公园内有个卢森堡，现在是议会大楼啥的，真似还能看到人在里面办公。公园东北面本该有个喷泉的，但去的时候没水可还行。",
+          "sourceIds": [
+            "S3047-02"
+          ],
+          "focusPlaceId": "luxembourg"
+        }
+      ],
+      "events": [
+        {
+          "id": "S3036-01",
+          "time": "09:30",
+          "text": "09:30 枫丹白露宫 Château de Fontainebleau",
+          "note": null
+        },
+        {
+          "id": "S3036-02",
+          "time": "13:30",
+          "text": "13:30 午餐 Pedro Alto",
+          "note": null
+        },
+        {
+          "id": "S3036-03",
+          "time": "14:20",
+          "text": "14:20 凯旋门 Arc de Triomphe",
+          "note": null
+        },
+        {
+          "id": "S3036-04",
+          "time": "16:00",
+          "text": "16:00 邮政博物馆 Musée de la Poste",
+          "note": null
+        },
+        {
+          "id": "S3036-05",
+          "time": "17:15",
+          "text": "17:15 先贤祠 Panthéon",
+          "note": null
+        },
+        {
+          "id": "S3036-06",
+          "time": "18:00",
+          "text": "18:00 小王子商店 Le Petit Prince",
+          "note": null
+        },
+        {
+          "id": "S3036-07",
+          "time": "18:20",
+          "text": "18:20 卢森堡公园 Jardin du Luxembourg",
+          "note": null
+        },
+        {
+          "id": "S3036-08",
+          "time": "20:00",
+          "text": "20:00 埃菲尔铁塔 Tour Eiffel",
+          "note": null
+        },
+        {
+          "id": "S3036-09",
+          "time": "21:30",
+          "text": "21:30 晚餐 Chez Loulou",
+          "note": null
+        }
+      ],
+      "weather": "18 Mon 晴，少云"
+    },
+    {
+      "id": "day-0319",
+      "date": "2024-03-19",
+      "title": "科隆一日",
+      "subtitle": "A Day in Cologne",
+      "city": "巴黎 → 科隆 → 阿姆",
+      "mapSources": [
+        "IMG_3061 + IMG_3062 + IMG_3063"
+      ],
+      "blocks": [
+        {
+          "id": "s3047-03",
+          "title": "巴黎北站 Gare du Nord",
+          "text": "在外面看到了漂亮的朝阳，感动了！",
+          "sourceIds": [
+            "S3047-03"
+          ],
+          "focusPlaceId": "gare-nord"
+        },
+        {
+          "id": "s3047-04",
+          "title": "巧克力博物馆 Schokoladenmuseum",
+          "text": "看到这拼写我就人晕了，德国特有的名词粘连 2333。很新奇的一个馆，是 Lindt 办的，布展很用心，学到了不少冷知识。见到了巧克力生产线（微型版），整个厂房内都是巧克力香！而且可以定制个人配料的巧克力，很有趣。出门还又送了我一摞，成为了接下来几天的应急能量补给。逛完博物馆后为了等自制巧克力，在临莱茵河的咖啡馆点了杯热巧克力坐着，很是惬意。还附了一块 Lindt 的 Schokoladenmuseum 特别包装巧克力。",
+          "sourceIds": [
+            "S3047-04"
+          ],
+          "focusPlaceId": "chocolate"
+        },
+        {
+          "id": "s3047-05",
+          "title": "香水博物馆 Farina Duftmuseum",
+          "text": "古龙香水馆，是最早时的香水工厂（二战时被炸了）。学到了不少香水知识，导览会让我们闻了几种作香水组分的精油，毫不意外地只辨识出柑橘类香味，临走还送了一瓶古龙水。",
+          "sourceIds": [
+            "S3047-05"
+          ],
+          "focusPlaceId": "farina"
+        },
+        {
+          "id": "s3048-01",
+          "title": "科隆大教堂 Kölner Dom",
+          "text": "伟大！知道会高但没想到这么高，震撼之心溢于言表，相片也完全无法展现。我在科隆从中午待到傍晚，不同时间的光影的确很精彩。哥特教堂外立面繁复的建筑结构，震撼了不得说一句莫奈中肯（『鲁昂大教堂』系列）。进入教堂内部也能看出顶真是高得惊人，中世纪时“接近上帝”的追求可见一斑。教堂的花窗也很好看。",
+          "sourceIds": [
+            "S3048-01"
+          ],
+          "focusPlaceId": "koln-dom"
+        },
+        {
+          "id": "s3048-02",
+          "title": "霍亨索伦桥 Hohenzollernbrücke",
+          "text": "莱茵河的科隆景观必须要同时包括大教堂和霍亨索伦桥，这个在夕阳的加持下十分美丽。在河对岸拍到了绝美的景象，从远处看大教堂，观察它从周遭建筑中显现的身影，也是很能展示其高大。从更远处的三角大厦能获得最著名的的全景，可惜没有长焦镜头，再可惜发车时间早了点没拍到夜景，感觉如果拖至少拍到华灯初上时估计能拿到绝好的城市夜景。\n桥上挂满了爱情锁，德国版本的艺术桥（爱情锁桥）了属于是。果然全世界都爱玩这套，希望霍亨索伦桥别也塌了 lol 这可是铁路桥。\n在桥上碰到了个好帅的摄影师。",
+          "sourceIds": [
+            "S3048-02"
+          ],
+          "focusPlaceId": "hohenzollern"
+        },
+        {
+          "id": "s3048-03",
+          "title": "科隆中央车站 Köln HBF",
+          "text": "在月台大厅上和站旁一间 post 的还有科隆的标志性数字 4711，据说是香水博物馆，也即古龙水早期制造地的房屋编号。当时参观时据讲解员说，让一个科隆人随意说个数很可能会是 4711，挺乐的。\n德铁有点逆天，原来我坐的那趟往阿姆的车和另一趟往多特蒙德的火车共用一个车头，中途解挂……\n\n上车坐了一会瞄眼显示屏发现地不对劲，问了个乘客发现大事不妙，赶紧下车，等了一会还是摸不着头脑。这时一位乘客来搭话，提示我：“Kid, your train is probably at the other side of the platform.” “Oh! really? To Amsterdam?” “Yeah, go! Hope you are not too late.”然后拍了我一把。最后证明果然另一端的那段才是开去阿姆的，真有点坑啊！感恩那个好心的路人，不然我要么在多特蒙德不知所措，要么在科隆露宿街头……\n极大改变了我心中德国人死板无情的刻板印象！（如果他是）",
+          "sourceIds": [
+            "S3048-03",
+            "S3048-04"
+          ],
+          "focusPlaceId": "koln-hbf"
+        },
+        {
+          "id": "s3049-01",
+          "title": "铸币塔 Munttoren",
+          "text": "一座颇有风格的钟塔，一层的商店内陈怪有意思的。",
+          "sourceIds": [
+            "S3049-01"
+          ],
+          "focusPlaceId": "munttoren"
+        },
+        {
+          "id": "s3049-02",
+          "title": "运河 Canal",
+          "text": "不得不说，纵横运河真使阿姆斯特丹河景韵味一绝。他们还在河岸的废弃自行车上插花作装饰，十分有荷兰风情了。白天和夜晚的运河河景真是各有韵味。",
+          "sourceIds": [
+            "S3049-02"
+          ],
+          "focusPlaceId": null
+        }
+      ],
+      "events": [
+        {
+          "id": "S3036-10",
+          "time": "07:30",
+          "text": "07:30 早餐 Carton",
+          "note": null
+        },
+        {
+          "id": "S3036-11",
+          "time": "07:40",
+          "text": "07:40 Paris - Cologne · EuroStar 9411\n下行另记：07:54 — 11:15",
+          "note": null
+        },
+        {
+          "id": "S3036-12",
+          "time": "12:00",
+          "text": "12:00 午餐 Augustiner am Heumarkt",
+          "note": null
+        },
+        {
+          "id": "S3036-13",
+          "time": "14:00",
+          "text": "14:00 巧克力博物馆 Schokoladenmuseum Köln",
+          "note": null
+        },
+        {
+          "id": "S3036-14",
+          "time": "16:00",
+          "text": "16:00 香水博物馆 Farina Duftmuseum",
+          "note": null
+        },
+        {
+          "id": "S3036-15",
+          "time": "17:00",
+          "text": "17:00 科隆大教堂 Kölner Dom",
+          "note": null
+        },
+        {
+          "id": "S3036-16",
+          "time": "17:40",
+          "text": "17:40 霍亨索伦桥 Hohenzollernbrücke",
+          "note": null
+        },
+        {
+          "id": "S3036-17",
+          "time": "18:00",
+          "text": "18:00 三角大厦 KölnTriangle",
+          "note": null
+        },
+        {
+          "id": "S3036-18",
+          "time": "19:20",
+          "text": "19:20 Cologne - Amsterdam · Deutsche Bahn ICE 104（原写 ICZ，车次待核）\n下行另记：19:15 — 22:00",
+          "note": null
+        },
+        {
+          "id": "S3036-19",
+          "time": "23:00",
+          "text": "23:00 伦勃朗像 Rembrandt Monument",
+          "note": null
+        },
+        {
+          "id": "S3036-20",
+          "time": "23:15",
+          "text": "23:15 铸币塔 Munttoren",
+          "note": null
+        }
+      ],
+      "weather": "19 Tue 晴"
+    },
+    {
+      "id": "day-0320",
+      "date": "2024-03-20",
+      "title": "阿姆斯特丹",
+      "subtitle": "Amsterdam",
+      "city": "阿姆＋Zaanse",
+      "mapSources": [
+        "IMG_3064"
+      ],
+      "blocks": [
+        {
+          "id": "s3049-03",
+          "title": "伦勃朗广场 Rembrandtplein",
+          "text": "有一尊伦勃朗像和一尊宇航员版沉思者，广场上的花卉也很好看。可惜没有很好的取景角度，而且在阿姆的几天天色都一般。\n广场上很多小酒馆，到了夜里十分热闹。住的酒店就在广场边上，前台小哥是个很有趣的葡萄牙人，跟他聊了不少东西，可惜忘了（没来得及）留个联系方式。交谈中其留下金句“I feel like these people from North Europe are, you know, kinda like, square.”（同时手比了个方块机器人的造型）令我爆笑。他还安利我去里斯本玩，这下不得不考虑造访了。（后续：2025 年圣诞假期间造访了葡萄牙）。",
+          "sourceIds": [
+            "S3049-03"
+          ],
+          "focusPlaceId": "rembrandtplein"
+        },
+        {
+          "id": "s3049-04",
+          "title": "梵高博物馆 Van Gogh Museum",
+          "text": "Vincent 看 Vincent 的画！在此见到了其中一幅『向日葵』，从真迹上能看到颜料的痕迹，觉得更有质感一些。博物馆的讲解器做的非常好，布展最后一幅画是『杏花』，太妙的设计了，尤其是想到这幅画是给梵高的侄子、也就是梵高博物馆的创立者之一的出生礼，有点感动到。\n解说词更是绝中绝：“By reaching the end of the museum, you helped him achieved another goal he had. He wrote: I still hope not to work for myself alone.” 听到这句话我差点眼泪掉下来。\n其它印象较深的画包括若干『自画像』、『黄房子』、『作画中的高更』、一些米勒的临摹、『麦田群鸦』。可惜好多其它重要作品都不在此地，十分遗憾，希望以后能有机会见到。\n纪念品商店东西都不错，还有一件后面写着“Vincent”的 t 恤，这不是为我量身定制的吗！咬牙买了（后续：已经莫名弄丢了）。有两款毛线玩偶还挺好看，可惜钱包遭不住，以后有钱了一定买（认真）。",
+          "sourceIds": [
+            "S3049-04",
+            "S3049-05",
+            "S3050-01"
+          ],
+          "focusPlaceId": "van-gogh"
+        },
+        {
+          "id": "s3050-02",
+          "title": "国家海事博物馆 Het Scheepvaartmuseum",
+          "text": "一座孤悬海中的楼，后面就是码头，据说出门是有艘船可以参观的，但我去的当天开去别处了。门票处的接待人员十分热情，向我各种介绍馆中内容。馆藏没有什么特别值得注意的，但里面有个小图书馆，very cute。楼上有个馆是介绍荷兰一年出口多少农产品到全世界的（p.s. 主要是洋葱），也算是冷知识了。",
+          "sourceIds": [
+            "S3050-02"
+          ],
+          "focusPlaceId": "maritime"
+        },
+        {
+          "id": "s3050-03",
+          "title": "伦勃朗故居 Museum Rembrandthuis",
+          "text": "以体量来说内容不错了，介绍了很多伦勃朗的生平和工作日常，还在大画室有个工作坊介绍颜料在早期是如何制作的，前台有的工作人员还会用中文作简短交流 hhh。",
+          "sourceIds": [
+            "S3050-03"
+          ],
+          "focusPlaceId": "rembrandthuis"
+        },
+        {
+          "id": "s3050-04",
+          "title": "阿姆斯特丹皇宫 et 水坝广场 Koninklijk Paleis et Dam Square",
+          "text": "广场上有人在喂鸽子。好多鸽子啊！它们也不怕人，那个饲鸟人看起来就经常来，几次去他都在，还会拉路过的小朋友塞一把，挺好玩的。\n皇宫挺不错，内部风格很好，主厅是白色为主，内部房间则是金碧辉煌的巴洛克，从内饰也能一窥荷兰黄金年代的辉煌，大厅的地板浮雕了当年的世界地图，美洲仍是不完整的，真是历史的见证了。\n皇宫里的花插得不错，这就是皇家品味么。",
+          "sourceIds": [
+            "S3050-04"
+          ],
+          "focusPlaceId": "dam"
+        },
+        {
+          "id": "s3050-05",
+          "title": "运河博物馆 Grachtenmuseum",
+          "text": "布展十分用心的小馆，多媒体技术运用得相好，了解了很多运河的发展史。",
+          "sourceIds": [
+            "S3050-05"
+          ],
+          "focusPlaceId": "canal-museum"
+        },
+        {
+          "id": "s3050-06",
+          "title": "赞丹 · Zaanse Schans",
+          "text": "稍有失望，感觉景色没有想象中的，但至少是亲眼见到风车了。在村北的码头给一对情侣拍照，被人夸“you should take money doing this” 乐了。",
+          "sourceIds": [
+            "S3050-06",
+            "J00"
+          ],
+          "focusPlaceId": "zaanse"
+        }
+      ],
+      "events": [
+        {
+          "id": "S3036-21",
+          "time": "09:00",
+          "text": "09:00 梵高美术馆 Van Gogh Museum",
+          "note": null
+        },
+        {
+          "id": "S3036-22",
+          "time": "11:30",
+          "text": "11:30 中央车站 Amsterdam Centraal",
+          "note": null
+        },
+        {
+          "id": "S3037-01",
+          "time": "12:10",
+          "text": "12:10 国家海事博物馆 Het Scheepvaartmuseum",
+          "note": null
+        },
+        {
+          "id": "S3037-02",
+          "time": "13:30",
+          "text": "13:30 伦勃朗故居 Museum Rembrandthuis",
+          "note": null
+        },
+        {
+          "id": "S3037-03",
+          "time": "14:30",
+          "text": "14:30 水坝广场 et 阿姆斯特丹皇宫 Dam Square et Koninklijk Paleis",
+          "note": null
+        },
+        {
+          "id": "S3037-04",
+          "time": "15:40",
+          "text": "15:40 阿姆斯特丹运河博物馆 Grachtenmuseum",
+          "note": null
+        },
+        {
+          "id": "S3037-05",
+          "time": "17:20",
+          "text": "17:20 赞丹 Zaanse Schans",
+          "note": null
+        },
+        {
+          "id": "S3037-06",
+          "time": "19:00",
+          "text": "19:00 运河游船",
+          "note": null
+        },
+        {
+          "id": "S3037-07",
+          "time": "20:30",
+          "text": "20:30 晚餐 Café Sonneveld",
+          "note": null
+        }
+      ],
+      "weather": "20 Wed 雨／阴"
+    },
+    {
+      "id": "day-0321",
+      "date": "2024-03-21",
+      "title": "重返巴黎",
+      "subtitle": "Back to Paris",
+      "city": "阿姆 → 巴黎",
+      "mapSources": [
+        "IMG_3063 + IMG_3061"
+      ],
+      "blocks": [
+        {
+          "id": "j21-h",
+          "title": "荷兰国立博物馆 · Rijksmuseum（Amsterdam）",
+          "text": "\n\n排最早一波队入场，直奔『夜巡』！得到了三十余分钟的个人专享时间。当时『夜巡』仍在修复，用玻璃罩隔开了。刚到时还有人员在工作，近距离观察了一下修复工作。『夜巡』画幅挺大的，细看之下发现里面的打光真是很有故事性，的确是北方画派风格。\n\n同一个大展厅里还有其他一些重要作品，看到了不少很好看的油画，荷兰人画静物真是有点东西。另一幅印象深刻的是『七月』，好好看的风景画，很有乡村气息。另外还看到了梵高的一幅自画像、『倒牛奶的女工』（群青真是美丽的颜色！）、伦勃朗的若干自画像。收获不小。",
+          "sourceIds": [
+            "J21-H",
+            "J21-01",
+            "J21-02"
+          ],
+          "focusPlaceId": "rijksmuseum"
+        },
+        {
+          "id": "s3055-02",
+          "title": "高铁",
+          "text": "在回程（由阿姆斯特丹回巴黎的欧洲之星）同一车厢里的一个高铁乘客忽然身体出问题了，在呼喊医生并引来了警方。应该说欧洲高铁的应急处置也是很到位的，我们被隔到了另一节车以保护病人隐私，然后很快列车就在临近站停靠，有医护就在对应车门外等候。还原地支了个小围挡把人先放里面抢救，估计一会可能是情况稳定了，人就被抬走了，列车才重启。这次突发情况直接导致我回巴黎晚了半个多钟 lol。",
+          "sourceIds": [
+            "S3055-02"
+          ],
+          "focusPlaceId": null
+        },
+        {
+          "id": "j21-03",
+          "title": "拉法耶特百货 Lafayette",
+          "text": "我这种穷鬼自然是直奔纪念品区的，可惜还是买不起。有一块地方卖巴黎地铁站的冰箱贴，还挺有趣的，但没有我住的站，不然高低买一块。其他也有些挺有特色的东西，下次一定。\n\n楼顶的天台非常好，俯瞰巴黎歌剧院，并远望埃菲尔铁塔，在夕阳下光影不错。（p.s. 就是在这天拍到了卢浮宫的人生夕阳。）",
+          "sourceIds": [
+            "J21-03",
+            "J21-04"
+          ],
+          "focusPlaceId": null
+        },
+        {
+          "id": "s3041-07",
+          "title": "卢浮宫 · 晚霞",
+          "text": "3 月 21 号在卢浮宫站搭车时还看到了人生中最好的夕阳，太惊艳了！本来卢浮宫的外部建筑和金字塔入口就是一绝，搭配上完美晚霞的迷人光景，真是令人热泪盈眶，太美辽！！",
+          "sourceIds": [
+            "S3041-07"
+          ],
+          "focusPlaceId": "louvre"
+        }
+      ],
+      "events": [
+        {
+          "id": "S3037-08",
+          "time": "09:00",
+          "text": "09:00 荷兰国立博物馆 Rijksmuseum",
+          "note": null
+        },
+        {
+          "id": "S3037-09",
+          "time": "11:00",
+          "text": "11:00 午餐 The Pantry",
+          "note": null
+        },
+        {
+          "id": "S3037-10",
+          "time": "13:10",
+          "text": "13:10 Amsterdam - Paris · EuroStar 9352\n下行另记：13:11 — 16:45",
+          "note": "16:45 是原定到达；实际到站时间未知。"
+        },
+        {
+          "id": "S3037-11",
+          "time": "18:30",
+          "text": "18:30 拉法耶特（老佛爷）百货 Lafayette",
+          "note": null
+        },
+        {
+          "id": "S3037-12",
+          "time": "19:30",
+          "text": "19:30 装饰艺术博物馆 Musée des Arts Décoratifs",
+          "note": null
+        },
+        {
+          "id": "S3037-13",
+          "time": "20:00",
+          "text": "20:00 奥赛美术馆 Musée d’Orsay",
+          "note": null
+        },
+        {
+          "id": "S3037-14",
+          "time": "22:30",
+          "text": "22:30 晚餐 Café du Marché",
+          "note": null
+        }
+      ],
+      "weather": "2024-03-21（承上下文）· 周四 · 阴"
+    },
+    {
+      "id": "day-0322",
+      "date": "2024-03-22",
+      "title": "右岸",
+      "subtitle": "The Right Bank",
+      "city": "巴黎中区",
+      "mapSources": [
+        "IMG_3065"
+      ],
+      "blocks": [
+        {
+          "id": "j22-01",
+          "title": "皇家宫殿 · Domaine national du Palais-Royal",
+          "text": "看过卢浮宫和凡尔赛宫后，竟然觉得皇家宫殿也就是“平平无奇”了。但其实建筑不错，有一条能出不错的效果图的柱廊。花园很温馨，阳光天来坐一会会是不错的体验。",
+          "sourceIds": [
+            "J22-01"
+          ],
+          "focusPlaceId": "palais-royal"
+        },
+        {
+          "id": "j22-02",
+          "title": "BnF 黎塞留馆 · BnF Richelieu",
+          "text": "只能进其中一个厅，主要就是来看建筑风格和设计的。 Salle Ovale 很好看，很有书室的感觉。门口的小花园也怪可爱的，去这坐着读书／聊天，环境会很好。",
+          "sourceIds": [
+            "J22-02"
+          ],
+          "focusPlaceId": "bnf"
+        },
+        {
+          "id": "s3052-01",
+          "title": "圣厄斯塔什教堂 Église Saint-Eustache",
+          "text": "一个相较而言较旧的教堂，但花窗也很漂亮，且由于采光较好，内部又接空旷，其实能更好的感受那种建筑高耸的感觉。",
+          "sourceIds": [
+            "S3052-01"
+          ],
+          "focusPlaceId": "saint-eustache"
+        }
+      ],
+      "events": [
+        {
+          "id": "S3037-15",
+          "time": "09:00",
+          "text": "09:00 橘园美术馆 Musée de l’Orangerie",
+          "note": null
+        },
+        {
+          "id": "S3037-16",
+          "time": "10:00",
+          "text": "10:00 皇家宫殿 Domaine National du Palais-Royal",
+          "note": null
+        },
+        {
+          "id": "S3037-17",
+          "time": "10:20",
+          "text": "10:20 法国国家图书馆黎塞留馆 BNF Richelieu Site",
+          "note": null
+        },
+        {
+          "id": "S3037-18",
+          "time": "11:15",
+          "text": "11:15 圣厄斯塔什教堂 Église Saint-Eustache",
+          "note": null
+        },
+        {
+          "id": "S3037-19",
+          "time": "12:00",
+          "text": "12:00 午餐 La Jacobine",
+          "note": null
+        },
+        {
+          "id": "S3037-20",
+          "time": "13:15",
+          "text": "13:15 法兰西学院 Institut de France",
+          "note": null
+        },
+        {
+          "id": "S3037-21",
+          "time": "13:30",
+          "text": "13:30 卢浮宫博物馆 Musée du Louvre",
+          "note": null
+        },
+        {
+          "id": "S3037-22",
+          "time": "21:30",
+          "text": "21:30 晚餐 Le Roussillon",
+          "note": null
+        }
+      ],
+      "weather": "2024-03-22（承上下文）· 周五 · 晴",
+      "headerSourceIds": [
+        "J22-H"
+      ]
+    },
+    {
+      "id": "day-0323",
+      "date": "2024-03-23",
+      "title": "拾遗",
+      "subtitle": "Odds and Ends",
+      "city": "巴黎东侧＋夜景",
+      "mapSources": [
+        "IMG_3066"
+      ],
+      "blocks": [
+        {
+          "id": "s3052-02",
+          "title": "拉雪兹神父公墓 Cimetière du Père-Lachaise",
+          "text": "大型定向越野了属于是，去之前列了个单子对着找，最后被地图折磨得不轻，最后严重超时完成，路线如下：\n\n- 毕沙罗，没找到，只找到其家族墓，就算找到一半吧。\n- 阿斯图里亚斯，听说过的危地马拉作家，诺奖得主。\n- 肖邦，伟大，无需多言。\n- 盖吕萨克，偶然路过看到了，物理人基因瞬间启动。\n- 莫里哀、拉封丹、格拉姆。\n- 巴黎公社社员墙，伟大，无需多言。\n- 王尔德，还真有防亲吻玻璃墙啊，乐了。\n- 普鲁斯特，有个人也在凭吊，他疑似是书迷之类的，感觉在流泪，还不时俯身将手抚在墓上，绝对是真爱粉了。\n- 德拉克洛瓦，伟大，无需多言。\n- 巴尔扎克，伟大，无需多言。\n- 雅克·路易·大卫，伟大，无需多言。\n- 罗西尼。",
+          "sourceIds": [
+            "S3052-02",
+            "S3052-03"
+          ],
+          "focusPlaceId": "pere-lachaise"
+        },
+        {
+          "id": "s3052-04",
+          "title": "雨果故居 Maison de Victor Hugo",
+          "text": "原来雨果有中国文化爱好。听说他从未去过中国，但他房间的中国味还挺不错的。屋中还保留着雨果去世时房间的样子。",
+          "sourceIds": [
+            "S3052-04"
+          ],
+          "focusPlaceId": "hugo"
+        },
+        {
+          "id": "s3052-05",
+          "title": "圣礼拜堂 Sainte-Chapelle",
+          "text": "太太太好看了吧！这花窗真的是神了，当天运气很好，早上下了会雨，但中午去时就放晴了。阳光穿过花窗真是炫丽多彩，在光影中徜徉好久，好喜欢这个采光。",
+          "sourceIds": [
+            "S3052-05"
+          ],
+          "focusPlaceId": "sainte-chapelle"
+        },
+        {
+          "id": "s3053-01",
+          "title": "梅里爱博物馆 Musée Méliès",
+          "text": "勾起了我小时候看『雨果』的回忆，当时只觉得电影挺好看的，并对梅里爱这名字略有耳闻，这次真是第一次详细了解了梅里爱对电影艺术的贡献。在最后完整观看了一遍『飞向月球』，以及其它很多梅里爱的短片，虽然在今天看来都是一眼看穿的简单剪辑，但能想象在当年这些东西是多么新奇，而且其实拍的东西点子都挺好的，我看的时候也常会心一笑。",
+          "sourceIds": [
+            "S3053-01"
+          ],
+          "focusPlaceId": "melies"
+        }
+      ],
+      "events": [
+        {
+          "id": "S3038-01",
+          "time": "09:30",
+          "text": "09:30 拉雪兹神父公墓 Cimetière du Père-Lachaise",
+          "note": null
+        },
+        {
+          "id": "S3038-02",
+          "time": "11:00",
+          "text": "11:00 维克多·雨果故居 Maison de Victor Hugo",
+          "note": null
+        },
+        {
+          "id": "S3038-03",
+          "time": "12:30",
+          "text": "12:30 圣礼拜堂 Sainte-Chapelle",
+          "note": null
+        },
+        {
+          "id": "S3038-04",
+          "time": "13:45",
+          "text": "13:45 电影博物馆 - 梅里爱博物馆 Musée Méliès",
+          "note": null
+        },
+        {
+          "id": "S3038-05",
+          "time": "15:00",
+          "text": "15:00 毕加索博物馆 Musée national Picasso-Paris",
+          "note": null
+        },
+        {
+          "id": "S3038-06",
+          "time": "17:00",
+          "text": "17:00 晚餐 Café du Marché",
+          "note": null
+        },
+        {
+          "id": "S3038-07",
+          "time": "21:00",
+          "text": "21:00 埃菲尔铁塔 Tour Eiffel",
+          "note": null
+        },
+        {
+          "id": "S3038-08",
+          "time": "21:30",
+          "text": "21:30 凯旋门 Arc de Triomphe",
+          "note": null
+        }
+      ],
+      "weather": "23 Sat 雨 阴 - 晴"
+    },
+    {
+      "id": "day-0324",
+      "date": "2024-03-24",
+      "title": "鲁昂一日",
+      "subtitle": "A Day in Rouen",
+      "city": "巴黎 → 鲁昂 → 巴黎",
+      "mapSources": [
+        "IMG_3067 + IMG_3068"
+      ],
+      "blocks": [
+        {
+          "id": "s3053-02",
+          "title": "卡蒙多·尼西博物馆 Musée Nissim de Camondo",
+          "text": "一个探寻法国装饰艺术的好去处，在当年的时代下，这个宅子的设计还挺新潮，有户内电梯。纪录片也不错，了解了这宅子和家族的历史。",
+          "sourceIds": [
+            "S3053-02"
+          ],
+          "focusPlaceId": "camondo"
+        },
+        {
+          "id": "s3053-03",
+          "title": "鲁昂美术馆 Musée des Beaux-Arts de Rouen",
+          "text": "其实馆藏不错的，各个艺术时期的画都有收录，印象派收藏也不错。见到了一幅很喜欢的莫奈，而且这里是鲁昂，那当然也有一幅『鲁昂大教堂』。",
+          "sourceIds": [
+            "S3053-03"
+          ],
+          "focusPlaceId": "rouen-art"
+        },
+        {
+          "id": "s3053-04",
+          "title": "鲁昂大教堂 Cathédrale Notre-Dame de Rouen",
+          "text": "外立面的哥特型雕极好看，两座塔楼 style 不一样是我没想到的。是修太久中间连图纸都改了？总之还是很雄伟的，外立面朝西，结合表面漂亮的浮雕，也难怪莫奈挑这里作画练习光影捕捉了。",
+          "sourceIds": [
+            "S3053-04"
+          ],
+          "focusPlaceId": "rouen-cathedral"
+        },
+        {
+          "id": "s3053-05",
+          "title": "圣马卢教堂 Église Catholique Saint-Maclou",
+          "text": "外饰其实漂亮过圣母大教堂，可能是不够高耸没名气吗？但真的很漂亮。门口有一队童子军还是什么在列队呢，很活泼。",
+          "sourceIds": [
+            "S3053-05"
+          ],
+          "focusPlaceId": "saint-maclou"
+        }
+      ],
+      "events": [
+        {
+          "id": "S3038-09",
+          "time": "10:00",
+          "text": "10:00 卡蒙多·尼西博物馆 Musée Nissim de Camondo",
+          "note": null
+        },
+        {
+          "id": "S3038-10",
+          "time": "11:00",
+          "text": "11:00 蒙索公园 Parc Monceau",
+          "note": null
+        },
+        {
+          "id": "S3038-11",
+          "time": "11:30",
+          "text": "11:30 让雅克汉纳博物馆 Musée Jean-Jacques Henner",
+          "note": null
+        },
+        {
+          "id": "S3038-12",
+          "time": "12:00",
+          "text": "12:00 Paris - Rouen · TER 13125\n下行另记：12:12 — 13:53",
+          "note": null
+        },
+        {
+          "id": "S3038-13",
+          "time": "14:00",
+          "text": "14:00 圣女贞德塔 Donjon de Rouen",
+          "note": null
+        },
+        {
+          "id": "S3038-14",
+          "time": "14:20",
+          "text": "14:20 鲁昂美术馆 Musée des Beaux-Arts de Rouen",
+          "note": null
+        },
+        {
+          "id": "S3038-15",
+          "time": "15:30",
+          "text": "15:30 大时钟 · Le Gros-Horloge",
+          "note": null
+        },
+        {
+          "id": "S3038-16",
+          "time": "15:40",
+          "text": "15:40 鲁昂大教堂 Cathédrale Notre-Dame de Rouen",
+          "note": null
+        },
+        {
+          "id": "S3038-17",
+          "time": "16:00",
+          "text": "16:00 圣马洛教堂 Église Catholique Saint-Maclou",
+          "note": null
+        },
+        {
+          "id": "S3038-18",
+          "time": "17:10",
+          "text": "17:10 Rouen - Paris · TER 13150\n下行另记：17:13 — 18:49",
+          "note": null
+        },
+        {
+          "id": "S3038-19",
+          "time": "19:15",
+          "text": "19:15 埃菲尔铁塔 Tour Eiffel",
+          "note": null
+        },
+        {
+          "id": "S3038-20",
+          "time": "20:00",
+          "text": "20:00 塞纳河游船 Bateaux Parisien",
+          "note": null
+        },
+        {
+          "id": "S3038-21",
+          "time": "22:00",
+          "text": "22:00 晚餐 L’éclair",
+          "note": null
+        }
+      ],
+      "weather": "24 Sun 晴"
+    },
+    {
+      "id": "day-0325",
+      "date": "2024-03-25",
+      "title": "返程",
+      "subtitle": "The Journey Home",
+      "city": "巴黎 → 芝加哥",
+      "mapSources": [
+        "IMG_3067"
+      ],
+      "blocks": [],
+      "events": [
+        {
+          "id": "S3038-22",
+          "time": "13:10",
+          "text": "13:10 回程航班 Paris CDG - Chicago ORD · Air France AF0136\n下行另记：13:10 — 16:20",
+          "note": null
+        }
+      ]
+    }
+  ],
+  "afterword": [
+    {
+      "id": "s3054-01",
+      "title": "巴黎地铁",
+      "text": "总体还挺良好，干净程度吊打美国，其实和国内比也是不差的。只是旧而已，但并不脏，也没有味。唯一比较幽默的就是地铁列车手动门，幸好之前查攻略时看到了这点，不然给坑死 hhh。",
+      "sourceIds": [
+        "S3054-01"
+      ],
+      "focusPlaceId": null
+    },
+    {
+      "id": "s3054-02",
+      "title": "语言",
+      "text": "不错，英语普及度极高，几乎没有遇到必须用法语的情况。法国人似乎也没有想象中那么讨厌英语嘛。",
+      "sourceIds": [
+        "S3054-02"
+      ],
+      "focusPlaceId": null
+    },
+    {
+      "id": "s3054-03",
+      "title": "治安",
+      "text": "不知是不是因为即将举办奥运，还是我这穷学生没什么好抢，在欧洲十来天毫无险情，过得十分安生。",
+      "sourceIds": [
+        "S3054-03"
+      ],
+      "focusPlaceId": null
+    },
+    {
+      "id": "s3054-04",
+      "title": "文创 et 纪念品",
+      "text": "总的来说很不错，当然也是我都在博物馆买+自己比较挑，其实是能买出很多划算，物美价廉，有纪念意义的东西的。",
+      "sourceIds": [
+        "S3054-04"
+      ],
+      "focusPlaceId": null
+    },
+    {
+      "id": "s3054-05",
+      "title": "房东",
+      "text": "后半程的房东是一对老夫妻，和男主人聊了不少他们的家族和个人经历。下面是一些摘录：\n男主人是智利人，长期为法航工作，据他说自己有 100 万法航里程，十分夸张了感觉，他经常代表公司到处谈些东西的估计是。曾和 JFK 的弟弟来往甚多，在八十年代也来过中国（北京和上海）。其家庭（家族）应该是智利的上层，比如他会提起什么他家族的某人在驻驻华使馆工作，他儿子是巴黎圣母院的主教什么的。女主人则是巴黎本地人，据说是“她就出生在这幢房子的一楼”，有点神奇。并介绍了女主人家里有一座城堡，以及“家里很多家具都是从城堡里搬来的”云云。能看出来的确有些家具有历史且颇为华贵，其余大多数家具则是男主人亲手打造（有一说一做的真心不错）。餐厅的一幅油画中是从城堡搬来，是“女主人祖母的画像”，什么法兰西贵族（乐）。\n在谈及智利时我尝试扯出一些我知道的相关知识，便提到我知道萨尔瓦多·阿连德。\n萨尔瓦多·阿连德。男主人则是直接发表锐评“You know? He’s a garbage”，果然这位是右翼。之后他又讲了一大通阿连德搞坏了智利经济之类的，这倒是不假，但之后他又夸扬了一番皮大帅，我有点绷不住，打个哈哈就切换话题了。之后他又说起了对“穆斯林”的厌恶和对法国政府收容大量中东难民的担忧（恰逢那几天发生了莫斯科音乐厅恐袭），总之确实看出来是一个比较保守的人了。\n女主人则十分和善，而且有典型的法腔英文，以下是摘录：“O, it’s parfait”“Here is the clé to my porte”之类的，万没想到我学的法语在这时派上了用场。",
+      "sourceIds": [
+        "S3054-05",
+        "S3055-01"
+      ],
+      "focusPlaceId": null
+    }
+  ],
+  "readingPolicy": "正文按景点与事件成章；中法双语原题移入章节标题，手稿天气移入日期信息。原文顺序与来源编号保留；地图为后期重建。"
+}

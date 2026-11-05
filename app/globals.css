@@ -41,13 +41,23 @@ body.terrain-immersive { background: var(--tl-paper); }
 .terrain-map-box { position: absolute; inset: 0 0 var(--tl-attrib-h); overflow: hidden; }
 .terrain-map-canvas { position: relative; width: 100%; height: 100%; }
 .terrain-map-canvas .maplibregl-canvas { outline: 0; }
+.terrain-photo-focus { display: grid; width: 22px; height: 22px; place-items: center; pointer-events: none; }
+.terrain-photo-focus-emphasis { position: relative; display: grid; width: 22px; height: 22px; place-items: center; opacity: 0; transform: scale(.6); transition: opacity .3s ease, transform .34s cubic-bezier(.2,.8,.2,1); }
+.terrain-photo-focus-emphasis::before { content: ""; position: absolute; inset: 2px; border-radius: 50%; background: color-mix(in srgb, #e56f2d 25%, transparent); filter: blur(4px); }
+.terrain-photo-focus-dot { position: relative; width: 8px; height: 8px; border: 1px solid #fff8ef; border-radius: 50%; background: #e56f2d; box-shadow: 0 1px 5px rgba(90, 37, 10, .2); }
+.dark .terrain-photo-focus-emphasis::before { background: color-mix(in srgb, #ff9851 25%, transparent); }
+.dark .terrain-photo-focus-dot { border-color: #18110d; background: #ff9851; }
+.terrain-photo-focus.is-active .terrain-photo-focus-emphasis { opacity: 1; transform: scale(1); }
+@media (prefers-reduced-motion: reduce) { .terrain-photo-focus-emphasis { transition: none; } }
 .terrain-map-status {
   position: absolute;
+  z-index: 4;
   top: 18px;
   left: 18px;
-  z-index: 4;
   display: grid;
-  min-width: min(235px, calc(100% - 220px));
+  min-width: 235px;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 12px 15px 11px;
   border: 1px solid color-mix(in srgb, var(--tl-ink) 13%, transparent);
   border-radius: 13px;
@@ -57,8 +67,14 @@ body.terrain-immersive { background: var(--tl-paper); }
   font-family: var(--font-ui);
 }
 .terrain-map-status span { color: var(--tl-accent); font-size: 10px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.terrain-map-status span.is-title { letter-spacing: .02em; text-transform: none; }
 .terrain-map-status strong { margin-top: 3px; font-family: var(--font-mono); font-size: 21px; line-height: 1; color: var(--tl-ink); }
 .terrain-map-status small { margin-top: 5px; overflow: hidden; color: color-mix(in srgb, var(--tl-ink) 72%, transparent); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.terrain-compass-group .terrain-map-compass { display: grid; place-items: center; color: var(--tl-accent); }
+.terrain-compass-group .terrain-map-compass:focus-visible { outline: 2px solid var(--tl-accent); outline-offset: 2px; }
+.terrain-map-compass-needle { display: grid; justify-items: center; align-content: center; height: 29px; transform: rotate(135deg); }
+.terrain-map-compass-needle > span { font: 800 8px/1 var(--font-ui); }
+.terrain-map-compass-needle svg { display: block; width: 12px; height: 19px; fill: currentColor; }
 .terrain-map-tools { position: absolute; z-index: 4; top: 18px; right: 18px; display: flex; gap: 8px; }
 .terrain-surface-tools { display: flex; }
 .travel-log-icon-btn { position: relative; display: grid; place-items: center; }
@@ -101,44 +117,6 @@ body.terrain-immersive { background: var(--tl-paper); }
 .basemap-ctl > :last-child .travel-log-icon-btn:last-child:focus-visible::after {
   transform: translate(0, 0);
 }
-.terrain-map-photo {
-  position: absolute;
-  z-index: 3;
-  width: 160px;
-  box-sizing: border-box;
-  margin: 0;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, white 72%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--tl-paper) 78%, transparent);
-  box-shadow: 0 16px 42px rgba(18, 20, 18, .28);
-  backdrop-filter: blur(12px);
-  animation: terrain-photo-in .3s cubic-bezier(.2,.8,.2,1) both;
-  pointer-events: none;
-}
-.terrain-photo-connector {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-.terrain-photo-connector line {
-  fill: none;
-  stroke: #e56f2d;
-  stroke-width: 1.5;
-  stroke-dasharray: 4 4;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--tl-paper) 80%, transparent));
-}
-.dark .terrain-photo-connector line { stroke: #ff9851; }
-.terrain-map-photo img { display: block; width: 100%; height: 112px; object-fit: cover; }
-.terrain-map-photo-video { position: absolute; left: 50%; top: 56px; display: grid; width: 30px; height: 30px; place-items: center; padding-left: 2px; border: 1px solid rgba(255,255,255,.75); border-radius: 50%; background: rgba(8,13,11,.68); color: #fff; font: 12px/1 var(--font-ui); transform: translate(-50%, -50%); backdrop-filter: blur(5px); }
-.terrain-map-photo figcaption { padding: 7px 9px 8px; color: var(--tl-ink); font: 650 10px/1 var(--font-mono); }
-@keyframes terrain-photo-in { from { opacity: 0; transform: translateY(8px) scale(.94); } to { opacity: 1; transform: none; } }
 .terrain-place {
   padding: 3px 7px;
   border: 1px solid color-mix(in srgb, var(--tl-ink) 22%, transparent);
@@ -299,6 +277,7 @@ body.terrain-immersive { background: var(--tl-paper); }
 .terrain-chapter-bar time { position: relative; z-index: 1; }
 .terrain-chapter-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: color-mix(in srgb, var(--tl-ink) 26%, transparent); transition: background .25s ease, transform .25s ease; }
 .terrain-chapter-label { flex: none; color: color-mix(in srgb, var(--tl-ink) 76%, transparent); font-size: 11px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.terrain-chapter-label.is-title { letter-spacing: .02em; text-transform: none; }
 .terrain-chapter-title { min-width: 0; overflow: hidden; color: color-mix(in srgb, var(--tl-ink) 58%, transparent); font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .terrain-chapter-title::before { content: "·"; margin-right: 9px; color: color-mix(in srgb, var(--tl-ink) 24%, transparent); }
 .terrain-chapter-bar time { margin-left: auto; flex: none; color: color-mix(in srgb, var(--tl-ink) 48%, transparent); font: 650 9px/1.2 var(--font-mono); letter-spacing: .02em; }
@@ -345,28 +324,27 @@ body.terrain-immersive { background: var(--tl-paper); }
   .terrain-chapter-block + .terrain-chapter-block { padding-top: 22px; }
   .terrain-scene { padding: 4rem 0 5rem; }
   .terrain-chapter-bar { top: calc(var(--log-map-height, 62vh) + 12px); }
-  .terrain-map-status { top: 12px; left: 12px; min-width: min(190px, calc(100% - 190px)); padding: 9px 11px; }
+  .terrain-map-status { top: 12px; left: 12px; min-width: 190px; padding: 9px 11px; }
   .terrain-map-status strong { font-size: 17px; }
   .terrain-map-tools { top: 12px; right: 12px; }
   .terrain-map-tools .pj-tool-btn { width: 28px; }
-  .terrain-map-photo { width: 126px; }
-  .terrain-map-photo img { height: 86px; }
-  .terrain-map-photo-video { top: 43px; }
 }
 @media (max-width: 560px) {
   .terrain-map-status { width: 145px; min-width: 145px; max-width: 145px; }
   .terrain-map-tools {
-    width: 185px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
     gap: 4px;
   }
+  .terrain-map-tools .pj-tool-btn { width: 26px; }
   [data-log-kind="terrain"] .travel-log-back { top: 100px; right: 14px; }
   .terrain-story-photo figcaption { display: block; }
   .terrain-story-photo figcaption span { display: block; max-width: none; }
   .terrain-story-photo figcaption small { display: block; margin-top: .35rem; }
   .terrain-place-agua,
   .terrain-place-antigua { display: none; }
+}
+@media (max-width: 340px) {
+  .terrain-map-status { width: 94px; min-width: 94px; max-width: 94px; }
+  .terrain-map-tools .pj-tool-btn { width: 24px; }
 }
 @font-face {
   font-family: "GenWanMin2 TC";
@@ -2854,7 +2832,7 @@ body.terrain-boot::before {
   transform: scaleX(1);
   pointer-events: none;
   /* Covers the page throughout the delay; also works if hydration never runs. */
-  animation: travel-log-entry-fallback 0.46s ease-in 3.5s both;
+  animation: travel-log-entry-fallback 0.58s linear 3.5s both;
 }
 body.travel-log-launch {
   overflow-x: clip;
@@ -2899,7 +2877,7 @@ body.terrain-boot .tl-veil-band {
 body.tl-veil-boot.tl-veil-open::before,
 body.pj-boot.pj-veil-open::before,
 body.terrain-boot.terrain-veil-open::before {
-  animation: travel-log-entry-open 0.46s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: travel-log-entry-open 0.58s linear both;
 }
 body.tl-veil-boot.tl-veil-open .tl-veil-band,
 body.pj-boot.pj-veil-open .tl-veil-band,
@@ -2909,14 +2887,18 @@ body.terrain-boot.terrain-veil-open .tl-veil-band {
   transition: opacity 0.18s linear;
 }
 @keyframes travel-log-entry-open {
-  from { transform: scaleX(1); background-color: var(--tl-accent-soft-2, #eef9fd); }
-  45% { background-color: var(--tl-accent-soft-3, #e2f4fb); }
-  to { transform: scaleX(0); background-color: var(--tl-chip, #cfeaf5); }
+  0% { transform: scaleX(1); background-color: var(--tl-accent-soft-2, #eef9fd); animation-timing-function: cubic-bezier(.45, 0, .7, .6); }
+  12% { transform: scaleX(.94); animation-timing-function: cubic-bezier(.25, .125, .7, .736); }
+  55% { transform: scaleX(.38); background-color: var(--tl-accent-soft-3, #e2f4fb); animation-timing-function: cubic-bezier(.3, .33, .7, .81); }
+  78% { transform: scaleX(.14); animation-timing-function: cubic-bezier(.3, .3, .7, .95); }
+  100% { transform: scaleX(-.01); background-color: var(--tl-accent-soft-2, #eef9fd); }
 }
 @keyframes travel-log-entry-fallback {
-  from { transform: scaleX(1); background-color: var(--tl-accent-soft-2, #eef9fd); }
-  45% { background-color: var(--tl-accent-soft-3, #e2f4fb); }
-  to { transform: scaleX(0); background-color: var(--tl-chip, #cfeaf5); }
+  0% { transform: scaleX(1); background-color: var(--tl-accent-soft-2, #eef9fd); animation-timing-function: cubic-bezier(.45, 0, .7, .6); }
+  12% { transform: scaleX(.94); animation-timing-function: cubic-bezier(.25, .125, .7, .736); }
+  55% { transform: scaleX(.38); background-color: var(--tl-accent-soft-3, #e2f4fb); animation-timing-function: cubic-bezier(.3, .33, .7, .81); }
+  78% { transform: scaleX(.14); animation-timing-function: cubic-bezier(.3, .3, .7, .95); }
+  100% { transform: scaleX(-.01); background-color: var(--tl-accent-soft-2, #eef9fd); }
 }
 @keyframes travel-log-entry-wordmark {
   to { opacity: 0; }

@@ -25,7 +25,7 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
     id: scene.id,
     label: scene.title,
     shortLabel: String(index + 1).padStart(2, "0"),
-    detail: scene.eyebrow,
+    detail: scene.eyebrow || scene.title,
     meta: scene.time,
     sectionId: scene.id,
   })), [data.scenes]);
@@ -67,12 +67,13 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
       const routeIndex = scene ? scene.route[0] + (scene.route[1] - scene.route[0]) * local
         : intro ? 0 : data.route.points.length - 1;
       let photoId: string | null = null;
-      let photoDistance = 150;
+      let photoDistance = Infinity;
       for (const figure of active.querySelectorAll<HTMLElement>("[data-terrain-photo]")) {
         const r = figure.getBoundingClientRect();
+        if (r.bottom <= panelTop || r.top >= window.innerHeight) continue;
         const center = (r.top + r.bottom) / 2;
         const d = Math.abs(center - line);
-        if (d < photoDistance || (r.top <= line && r.bottom >= line)) {
+        if (d < photoDistance) {
           photoId = figure.dataset.terrainPhoto ?? null;
           photoDistance = d;
         }
@@ -171,8 +172,8 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
           <div className={`terrain-chapter-bar${active ? " on" : ""}`}>
             <span className="terrain-chapter-fill" aria-hidden="true" />
             <span className="terrain-chapter-dot" aria-hidden="true" />
-            <span className="terrain-chapter-label">{scene.eyebrow}</span>
-            <span className="terrain-chapter-title">{scene.title}</span>
+            <span className={`terrain-chapter-label${scene.eyebrow ? "" : " is-title"}`}>{scene.eyebrow || scene.title}</span>
+            {scene.eyebrow && <span className="terrain-chapter-title">{scene.title}</span>}
             <time>{scene.time}</time>
           </div>
           <article className="terrain-scene">
@@ -197,7 +198,7 @@ export default function TerrainStory({ data, lang, reading, onReading, focus }: 
         </div>;
       })}
     </main>
-    <footer className="terrain-outro" data-terrain-scene={TERRAIN_COMPLETE_SCENE_ID}><span>ANTIGUA · ACATENANGO · FUEGO</span><p>{lang === "zh" ? "回到 Antigua，火山仍然醒着。" : "Back in Antigua, the volcano remains awake."}</p></footer>
+    <footer className="terrain-outro" data-terrain-scene={TERRAIN_COMPLETE_SCENE_ID}><span>ANTIGUA · ACATENANGO · FUEGO</span><p>{lang === "zh" ? "火山游圆满宣告结束。" : "Back in Antigua, the volcano remains awake."}</p></footer>
     </div>
     <ChapterNavigation chapters={chapters} activeId={reading.sceneId} scopeRef={rootRef} kind="terrain" lang={lang} title={data.title} />
   </div>;

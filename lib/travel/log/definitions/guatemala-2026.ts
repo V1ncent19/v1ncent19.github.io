@@ -9,8 +9,8 @@ export const guatemala2026: TerrainDefinition = {
   card,
   wordmark: "Acatenango 2026",
   pageTitles: {
-    en: "Acatenango 2026 — While Fuego Was Awake",
-    zh: "在火山醒着的时候 — Acatenango × Fuego",
+    en: "A Hiking toward Fuego",
+    zh: "向 Fuego 进发",
   },
   data: loadTerrain(data),
 };

@@ -10,6 +10,7 @@ const TRANSITIONS = {
   journal: { immersive: ["tl-immersive"], boot: "tl-veil-boot", open: "tl-veil-open", beat: 200 },
   pilgrimage: { immersive: ["pj-immersive", "tl-immersive"], boot: "pj-boot", open: "pj-veil-open", beat: 180 },
   terrain: { immersive: ["terrain-immersive", "tl-immersive"], boot: "terrain-boot", open: "terrain-veil-open", beat: 260 },
+  reconstructed: { immersive: ["tl-immersive"], boot: "tl-veil-boot", open: "tl-veil-open", beat: 200 },
 } as const;
 const ENTRY_ANIMATIONS = ["travel-log-entry-open", "travel-log-entry-fallback"];
 
@@ -86,10 +87,11 @@ export default function TravelLogShell({ kind, id, wordmark, lang, dataReady, ma
 }) {
   useTravelTransition(kind, dataReady, mapReady, failed);
   const layout = useMemo(() => ({ storageKey: `travel-log-split:${id}`, legacyStorageKey, ...LOG_LAYOUTS[kind] }), [id, kind, legacyStorageKey]);
+  const journalLayout = kind === "journal" || kind === "reconstructed";
   return <LogLayoutContext.Provider value={layout}>
-    <div style={{ "--log-default-map-height": `${layout.defaultVh}vh` } as CSSProperties} className={kind === "journal" ? "travel-layout" : "pj-page"} data-travel-log={id} data-log-kind={kind}>
-      {map && (kind === "journal" ? <div className="map-col" data-log-map>{map}</div> : map)}
-      {story && (kind === "journal" ? <div className="story-col">{story}</div> : story)}
+    <div style={{ "--log-default-map-height": `${layout.defaultVh}vh` } as CSSProperties} className={journalLayout ? "travel-layout" : "pj-page"} data-travel-log={id} data-log-kind={kind}>
+      {map && (journalLayout ? <div className="map-col" data-log-map>{map}</div> : map)}
+      {story && (journalLayout ? <div className="story-col">{story}</div> : story)}
       {children}
       {dataReady && <TravelLogBack lang={lang} />}
     </div>

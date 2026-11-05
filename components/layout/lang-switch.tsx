@@ -36,33 +36,51 @@ function alternateFor(path: string): { href: string; label: string; title: strin
 /**
  * Scroll position across language switches (2026-09-07). A language switch is
  * a full route change to a different document, so Next resets the scroll —
- * to keep the reader "at the same section" we snapshot on click (id of the
- * nearest § section heading above the viewport + fractional scroll position)
- * and restore after the new route renders: same-section first, proportional
- * fallback. Pages whose section structure matches (home, about, blog & project
- * posts via the § anchors) land on the same section; pure-prose pairs without
- * ids fall back to the fraction.
+ * to keep the reader near the same content we snapshot the nearest section
+ * and progress within it, then restore that progress in the translated page.
+ * The homepage uses its three main sections because the later two-column
+ * headings can share a vertical position. Pages without matching anchors
+ * fall back to proportional document scroll.
  */
 const POS_KEY = "wb-lang-pos";
 
-type SavedPos = { id: string | null; frac: number };
+type SavedPos = { id: string | null; frac: number; sectionFrac: number | null; y: number };
 
-function saveScrollPos() {
+const READING_LINE = 160;
+
+function sectionHeadings(path: string): HTMLElement[] {
+  const normalized = path.replace(/\/+$/, "") || "/";
+  if (normalized === "/" || normalized === "/zh") {
+    return ["hello", "navigation", "posts"]
+      .map(id => document.getElementById(id))
+      .filter((el): el is HTMLElement => el instanceof HTMLElement);
+  }
+  return [...document.querySelectorAll<HTMLElement>("h2[id], h3[id]")];
+}
+
+function documentTop(el: HTMLElement): number {
+  return el.getBoundingClientRect().top + window.scrollY;
+}
+
+function saveScrollPos(path: string) {
   try {
     const doc = document.documentElement;
     const spans = doc.scrollHeight - window.innerHeight;
     let id: string | null = null;
-    // nearest section heading at/above the reading line — threshold must
-    // clear scroll-margin-top (~112px), or an anchored-section-aligned
-    // heading would be missed
-    const headings = doc.querySelectorAll<HTMLElement>("h2[id], h3[id]");
-    headings.forEach((el) => {
-      if (el.getBoundingClientRect().top <= 160) id = el.id;
-    });
+    let sectionFrac: number | null = null;
+    const headings = sectionHeadings(path);
+    const activeIndex = headings.findLastIndex(el => el.getBoundingClientRect().top <= READING_LINE);
+    if (activeIndex >= 0) {
+      const current = headings[activeIndex];
+      const start = documentTop(current);
+      const end = headings[activeIndex + 1] ? documentTop(headings[activeIndex + 1]) : doc.scrollHeight;
+      id = current.id;
+      sectionFrac = Math.max(0, Math.min(1, (window.scrollY + READING_LINE - start) / Math.max(1, end - start)));
+    }
     const frac = spans > 0 ? window.scrollY / spans : 0;
     sessionStorage.setItem(
       POS_KEY,
-      JSON.stringify({ id, frac } satisfies SavedPos),
+      JSON.stringify({ id, frac, sectionFrac, y: window.scrollY } satisfies SavedPos),
     );
   } catch {
     /* private mode etc. — restore is best-effort only */
@@ -89,7 +107,7 @@ export function LangSwitch({ className = "" }: { className?: string }) {
     if (!saved) return;
     /* double rAF: the new route's DOM must be laid out before we measure.
        The catch: the fresh document is still SHORT (webfonts not swapped,
-       images not loaded), so scrollIntoView clamps to the current max scroll
+       images not loaded), so the initial scroll can clamp to the current max
        and the later growth leaves the position hundreds of px off. So we
        re-apply whenever the document height changes (ResizeObserver, bounded
        to 4s) — every pass bails out once the reader scrolls by themselves.
@@ -100,21 +118,22 @@ export function LangSwitch({ className = "" }: { className?: string }) {
       if (cancelled) return;
       if (lastAppliedY !== null && Math.abs(window.scrollY - lastAppliedY) > 4)
         return; // the reader has taken over — don't fight them
-      if (saved!.id) {
-        const el = document.getElementById(saved!.id);
-        if (el) {
-          el.scrollIntoView(); // scroll-margin-top handles the sticky nav
-          lastAppliedY = Math.round(window.scrollY);
-          return;
-        }
+      const headings = sectionHeadings(pathname);
+      const activeIndex = headings.findIndex(el => el.id === saved!.id);
+      if (activeIndex >= 0 && typeof saved!.sectionFrac === "number") {
+        const start = documentTop(headings[activeIndex]);
+        const end = headings[activeIndex + 1] ? documentTop(headings[activeIndex + 1]) : document.documentElement.scrollHeight;
+        window.scrollTo(0, start + saved!.sectionFrac * (end - start) - READING_LINE);
+        lastAppliedY = window.scrollY;
+        return;
       }
       const spans = Math.max(
         0,
         document.documentElement.scrollHeight - window.innerHeight,
       );
-      const y = saved!.frac * spans;
+      const y = saved!.id ? saved!.frac * spans : saved!.y ?? saved!.frac * spans;
       window.scrollTo(0, y);
-      lastAppliedY = Math.round(y);
+      lastAppliedY = window.scrollY;
     };
     const raf = requestAnimationFrame(() => requestAnimationFrame(apply));
     const ro = new ResizeObserver(() => apply());
@@ -133,8 +152,9 @@ export function LangSwitch({ className = "" }: { className?: string }) {
   return (
     <Link
       href={alt.href}
+      scroll={false}
       title={alt.title}
-      onClick={saveScrollPos}
+      onClick={() => saveScrollPos(pathname)}
       className={[
         "ui-text inline-flex h-10 items-center rounded-lg border border-line-strong bg-surface px-3 text-sm font-semibold text-muted shadow-sm transition-colors",
         "hover:bg-surface-tint hover:text-ink hover:no-underline",

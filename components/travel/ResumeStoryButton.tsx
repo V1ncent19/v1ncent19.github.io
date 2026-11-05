@@ -1,9 +1,9 @@
 "use client";
 
-export default function ResumeStoryButton({ onResume }: { onResume: () => void }) {
+export default function ResumeStoryButton({ onResume, lang = "en" }: { onResume: () => void; lang?: "en" | "zh" }) {
   return (
-    <button className="resume-story" onClick={onResume}>
-      ↩ Resume story
+    <button type="button" className="resume-story" onClick={onResume}>
+      {lang === "zh" ? "↩ 继续跟随" : "↩ Resume story"}
       <style jsx>{`
         .resume-story {
           position: absolute;
@@ -32,6 +32,9 @@ export default function ResumeStoryButton({ onResume }: { onResume: () => void }
           background: #f0fdfd;
           transform: translateX(-50%) translateY(-1px);
           box-shadow: 0 5px 18px rgba(0, 0, 0, 0.24);
+        }
+        @media (max-width: 560px) {
+          .resume-story { top: 68px; }
         }
       `}</style>
     </button>

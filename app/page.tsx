@@ -597,7 +597,7 @@ export default function HomePage() {
               <section className="mt-12">
                 <ModuleHeader
                   id="meta"
-                  caption="Site statistics and license."
+                  caption=""
                 >
                   Site Metadata
                 </ModuleHeader>

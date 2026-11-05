@@ -14,6 +14,7 @@ const SKINS = {
   journal: { bar: "tnav", track: "tnav-track", fill: "tnav-fill", scrub: "tnav-scrub", box: "tnav-scrub-box", text: "tnav-scrub-text", toc: "tnav-toc-btn", rail: "tnav-rail", pct: "tnav-rail-pct", railTrack: "tnav-rail-track", railFill: "tnav-rail-fill", top: "tnav-top-btn", tick: "tnav-tick", tip: "tnav-tip", mark: "tnav-mark", backdrop: "tnav-backdrop", drawer: "tnav-drawer", head: "tnav-drawer-head", close: "tnav-close", list: "tnav-list", row: "tnav-row" },
   pilgrimage: { bar: "pjr-bar", track: "pjr-track", fill: "pjr-fill", scrub: "pjr-scrub", box: "pjr-scrub-box", text: "pjr-scrub-text", toc: "pjr-toc", rail: "pjr-rail", pct: "pjr-pct", railTrack: "pjr-rail-track", railFill: "pjr-rail-fill", top: "pjr-top", tick: "pjr-tick", tip: "pjr-tip", mark: "pjr-mark", backdrop: "pjr-backdrop", drawer: "pjr-drawer", head: "pjr-drawer-head", close: "pjr-drawer-x", list: "pjr-list", row: "pjr-row" },
   terrain: { bar: "pjr-bar", track: "pjr-track", fill: "pjr-fill", scrub: "pjr-scrub", box: "pjr-scrub-box", text: "pjr-scrub-text", toc: "pjr-toc", rail: "pjr-rail", pct: "pjr-pct", railTrack: "pjr-rail-track", railFill: "pjr-rail-fill", top: "pjr-top", tick: "pjr-tick", tip: "pjr-tip", mark: "pjr-mark", backdrop: "pjr-backdrop", drawer: "pjr-drawer", head: "pjr-drawer-head", close: "pjr-drawer-x", list: "pjr-list", row: "pjr-row" },
+  reconstructed: { bar: "tnav", track: "tnav-track", fill: "tnav-fill", scrub: "tnav-scrub", box: "tnav-scrub-box", text: "tnav-scrub-text", toc: "tnav-toc-btn", rail: "tnav-rail", pct: "tnav-rail-pct", railTrack: "tnav-rail-track", railFill: "tnav-rail-fill", top: "tnav-top-btn", tick: "tnav-tick", tip: "tnav-tip", mark: "tnav-mark", backdrop: "tnav-backdrop", drawer: "tnav-drawer", head: "tnav-drawer-head", close: "tnav-close", list: "tnav-list", row: "tnav-row" },
 } as const;
 
 export default function ChapterNavigation({ chapters, activeId, scopeRef, kind, lang = "en", title }: {
@@ -69,11 +70,13 @@ export default function ChapterNavigation({ chapters, activeId, scopeRef, kind, 
       if (root && railBoxRef.current && window.innerWidth >= LOG_BREAKPOINT) {
         // Position depends on the article's typography, not on its data format.
         const r = root.getBoundingClientRect();
-        const centre = kind === "journal"
-          ? r.right - 104 + (window.innerWidth >= 1280 ? 74 : 56) - 21
-          : r.right - 24;
+        const centre = kind === "reconstructed"
+          ? (root.querySelector<HTMLElement>(".fr-days")?.getBoundingClientRect().right ?? r.right) - 53
+          : kind === "journal"
+            ? r.right - 104 + (window.innerWidth >= 1280 ? 74 : 56) - 21
+            : r.right - 24;
         const vw = document.documentElement.clientWidth || window.innerWidth;
-        railBoxRef.current.style.right = `${Math.max(kind === "journal" ? 0 : 10, vw - centre - (kind === "journal" ? 0 : 2)).toFixed(1)}px`;
+        railBoxRef.current.style.right = `${Math.max(kind === "journal" || kind === "reconstructed" ? 0 : 10, vw - centre - (kind === "journal" || kind === "reconstructed" ? 0 : 2)).toFixed(1)}px`;
       }
       raf = requestAnimationFrame(step);
     };

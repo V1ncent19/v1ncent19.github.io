@@ -10,7 +10,7 @@ category: Cuisine
 
 ## 备料
 
--   蛋黄，意面（100g Linguine[^1] 配一个蛋）；
+-   蛋黄，意面（100 g Linguine[^1] 配一个蛋）；
 -   **黑** 胡椒，可以从 **Carbon**ara 的词根里面看出来为啥要用黑的，模仿碳的效果；
 -   盐，培根（据说传统上要用 Guanciale，但我没有，所以就用培根了）；Parmesan cheese（多给点）。
 

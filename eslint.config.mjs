@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Legacy static export and ignored local scratch files are not app source.
+    "_site/**",
+    ".workbuddy/**",
   ]),
 ]);
 

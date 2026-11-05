@@ -23,10 +23,11 @@ await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
 const base = `http://127.0.0.1:${server.address().port}`;
 const theme = process.argv.includes("--dark") ? "dark" : "light";
 const reduced = process.argv.includes("--reduced");
+const tripIds = process.argv.includes("--france") ? ["france-2024"] : ["ptes-2025", "just-because"];
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH, headless: true,
   args: ["--no-proxy-server", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 try {
-  for (const width of process.argv.includes("--smoke") ? [390] : [1440, 390]) for (const lang of ["en", "zh"]) for (const id of ["ptes-2025", "just-because"]) {
+  for (const width of process.argv.includes("--smoke") ? [390] : [1440, 390]) for (const lang of ["en", "zh"]) for (const id of tripIds) {
     const page = await browser.newPage({ viewport: { width, height: 900 }, reducedMotion: reduced ? "reduce" : "no-preference" });
     await page.addInitScript(theme => localStorage.setItem("theme", theme), theme);
     await page.addInitScript(() => {

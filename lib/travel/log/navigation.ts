@@ -11,7 +11,7 @@ export function navigateToChapter(scope: HTMLElement | null, id: string, policy:
   if (!el) return;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const behavior = reduce ? "instant" : "smooth";
-  if (policy === "journal") {
+  if (policy === "journal" || policy === "reconstructed") {
     window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - readingLine(scope) + 4), behavior });
   } else {
     el.scrollIntoView({ behavior, block: "start" });

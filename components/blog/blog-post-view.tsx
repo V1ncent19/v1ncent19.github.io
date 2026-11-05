@@ -20,7 +20,7 @@ const EN_MONTHS = [
 function formatDay(iso: string, lang: BlogLang): string {
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return iso;
-  if (lang === "zh") return `${y}年${m}月${d}日`;
+  if (lang === "zh") return `${y} 年 ${m} 月 ${d} 日`;
   return `${EN_MONTHS[m - 1]} ${d}, ${y}`;
 }
 

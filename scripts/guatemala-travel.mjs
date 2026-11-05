@@ -19,6 +19,9 @@ const TRIP = path.join(ROOT, "content", "travel", "guatemala-2026");
 const STORY = path.join(TRIP, "story.json");
 const OUT = path.join(TRIP, "data.json");
 const PHOTO_OUT = path.join(ROOT, "public", "assets", "photos", "travel", "guatemala-2026");
+// IMG_0593 has a GPS fix about 350 m off the recorded trail. Keep the story
+// photo, but do not regenerate its misplaced map marker.
+const MAP_HIDDEN_PHOTO_IDS = new Set(["img-0593"]);
 
 const VIDEO_CONFIG = {
   "IMG_0772.MOV": { id: "video-0772", posterAtS: 3 },
@@ -239,6 +242,7 @@ async function buildMedia(route) {
       lon: Number(Number(tags.longitude).toFixed(7)),
       altitudeM: Math.round(Number(tags.GPSAltitude || 0)),
       routeIndex: nearestRouteIndex(route, epoch),
+      ...(MAP_HIDDEN_PHOTO_IDS.has(id) ? { mapVisible: false } : {}),
     });
   }
   for (const name of fs.readdirSync(MASTERS).filter(name => /\.mov$/i.test(name))) {
@@ -288,7 +292,7 @@ const data = {
   photos,
   scenes: story.scenes.map(scene => ({
     id: scene.id,
-    eyebrow: scene.eyebrow,
+    ...(scene.eyebrow ? { eyebrow: scene.eyebrow } : {}),
     title: scene.title,
     time: scene.time,
     route: [indexAt(route, scene.startAt), indexAt(route, scene.endAt)],

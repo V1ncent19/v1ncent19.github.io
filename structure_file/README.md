@@ -20,8 +20,10 @@
 | 改首页卡片 / 总导航 / 标签 / 卡片确认与返回 | `FEATURE_HOME_NAVIGATION.md` |
 | 改旅行日志公共框架 / 新增日志 | `FEATURE_TRAVEL_LOG.md` |
 | 改 Guatemala 三维地形日志 | `FEATURE_GUATEMALA_TERRAIN_LOG.md` |
+| 2024 春季手写游记数字化、路线重建与交互初版 | `PLAN_FRANCE_2024_LOG.md` |
 | 改巡礼页（`/travel/just-because`） | `FEATURE_PILGRIMAGE.md` |
 | 查看全站交互走查与改进建议 | `INTERACTION_AUDIT.md` |
+| 核对全站中英混排、引号与数字单位规则 | `TEXT_STYLE_AUDIT.md`（待用户定稿） |
 | 想知道 2026-09 的原始设计意图 | `archive/`（**多已过时，只考古**） |
 
 路径速查（都在本目录）：

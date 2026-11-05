@@ -112,7 +112,7 @@ try {
             }
           }
           assert.equal(samples[0].scale, 1);
-          assert(samples.at(-1).scale < .001);
+          assert(samples.at(-1).scale < -.005, "Opening edge must continue beyond the right viewport edge");
           assert(samples[2].scale > 0 && samples[2].scale < 1, "Opening has a visible intermediate frame");
           assert(samples.every((s, i) => i === 0 || s.scale <= samples[i - 1].scale), "Coverage must shrink monotonically");
           assert(samples.every(s => s.origin === `${width}px 450px` && s.position === "fixed" && s.inset === "0px"), "Right edge stays fixed; reveal moves left to right");
@@ -156,7 +156,7 @@ try {
       await fallback.screenshot({ path: path.join(process.env.TRAVEL_ENTRY_SHOTS, "initial-full-coverage.png") });
     }
     await delay(4200);
-    assert.equal(await fallback.evaluate(() => new DOMMatrixReadOnly(getComputedStyle(document.body, "::before").transform).a), 0);
+    assert((await fallback.evaluate(() => new DOMMatrixReadOnly(getComputedStyle(document.body, "::before").transform).a)) < -.005);
     assert.equal(await fallback.locator(".tl-veil-band").evaluate(el => getComputedStyle(el).opacity), "0");
     await fallback.close(); console.log("Hydration unavailable: CSS curtain and wordmark fallback OK");
 

@@ -145,14 +145,14 @@ const EN_MONTHS = [
 function formatDate(iso: string, lang: Lang): string {
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return iso;
-  return lang === "zh" ? `${y}年${m}月${d}日` : `${EN_MONTHS[m - 1]} ${d}, ${y}`;
+  return lang === "zh" ? `${y} 年 ${m} 月 ${d} 日` : `${EN_MONTHS[m - 1]} ${d}, ${y}`;
 }
 
-/** "YYYY-MM-DD" → month-year label ("Sep 2024" / "2024年9月"). */
+/** "YYYY-MM-DD" → month-year label ("Sep 2024" / "2024 年 9 月"). */
 function formatYearMonth(iso: string, lang: Lang): string {
   const [y, m] = iso.split("-").map(Number);
   if (!y || !m) return iso;
-  return lang === "zh" ? `${y}年${m}月` : `${EN_MONTHS[m - 1]} ${y}`;
+  return lang === "zh" ? `${y} 年 ${m} 月` : `${EN_MONTHS[m - 1]} ${y}`;
 }
 
 /** Compact, language-neutral "2026.08" used on the resting glass bar. */

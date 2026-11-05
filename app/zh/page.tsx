@@ -140,18 +140,14 @@ const POST_TONE: Record<BlogCategory, string> = {
     "bg-[var(--curated-soft)] text-[var(--curated)] transition-colors group-hover:bg-[var(--curated)] group-hover:text-on-brand",
 };
 
-/** "2024-09-20" → "2024年9月20日" */
+/** "2024-09-20" → "2024 年 9 月 20 日" */
 function formatDayZh(date: string): string {
   const [y, m, d] = date.split("-").map(Number);
   if (!y || !m || !d) return date;
-  return new Date(y, m - 1, d).toLocaleDateString("zh-CN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return `${y} 年 ${m} 月 ${d} 日`;
 }
 
-/** Full date when a day is known, else "2024年9月" (project updates). */
+/** Full date when a day is known, else "2024 年 9 月" (project updates). */
 function feedDateZh(date: string): string {
   return date.split("-").length >= 3 ? formatDayZh(date) : formatMonth(date, "zh");
 }

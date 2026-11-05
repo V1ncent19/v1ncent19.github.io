@@ -1,0 +1,2018 @@
+{
+  "gare-nord": {
+    "label": "巴黎北站",
+    "query": "Gare du Nord, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "巴黎北站"
+    ],
+    "results": [
+      {
+        "name": "Gare du Nord (Métro)",
+        "lat": "48.8795666",
+        "lon": "2.3572124",
+        "category": "railway",
+        "type": "station",
+        "display_name": "Gare du Nord (Métro), Rue du Faubourg Saint-Denis, Quartier Saint-Vincent-de-Paul, Paris 10e Arrondissement, Paris, Île-de-France, France métropolitaine, 75010, France",
+        "osm_type": "node",
+        "osm_id": 5364676905
+      },
+      {
+        "name": "Gare du Nord",
+        "lat": "48.8811597",
+        "lon": "2.3570131",
+        "category": "amenity",
+        "type": "bicycle_parking",
+        "display_name": "Gare du Nord, Voie d'accès vélostation Gare du Nord, Quartier Saint-Vincent-de-Paul, Paris 10e Arrondissement, Paris, Île-de-France, France métropolitaine, 75010, France",
+        "osm_type": "way",
+        "osm_id": 1288000977
+      },
+      {
+        "name": "Gare du Nord (Métro ligne 5)",
+        "lat": "48.8801786",
+        "lon": "2.3576213",
+        "category": "railway",
+        "type": "platform",
+        "display_name": "Gare du Nord (Métro ligne 5), Rue du Faubourg Saint-Denis, Quartier Saint-Vincent-de-Paul, Paris 10e Arrondissement, Paris, Île-de-France, France métropolitaine, 75010, France",
+        "osm_type": "way",
+        "osm_id": 588798749
+      }
+    ]
+  },
+  "gare-lyon": {
+    "label": "巴黎里昂站",
+    "query": "Gare de Lyon, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "Gare de Lyon",
+      "Gare de Lyon（返程）"
+    ],
+    "results": [
+      {
+        "name": "Gare de Lyon",
+        "lat": "48.8443818",
+        "lon": "2.3748001",
+        "category": "building",
+        "type": "train_station",
+        "display_name": "Gare de Lyon, 4, Rue Van Gogh, Quartier des Quinze-Vingts, Paris 12e Arrondissement, Paris, Île-de-France, France métropolitaine, 75571, France",
+        "osm_type": "way",
+        "osm_id": 1161318094
+      },
+      {
+        "name": "Gare de Lyon",
+        "lat": "48.8436635",
+        "lon": "2.3744869",
+        "category": "railway",
+        "type": "stop",
+        "display_name": "Gare de Lyon, Rue de Bercy, Quartier des Quinze-Vingts, Paris 12e Arrondissement, Paris, Île-de-France, France métropolitaine, 75012, France",
+        "osm_type": "node",
+        "osm_id": 1309031698
+      },
+      {
+        "name": "Gare de Lyon",
+        "lat": "48.8446832",
+        "lon": "2.3737743",
+        "category": "railway",
+        "type": "station",
+        "display_name": "Gare de Lyon, Place Louis Armand, Quartier des Quinze-Vingts, Paris 12e Arrondissement, Paris, Île-de-France, France métropolitaine, 75012, France",
+        "osm_type": "node",
+        "osm_id": 26824135
+      }
+    ]
+  },
+  "saint-lazare": {
+    "label": "巴黎圣拉扎尔站",
+    "query": "Gare Saint-Lazare, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "巴黎Saint-Lazare站",
+      "圣拉扎尔车站"
+    ],
+    "results": [
+      {
+        "name": "Gare Saint-Lazare",
+        "lat": "48.8770414",
+        "lon": "2.3250674",
+        "category": "building",
+        "type": "train_station",
+        "display_name": "Gare Saint-Lazare, 11, Cour de Rome, Quartier de l'Europe, Paris 8e Arrondissement, Paris, Île-de-France, France métropolitaine, 75008, France",
+        "osm_type": "way",
+        "osm_id": 727994377
+      }
+    ]
+  },
+  "orsay": {
+    "label": "奥赛美术馆",
+    "query": "Musée d'Orsay, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "奥赛美术馆"
+    ],
+    "results": [
+      {
+        "name": "Musée d'Orsay",
+        "lat": "48.8599179",
+        "lon": "2.3265849",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée d'Orsay, 1, Rue de la Légion d'Honneur, Quartier Saint-Thomas-d'Aquin, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "way",
+        "osm_id": 63178753
+      },
+      {
+        "name": "Musée d'Orsay",
+        "lat": "48.8605888",
+        "lon": "2.3259096",
+        "category": "railway",
+        "type": "station",
+        "display_name": "Musée d'Orsay, 62, Rue de Lille, Quartier Saint-Thomas-d'Aquin, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75343, France",
+        "osm_type": "node",
+        "osm_id": 2379542204
+      }
+    ]
+  },
+  "rodin": {
+    "label": "罗丹美术馆",
+    "query": "Musée Rodin, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "罗丹美术馆"
+    ],
+    "results": [
+      {
+        "name": "Musée Rodin",
+        "lat": "48.8547473",
+        "lon": "2.3158670",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée Rodin, 77, Rue de Varenne, Quartier des Invalides, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "way",
+        "osm_id": 472159547
+      }
+    ]
+  },
+  "sacre-coeur": {
+    "label": "圣心堂",
+    "query": "Basilique du Sacré-Cœur, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "蒙马特／圣心堂外（夕阳）",
+      "圣心堂（夜访）"
+    ],
+    "results": [
+      {
+        "name": "Basilique du Sacré-Cœur",
+        "lat": "48.8868058",
+        "lon": "2.3430153",
+        "category": "amenity",
+        "type": "place_of_worship",
+        "display_name": "Basilique du Sacré-Cœur, Rue du Chevalier de la Barre, Quartier de Clignancourt, Paris 18e Arrondissement, Paris, Île-de-France, France métropolitaine, 75018, France",
+        "osm_type": "way",
+        "osm_id": 23762981
+      }
+    ]
+  },
+  "saint-michel": {
+    "label": "圣米歇尔喷泉",
+    "query": "Fontaine Saint-Michel, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "圣米歇尔喷泉／换乘区域"
+    ],
+    "results": [
+      {
+        "name": "Fontaine Saint-Michel",
+        "lat": "48.8532876",
+        "lon": "2.3436351",
+        "category": "railway",
+        "type": "subway_entrance",
+        "display_name": "Fontaine Saint-Michel, Place Saint-Michel, Quartier de la Monnaie, Paris 6e Arrondissement, Paris, Île-de-France, France métropolitaine, 75006, France",
+        "osm_type": "node",
+        "osm_id": 257628954
+      },
+      {
+        "name": "Fontaine Saint-Michel",
+        "lat": "48.8532059",
+        "lon": "2.3437336",
+        "category": "amenity",
+        "type": "fountain",
+        "display_name": "Fontaine Saint-Michel, Place Saint-Michel, Quartier de la Monnaie, Paris 6e Arrondissement, Paris, Île-de-France, France métropolitaine, 75006, France",
+        "osm_type": "way",
+        "osm_id": 40579862
+      },
+      {
+        "name": "Fontaine Saint-Michel",
+        "lat": "48.8531833",
+        "lon": "2.3437000",
+        "category": "tourism",
+        "type": "artwork",
+        "display_name": "Fontaine Saint-Michel, Place Saint-Michel, Quartier de la Monnaie, Paris 6e Arrondissement, Paris, Île-de-France, France métropolitaine, 75006, France",
+        "osm_type": "way",
+        "osm_id": 1175175570
+      }
+    ]
+  },
+  "versailles": {
+    "label": "凡尔赛宫",
+    "query": "Château de Versailles, Versailles, France",
+    "city": "Versailles",
+    "aliases": [
+      "凡尔赛宫"
+    ],
+    "results": [
+      {
+        "name": "Château de Versailles",
+        "lat": "48.8044252",
+        "lon": "2.1202853",
+        "category": "building",
+        "type": "palace",
+        "display_name": "Château de Versailles, Cour de l'Opéra, Notre-Dame, Versailles, Yvelines, Île-de-France, France métropolitaine, 78000, France",
+        "osm_type": "relation",
+        "osm_id": 1149002
+      }
+    ]
+  },
+  "invalides": {
+    "label": "荣军院",
+    "query": "Hôtel des Invalides, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "荣军院／拿破仑墓"
+    ],
+    "results": [
+      {
+        "name": "Hôtel des Invalides",
+        "lat": "48.8559537",
+        "lon": "2.3133431",
+        "category": "leisure",
+        "type": "historic_building",
+        "display_name": "Hôtel des Invalides, 129, Rue de Grenelle, Quartier des Invalides, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "relation",
+        "osm_id": 1463538
+      }
+    ]
+  },
+  "pont-alexandre": {
+    "label": "亚历山大三世桥",
+    "query": "Pont Alexandre III, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "亚历山大三世桥"
+    ],
+    "results": [
+      {
+        "name": "Pont Alexandre III",
+        "lat": "48.8634697",
+        "lon": "2.3135181",
+        "category": "man_made",
+        "type": "bridge",
+        "display_name": "Pont Alexandre III, Quartier des Invalides, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "way",
+        "osm_id": 183620685
+      },
+      {
+        "name": "Pont Alexandre III",
+        "lat": "48.8636423",
+        "lon": "2.3135438",
+        "category": "highway",
+        "type": "primary",
+        "display_name": "Pont Alexandre III, Quartier des Invalides, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "way",
+        "osm_id": 17067006
+      },
+      {
+        "name": "Pont Alexandre III",
+        "lat": "48.8644927",
+        "lon": "2.3136456",
+        "category": "highway",
+        "type": "primary",
+        "display_name": "Pont Alexandre III, Quartier des Champs-Élysées, Paris 8e Arrondissement, Paris, Île-de-France, France métropolitaine, 75008, France",
+        "osm_type": "way",
+        "osm_id": 17066999
+      }
+    ]
+  },
+  "petit-palais": {
+    "label": "小皇宫",
+    "query": "Petit Palais, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "小皇宫"
+    ],
+    "results": [
+      {
+        "name": "Petit Palais, Musée des beaux-arts de la Ville de Paris",
+        "lat": "48.8660420",
+        "lon": "2.3153496",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Petit Palais, Musée des beaux-arts de la Ville de Paris, Avenue Winston Churchill, Quartier des Champs-Élysées, Paris 8e Arrondissement, Paris, Île-de-France, France métropolitaine, 75008, France",
+        "osm_type": "relation",
+        "osm_id": 2778854
+      }
+    ]
+  },
+  "marine": {
+    "label": "海军府",
+    "query": "Hôtel de la Marine, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "海军府"
+    ],
+    "results": [
+      {
+        "name": "Hôtel de la Marine",
+        "lat": "48.8669402",
+        "lon": "2.3235045",
+        "category": "historic",
+        "type": "manor",
+        "display_name": "Hôtel de la Marine, Place de la Concorde, Quartier de la Madeleine, Paris 8e Arrondissement, Paris, Île-de-France, France métropolitaine, 75008, France",
+        "osm_type": "relation",
+        "osm_id": 1060822
+      }
+    ]
+  },
+  "louvre": {
+    "label": "卢浮宫",
+    "query": "Musée du Louvre, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "卢浮宫（首次入馆）",
+      "卢浮宫（第二次入馆）",
+      "装饰艺术馆／卢浮宫外晚霞区域"
+    ],
+    "results": [
+      {
+        "name": "Musée du Louvre",
+        "lat": "48.8611473",
+        "lon": "2.3380277",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée du Louvre, Pont du Carrousel, Saint-Germain-l'Auxerrois, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "relation",
+        "osm_id": 7515426
+      },
+      {
+        "name": "Musée du Louvre (Musée du Louvre)",
+        "lat": "48.8624127",
+        "lon": "2.3365898",
+        "category": "railway",
+        "type": "subway_entrance",
+        "display_name": "Musée du Louvre (Musée du Louvre), Place du Palais Royal, Quartier du Palais Royal, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "node",
+        "osm_id": 679476624
+      }
+    ]
+  },
+  "louvre-poste": {
+    "label": "卢浮宫邮局",
+    "query": "La Poste du Louvre, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "卢浮宫邮局"
+    ],
+    "results": [
+      {
+        "name": "Poste centrale du Louvre",
+        "lat": "48.8647175",
+        "lon": "2.3438048",
+        "category": "building",
+        "type": "office",
+        "display_name": "Poste centrale du Louvre, Rue du Louvre, Quartier Les Halles, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "way",
+        "osm_id": 29560121
+      },
+      {
+        "name": "Relais Poste",
+        "lat": "48.8668589",
+        "lon": "2.3359933",
+        "category": "amenity",
+        "type": "post_office",
+        "display_name": "Relais Poste, Rue des Petits Champs, Quartier du Palais Royal, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75002, France",
+        "osm_type": "node",
+        "osm_id": 8440023884
+      },
+      {
+        "name": "Relais Poste",
+        "lat": "48.8617850",
+        "lon": "2.3395114",
+        "category": "amenity",
+        "type": "post_office",
+        "display_name": "Relais Poste, Rue de Marengo, Quartier Les Halles, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "node",
+        "osm_id": 8890286661
+      }
+    ]
+  },
+  "marmottan": {
+    "label": "玛蒙丹·莫奈美术馆",
+    "query": "Musée Marmottan Monet, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "玛蒙丹·莫奈美术馆"
+    ],
+    "results": [
+      {
+        "name": "Musée Marmottan Monet",
+        "lat": "48.8594112",
+        "lon": "2.2672558",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée Marmottan Monet, 2, Rue Louis Boilly, Quartier de la Muette, Paris 16e Arrondissement, Paris, Île-de-France, France métropolitaine, 75016, France",
+        "osm_type": "way",
+        "osm_id": 83422695
+      }
+    ]
+  },
+  "guimet": {
+    "label": "吉美亚洲艺术博物馆",
+    "query": "Musée Guimet, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "吉美亚洲艺术博物馆"
+    ],
+    "results": [
+      {
+        "name": "Musée Guimet",
+        "lat": "48.8653790",
+        "lon": "2.2935933",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée Guimet, 6, Place d'Iéna, Chaillot, Paris 16e Arrondissement, Paris, Île-de-France, France métropolitaine, 75116, France",
+        "osm_type": "way",
+        "osm_id": 79641993
+      }
+    ]
+  },
+  "architecture": {
+    "label": "建筑与遗产之城",
+    "query": "Cité de l'architecture et du patrimoine, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "建筑与遗产之城"
+    ],
+    "results": [
+      {
+        "name": "Cité de l'architecture et du patrimoine",
+        "lat": "48.8628901",
+        "lon": "2.2889810",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Cité de l'architecture et du patrimoine, 1, Place du Trocadéro et du 11 Novembre 1918, Chaillot, Paris 16e Arrondissement, Paris, Île-de-France, France métropolitaine, 75016, France",
+        "osm_type": "node",
+        "osm_id": 1296750671
+      }
+    ]
+  },
+  "trocadero": {
+    "label": "特罗卡德罗",
+    "query": "Place du Trocadéro, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "特罗卡德罗花园",
+      "Trocadéro广场"
+    ],
+    "results": [
+      {
+        "name": "Place du Trocadéro",
+        "lat": "48.8623703",
+        "lon": "2.2880959",
+        "category": "highway",
+        "type": "pedestrian",
+        "display_name": "Place du Trocadéro, Chaillot, Paris 16e Arrondissement, Paris, Île-de-France, France métropolitaine, 75016, France",
+        "osm_type": "way",
+        "osm_id": 595908371
+      },
+      {
+        "name": "Place du Trocadéro",
+        "lat": "48.8617742",
+        "lon": "2.2880925",
+        "category": "highway",
+        "type": "pedestrian",
+        "display_name": "Place du Trocadéro, Quartier de la Muette, Paris 16e Arrondissement, Paris, Île-de-France, France métropolitaine, 75016, France",
+        "osm_type": "way",
+        "osm_id": 1298036637
+      }
+    ]
+  },
+  "bir-hakeim": {
+    "label": "比尔阿克姆桥",
+    "query": "Pont de Bir-Hakeim, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "比尔阿克姆桥"
+    ],
+    "results": [
+      {
+        "name": "Pont de Bir-Hakeim",
+        "lat": "48.8557254",
+        "lon": "2.2875477",
+        "category": "man_made",
+        "type": "bridge",
+        "display_name": "Pont de Bir-Hakeim, Pont de Bir Hakeim, Quartier de Grenelle, Paris 15e Arrondissement, Paris, Île-de-France, France métropolitaine, 75015, France",
+        "osm_type": "way",
+        "osm_id": 183602168
+      },
+      {
+        "name": "Pont de Bir Hakeim",
+        "lat": "48.8555982",
+        "lon": "2.2878016",
+        "category": "highway",
+        "type": "secondary",
+        "display_name": "Pont de Bir Hakeim, Quartier de Grenelle, Paris 15e Arrondissement, Paris, Île-de-France, France métropolitaine, 75015, France",
+        "osm_type": "way",
+        "osm_id": 1410449420
+      },
+      {
+        "name": "Pont de Bir Hakeim",
+        "lat": "48.8560618",
+        "lon": "2.2871017",
+        "category": "highway",
+        "type": "secondary",
+        "display_name": "Pont de Bir Hakeim, Quartier de la Muette, Paris 16e Arrondissement, Paris, Île-de-France, France métropolitaine, 75016, France",
+        "osm_type": "way",
+        "osm_id": 172948769
+      }
+    ]
+  },
+  "eiffel": {
+    "label": "埃菲尔铁塔",
+    "query": "Tour Eiffel, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "埃菲尔铁塔"
+    ],
+    "results": [
+      {
+        "name": "Tour Eiffel",
+        "lat": "48.8582599",
+        "lon": "2.2945006",
+        "category": "man_made",
+        "type": "tower",
+        "display_name": "Tour Eiffel, 5, Avenue Anatole France, Quartier du Gros-Caillou, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "way",
+        "osm_id": 5013364
+      },
+      {
+        "name": "Le Jules Verne",
+        "lat": "48.8581328",
+        "lon": "2.2944968",
+        "category": "amenity",
+        "type": "restaurant",
+        "display_name": "Le Jules Verne, Avenue Gustave Eiffel, Quartier du Gros-Caillou, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "node",
+        "osm_id": 3135278479
+      }
+    ]
+  },
+  "montparnasse": {
+    "label": "蒙帕纳斯",
+    "query": "Tour Montparnasse, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "蒙帕纳斯附近（未登塔）"
+    ],
+    "results": [
+      {
+        "name": "Tour Montparnasse",
+        "lat": "48.8421098",
+        "lon": "2.3219721",
+        "category": "tourism",
+        "type": "attraction",
+        "display_name": "Tour Montparnasse, Rue du Départ, Quartier Necker, Paris 15e Arrondissement, Paris, Île-de-France, France métropolitaine, 75015, France",
+        "osm_type": "way",
+        "osm_id": 16406633
+      }
+    ]
+  },
+  "notre-dame": {
+    "label": "巴黎圣母院",
+    "query": "Cathédrale Notre-Dame de Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "巴黎圣母院外"
+    ],
+    "results": [
+      {
+        "name": "Cathédrale Notre-Dame de Paris",
+        "lat": "48.8529371",
+        "lon": "2.3500501",
+        "category": "amenity",
+        "type": "place_of_worship",
+        "display_name": "Cathédrale Notre-Dame de Paris, 6, Parvis Notre-Dame - Place Jean-Paul II, Quartier Les Îles, Paris 4e Arrondissement, Paris, Île-de-France, France métropolitaine, 75004, France",
+        "osm_type": "way",
+        "osm_id": 201611261
+      }
+    ]
+  },
+  "orangerie": {
+    "label": "橘园美术馆",
+    "query": "Musée de l'Orangerie, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "橘园美术馆"
+    ],
+    "results": [
+      {
+        "name": "Musée de l'Orangerie",
+        "lat": "48.8637655",
+        "lon": "2.3226602",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée de l'Orangerie, Quai des Tuileries, Saint-Germain-l'Auxerrois, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "way",
+        "osm_id": 54188996
+      }
+    ]
+  },
+  "madeleine": {
+    "label": "玛德莱娜教堂",
+    "query": "Église de la Madeleine, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "玛德莱娜教堂"
+    ],
+    "results": [
+      {
+        "name": "Église de la Madeleine",
+        "lat": "48.8701338",
+        "lon": "2.3245425",
+        "category": "amenity",
+        "type": "place_of_worship",
+        "display_name": "Église de la Madeleine, Place de la Madeleine, Quartier de la Madeleine, Paris 8e Arrondissement, Paris, Île-de-France, France métropolitaine, 75008, France",
+        "osm_type": "way",
+        "osm_id": 54180046
+      }
+    ]
+  },
+  "saint-augustin": {
+    "label": "圣奥古斯丁教堂",
+    "query": "Église Saint-Augustin, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "圣奥古斯丁教堂"
+    ],
+    "results": [
+      {
+        "name": "Église Saint-Augustin",
+        "lat": "48.8762078",
+        "lon": "2.3188772",
+        "category": "amenity",
+        "type": "place_of_worship",
+        "display_name": "Église Saint-Augustin, Boulevard Malesherbes, Quartier de l'Europe, Paris 8e Arrondissement, Paris, Île-de-France, France métropolitaine, 75017, France",
+        "osm_type": "way",
+        "osm_id": 67501490
+      }
+    ]
+  },
+  "opera": {
+    "label": "巴黎歌剧院",
+    "query": "Palais Garnier, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "巴黎歌剧院"
+    ],
+    "results": [
+      {
+        "name": "L'Opéra Restaurant",
+        "lat": "48.8720949",
+        "lon": "2.3323339",
+        "category": "amenity",
+        "type": "restaurant",
+        "display_name": "L'Opéra Restaurant, Place Jacques Rouché, Quartier de la Chaussée-d'Antin, Paris 9e Arrondissement, Paris, Île-de-France, France métropolitaine, 75009, France",
+        "osm_type": "node",
+        "osm_id": 1393155090
+      },
+      {
+        "name": "Palais Garnier",
+        "lat": "48.8714332",
+        "lon": "2.3319654",
+        "category": "tourism",
+        "type": "viewpoint",
+        "display_name": "Palais Garnier, Place de l'Opéra, Quartier de la Chaussée-d'Antin, Paris 9e Arrondissement, Paris, Île-de-France, France métropolitaine, 75009, France",
+        "osm_type": "node",
+        "osm_id": 3462104314
+      }
+    ]
+  },
+  "conciergerie": {
+    "label": "古监狱",
+    "query": "Conciergerie, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "古监狱"
+    ],
+    "results": [
+      {
+        "name": "Conciergerie",
+        "lat": "48.8559492",
+        "lon": "2.3460263",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Conciergerie, 2, Boulevard du Palais, Saint-Germain-l'Auxerrois, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "node",
+        "osm_id": 910390736
+      },
+      {
+        "name": "Palais de Justice de Paris",
+        "lat": "48.8556574",
+        "lon": "2.3450512",
+        "category": "building",
+        "type": "civic",
+        "display_name": "Palais de Justice de Paris, Accès Parking Pont Neuf, Saint-Germain-l'Auxerrois, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "relation",
+        "osm_id": 536982
+      }
+    ]
+  },
+  "monnaie": {
+    "label": "货币博物馆",
+    "query": "Monnaie de Paris, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "货币博物馆"
+    ],
+    "results": [
+      {
+        "name": "Hôtel de la Monnaie",
+        "lat": "48.8564015",
+        "lon": "2.3384956",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Hôtel de la Monnaie, 11, Quai de Conti, Quartier de la Monnaie, Paris 6e Arrondissement, Paris, Île-de-France, France métropolitaine, 75006, France",
+        "osm_type": "relation",
+        "osm_id": 967664
+      }
+    ]
+  },
+  "hotel-ville": {
+    "label": "巴黎市政厅",
+    "query": "Hôtel de Ville, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "巴黎市政厅"
+    ],
+    "results": [
+      {
+        "name": "Hôtel de ville",
+        "lat": "48.8564263",
+        "lon": "2.3525276",
+        "category": "amenity",
+        "type": "townhall",
+        "display_name": "Hôtel de ville, Place de l'Hôtel de Ville, Quartier Saint-Merri, Paris 4e Arrondissement, Paris, Île-de-France, France métropolitaine, 75004, France",
+        "osm_type": "relation",
+        "osm_id": 284089
+      },
+      {
+        "name": "Hôtel de Ville",
+        "lat": "48.8575406",
+        "lon": "2.3515397",
+        "category": "railway",
+        "type": "station",
+        "display_name": "Hôtel de Ville, Rue du Renard, Quartier Saint-Merri, Paris 4e Arrondissement, Paris, Île-de-France, France métropolitaine, 75004, France",
+        "osm_type": "node",
+        "osm_id": 5226630385
+      }
+    ]
+  },
+  "pompidou": {
+    "label": "蓬皮杜中心",
+    "query": "Centre Pompidou, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "蓬皮杜中心"
+    ],
+    "results": [
+      {
+        "name": "Centre Georges Pompidou",
+        "lat": "48.8604964",
+        "lon": "2.3524221",
+        "category": "amenity",
+        "type": "arts_centre",
+        "display_name": "Centre Georges Pompidou, 19, Rue Beaubourg, Quartier Saint-Merri, Paris 4e Arrondissement, Paris, Île-de-France, France métropolitaine, 75004, France",
+        "osm_type": "way",
+        "osm_id": 55503397
+      }
+    ]
+  },
+  "fontainebleau-station": {
+    "label": "Fontainebleau–Avon 站",
+    "query": "Gare de Fontainebleau Avon, France",
+    "city": "Fontainebleau",
+    "aliases": [
+      "Fontainebleau–Avon站",
+      "Fontainebleau–Avon站（返程）"
+    ],
+    "results": [
+      {
+        "name": "Gare Dépose",
+        "lat": "48.4165620",
+        "lon": "2.7263110",
+        "category": "highway",
+        "type": "bus_stop",
+        "display_name": "Gare Dépose, Avenue Franklin Roosevelt, Changis, Avon, Fontainebleau, Seine-et-Marne, Île-de-France, France métropolitaine, 77210, France",
+        "osm_type": "node",
+        "osm_id": 6177340918
+      },
+      {
+        "name": "Gare de Fontainebleau - Avon",
+        "lat": "48.4149019",
+        "lon": "2.7262485",
+        "category": "amenity",
+        "type": "shelter",
+        "display_name": "Gare de Fontainebleau - Avon, Rue des Yèbles, Changis, Avon, Fontainebleau, Seine-et-Marne, Île-de-France, France métropolitaine, 77210, France",
+        "osm_type": "way",
+        "osm_id": 262518387
+      },
+      {
+        "name": "Gare de Fontainebleau - Avon",
+        "lat": "48.4155096",
+        "lon": "2.7269289",
+        "category": "amenity",
+        "type": "bench",
+        "display_name": "Gare de Fontainebleau - Avon, Rue des Yèbles, Changis, Avon, Fontainebleau, Seine-et-Marne, Île-de-France, France métropolitaine, 77210, France",
+        "osm_type": "node",
+        "osm_id": 2681853483
+      }
+    ]
+  },
+  "fontainebleau": {
+    "label": "枫丹白露宫",
+    "query": "Château de Fontainebleau, France",
+    "city": "Fontainebleau",
+    "aliases": [
+      "枫丹白露宫"
+    ],
+    "results": [
+      {
+        "name": "Château de Fontainebleau",
+        "lat": "48.4021166",
+        "lon": "2.6998510",
+        "category": "historic",
+        "type": "castle",
+        "display_name": "Château de Fontainebleau, Cour de la Fontaine, Centre, Fontainebleau, Seine-et-Marne, Île-de-France, France métropolitaine, 77300, France",
+        "osm_type": "way",
+        "osm_id": 655065732
+      }
+    ]
+  },
+  "arc": {
+    "label": "凯旋门",
+    "query": "Arc de Triomphe, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "凯旋门"
+    ],
+    "results": [
+      {
+        "name": "Arc de Triomphe",
+        "lat": "48.8737791",
+        "lon": "2.2950372",
+        "category": "building",
+        "type": "triumphal_arch",
+        "display_name": "Arc de Triomphe, Place Charles de Gaulle, Quartier du Faubourg-du-Roule, Paris 8e Arrondissement, Paris, Île-de-France, France métropolitaine, 75008, France",
+        "osm_type": "way",
+        "osm_id": 226413508
+      }
+    ]
+  },
+  "poste-museum": {
+    "label": "邮政博物馆",
+    "query": "Musée de la Poste, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "邮政博物馆"
+    ],
+    "results": [
+      {
+        "name": "Musée de la Poste",
+        "lat": "48.8414555",
+        "lon": "2.3172190",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée de la Poste, 34, Boulevard de Vaugirard, Quartier Necker, Paris 15e Arrondissement, Paris, Île-de-France, France métropolitaine, 75015, France",
+        "osm_type": "node",
+        "osm_id": 993828548
+      }
+    ]
+  },
+  "pantheon": {
+    "label": "先贤祠",
+    "query": "Panthéon, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "先贤祠"
+    ],
+    "results": [
+      {
+        "name": "Panthéon",
+        "lat": "48.8461947",
+        "lon": "2.3460507",
+        "category": "building",
+        "type": "church",
+        "display_name": "Panthéon, Place du Panthéon, Quartier de la Sorbonne, Paris 5e Arrondissement, Paris, Île-de-France, France métropolitaine, 75005, France",
+        "osm_type": "way",
+        "osm_id": 16407465
+      },
+      {
+        "name": "Paris 5e Arrondissement",
+        "lat": "48.8459728",
+        "lon": "2.3443504",
+        "category": "boundary",
+        "type": "administrative",
+        "display_name": "Paris 5e Arrondissement, Paris, Île-de-France, France métropolitaine, 75005, France",
+        "osm_type": "relation",
+        "osm_id": 20873
+      }
+    ]
+  },
+  "luxembourg": {
+    "label": "卢森堡公园",
+    "query": "Jardin du Luxembourg, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "卢森堡公园"
+    ],
+    "results": [
+      {
+        "name": "Jardin du Luxembourg",
+        "lat": "48.8467228",
+        "lon": "2.3364148",
+        "category": "leisure",
+        "type": "park",
+        "display_name": "Jardin du Luxembourg, Allée du Séminaire - Jean-Jacques Olier, Quartier de l'Odéon, Paris 6e Arrondissement, Paris, Île-de-France, France métropolitaine, 75006, France",
+        "osm_type": "way",
+        "osm_id": 128206209
+      }
+    ]
+  },
+  "palais-royal": {
+    "label": "皇家宫殿",
+    "query": "Palais Royal, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "皇家宫殿"
+    ],
+    "results": [
+      {
+        "name": "Palais Royal",
+        "lat": "48.8635847",
+        "lon": "2.3362042",
+        "category": "building",
+        "type": "palace",
+        "display_name": "Palais Royal, Galerie de la Cour d'Honneur, Quartier du Palais Royal, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "relation",
+        "osm_id": 3300400
+      },
+      {
+        "name": "Quartier du Palais Royal",
+        "lat": "48.8646034",
+        "lon": "2.3360491",
+        "category": "boundary",
+        "type": "administrative",
+        "display_name": "Quartier du Palais Royal, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "relation",
+        "osm_id": 2172739
+      }
+    ]
+  },
+  "decorative-arts": {
+    "label": "装饰艺术馆",
+    "query": "Musée des Arts Décoratifs, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "装饰艺术馆"
+    ],
+    "results": [
+      {
+        "name": "Musée des Arts Décoratifs",
+        "lat": "48.8631692",
+        "lon": "2.3329513",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée des Arts Décoratifs, 107, Rue de Rivoli, Saint-Germain-l'Auxerrois, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "node",
+        "osm_id": 247584452
+      }
+    ]
+  },
+  "bnf": {
+    "label": "BnF 黎塞留馆",
+    "query": "Bibliothèque nationale de France Richelieu, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "BnF黎塞留馆"
+    ],
+    "results": [
+      {
+        "name": "Bibliothèque nationale de France, Richelieu",
+        "lat": "48.8672823",
+        "lon": "2.3381642",
+        "category": "amenity",
+        "type": "library",
+        "display_name": "Bibliothèque nationale de France, Richelieu, 58, Rue de Richelieu, Vivienne, Paris 2e Arrondissement, Paris, Île-de-France, France métropolitaine, 75002, France",
+        "osm_type": "relation",
+        "osm_id": 545655
+      }
+    ]
+  },
+  "saint-eustache": {
+    "label": "圣厄斯塔什教堂",
+    "query": "Église Saint-Eustache, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "圣厄斯塔什教堂"
+    ],
+    "results": [
+      {
+        "name": "Église Saint-Eustache",
+        "lat": "48.8633997",
+        "lon": "2.3451276",
+        "category": "amenity",
+        "type": "place_of_worship",
+        "display_name": "Église Saint-Eustache, Rue Montmartre, Quartier Les Halles, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "way",
+        "osm_id": 53762963
+      }
+    ]
+  },
+  "pere-lachaise": {
+    "label": "拉雪兹公墓",
+    "query": "Cimetière du Père Lachaise, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "拉雪兹公墓"
+    ],
+    "results": [
+      {
+        "name": "Cimetière du Père-Lachaise",
+        "lat": "48.8611296",
+        "lon": "2.3940087",
+        "category": "landuse",
+        "type": "cemetery",
+        "display_name": "Cimetière du Père-Lachaise, 8, Boulevard de Ménilmontant, Quartier du Père-Lachaise, Paris 20e Arrondissement, Paris, Île-de-France, France métropolitaine, 75020, France",
+        "osm_type": "way",
+        "osm_id": 13859706
+      }
+    ]
+  },
+  "hugo": {
+    "label": "雨果故居",
+    "query": "Maison de Victor Hugo, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "雨果故居"
+    ],
+    "results": [
+      {
+        "name": "Maison de Victor Hugo",
+        "lat": "48.8547990",
+        "lon": "2.3661358",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Maison de Victor Hugo, 6, Place des Vosges, Quartier de l'Arsenal, Paris 4e Arrondissement, Paris, Île-de-France, France métropolitaine, 75004, France",
+        "osm_type": "node",
+        "osm_id": 254033221
+      }
+    ]
+  },
+  "sainte-chapelle": {
+    "label": "圣礼拜堂",
+    "query": "Sainte-Chapelle, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "圣礼拜堂"
+    ],
+    "results": [
+      {
+        "name": "Sainte-Chapelle",
+        "lat": "48.8553933",
+        "lon": "2.3449941",
+        "category": "amenity",
+        "type": "place_of_worship",
+        "display_name": "Sainte-Chapelle, 8, Boulevard du Palais, Saint-Germain-l'Auxerrois, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "relation",
+        "osm_id": 3344870
+      }
+    ]
+  },
+  "melies": {
+    "label": "梅里爱博物馆",
+    "query": "Cinémathèque française, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "梅里爱博物馆"
+    ],
+    "results": [
+      {
+        "name": "Cinémathèque Française",
+        "lat": "48.8369987",
+        "lon": "2.3826352",
+        "category": "tourism",
+        "type": "gallery",
+        "display_name": "Cinémathèque Française, Rue de Bercy, Quartier de Bercy, Paris 12e Arrondissement, Paris, Île-de-France, France métropolitaine, 75012, France",
+        "osm_type": "way",
+        "osm_id": 78271385
+      }
+    ]
+  },
+  "picasso": {
+    "label": "毕加索博物馆",
+    "query": "Musée Picasso, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "毕加索博物馆"
+    ],
+    "results": [
+      {
+        "name": "Musée national Picasso-Paris",
+        "lat": "48.8598698",
+        "lon": "2.3621152",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée national Picasso-Paris, 5, Rue de Thorigny, Quartier des Archives, Paris 3e Arrondissement, Paris, Île-de-France, France métropolitaine, 75003, France",
+        "osm_type": "way",
+        "osm_id": 57745741
+      }
+    ]
+  },
+  "camondo": {
+    "label": "卡蒙多博物馆",
+    "query": "Musée Nissim de Camondo, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "卡蒙多博物馆"
+    ],
+    "results": [
+      {
+        "name": "Musée Nissim de Camondo",
+        "lat": "48.8791733",
+        "lon": "2.3123464",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée Nissim de Camondo, Passage Commun, Quartier de l'Europe, Paris 8e Arrondissement, Paris, Île-de-France, France métropolitaine, 75008, France",
+        "osm_type": "way",
+        "osm_id": 68353844
+      }
+    ]
+  },
+  "monceau": {
+    "label": "蒙索公园",
+    "query": "Parc Monceau, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "蒙索公园"
+    ],
+    "results": [
+      {
+        "name": "Parc Monceau",
+        "lat": "48.8793740",
+        "lon": "2.3088732",
+        "category": "leisure",
+        "type": "park",
+        "display_name": "Parc Monceau, Paris, Île-de-France, France métropolitaine, France",
+        "osm_type": "relation",
+        "osm_id": 2826933
+      }
+    ]
+  },
+  "henner": {
+    "label": "Henner 博物馆",
+    "query": "Musée national Jean-Jacques Henner, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "Henner博物馆"
+    ],
+    "results": [
+      {
+        "name": "Musée national Jean-Jacques Henner",
+        "lat": "48.8830349",
+        "lon": "2.3076969",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée national Jean-Jacques Henner, 43, Avenue de Villiers, Quartier de la Plaine-de-Monceau, Paris 17e Arrondissement, Paris, Île-de-France, France métropolitaine, 75017, France",
+        "osm_type": "node",
+        "osm_id": 12770227249
+      }
+    ]
+  },
+  "pont-alma": {
+    "label": "Pont de l’Alma",
+    "query": "Pont de l'Alma, Paris, France",
+    "city": "Paris",
+    "aliases": [],
+    "results": [
+      {
+        "name": "Pont de l'Alma",
+        "lat": "48.8625636",
+        "lon": "2.2999572",
+        "category": "railway",
+        "type": "stop",
+        "display_name": "Pont de l'Alma, Promenade Gisèle Halimi, Quartier du Gros-Caillou, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "node",
+        "osm_id": 270191328
+      },
+      {
+        "name": "Pont de l'Alma",
+        "lat": "48.8625482",
+        "lon": "2.2999919",
+        "category": "railway",
+        "type": "station",
+        "display_name": "Pont de l'Alma, Promenade Gisèle Halimi, Quartier du Gros-Caillou, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "node",
+        "osm_id": 3414141480
+      },
+      {
+        "name": "Pont de l'Alma",
+        "lat": "48.8634373",
+        "lon": "2.3018510",
+        "category": "highway",
+        "type": "primary",
+        "display_name": "Pont de l'Alma, Quartier du Gros-Caillou, Paris 7e Arrondissement, Paris, Île-de-France, France métropolitaine, 75007, France",
+        "osm_type": "way",
+        "osm_id": 17066884
+      }
+    ]
+  },
+  "koln-hbf": {
+    "label": "科隆中央车站",
+    "query": "Köln Hauptbahnhof, Köln, Germany",
+    "city": "Cologne",
+    "aliases": [
+      "科隆中央车站",
+      "科隆中央车站（返程）"
+    ],
+    "results": [
+      {
+        "name": "Köln Hauptbahnhof",
+        "lat": "50.9427839",
+        "lon": "6.9590705",
+        "category": "railway",
+        "type": "station",
+        "display_name": "Köln Hauptbahnhof, 11, Trankgasse, Martinsviertel, Altstadt-Nord, Innenstadt, Köln, Nordrhein-Westfalen, 50667, Deutschland",
+        "osm_type": "node",
+        "osm_id": 2399559029
+      }
+    ]
+  },
+  "chocolate": {
+    "label": "巧克力博物馆",
+    "query": "Schokoladenmuseum, Köln, Germany",
+    "city": "Cologne",
+    "aliases": [
+      "巧克力博物馆"
+    ],
+    "results": [
+      {
+        "name": "Schokoladenmuseum",
+        "lat": "50.9319828",
+        "lon": "6.9644356",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Schokoladenmuseum, 1a, Am Schokoladenmuseum, Rheinauhafen, Altstadt-Süd, Innenstadt, Köln, Nordrhein-Westfalen, 50678, Deutschland",
+        "osm_type": "way",
+        "osm_id": 334606061
+      },
+      {
+        "name": "Schokoladenmuseum",
+        "lat": "50.9326600",
+        "lon": "6.9631919",
+        "category": "highway",
+        "type": "platform",
+        "display_name": "Schokoladenmuseum, Am Leystapel, Georgsviertel, Altstadt-Süd, Innenstadt, Köln, Nordrhein-Westfalen, 50676, Deutschland",
+        "osm_type": "way",
+        "osm_id": 753456529
+      },
+      {
+        "name": "Schokoladenmuseum",
+        "lat": "50.9326851",
+        "lon": "6.9632018",
+        "category": "highway",
+        "type": "bus_stop",
+        "display_name": "Schokoladenmuseum, Am Leystapel, Georgsviertel, Altstadt-Süd, Innenstadt, Köln, Nordrhein-Westfalen, 50676, Deutschland",
+        "osm_type": "node",
+        "osm_id": 2598103188
+      }
+    ]
+  },
+  "farina": {
+    "label": "Farina 香水博物馆",
+    "query": "Farina Duftmuseum, Köln, Germany",
+    "city": "Cologne",
+    "aliases": [
+      "Farina香水博物馆"
+    ],
+    "results": [
+      {
+        "name": "Duftmuseum im Farina-Haus",
+        "lat": "50.9377446",
+        "lon": "6.9579305",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Duftmuseum im Farina-Haus, 21, Obenmarspforten, Martinsviertel, Altstadt-Nord, Innenstadt, Köln, Nordrhein-Westfalen, 50667, Deutschland",
+        "osm_type": "way",
+        "osm_id": 48359832
+      }
+    ]
+  },
+  "koln-dom": {
+    "label": "科隆大教堂",
+    "query": "Kölner Dom, Köln, Germany",
+    "city": "Cologne",
+    "aliases": [
+      "科隆大教堂"
+    ],
+    "results": [
+      {
+        "name": "Kölner Dom",
+        "lat": "50.9413035",
+        "lon": "6.9581380",
+        "category": "amenity",
+        "type": "place_of_worship",
+        "display_name": "Kölner Dom, 4, Domkloster, Andreasviertel, Altstadt-Nord, Innenstadt, Köln, Nordrhein-Westfalen, 50667, Deutschland",
+        "osm_type": "way",
+        "osm_id": 4532022
+      }
+    ]
+  },
+  "hohenzollern": {
+    "label": "霍亨索伦桥",
+    "query": "Hohenzollernbrücke, Köln, Germany",
+    "city": "Cologne",
+    "aliases": [
+      "霍亨索伦桥"
+    ],
+    "results": [
+      {
+        "name": "Hohenzollernbrücke",
+        "lat": "50.9414376",
+        "lon": "6.9657041",
+        "category": "man_made",
+        "type": "bridge",
+        "display_name": "Hohenzollernbrücke, Kurt-Rossa-Platz, Martinsviertel, Altstadt-Nord, Innenstadt, Köln, Nordrhein-Westfalen, 50667, Deutschland",
+        "osm_type": "way",
+        "osm_id": 268130024
+      },
+      {
+        "name": "Hohenzollernbrücke",
+        "lat": "50.9414376",
+        "lon": "6.9657041",
+        "category": "man_made",
+        "type": "bridge",
+        "display_name": "Hohenzollernbrücke, Trankgassenwerft, Martinsviertel, Altstadt-Nord, Innenstadt, Köln, Nordrhein-Westfalen, 50667, Deutschland",
+        "osm_type": "way",
+        "osm_id": 258521129
+      },
+      {
+        "name": "Hohenzollernbrücke",
+        "lat": "50.9415557",
+        "lon": "6.9657052",
+        "category": "man_made",
+        "type": "bridge",
+        "display_name": "Hohenzollernbrücke, Deutz, Innenstadt, Köln, Nordrhein-Westfalen, 50679, Deutschland",
+        "osm_type": "way",
+        "osm_id": 268663549
+      }
+    ]
+  },
+  "koln-triangle": {
+    "label": "KölnTriangle",
+    "query": "KölnTriangle, Köln, Germany",
+    "city": "Cologne",
+    "aliases": [
+      "KölnTriangle"
+    ],
+    "results": [
+      {
+        "name": "KölnTriangle Cologne View",
+        "lat": "50.9403829",
+        "lon": "6.9718364",
+        "category": "tourism",
+        "type": "viewpoint",
+        "display_name": "KölnTriangle Cologne View, 1, Ottoplatz, Deutz, Innenstadt, Köln, Nordrhein-Westfalen, 50679, Deutschland",
+        "osm_type": "node",
+        "osm_id": 13396033603
+      }
+    ]
+  },
+  "ams-centraal": {
+    "label": "阿姆斯特丹中央车站",
+    "query": "Amsterdam Centraal, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "阿姆斯特丹中央车站"
+    ],
+    "results": [
+      {
+        "name": "Amsterdam Centraal",
+        "lat": "52.3789010",
+        "lon": "4.9005805",
+        "category": "railway",
+        "type": "station",
+        "display_name": "Amsterdam Centraal, Middentunnel, Centrum, Amsterdam, Noord-Holland, Nederland, 1012 AB, Nederland",
+        "osm_type": "node",
+        "osm_id": 4290854847
+      }
+    ]
+  },
+  "rembrandtplein": {
+    "label": "伦勃朗广场",
+    "query": "Rembrandtplein, Amsterdam, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "伦勃朗像"
+    ],
+    "results": [
+      {
+        "name": "Rembrandtplein",
+        "lat": "52.3659880",
+        "lon": "4.8966112",
+        "category": "place",
+        "type": "square",
+        "display_name": "Rembrandtplein, Grachtengordel, Centrum, Amsterdam, Noord-Holland, Nederland",
+        "osm_type": "way",
+        "osm_id": 470612445
+      },
+      {
+        "name": "Rembrandtplein",
+        "lat": "52.3658163",
+        "lon": "4.8967209",
+        "category": "highway",
+        "type": "residential",
+        "display_name": "Rembrandtplein, Grachtengordel, Centrum, Amsterdam, Noord-Holland, Nederland, 1017 CV, Nederland",
+        "osm_type": "way",
+        "osm_id": 610234805
+      },
+      {
+        "name": "Rembrandtplein",
+        "lat": "52.3663112",
+        "lon": "4.8968385",
+        "category": "highway",
+        "type": "pedestrian",
+        "display_name": "Rembrandtplein, Grachtengordel, Centrum, Amsterdam, Noord-Holland, Nederland, 1017 CT, Nederland",
+        "osm_type": "way",
+        "osm_id": 773856010
+      }
+    ]
+  },
+  "munttoren": {
+    "label": "铸币塔",
+    "query": "Munttoren, Amsterdam, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "铸币塔"
+    ],
+    "results": [
+      {
+        "name": "Munttoren",
+        "lat": "52.3670603",
+        "lon": "4.8932124",
+        "category": "building",
+        "type": "yes",
+        "display_name": "Munttoren, Muntplein, Centrum, Amsterdam, Noord-Holland, Nederland, 1012 WR, Nederland",
+        "osm_type": "way",
+        "osm_id": 57862728
+      },
+      {
+        "name": "Munttoren",
+        "lat": "52.3670567",
+        "lon": "4.8932133",
+        "category": "man_made",
+        "type": "tower",
+        "display_name": "Munttoren, Muntplein, Centrum, Amsterdam, Noord-Holland, Nederland, 1012 WR, Nederland",
+        "osm_type": "node",
+        "osm_id": 7027039946
+      }
+    ]
+  },
+  "van-gogh": {
+    "label": "梵高博物馆",
+    "query": "Van Gogh Museum, Amsterdam, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "梵高博物馆"
+    ],
+    "results": [
+      {
+        "name": "Van Gogh Museum",
+        "lat": "52.3583673",
+        "lon": "4.8810900",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Van Gogh Museum, 7, Paulus Potterstraat, Museumkwartier, Oud-Zuid, Zuid, Amsterdam, Noord-Holland, Nederland, 1071 CX, Nederland",
+        "osm_type": "relation",
+        "osm_id": 6577680
+      }
+    ]
+  },
+  "maritime": {
+    "label": "国家海事博物馆",
+    "query": "Het Scheepvaartmuseum, Amsterdam, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "国家海事博物馆"
+    ],
+    "results": [
+      {
+        "name": "Het Scheepvaartmuseum",
+        "lat": "52.3720050",
+        "lon": "4.9149527",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Het Scheepvaartmuseum, 1, Kattenburgerplein, Marineterrein, Oostelijke Eilanden, Centrum, Amsterdam, Noord-Holland, Nederland, 1018 KK, Nederland",
+        "osm_type": "way",
+        "osm_id": 1287492683
+      },
+      {
+        "name": "Restaurant Stalpaert",
+        "lat": "52.3714555",
+        "lon": "4.9145436",
+        "category": "amenity",
+        "type": "restaurant",
+        "display_name": "Restaurant Stalpaert, Kattenburgerplein, Marineterrein, Oostelijke Eilanden, Centrum, Amsterdam, Noord-Holland, Nederland, 1018 KK, Nederland",
+        "osm_type": "node",
+        "osm_id": 5211679121
+      }
+    ]
+  },
+  "rembrandthuis": {
+    "label": "伦勃朗故居",
+    "query": "Museum Rembrandthuis, Amsterdam, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "伦勃朗故居"
+    ],
+    "results": [
+      {
+        "name": "Rembrandthuis",
+        "lat": "52.3693692",
+        "lon": "4.9012497",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Rembrandthuis, 4, Jodenbreestraat, Uilenburg, Nieuwmarkt/Lastage, Centrum, Amsterdam, Noord-Holland, Nederland, 1011 NK, Nederland",
+        "osm_type": "node",
+        "osm_id": 250624673
+      }
+    ]
+  },
+  "dam": {
+    "label": "水坝广场",
+    "query": "Dam Square, Amsterdam, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "水坝广场／皇宫"
+    ],
+    "results": [
+      {
+        "name": "Dam",
+        "lat": "52.3731162",
+        "lon": "4.8923511",
+        "category": "place",
+        "type": "square",
+        "display_name": "Dam, Centrum, Amsterdam, Noord-Holland, Nederland",
+        "osm_type": "way",
+        "osm_id": 94756489
+      }
+    ]
+  },
+  "zaandijk-station": {
+    "label": "Zaandijk Zaanse Schans 站",
+    "query": "Zaandijk Zaanse Schans railway station, Netherlands",
+    "city": "Zaanse",
+    "aliases": [
+      "Zaandijk Zaanse Schans站",
+      "Zaandijk Zaanse Schans站（返程）"
+    ],
+    "results": [
+      {
+        "name": "Zaandijk Zaanse Schans",
+        "lat": "52.4692791",
+        "lon": "4.8051566",
+        "category": "railway",
+        "type": "station",
+        "display_name": "Zaandijk Zaanse Schans, Kogertunnel, Koog aan de Zaan, Zaanstad, Noord-Holland, Nederland, 1541 LK, Nederland",
+        "osm_type": "node",
+        "osm_id": 4185358281
+      }
+    ]
+  },
+  "zaanse": {
+    "label": "桑斯安斯风车村",
+    "query": "Zaanse Schans, Zaandam, Netherlands",
+    "city": "Zaanse",
+    "aliases": [
+      "Pier - best photos of the mills／风车村观光区"
+    ],
+    "results": [
+      {
+        "name": "Zaanse Schans",
+        "lat": "52.4750534",
+        "lon": "4.8179761",
+        "category": "tourism",
+        "type": "theme_park",
+        "display_name": "Zaanse Schans, Zaandam, Zaanstad, Noord-Holland, Nederland",
+        "osm_type": "way",
+        "osm_id": 177095326
+      }
+    ]
+  },
+  "rijksmuseum": {
+    "label": "荷兰国立博物馆",
+    "query": "Rijksmuseum, Amsterdam, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "荷兰国立博物馆"
+    ],
+    "results": [
+      {
+        "name": "Rijksmuseum",
+        "lat": "52.3598431",
+        "lon": "4.8850395",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Rijksmuseum, Stadhouderskade, Museumkwartier, Oud-Zuid, Zuid, Amsterdam, Noord-Holland, Nederland, 1017 SG, Nederland",
+        "osm_type": "way",
+        "osm_id": 29989787
+      }
+    ]
+  },
+  "rouen-joan": {
+    "label": "圣女贞德塔",
+    "query": "Tour Jeanne d'Arc, Rouen, France",
+    "city": "Rouen",
+    "aliases": [
+      "圣女贞德塔"
+    ],
+    "results": [
+      {
+        "name": "Tour Jeanne d'Arc",
+        "lat": "49.4464685",
+        "lon": "1.0943947",
+        "category": "man_made",
+        "type": "tower",
+        "display_name": "Tour Jeanne d'Arc, Rue du Donjon, Quartier Vieux-Marché Cathédrale, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76000, France",
+        "osm_type": "way",
+        "osm_id": 64181280
+      }
+    ]
+  },
+  "rouen-art": {
+    "label": "鲁昂美术馆",
+    "query": "Musée des Beaux-Arts de Rouen, France",
+    "city": "Rouen",
+    "aliases": [
+      "鲁昂美术馆"
+    ],
+    "results": [
+      {
+        "name": "Musée des Beaux-Arts",
+        "lat": "49.4448162",
+        "lon": "1.0942239",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Musée des Beaux-Arts, Esplanade Marcel Duchamp, Vieux-Marché-Cathédrale, Quartier Vieux-Marché Cathédrale, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76000, France",
+        "osm_type": "node",
+        "osm_id": 13530619691
+      },
+      {
+        "name": "Musée des Beaux Arts",
+        "lat": "49.4454345",
+        "lon": "1.0928457",
+        "category": "amenity",
+        "type": "bicycle_parking",
+        "display_name": "Musée des Beaux Arts, Rue du Bailliage, Vieux-Marché-Cathédrale, Quartier Vieux-Marché Cathédrale, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76000, France",
+        "osm_type": "way",
+        "osm_id": 1110002039
+      },
+      {
+        "name": "Musée des Beaux-Arts",
+        "lat": "49.4442372",
+        "lon": "1.0940903",
+        "category": "amenity",
+        "type": "bicycle_rental",
+        "display_name": "Musée des Beaux-Arts, Rue Jean Lecanuet, Vieux-Marché-Cathédrale, Quartier Vieux-Marché Cathédrale, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76000, France",
+        "osm_type": "node",
+        "osm_id": 11118823657
+      }
+    ]
+  },
+  "gros-horloge": {
+    "label": "大时钟",
+    "query": "Gros-Horloge, Rouen, France",
+    "city": "Rouen",
+    "aliases": [
+      "大时钟"
+    ],
+    "results": [
+      {
+        "name": "Gros-Horloge",
+        "lat": "49.4415280",
+        "lon": "1.0912622",
+        "category": "building",
+        "type": "yes",
+        "display_name": "Gros-Horloge, Rue du Gros-Horloge, Vieux-Marché-Cathédrale, Quartier Vieux-Marché Cathédrale, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76000, France",
+        "osm_type": "way",
+        "osm_id": 63205872
+      },
+      {
+        "name": "Gros-Horloge",
+        "lat": "49.4414024",
+        "lon": "1.0918340",
+        "category": "information",
+        "type": "board",
+        "display_name": "Gros-Horloge, Rue Thouret, Vieux-Marché-Cathédrale, Quartier Vieux-Marché Cathédrale, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76000, France",
+        "osm_type": "node",
+        "osm_id": 7083938597
+      }
+    ]
+  },
+  "rouen-cathedral": {
+    "label": "鲁昂大教堂",
+    "query": "Cathédrale Notre-Dame de Rouen, France",
+    "city": "Rouen",
+    "aliases": [
+      "鲁昂大教堂"
+    ],
+    "results": [
+      {
+        "name": "Cathédrale Notre-Dame",
+        "lat": "49.4402880",
+        "lon": "1.0948212",
+        "category": "amenity",
+        "type": "place_of_worship",
+        "display_name": "Cathédrale Notre-Dame, Place de la Cathédrale, Vieux-Marché-Cathédrale, Quartier Vieux-Marché Cathédrale, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76000, France",
+        "osm_type": "way",
+        "osm_id": 63420359
+      }
+    ]
+  },
+  "saint-maclou": {
+    "label": "Saint-Maclou 教堂",
+    "query": "Église Saint-Maclou, Rouen, France",
+    "city": "Rouen",
+    "aliases": [
+      "Saint-Maclou教堂"
+    ],
+    "results": [
+      {
+        "name": "Église Saint-Maclou",
+        "lat": "49.4397819",
+        "lon": "1.0983808",
+        "category": "amenity",
+        "type": "place_of_worship",
+        "display_name": "Église Saint-Maclou, Place Barthélémy, Quartier Saint-Marc / Croix de Pierre / Saint-Nicaise, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76000, France",
+        "osm_type": "way",
+        "osm_id": 64201546
+      }
+    ]
+  },
+  "cdg": {
+    "label": "巴黎戴高乐机场",
+    "query": "Aéroport Charles de Gaulle, Roissy-en-France, France",
+    "city": "Paris",
+    "aliases": [
+      "CDG机场"
+    ],
+    "results": []
+  },
+  "saint-michel-rer": {
+    "label": "Saint-Michel–Notre-Dame 站",
+    "query": "Saint-Michel Notre-Dame RER, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "Saint-Michel–Notre-Dame站"
+    ],
+    "results": []
+  },
+  "canal-museum": {
+    "label": "运河博物馆",
+    "query": "Het Grachtenhuis, Herengracht, Amsterdam, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "运河博物馆"
+    ],
+    "results": [
+      {
+        "name": "Grachtenhuis",
+        "lat": "52.3678921",
+        "lon": "4.8862198",
+        "category": "tourism",
+        "type": "museum",
+        "display_name": "Grachtenhuis, 386, Herengracht, De 9 Straatjes, Grachtengordel, Centrum, Amsterdam, Noord-Holland, Nederland, 1016 CJ, Nederland",
+        "osm_type": "node",
+        "osm_id": 4909411075
+      }
+    ]
+  },
+  "rouen-station": {
+    "label": "鲁昂站",
+    "query": "Rouen Rive Droite railway station, Rouen, France",
+    "city": "Rouen",
+    "aliases": [
+      "鲁昂站",
+      "鲁昂站（返程）"
+    ],
+    "results": [
+      {
+        "name": "Rouen Rive-Droite",
+        "lat": "49.4492443",
+        "lon": "1.0942235",
+        "category": "railway",
+        "type": "station",
+        "display_name": "Rouen Rive-Droite, Place Bernard Tissot, Quartier Gare / Jouvenet, Rouen, Seine-Maritime, Normandie, France métropolitaine, 76000, France",
+        "osm_type": "node",
+        "osm_id": 2076751841
+      }
+    ]
+  },
+  "le-florentin": {
+    "label": "Le Florentin",
+    "query": "10 Rue Saint-Florentin, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "Le Florentin晚餐"
+    ],
+    "results": [
+      {
+        "name": "Toraya",
+        "lat": "48.8676903",
+        "lon": "2.3245314",
+        "category": "shop",
+        "type": "pastry",
+        "display_name": "Toraya, 10, Rue Saint-Florentin, Quartier Vendôme, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "node",
+        "osm_id": 4307210205
+      },
+      {
+        "name": "",
+        "lat": "48.8676590",
+        "lon": "2.3244768",
+        "category": "place",
+        "type": "house",
+        "display_name": "10, Rue Saint-Florentin, Quartier Vendôme, Paris 1er Arrondissement, Paris, Île-de-France, France métropolitaine, 75001, France",
+        "osm_type": "node",
+        "osm_id": 683398128
+      }
+    ]
+  },
+  "pierre-herme-opera": {
+    "label": "Pierre Hermé Opéra",
+    "query": "39 Avenue de l'Opéra, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "Pierre Hermé Opéra店"
+    ],
+    "results": [
+      {
+        "name": "",
+        "lat": "48.8683415",
+        "lon": "2.3330811",
+        "category": "place",
+        "type": "house",
+        "display_name": "39, Avenue de l'Opéra, Gaillon, Paris 2e Arrondissement, Paris, Île-de-France, France métropolitaine, 75002, France",
+        "osm_type": "node",
+        "osm_id": 9634431844
+      }
+    ]
+  },
+  "shakespeare-bookshop": {
+    "label": "Shakespeare and Company",
+    "query": "Shakespeare and Company, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "莎士比亚书店"
+    ],
+    "results": [
+      {
+        "name": "Shakespeare and Company",
+        "lat": "48.8525747",
+        "lon": "2.3471123",
+        "category": "shop",
+        "type": "books",
+        "display_name": "Shakespeare and Company, 37, Rue de la Bûcherie, Quartier de la Sorbonne, Paris 5e Arrondissement, Paris, Île-de-France, France métropolitaine, 75005, France",
+        "osm_type": "node",
+        "osm_id": 251373380
+      }
+    ]
+  },
+  "pedra-alta-marbeuf": {
+    "label": "Pedra Alta Marbeuf",
+    "query": "25 Rue Marbeuf, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "Pedra Alta午餐（25 Rue Marbeuf）"
+    ],
+    "results": [
+      {
+        "name": "",
+        "lat": "48.8689425",
+        "lon": "2.3039956",
+        "category": "place",
+        "type": "house",
+        "display_name": "25, Rue Marbeuf, Quartier des Champs-Élysées, Paris 8e Arrondissement, Paris, Île-de-France, France métropolitaine, 75008, France",
+        "osm_type": "node",
+        "osm_id": 10163864349
+      }
+    ]
+  },
+  "augustiner-heumarkt": {
+    "label": "Augustiner am Heumarkt",
+    "query": "Heumarkt 42, Köln, Germany",
+    "city": "Cologne",
+    "aliases": [
+      "Augustiner午餐"
+    ],
+    "results": [
+      {
+        "name": "",
+        "lat": "50.9367730",
+        "lon": "6.9613000",
+        "category": "building",
+        "type": "apartments",
+        "display_name": "42, Heumarkt, Martinsviertel, Altstadt-Nord, Innenstadt, Köln, Nordrhein-Westfalen, 50667, Deutschland",
+        "osm_type": "way",
+        "osm_id": 334098995
+      },
+      {
+        "name": "Augustiner",
+        "lat": "50.9367864",
+        "lon": "6.9611940",
+        "category": "amenity",
+        "type": "restaurant",
+        "display_name": "Augustiner, 42, Heumarkt, Martinsviertel, Altstadt-Nord, Innenstadt, Köln, Nordrhein-Westfalen, 50667, Deutschland",
+        "osm_type": "node",
+        "osm_id": 427087677
+      }
+    ]
+  },
+  "the-pantry": {
+    "label": "The Pantry",
+    "query": "The Pantry, Leidsekruisstraat 21, Amsterdam, Netherlands",
+    "city": "Amsterdam",
+    "aliases": [
+      "The Pantry午餐"
+    ],
+    "results": [
+      {
+        "name": "The Pantry",
+        "lat": "52.3634594",
+        "lon": "4.8849563",
+        "category": "amenity",
+        "type": "restaurant",
+        "display_name": "The Pantry, 21-H, Leidsekruisstraat, Centrum, Amsterdam, Noord-Holland, Nederland, 1017 RE, Nederland",
+        "osm_type": "node",
+        "osm_id": 2730035759
+      }
+    ]
+  },
+  "la-jacobine": {
+    "label": "La Jacobine",
+    "query": "La Jacobine, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "La Jacobine午餐"
+    ],
+    "results": [
+      {
+        "name": "La Jacobine",
+        "lat": "48.8533357",
+        "lon": "2.3389536",
+        "category": "amenity",
+        "type": "restaurant",
+        "display_name": "La Jacobine, Cour du Commerce Saint-André, Quartier de la Monnaie, Paris 6e Arrondissement, Paris, Île-de-France, France métropolitaine, 75006, France",
+        "osm_type": "node",
+        "osm_id": 2613703963
+      }
+    ]
+  },
+  "institut-de-france": {
+    "label": "Institut de France",
+    "query": "Institut de France, Paris, France",
+    "city": "Paris",
+    "aliases": [
+      "法兰西学院"
+    ],
+    "results": [
+      {
+        "name": "Institut de France",
+        "lat": "48.8568375",
+        "lon": "2.3372581",
+        "category": "building",
+        "type": "public",
+        "display_name": "Institut de France, Quai de Conti, Quartier de la Monnaie, Paris 6e Arrondissement, Paris, Île-de-France, France métropolitaine, 75006, France",
+        "osm_type": "relation",
+        "osm_id": 967665
+      },
+      {
+        "name": "Institut de France",
+        "lat": "48.8576071",
+        "lon": "2.3358845",
+        "category": "amenity",
+        "type": "bicycle_rental",
+        "display_name": "Institut de France, Quai Malaquais, Quartier de Saint-Germain-des-Prés, Paris 6e Arrondissement, Paris, Île-de-France, France métropolitaine, 75006, France",
+        "osm_type": "node",
+        "osm_id": 782578990
+      }
+    ]
+  }
+}

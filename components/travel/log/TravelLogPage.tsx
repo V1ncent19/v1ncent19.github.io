@@ -4,6 +4,7 @@ import { pick } from "@/lib/localized";
 import TravelLog from "../TravelLog";
 import PilgrimageLog from "../PilgrimageLog";
 import TerrainTravelLog from "../TerrainTravelLog";
+import ReconstructedTravelLog from "../ReconstructedTravelLog";
 
 export function logMetadata(log: TravelLogDefinition, lang: LogLang): Metadata {
   return { title: pick(log.pageTitles ?? log.card.title, lang), description: pick(log.card.blurb, lang) };
@@ -23,6 +24,7 @@ export default function TravelLogPage({ log, lang = "en" }: { log: TravelLogDefi
     }} />
     {log.kind === "journal" ? <TravelLog log={log} lang={lang} />
       : log.kind === "pilgrimage" ? <PilgrimageLog log={log} lang={lang} />
-      : <TerrainTravelLog log={log} lang={lang} />}
+      : log.kind === "terrain" ? <TerrainTravelLog log={log} lang={lang} />
+      : <ReconstructedTravelLog log={log} lang={lang} />}
   </>;
 }

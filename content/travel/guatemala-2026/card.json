@@ -1,12 +1,12 @@
 {
   "id": "guatemala-2026",
   "title": {
-    "en": "Acatenango — While Fuego Was Awake",
-    "zh": "在火山醒着的时候"
+    "en": "A Hiking toward Fuego",
+    "zh": "向 Fuego 进发"
   },
   "blurb": {
-    "en": "A two-day climb from Antigua to Acatenango, crossing the saddle toward an erupting Fuego before returning to Antigua.",
-    "zh": "从 Antigua 出发攀登 Acatenango，横越鞍部靠近仍在喷发的 Fuego，再沿云雾林下山并返回 Antigua 的两日火山行。"
+    "en": "A volcano eruption is definitely a must-see in lifetime.",
+    "zh": "如果我有一张人生清单，那么其中肯定有一项是亲眼看一次火山喷发。"
   },
   "start": "2026-05-31",
   "end": "2026-06-01",
@@ -18,20 +18,20 @@
   "showPinnedBadge": false,
   "stops": {
     "en": ["Antigua", "Acatenango", "Fuego"],
-    "zh": ["安提瓜", "阿卡特南戈", "富埃戈"]
+    "zh": ["安提瓜", "Acatenango", "Fuego"]
   },
   "cover": "/assets/photos/travel/guatemala-2026/img-0813.webp",
   "coverPos": "center 44%",
   "cardMeta": {
     "en": "Interactive 3D terrain log",
-    "zh": "三维地形互动游记"
+    "zh": "攀登地图"
   },
   "cardCta": {
     "en": "Climb the route",
-    "zh": "沿路线登山"
+    "zh": "阅读旅行志"
   },
   "cardFacts": {
-    "en": ["June 1, 2026", "3,617 m", "33 photos · 2 videos"],
-    "zh": ["2026.06.01", "最高 3,617 m", "33 张照片 · 2 段视频"]
+    "en": ["2 days", "June 1, 2026", "3,617 m"],
+    "zh": ["2 日", "2026.06.01", "3,617 m"]
   }
 }
