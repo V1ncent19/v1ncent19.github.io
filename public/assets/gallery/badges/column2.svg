@@ -1,0 +1,11 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <path id="capital-leaf" d="M49 76c-8-2-15-8-18-17 7 0 12 2 17 7-5-9-6-18-3-27 7 7 10 18 4 37Z"/>
+  </defs>
+  <path d="M15 24c10-5 22-7 35-7s25 2 35 7l-7 12H22l-7-12Z"/>
+  <circle cx="50" cy="26" r="7"/><circle cx="50" cy="26" r="2"/>
+  <path d="M22 38c-1-10 8-16 17-11 8 5 5 15-3 16-6 1-9-5-5-8 3-2 6 0 5 3M78 38c1-10-8-16-17-11-8 5-5 15 3 16 6 1 9-5 5-8-3-2-6 0-5 3"/>
+  <use href="#capital-leaf"/><use href="#capital-leaf" transform="matrix(-1 0 0 1 100 0)"/>
+  <path d="M26 42c9 2 17 8 24 18 7-10 15-16 24-18-2 13-10 24-24 34-14-10-22-21-24-34Z"/>
+  <path d="M31 76h38v9H31Z"/>
+</svg>

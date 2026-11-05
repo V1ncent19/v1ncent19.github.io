@@ -1,0 +1,3691 @@
+@import "tailwindcss";
+
+/* Self-hosted 源雲明體丹 GenWanMin2 TC, per-weight subset webfonts
+   (2026-09-07; EL/L added 2026-10-24 so light headings have a real lightweight
+   sibling instead of a synthesized fake-bold). Sources:
+   assets-src/fonts/GenWanMin2TC/*.otf (22 MB each —
+   never deploy raw); subsets → public/fonts/genwanmin2tc-{el,l,r,m,sb}.woff2
+   (~850 KB each) via scripts/subset-cjk-fonts.py. EL/L/R/M/SB map to the
+   font's own 300/400/500/600 weights (bold-700 requests resolve to SB; a
+   `font-weight: 350` for the masthead lands on L). `local()`
+   first: visitors with the font installed use their full local copy and
+   skip the download. */
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-EL"),
+    url("/fonts/genwanmin2tc-el.woff2")
+      format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Acatenango terrain journal — a third travel-log grammar.
+   It keeps the shared pilgrimage shell/navigation, but the left column is a
+   pitched DEM surface and the right column advances a continuous route.
+   ═══════════════════════════════════════════════════════════════════════════ */
+body.terrain-immersive { background: var(--tl-paper); }
+.terrain-map-col {
+  --tl-attrib-h: 30px;
+  position: sticky;
+  top: 0;
+  width: 48%;
+  height: 100vh;
+  flex: 0 0 48%;
+  overflow: hidden;
+  border-right: 1px solid color-mix(in srgb, var(--tl-ink) 12%, transparent);
+  background: #e6e2d5;
+}
+.terrain-map-box { position: absolute; inset: 0 0 var(--tl-attrib-h); overflow: hidden; }
+.terrain-map-canvas { position: relative; width: 100%; height: 100%; }
+.terrain-map-canvas .maplibregl-canvas { outline: 0; }
+.terrain-photo-focus { display: grid; width: 22px; height: 22px; place-items: center; pointer-events: none; }
+.terrain-photo-focus-emphasis { position: relative; display: grid; width: 22px; height: 22px; place-items: center; opacity: 0; transform: scale(.6); transition: opacity .3s ease, transform .34s cubic-bezier(.2,.8,.2,1); }
+.terrain-photo-focus-emphasis::before { content: ""; position: absolute; inset: 2px; border-radius: 50%; background: color-mix(in srgb, #e56f2d 25%, transparent); filter: blur(4px); }
+.terrain-photo-focus-dot { position: relative; width: 8px; height: 8px; border: 1px solid #fff8ef; border-radius: 50%; background: #e56f2d; box-shadow: 0 1px 5px rgba(90, 37, 10, .2); }
+.dark .terrain-photo-focus-emphasis::before { background: color-mix(in srgb, #ff9851 25%, transparent); }
+.dark .terrain-photo-focus-dot { border-color: #18110d; background: #ff9851; }
+.terrain-photo-focus.is-active .terrain-photo-focus-emphasis { opacity: 1; transform: scale(1); }
+@media (prefers-reduced-motion: reduce) { .terrain-photo-focus-emphasis { transition: none; } }
+.terrain-map-status {
+  position: absolute;
+  z-index: 4;
+  top: 18px;
+  left: 18px;
+  display: grid;
+  min-width: 235px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 12px 15px 11px;
+  border: 1px solid color-mix(in srgb, var(--tl-ink) 13%, transparent);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--tl-paper) 78%, transparent);
+  box-shadow: 0 10px 32px rgba(18, 25, 22, 0.12);
+  backdrop-filter: blur(14px) saturate(1.25);
+  font-family: var(--font-ui);
+}
+.terrain-map-status span { color: var(--tl-accent); font-size: 10px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.terrain-map-status span.is-title { letter-spacing: .02em; text-transform: none; }
+.terrain-map-status strong { margin-top: 3px; font-family: var(--font-mono); font-size: 21px; line-height: 1; color: var(--tl-ink); }
+.terrain-map-status small { margin-top: 5px; overflow: hidden; color: color-mix(in srgb, var(--tl-ink) 72%, transparent); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.terrain-compass-group .terrain-map-compass { display: grid; place-items: center; color: var(--tl-accent); }
+.terrain-compass-group .terrain-map-compass:focus-visible { outline: 2px solid var(--tl-accent); outline-offset: 2px; }
+.terrain-map-compass-needle { display: grid; justify-items: center; align-content: center; height: 29px; transform: rotate(135deg); }
+.terrain-map-compass-needle > span { font: 800 8px/1 var(--font-ui); }
+.terrain-map-compass-needle svg { display: block; width: 12px; height: 19px; fill: currentColor; }
+.terrain-map-tools { position: absolute; z-index: 4; top: 18px; right: 18px; display: flex; gap: 8px; }
+.terrain-surface-tools { display: flex; }
+.travel-log-icon-btn { position: relative; display: grid; place-items: center; }
+.travel-log-icon-btn > svg { display: block; width: 15px; height: 15px; }
+.travel-log-icon-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  z-index: 20;
+  width: max-content;
+  max-width: 13rem;
+  padding: 6px 9px;
+  border: 1px solid color-mix(in srgb, var(--tl-ink) 12%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--tl-paper) 94%, transparent);
+  box-shadow: 0 7px 20px rgba(18,25,22,.16);
+  color: var(--tl-ink);
+  opacity: 0;
+  font: 600 11px/1.25 var(--font-ui);
+  pointer-events: none;
+  transform: translate(-50%, -4px);
+  transition: opacity .16s ease, transform .16s ease;
+  white-space: nowrap;
+}
+.travel-log-icon-btn:hover::after,
+.travel-log-icon-btn:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+.terrain-map-tools > :last-child .travel-log-icon-btn:last-child::after,
+.pj-map-tools > :last-child .travel-log-icon-btn:last-child::after,
+.basemap-ctl > :last-child .travel-log-icon-btn:last-child::after {
+  right: 0;
+  left: auto;
+  transform: translate(0, -4px);
+}
+.terrain-map-tools > :last-child .travel-log-icon-btn:last-child:hover::after,
+.terrain-map-tools > :last-child .travel-log-icon-btn:last-child:focus-visible::after,
+.pj-map-tools > :last-child .travel-log-icon-btn:last-child:hover::after,
+.pj-map-tools > :last-child .travel-log-icon-btn:last-child:focus-visible::after,
+.basemap-ctl > :last-child .travel-log-icon-btn:last-child:hover::after,
+.basemap-ctl > :last-child .travel-log-icon-btn:last-child:focus-visible::after {
+  transform: translate(0, 0);
+}
+.terrain-place {
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--tl-ink) 22%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tl-paper) 78%, transparent);
+  box-shadow: 0 3px 12px rgba(18,25,22,.15);
+  color: var(--tl-ink);
+  font: 700 9px/1.2 var(--font-ui);
+  letter-spacing: .04em;
+  white-space: nowrap;
+  backdrop-filter: blur(7px);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+.terrain-place-fuego { color: #c84828; }
+.terrain-place-trail-start,
+.terrain-place-camp { color: var(--tl-accent); }
+.terrain-place-waypoint {
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.terrain-waypoint-icon {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--tl-accent) 70%, var(--tl-paper));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tl-paper) 90%, transparent);
+  box-shadow: 0 4px 14px rgba(18,25,22,.18);
+  transition: transform .25s var(--ease), background-color .25s var(--ease);
+}
+.terrain-waypoint-icon svg { width: 15px; height: 15px; }
+.terrain-waypoint-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: 34px;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--tl-accent) 38%, var(--tl-paper));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--tl-paper) 92%, transparent);
+  box-shadow: 0 7px 20px rgba(18,25,22,.17);
+  color: var(--tl-accent);
+  opacity: 0;
+  font: 700 9px/1.2 var(--font-ui);
+  letter-spacing: .03em;
+  pointer-events: none;
+  transform: translate(-50%, 7px) scale(.92);
+  transform-origin: 50% 100%;
+  transition: opacity .22s var(--ease), transform .28s var(--ease);
+  white-space: nowrap;
+}
+.terrain-waypoint-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  border-right: inherit;
+  border-bottom: inherit;
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+}
+.terrain-place-waypoint.is-near .terrain-waypoint-icon {
+  background: color-mix(in srgb, var(--tl-accent) 12%, var(--tl-paper));
+  transform: scale(1.08);
+}
+.terrain-place-waypoint.is-near .terrain-waypoint-bubble {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+.terrain-attrib {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: var(--tl-attrib-h);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .45rem;
+  padding: 5px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--tl-ink) 10%, transparent);
+  background: color-mix(in srgb, var(--tl-paper) 94%, transparent);
+  color: color-mix(in srgb, var(--tl-ink) 58%, transparent);
+  font: 9px/1.2 var(--font-ui);
+  touch-action: none;
+}
+.terrain-attrib a { color: inherit; text-decoration: none; }
+.terrain-attrib a:hover { color: var(--tl-accent); }
+
+.terrain-story-col {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 22vh;
+  font-family: var(--font-serif-latin), var(--font-serif-zh);
+}
+.terrain-inner {
+  max-width: 40rem;
+  margin: 0 auto;
+  /* Mirror PTES' dedicated rail lane: the wider right inset belongs to the
+     progress axis, so prose and photographs never compete with its ticks. */
+  padding: 0 4.5rem 0 2.5rem;
+}
+.terrain-hero,
+.terrain-scene,
+.terrain-outro { width: 100%; }
+.terrain-hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 5rem 0 6rem;
+}
+.terrain-hero-content { margin: auto 0 0; }
+.terrain-hero > .travel-log-scroll-cue { margin-top: auto; margin-bottom: 34px; }
+.terrain-kicker { margin: 0 0 .8rem; color: var(--tl-accent); font: 750 11px/1.3 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; }
+.terrain-hero h1 { max-width: 9em; margin: 0; color: var(--tl-ink); font-family: var(--font-serif-zh), var(--font-serif-latin); font-size: clamp(2.25rem, 5.2vw, 4.3rem); font-weight: 650; line-height: 1.08; letter-spacing: -.035em; }
+.terrain-subtitle { margin: .75rem 0 0; color: color-mix(in srgb, var(--tl-ink) 66%, transparent); font: 650 13px/1.4 var(--font-ui); letter-spacing: .06em; }
+.terrain-intro { max-width: 35rem; margin: 2.1rem 0 0; color: color-mix(in srgb, var(--tl-ink) 80%, transparent); font-size: 1rem; line-height: 1.95; }
+.terrain-chapter-block { position: relative; padding: 0; scroll-margin-top: 1rem; }
+.terrain-chapter-block + .terrain-chapter-block {
+  padding-top: 26px;
+  border-top: 1px solid color-mix(in srgb, var(--tl-ink) 10%, transparent);
+}
+.terrain-chapter-bar {
+  position: sticky;
+  top: calc(var(--tl-top, 0px) + 46px);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 13px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--tl-ink) 13%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tl-paper) 94%, transparent);
+  box-shadow: 0 5px 18px rgba(18,25,22,.08);
+  backdrop-filter: blur(12px) saturate(1.2);
+  color: var(--tl-ink);
+  font-family: var(--font-ui);
+  transition: width .3s var(--ease), margin .3s var(--ease), border-color .25s ease, box-shadow .25s ease;
+}
+.terrain-chapter-fill { position: absolute; inset: 0 auto 0 0; width: var(--chapter-fill, 0%); border-radius: inherit; background: color-mix(in srgb, var(--tl-accent) 12%, transparent); transition: width .14s linear, background .25s ease; }
+.terrain-chapter-block.done .terrain-chapter-fill { background: color-mix(in srgb, var(--tl-ink) 7%, transparent); }
+.terrain-chapter-dot,
+.terrain-chapter-label,
+.terrain-chapter-title,
+.terrain-chapter-bar time { position: relative; z-index: 1; }
+.terrain-chapter-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: color-mix(in srgb, var(--tl-ink) 26%, transparent); transition: background .25s ease, transform .25s ease; }
+.terrain-chapter-label { flex: none; color: color-mix(in srgb, var(--tl-ink) 76%, transparent); font-size: 11px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.terrain-chapter-label.is-title { letter-spacing: .02em; text-transform: none; }
+.terrain-chapter-title { min-width: 0; overflow: hidden; color: color-mix(in srgb, var(--tl-ink) 58%, transparent); font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.terrain-chapter-title::before { content: "·"; margin-right: 9px; color: color-mix(in srgb, var(--tl-ink) 24%, transparent); }
+.terrain-chapter-bar time { margin-left: auto; flex: none; color: color-mix(in srgb, var(--tl-ink) 48%, transparent); font: 650 9px/1.2 var(--font-mono); letter-spacing: .02em; }
+.terrain-chapter-bar.on { border-color: color-mix(in srgb, var(--tl-accent) 76%, transparent); box-shadow: 0 4px 20px color-mix(in srgb, var(--tl-accent) 20%, transparent); }
+.terrain-chapter-bar.on .terrain-chapter-dot { background: var(--tl-accent); transform: scale(1.35); }
+@media (min-width: 1024px) {
+  .terrain-chapter-block.pinned .terrain-chapter-bar { width: calc(100% + 56px); margin-right: -56px; }
+}
+@media (min-width: 1280px) {
+  .terrain-chapter-block.pinned .terrain-chapter-bar { width: calc(100% + 148px); margin-left: -74px; margin-right: -74px; }
+}
+.terrain-scene { padding: 6.5rem 0 7rem; }
+.terrain-scene-head { margin-bottom: 2rem; }
+.terrain-scene-head h2 { max-width: 12em; margin: 0; color: var(--tl-ink); font-size: clamp(1.8rem, 3.4vw, 2.7rem); font-weight: 620; line-height: 1.18; letter-spacing: -.025em; }
+.terrain-scene > p { margin: 0 0 1.25rem; color: color-mix(in srgb, var(--tl-ink) 86%, transparent); font-size: 1rem; line-height: 2; text-align: justify; text-wrap: pretty; }
+.terrain-photo-stack { display: grid; gap: 2.2rem; margin-top: 2.8rem; }
+.terrain-story-photo { position: relative; margin: 0; overflow: hidden; border-radius: 14px; background: var(--tl-chip); box-shadow: 0 18px 45px rgba(24,30,27,.12); }
+.terrain-story-photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease); }
+.terrain-story-photo video { display: block; width: 100%; height: 100%; object-fit: cover; background: #080c0b; }
+.terrain-story-photo:hover img { transform: scale(1.015); }
+.terrain-story-photo figcaption { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: end; gap: 1.5rem; padding: 2.8rem 1.15rem 1rem; background: linear-gradient(transparent, rgba(7,12,10,.78)); color: white; font: 12px/1.45 var(--font-ui); }
+.terrain-story-photo.is-video figcaption { top: 0; bottom: auto; align-items: start; padding: 1rem 1.15rem 2.8rem; background: linear-gradient(rgba(7,12,10,.72), transparent); pointer-events: none; }
+.terrain-story-photo figcaption span { max-width: 75%; }
+.terrain-story-photo figcaption small { flex: none; font: 9px/1.3 var(--font-mono); opacity: .8; }
+.terrain-outro { min-height: 55vh; display: flex; flex-direction: column; justify-content: center; padding: 5rem 0; text-align: center; }
+.terrain-outro span { color: var(--tl-accent); font: 750 10px/1.4 var(--font-ui); letter-spacing: .2em; }
+.terrain-outro p { margin: .8rem 0 0; color: var(--tl-ink); font-size: 1.25rem; }
+
+@media (max-width: 1023px) {
+  .terrain-map-col {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    width: 100%;
+    height: var(--log-map-height, 62vh);
+    min-height: var(--log-map-height, 62vh);
+    border-right: 0;
+    border-bottom: 1px solid var(--tl-paper-line);
+  }
+  .terrain-story-col { padding-bottom: 9vh; }
+  .terrain-inner { padding: 0 1.25rem; }
+  .terrain-hero { min-height: 62vh; padding: 4rem 0; }
+  .terrain-chapter-block { padding: 0; scroll-margin-top: var(--log-landing, 560px); }
+  .terrain-chapter-block + .terrain-chapter-block { padding-top: 22px; }
+  .terrain-scene { padding: 4rem 0 5rem; }
+  .terrain-chapter-bar { top: calc(var(--log-map-height, 62vh) + 12px); }
+  .terrain-map-status { top: 12px; left: 12px; min-width: 190px; padding: 9px 11px; }
+  .terrain-map-status strong { font-size: 17px; }
+  .terrain-map-tools { top: 12px; right: 12px; }
+  .terrain-map-tools .pj-tool-btn { width: 28px; }
+}
+@media (max-width: 560px) {
+  .terrain-map-status { width: 145px; min-width: 145px; max-width: 145px; }
+  .terrain-map-tools {
+    gap: 4px;
+  }
+  .terrain-map-tools .pj-tool-btn { width: 26px; }
+  [data-log-kind="terrain"] .travel-log-back { top: 100px; right: 14px; }
+  .terrain-story-photo figcaption { display: block; }
+  .terrain-story-photo figcaption span { display: block; max-width: none; }
+  .terrain-story-photo figcaption small { display: block; margin-top: .35rem; }
+  .terrain-place-agua,
+  .terrain-place-antigua { display: none; }
+}
+@media (max-width: 340px) {
+  .terrain-map-status { width: 94px; min-width: 94px; max-width: 94px; }
+  .terrain-map-tools .pj-tool-btn { width: 24px; }
+}
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-L"),
+    url("/fonts/genwanmin2tc-l.woff2")
+      format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-R"),
+    url("/fonts/genwanmin2tc-r.woff2")
+      format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-M"),
+    url("/fonts/genwanmin2tc-m.woff2")
+      format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GenWanMin2 TC";
+  src:
+    local("GenWanMin2TC-SB"),
+    url("/fonts/genwanmin2tc-sb.woff2")
+      format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Cactus Classical Serif (仙人掌明體) — kept as the deep fallback behind
+   GenWanMin2 TC (subset webfont, 2026-09-07).
+   The full TTF is 28 MB — never put it in public/. scripts/subset-cactus.py
+   shrinks it to the chars the site actually uses → public/fonts/cactus-subset.woff2
+   (~316 KB); re-run it after adding substantial new content (managed venv:
+   C:/Users/V1nce/.workbuddy/binaries/python/envs/default/Scripts/python.exe
+   scripts/subset-cactus.py). `local()` first: visitors with the font
+   installed use their full local copy and skip the download entirely.
+   Chars missing from the subset fall through the stack to Noto Serif SC. */
+@font-face {
+  font-family: "Cactus Classical Serif";
+  src:
+    local("Cactus Classical Serif"),
+    local("CactusClassicalSerif-Regular"),
+    url("/fonts/cactus-subset.woff2")
+      format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* EB Garamond — the site's Latin serif (2026-10-25, user choice).
+   Replaces the `"Palatino Linotype", …` system stack. Registered as a
+   *variable* font (wght 400–800) so one file per style covers every weight the
+   layout asks for (`font-medium|semibold|bold` = 500/600/700). The upstream
+   variable pair is 583 KB; scripts/subset-ebgaramond.py cuts it to Latin
+   Basic + Latin-1 + Latin Extended-A + general punctuation + currency/arrow/
+   math blocks + Latin ligatures → ~106 KB for both styles. Source woff2 and
+   OFL text live in assets-src/fonts/EBGaramond/ (never deployed raw).
+
+   Keep the size compensation on these Latin faces only, registered once per
+   used weight (400/500/600/700/800). Both variable files have x-heights of
+   400/407/413/419/423 per 1000 em at these weights. Each size-adjust value
+   preserves the previous body-level ex-height 0.47 target: 0.47 / x-height.
+   All registrations reuse the same two URLs and cached font files.
+   The inherited body rule also shrank GenWanMin2 TC to 91.44% of its native
+   size (0.47 / 0.514), and affected UI fonts. Removing it restores Chinese
+   glyphs by ~9.36% without enlarging English embedded in Chinese content.
+   Do not combine the old body rule with size-adjust: it cancels this scaling.
+
+   No `local()` entry on purpose: EB Garamond is rarely installed on Windows
+   or macOS, and a locally-installed full-width build would silently differ
+   from this subset. The subset is small enough that caching wins. */
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  size-adjust: 117.5%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  size-adjust: 115.479115%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  size-adjust: 113.801453%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  size-adjust: 112.171838%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-roman.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  size-adjust: 111.111111%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  size-adjust: 117.5%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
+  size-adjust: 115.479115%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 600;
+  font-style: italic;
+  size-adjust: 113.801453%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  size-adjust: 112.171838%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/ebgaramond-italic.woff2") format("woff2");
+  font-weight: 800;
+  font-style: italic;
+  size-adjust: 111.111111%;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------------
+ * Global page scale (2026-09-05)
+ * Mimics ~90% browser zoom: the root font-size drives every rem-based length
+ * (all Tailwind spacing / text / max-width utilities, .shell, prose), so the
+ * whole layout renders ~10% narrower with natural side whitespace — without
+ * the fixed-positioning and pointer-coordinate quirks of CSS `zoom`.
+ * PX-sized details (1px borders, the spacetime grid) intentionally keep
+ * their size. Tune --page-scale to retune the whole site's density.
+ * ------------------------------------------------------------------------- */
+:root {
+  --page-scale: 0.9;
+}
+
+html {
+  font-size: calc(16px * var(--page-scale));
+}
+
+/* ---------------------------------------------------------------------------
+ * Small-type tier (2026-10-25)
+ * --page-scale also divides every type size, which pushed the labels and
+ * metadata tier below the legibility floor: text-xs rendered 10.8 px and
+ * text-[10px] rendered 9 px. The reading sizes are fine at this density, so
+ * ONLY the two small steps are lifted — body copy, .prose and every container
+ * width stay byte-identical, which is why this cannot reflow the layout.
+ *   12.0 -> 12.96 px  (+8%)   text-xs (and every text-xs / sm / lg mix)
+ *   14.0 -> 14.69 px  (+5%)   text-sm
+ * Tailwind v4 resolves text-xs / text-sm from these two theme keys, so this
+ * replaces the old 0.75 / 0.875 rem steps everywhere with no class churn.
+ * The arbitrary bracket sizes (39 sites of text-[10px] / text-[11px] plus a
+ * few 9 / 9.5 / 10.5 px chrome chips) are NOT reached by these keys — verified
+ * in the built CSS, they stay literal px — so a second rule lifts them to
+ * parity with the new text-xs. See `html :is(...)` below. Both are needed.
+ * ------------------------------------------------------------------------- */
+@theme {
+  --text-xs: 0.9rem; /* 12.96 px at --page-scale 0.9 */
+  --text-sm: 1.02rem; /* 14.69 px */
+}
+
+/* Arbitrary `text-[Npx]` utilities compile to literal px (they are not theme
+ * lookups), so the sub-12 px ones cannot be moved through --text-*. Lift every
+ * step below 12 px onto the same 12.96 px as the new text-xs rather than
+ * bumping each by a percentage: these are tiny chrome labels (header BETA chip
+ * 9 px, gallery card badges 9.5 / 10.5 px) where a mere +8% would leave them
+ * unreadable. Listing the classes keeps the rule out of every other utility;
+ * the html scope out-ranks the single-class declaration. */
+html :is(.text-\[9px\], .text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .text-\[11px\]) {
+  font-size: 0.9rem;
+}
+
+/* Metadata badges use their own compact type/line-height, independent of
+   the small-type lift above. Keep filter buttons at their normal target size. */
+.post-category-tag {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  padding: 0.2rem 0.6rem;
+  white-space: nowrap;
+}
+
+/* Home feed labels and preview flags are supporting metadata. Do not add
+   arbitrary text-[9px]/text-[10px] utilities: the global lift would win. */
+.recent-post-tag {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+}
+/* Small auxiliary badges, independent of the global reading-size floor. */
+.badge-text {
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+.badge-text-sm {
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  padding: 0.2rem 0.55rem;
+}
+.beta-badge {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.16rem 0.45rem;
+}
+
+/* A single background follows desktop nav hover/focus without moving text. */
+.primary-nav-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 0;
+  height: 0;
+  border-radius: 9999px;
+  background: var(--surface-sink);
+  pointer-events: none;
+  opacity: 0;
+  transition: transform 200ms var(--ease), width 200ms var(--ease), height 200ms var(--ease), opacity 120ms linear;
+}
+.primary-nav-rail[data-indicator-ready] .primary-nav-link {
+  background-color: transparent;
+}
+.primary-nav-label {
+  position: relative;
+  display: inline-flex;
+  align-self: stretch;
+  align-items: center;
+}
+.primary-nav-link[aria-current="page"] .primary-nav-label::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 0.6rem;
+  height: 2px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: var(--brand);
+  opacity: 0.65;
+}
+@media (prefers-reduced-motion: reduce) {
+  .primary-nav-indicator { transition: none; }
+}
+
+/*
+ * Theme switching is class-based: `.dark` on <html> enables the dark palette.
+ * A no-FOUC inline script (components/theme/theme-script.tsx) sets the class
+ * before hydration. `dark:` utilities below are driven by that class, not by
+ * `prefers-color-scheme`.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+ * Design tokens
+ * Palette is editable in one place so future color experiments are cheap.
+ *
+ * AUTHORITATIVE SOURCE: the Stitch "Home – Desktop Layout Variant 3" mocks
+ * (new/stitch_design_system_creator/home_..._animated_interactive/code.html for
+ * light, home_..._dark_mode_refined/code.html for dark). Stitch generated
+ * per-page palettes that disagree with each other; per the 2026-09-04 decision
+ * every conflict resolves to the HOME page, so these tokens ARE home's palette:
+ *   light  → M3 "icy": #f5fafd paper, sky-cyan #1ba7c9 primary (deepened
+ *            from the dark #3ccfff so it reads on near-white), #171c1f ink,
+ *            containers #eff4f8 / #e9eff2, light-cyan accents #41cfff/#bce9ff.
+ *   dark   → deep slate #0c1219, cards #101824→#223348, crisp cyan #3ccfff,
+ *            near-white ink #f0f6fc.
+ * ------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  /* surfaces — near-white ice, cool tint */
+  --canvas: #f5fafd;
+  --surface: #ffffff; /* card = surface-container-lowest */
+  --raised: #ffffff;
+  --surface-tint: #eff4f8; /* subtle hover fills, code chips (container-low) */
+  --surface-sink: #e9eff2; /* pressed / active chip (surface-container) */
+
+  /* text — soft near-black */
+  --ink: #171c1f;
+  --muted: #3d484e; /* on-surface-variant */
+  --faint: #6d797f; /* outline */
+
+  /* lines */
+  --line: #d7e1e7;
+  --line-strong: #b6c3cb;
+
+  /* brand + accents — sky-cyan primary. Light deepens the shared cyan
+     (#1ba7c9 vs dark #3ccfff) so it stays readable on the near-white canvas,
+     but the hues read as the same sky blue across modes. */
+  --brand: #1ba7c9;
+  --brand-strong: #0f86a3; /* hover: darker sky on light, brighter on dark */
+  --brand-soft: color-mix(in srgb, var(--brand) 10%, transparent);
+  --on-brand: #ffffff; /* on-primary */
+  --accent: #376476; /* secondary */
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+  --on-accent: #ffffff; /* on-secondary — added 2026-09-04 for card hover-fill */
+  --tertiary: #825500; /* warm accent, used for chips/variety */
+  --tertiary-soft: color-mix(in srgb, var(--tertiary) 10%, transparent);
+  --on-tertiary: #ffffff; /* added 2026-09-04 for card hover-fill */
+  /* curated accent — orange-red, the gallery's featured-collection colour.
+     Mirrors --brand (theme-paired): items marked `featured` in items.json use
+     this in place of the default blue. */
+  --curated: #c8441f;
+  --curated-soft: color-mix(in srgb, var(--curated) 13%, transparent);
+
+  /* typography stacks */
+  /* No trailing generic `serif` here ON PURPOSE. Every use site appends
+     var(--font-serif-zh/-ja), which already ends with one. A generic family
+     in the middle of the combined list sits AHEAD of the CJK families and
+     swallows all CJK text — Chinese silently rendered in the platform's
+     default serif and the self-hosted webfonts never even loaded
+     (document.fonts status stayed "unloaded"; found 2026-09-07). */
+  --font-serif-latin: "EB Garamond", "Palatino Linotype", "Book Antiqua",
+    Palatino, Georgia, "Times New Roman";
+  /* "GenWanMin2 TC" (源雲明體丹) leads the zh stack (2026-09-07, user
+     choice): Source-Han-based, so simplified codepoints are fully covered —
+     no per-glyph mixing. Self-hosted as per-weight subset woff2 (see the
+     @font-face block at the top of this file; regenerate via
+     scripts/subset-cjk-fonts.py). Cactus Classical Serif stays behind it as
+     a deep fallback for the few chars GenWanMin lacks (rarely reached, so
+     its woff2 is only downloaded if actually needed). */
+  --font-serif-zh: "GenWanMin2 TC", "Cactus Classical Serif",
+    "Noto Serif SC", "Source Han Serif SC", SimSun, "Songti SC", "Songti TC",
+    serif;
+  --font-serif-ja: "Noto Serif JP", "Yu Mincho", "YuMincho", serif;
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* shape */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  /* elevation — borders + restrained shadows.
+   *
+   * `--shadow-lift` is a CARD shadow: its 32px blur is tuned for a 300px+
+   * tile. On a 44–64px control (the CV download pill, a search field) that
+   * same blur reads as a halo detached from the object — the "阴影太大"
+   * report of 2026-10-17. Controls therefore get `--shadow-ctl`: same
+   * "rises toward you" gesture, but a 12px blur with a NEGATIVE spread so
+   * the shadow hugs the shape. Use `hover:shadow-ctl` on anything button-
+   * sized; keep `hover:shadow-lift` for cards. */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.05);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.05), 0 14px 32px rgb(0 0 0 / 0.1);
+  --shadow-ctl: 0 1px 2px rgb(0 0 0 / 0.05), 0 4px 12px -4px rgb(0 0 0 / 0.14);
+  --shadow-panel: 0 24px 60px -20px rgb(0 0 0 / 0.35);
+
+  /* motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 160ms;
+  --dur: 240ms;
+
+  /* reading measure */
+  --measure: 68ch;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* surfaces — deep slate navy */
+  --canvas: #0c1219;
+  --surface: #101824; /* card (surface-container-low) */
+  --raised: #162232; /* surface-container */
+  --surface-tint: #162232; /* hover fills (surface-container) */
+  --surface-sink: #1c2b3e; /* active chip / stronger hover (container-high) */
+
+  /* text */
+  --ink: #f0f6fc;
+  --muted: #94a3b8;
+  --faint: #6e7681;
+
+  /* lines */
+  --line: #2a3745;
+  --line-strong: #3e4d5c;
+
+  /* brand + accents — sharp cyan-on-slate */
+  --brand: #3ccfff;
+  --brand-strong: #62d4ff;
+  --brand-soft: color-mix(in srgb, var(--brand) 14%, transparent);
+  --on-brand: #001f29; /* on-primary (deep teal, high-contrast on cyan) */
+  --accent: #62d4ff;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --on-accent: #001f29; /* deep teal on bright cyan (added 2026-09-04) */
+  --tertiary: #ffb952; /* warm amber accent on dark */
+  --tertiary-soft: color-mix(in srgb, var(--tertiary) 14%, transparent);
+  --on-tertiary: #2a1c00; /* near-black on amber (added 2026-09-04) */
+  /* curated (gallery featured) accent on dark — brighter orange-red so it stays
+     legible on the slate navy. Same hue family as the light --curated. */
+  --curated: #ff7b45;
+  --curated-soft: color-mix(in srgb, var(--curated) 15%, transparent);
+
+  /* elevation */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 20px rgb(0 0 0 / 0.25);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 40px rgb(0 0 0 / 0.45);
+  /* Dark elevation reads as a dark halo, so it needs less blur, not more. */
+  --shadow-ctl: 0 1px 2px rgb(0 0 0 / 0.45), 0 4px 12px -4px rgb(0 0 0 / 0.55);
+  --shadow-panel: 0 24px 70px -18px rgb(0 0 0 / 0.8);
+}
+
+/* Map tokens to Tailwind utility names (bg-canvas, text-ink, text-muted,
+ * border-line, text-brand, text-accent, bg-raised, bg-surface, …).
+ * `inline` keeps utilities referencing the custom properties directly so the
+ * `.dark` overrides above apply without a rebuild.
+ */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-surface-tint: var(--surface-tint);
+  --color-surface-sink: var(--surface-sink);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-soft: var(--tertiary-soft);
+  --color-on-tertiary: var(--on-tertiary);
+
+  --font-serif: var(--font-serif-latin), var(--font-serif-zh);
+  --font-ui: var(--font-ui);
+  --font-mono: var(--font-mono);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-lift: var(--shadow-lift);
+  --shadow-ctl: var(--shadow-ctl);
+  --shadow-panel: var(--shadow-panel);
+}
+
+@layer base {
+  html {
+    background: var(--canvas);
+    /* No global `scroll-behavior: smooth` here: Next.js resets scroll to the
+       top of a newly navigated page during client-side transitions, and a
+       page-wide smooth would turn that instant reset into a visible "fly back
+       to top" from wherever the previous page was scrolled (reported on blog
+       posts, 2026-09-04). Animations that want easing pass `behavior:
+       "smooth"` explicitly (the capsule nav's back-to-top control). This offset
+       keeps anchor targets (#main, blog #category tags, …) clear of the pinned
+       capsule nav. */
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-serif-latin), var(--font-serif-zh);
+    font-size: 1.0625rem; /* ~17px, comfortable for serif reading */
+    line-height: 1.65;
+    /* Latin size compensation lives on its @font-face rules, so Chinese and
+       UI fonts retain their own metrics instead of inheriting an x-height target. */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background-color var(--dur-fast) var(--ease),
+      color var(--dur-fast) var(--ease);
+  }
+
+  /* Language-aware stacks: zh/ja fragments fall back to the right serif. */
+  :lang(zh) {
+    font-family: var(--font-serif-latin), var(--font-serif-zh);
+  }
+  :lang(ja) {
+    font-family: var(--font-serif-latin), var(--font-serif-ja);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif-latin), var(--font-serif-zh);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.005em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  a {
+    color: var(--brand);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  a:hover {
+    color: var(--brand-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--brand-soft);
+  }
+
+  :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Semantic helpers used across the shell. Kept minimal here; page-level
+ * components compose layout with Tailwind utilities. */
+@layer components {
+  /* Sans-serif surface for UI text: labels, nav, tags, metadata, buttons. */
+  .ui-text {
+    font-family: var(--font-ui);
+  }
+
+  .shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 72rem;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .shell {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Horizontally scrollable chip rows that do not show a scrollbar. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Theme toggle — 3-way (light / dark / system).
+ * All three stacked icons are always in the DOM; exactly one is shown based on
+ * `data-theme` on <html> (set by theme-script before hydration, updated on
+ * click). When no attribute is present yet, "system" is the safe default.
+ * ------------------------------------------------------------------------- */
+.ti-sun,
+.ti-moon,
+.ti-system {
+  display: none;
+}
+
+html[data-theme="light"] .ti-sun {
+  display: block;
+}
+
+html[data-theme="dark"] .ti-moon {
+  display: block;
+}
+
+html[data-theme="system"] .ti-system,
+html:not([data-theme]) .ti-system {
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+ * Gallery lightbox motion (2026-09-04, Request C).
+ * Open: the overlay fades in (.gb-overlay-in). The panel itself expands from
+ * the clicked thumbnail via a shared-element (FLIP) transition driven by inline
+ * styles in gallery-view.tsx, so it needs no CSS keyframe. Close: requestClose
+ * swaps the overlay class to .gb-overlay-out (fade out) and shrinks the panel
+ * back onto the thumbnail with inline transitions, then unmounts. Photos
+ * switched with ←/→ remount the <img> by key, so .gb-img-in fades each frame in.
+ * Reduced motion is already flattened by the global `*` rule in @layer base.
+ * ------------------------------------------------------------------------- */
+@keyframes gb-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes gb-stage-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.gb-overlay-in {
+  animation: gb-overlay-in 0.25s ease-out both;
+}
+.gb-overlay-out {
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.gb-img-in {
+  animation: gb-stage-in 0.22s ease-out both;
+}
+
+/* ---------------------------------------------------------------------------
+ * Route-content fade (2026-09-05, Task D #4).
+ * The whole <main> page content is remounted per pathname by a keyed client
+ * wrapper (components/layout/route-fade.tsx); each mount replays this short
+ * ease — opacity 0→1 with a 4px rise — so internal navigation feels like the
+ * new page "渗透" (bleeds in) over the canvas instead of snapping. Only a small
+ * translateY is animated and the final frame is `transform: none`, so no fixed
+ * descendant (gallery lightbox overlay) is given a containing block after the
+ * run. Reduced motion is flattened by the global `*` rule in @layer base.
+ * ------------------------------------------------------------------------- */
+@keyframes route-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.route-fade {
+  /* `both`/`forwards` would keep the (identity-matrix) transform of the last
+     keyframe applied after the run ends, and an applied transform — even the
+     identity — makes `.route-fade` a containing block for `position: fixed`
+     descendants (the gallery lightbox overlay). That pinned the overlay to the
+     whole page column instead of the viewport, so the opened card rendered
+     off-position and oversized. `backwards` covers the (zero) delay before the
+     run and nothing after it, so once the fade finishes the element returns to
+     its base style (no transform) and fixed overlays are unaffected again. */
+  animation: route-in 0.26s var(--ease) backwards;
+}
+
+/* ---------------------------------------------------------------------------
+ * Gallery lightbox — decorative one-dot location map (2026-09-05).
+ * `.world-map` (components/gallery/gallery-view.tsx) sits in the open card's
+ * caption between the title and the alt quote. The sheet is kept exactly as
+ * shipped (its own #dadada land / #fff coast colours) — we only fade it so it
+ * reads as a faint engraved mark in BOTH themes, and tint the single marker
+ * with the card accent --tile-accent (set on the caption rail by accentVars).
+ * The marker lives in an overlay <svg> sharing the sheet's viewBox, so its raw
+ * projected coordinates land on the geographic point; the halo's resting state
+ * is opacity 0, so with motion reduced (global flatten + the rule below) only
+ * the static core dot shows.
+ * ------------------------------------------------------------------------- */
+.world-map {
+  position: relative;
+}
+.world-map-img {
+  opacity: 0.7;
+}
+.dark .world-map-img {
+  opacity: 0.34;
+}
+.world-map-marker {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+}
+.world-map-marker circle {
+  fill: var(--tile-accent, var(--brand));
+}
+.world-map-core {
+  stroke: var(--surface);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke; /* ring stays ~constant px at any zoom */
+  paint-order: stroke;
+}
+.world-map-halo {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: world-map-pulse 2.6s var(--ease) infinite;
+}
+@keyframes world-map-pulse {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.9);
+  }
+  55%,
+  100% {
+    opacity: 0;
+    transform: scale(2.7);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-map-halo {
+    animation: none;
+  }
+}
+
+/* About travel board markers (2026-09-05) — soft glow base + the breathing
+   halo above, plus hover states shared with the checklist via one hoverId in
+   travel-board.tsx. Everything animated here is transform/opacity only
+   (compositor-driven, no layout/paint per frame); the glow's blur filter is
+   static, so it is rasterised once and never repainted. The hotspot ring and
+   the core scale-up are pure transitions on the `.travel-map-hot` group set
+   from React. Reduced motion kills the breathing halo (rule above); the
+   hover states are transitions, which the global flatten leaves instant.
+   Kind colours (2026-09-05, user request): visited = brand blue, wishlist =
+   orange-red — the map dots AND the checklist icons both read these vars,
+   so the two stay in sync by construction. */
+.travel-board {
+  --travel-visited: var(--brand);
+  --travel-wish: #e8590c;
+}
+.dark .travel-board {
+  --travel-wish: #ff8a5c; /* brighter orange-red for the dark canvas */
+}
+.travel-pt-glow {
+  opacity: 0.16;
+  /* blur is set inline in travel-board.tsx (MARKER.glow / 3) so it scales
+     with the radius knob — no separate CSS value to keep in sync. */
+  transition: opacity 250ms var(--ease);
+}
+.dark .travel-pt-glow {
+  opacity: 0.24;
+}
+.travel-map-hot .travel-pt-glow {
+  opacity: 0.42;
+}
+.travel-pt-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 250ms var(--ease);
+}
+.travel-map-hot .travel-pt-core {
+  transform: scale(1.3);
+}
+.travel-pt-ring-hot {
+  opacity: 0;
+  transition: opacity 250ms var(--ease);
+}
+.travel-map-hot .travel-pt-ring-hot {
+  opacity: 0.9;
+}
+/* Invisible oversized target re-enabling pointer events inside the
+   otherwise pointer-transparent map layer (img + svg root stay inert). */
+.travel-map-hit {
+  pointer-events: auto;
+  cursor: default;
+}
+/* Place-name tooltip anchored at the hot marker's projected coordinates
+   (position comes from travel-board.tsx as % of the sheet box). Sits above
+   the point; `.map-tip-below` flips it underneath near the sheet's top edge. */
+.map-tip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 12px));
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 5;
+  animation: map-tip-in 160ms var(--ease) backwards;
+}
+.map-tip-below {
+  transform: translate(-50%, 14px);
+}
+@keyframes map-tip-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Homepage "email-copy" button — stacked three-state micro-interaction
+ * (reference 2026-09-04). Three text states occupy the same grid cell and
+ * slide vertically: idle ("Email me" + envelope) → hover cue ("click to
+ * copy") while hovering, and → success (check + "copied") for ~1.8 s after a
+ * click. The grid overlap keeps the button width constant at the widest
+ * state, so neighbours in the hero action row never reflow.
+ *
+ * The base look reuses the action-row tokens via the utility classes on the
+ * element (rounded-lg surface card, border, paddings, hover lift). Only the
+ * transient `.is-copied` fill introduces the success green #20a05a chosen
+ * against the locked v1 palette (2026-09-04). Rules here sit outside @layer,
+ * so they override the layered Tailwind utilities when both apply.
+ * ------------------------------------------------------------------------- */
+.email-copy {
+  position: relative;
+  display: inline-grid;
+  min-width: max-content;
+  overflow: hidden;
+
+  transition:
+    background-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms ease,
+    transform 180ms ease;
+}
+
+.email-copy:hover {
+  /* same lift the other action-row buttons get on hover */
+  transform: translateY(-2px);
+}
+
+/* Each state fills the shared cell and centres its content. */
+.email-copy__state {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* matches the action-row gap-1.5 */
+  white-space: nowrap;
+
+  transition:
+    transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 350ms ease;
+}
+
+.email-copy__idle {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* hover-cue and success states wait one row below the fold */
+.email-copy__hover,
+.email-copy__done {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+/* Hover: idle slides up, hover cue slides in */
+.email-copy:hover .email-copy__idle {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.email-copy:hover .email-copy__hover {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Copied: both upper states clear, success slides in on a green fill */
+.email-copy.is-copied {
+  background: #20a05a;
+  border-color: #20a05a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgb(32 160 90 / 0.22);
+}
+.email-copy.is-copied .email-copy__idle,
+.email-copy.is-copied .email-copy__hover {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.email-copy.is-copied .email-copy__done {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------------------
+ * About-page prose widgets (2026-09-04) — spoiler text + recommendation pill.
+ * Both live in hand-authored markdown (content/about/*.md), rendered through
+ * components/content/prose.tsx:
+ *
+ *  • heimu (<span class="heimu">…</span>) — the classic wiki spoiler. The text
+ *    sits under an ink bar and lights up only on hover; About's tiny client
+ *    wrapper adds a tap/click toggle (.is-open) for touch & keyboard. Style
+ *    mirrors the legacy Jekyll rule (bar stays, text turns light), theme-aware:
+ *    a soft gray-black bar on light, a soft slate bar on the deep navy canvas
+ *    in dark mode. Reveal text is a fixed near-white so it stays legible on
+ *    the bar in both themes.
+ *  • a.rec — a markdown link whose title begins with "推荐：" / "Recommendation:"
+ *    is turned into a capsule trigger by a rehype plugin in prose.tsx; hovering
+ *    (or keyboard focus) pops a little pill just above the text via ::after
+ *    reading the data-rec attribute. No layout shift — it overlays.
+ * ------------------------------------------------------------------------- */
+
+/* ---- facts counter chip completion ----
+ * When every sealed envelope on the About board is unsealed, the counter chip
+ * pops once (scale bounce) and settles into the site's locked success green
+ * #20a05a — the same green as the email-copy button — with a scale-in
+ * checkmark. The class stays applied, so the green background persists; the
+ * one-shot animations run only on the moment the class is added. */
+@keyframes facts-chip-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes facts-chip-check-in {
+  0% {
+    transform: scale(0) rotate(-30deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.3) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.facts-chip-done {
+  background: #20a05a;
+  border-color: #20a05a;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgb(32 160 90 / 0.22);
+  animation: facts-chip-pop 0.45s var(--ease);
+}
+.facts-chip-done .facts-chip-check {
+  animation: facts-chip-check-in 0.4s var(--ease) 0.12s backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .facts-chip-done,
+  .facts-chip-done .facts-chip-check {
+    animation: none;
+  }
+}
+
+/* ---- Site Navigation gateway scroll-reveal (2026-09-05) ----
+ * The home gateway grid arms (via the GatewayReveal client component) only
+ * after JS mounts, so no-JS/SSR visitors always see the cards. When armed and
+ * the grid first intersects, `.is-in` lands once and each `.gw-item` fades
+ * and rises in, staggered 80ms per card via its inline `--gw-i` index. The
+ * component never arms under prefers-reduced-motion; the media query below is
+ * a belt-and-braces guard. Hover lift lives on the inner card div, so these
+ * transforms never fight it. */
+.gw-reveal .gw-item {
+  transition:
+    opacity 0.5s var(--ease),
+    transform 0.5s var(--ease);
+  transition-delay: calc(var(--gw-i, 0) * 80ms);
+}
+.gw-armed:not(.is-in) .gw-item {
+  opacity: 0;
+  transform: translateY(14px);
+}
+.gw-reveal.is-in .gw-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gw-reveal .gw-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---- gateway circle reveal (2026-09-05) ----
+ * Each Site Navigation card keeps its photo *behind* the content; on
+ * hover-capable pointers (and keyboard focus) an expanding circle anchored at
+ * the watermark's corner uncovers it — an iris/spotlight reveal rather than a
+ * prop flying out. The circle never overhangs the card, so the layout stays
+ * strictly inside the rounded corners. A surface-toned veil between photo and
+ * text keeps copy readable (theme-aware via --surface). The image still
+ * lazy-swaps from data-peek-src on first hover/focus (delegated in
+ * GatewayReveal), so page load carries zero photo bytes. The watermark icon
+ * yields while the reveal is open. Touch pointers get the same reveal driven
+ * by scroll position — the midline `.is-live` block below. */
+.gateway-orb {
+  position: absolute;
+  inset: 0;
+  clip-path: circle(0% at calc(100% - 36px) calc(100% - 36px));
+  transition: clip-path 0.55s var(--ease);
+}
+.gateway-orb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* inline style may override with contain for the CV strip */
+  background: #eceae4; /* placeholder tone until the lazy swap lands */
+  /* Decode gate (GatewayReveal.arm): the orb's circle reveal is pure CSS on
+     :hover and cannot wait for the image, so the photo itself stays hidden
+     until `.peek-ready` lands (img.decode() resolved, ≤1.5s fallback). On a
+     slow network the circle uncovers a soft veil wash first and the photo
+     fades in once whole — never a half-downloaded scanline mess. */
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+}
+.gateway-orb img.peek-ready {
+  opacity: 1;
+}
+.gateway-orb-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--surface) 88%, transparent),
+    color-mix(in srgb, var(--surface) 62%, transparent) 52%,
+    color-mix(in srgb, var(--surface) 74%, transparent)
+  );
+}
+@media (hover: hover) {
+  .group:hover .gateway-orb,
+  .group:focus-within .gateway-orb {
+    clip-path: circle(142% at calc(100% - 36px) calc(100% - 36px));
+  }
+  .group:hover .gateway-watermark,
+  .group:focus-within .gateway-watermark {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gateway-orb {
+    transition: none;
+  }
+  .gateway-orb img {
+    transition: none;
+  }
+}
+
+/* ---- story tile hover orb + launching confirm (2026-09-26) ----
+ * The /travel hub's story tiles borrow the home gateway language: on
+ * hover/focus a cover photo is uncovered by a clip-path circle anchored at
+ * the card's bottom-right corner (same easing and anchor spirit as
+ * .gateway-orb), dimmed by the same surface veil so the typographic content
+ * (kept at z-10) stays readable. Click adds .is-launching — the gateway's
+ * "pressed settle" — before the host's delayed navigation. */
+.story-orb {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  clip-path: circle(0% at calc(100% - 34px) calc(100% - 34px));
+  transition: clip-path 0.5s var(--ease);
+}
+.story-orb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.story-orb-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--surface) 88%, transparent),
+    color-mix(in srgb, var(--surface) 62%, transparent) 52%,
+    color-mix(in srgb, var(--surface) 74%, transparent)
+  );
+}
+@media (hover: hover) {
+  .story-tile:not([data-return-idle]):hover {
+    translate: 0 -0.25rem;
+    border-color: var(--line-strong);
+    box-shadow: var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+      var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-lift);
+  }
+  .story-tile:not([data-return-idle]):hover .story-orb {
+    clip-path: circle(142% at calc(100% - 34px) calc(100% - 34px));
+  }
+}
+.story-tile:not([data-return-idle]):focus-visible .story-orb {
+  clip-path: circle(142% at calc(100% - 34px) calc(100% - 34px));
+}
+.story-tile[data-return-idle],
+.story-tile[data-return-idle] .story-orb {
+  transition: none;
+}
+.story-tile.is-launching {
+  transform: scale(0.985);
+  transition-duration: 0.18s;
+}
+/* Launch stamp on story tiles (2026-09-28, user request — same ack as the
+   home navigation pane): circle chip pops in around a drawn right arrow.
+   Shares the gateway's keyframes; the chip keeps the type readable because
+   the stamp only plays for the 320ms hold before navigation. */
+.story-tile.is-launching .gateway-stamp-chip {
+  animation: gw-stamp-pop 0.28s var(--ease) forwards;
+}
+.story-tile.is-launching .gateway-stamp-chip svg path {
+  animation: gw-arrow-draw 0.24s 0.08s var(--ease) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-orb {
+    transition: none;
+  }
+  .story-tile.is-launching {
+    transition: none;
+  }
+  .story-tile.is-launching .gateway-stamp-chip,
+  .story-tile.is-launching .gateway-stamp-chip svg path {
+    animation: none;
+  }
+}
+
+/* ---- gateway title glass capsule (2026-09-05) ----
+ * Frosted pill behind the card title ("Blog" & co.). Home cards offset its
+ * left padding so the title text aligns with its description; other
+ * consumers retain the original capsule geometry. At rest it is fully
+ * transparent; on hover-capable pointers /
+ * keyboard focus it frosts over (surface glass + blur) with the tone tint
+ * fading in — same soft → vivid colour story as the number chip, and the
+ * same 150ms timing so chip text and pill shift colour in lockstep. Touch
+ * pointers use the existing scroll-driven .is-live treatment below. */
+/* Home gateway text: keep title and its single description in one column.
+   Scope the capsule offset so the travel story cards keep their own layout. */
+.gateway-copy { padding-top: 1rem; }
+.gateway-copy-featured { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.gateway-description { margin-top: 0.65rem; }
+.gateway-copy-compact .gateway-description { min-height: 3.3em; }
+.gateway-card .gw-title-pill { margin-left: calc(-0.85rem - 1px); }
+
+.gw-title-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.32rem 0.85rem;
+  margin: -0.32rem -0.85rem -0.32rem 0;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  transition:
+    background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Optical alignment of the featured title, without changing its line box.
+   Latin ink sits below its typographic center; the CJK ink is left-heavy. */
+.gateway-card .gw-title-pill[data-featured][lang="en"] h3 {
+  translate: 0.02em -0.1em;
+}
+.gateway-card .gw-title-pill[data-featured][lang="zh"] h3 {
+  translate: 0.05em 0.01em;
+}
+.gw-title-pill-tint {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (hover: hover) {
+  .group:hover .gw-title-pill,
+  .group:focus-within .gw-title-pill {
+    background-color: color-mix(in srgb, var(--surface) 64%, transparent);
+    border-color: color-mix(in srgb, var(--line) 75%, transparent);
+    box-shadow: 0 2px 12px rgb(28 37 48 / 0.1);
+    -webkit-backdrop-filter: blur(9px) saturate(1.1);
+    backdrop-filter: blur(9px) saturate(1.1);
+  }
+  .group:hover .gw-title-pill-tint,
+  .group:focus-within .gw-title-pill-tint {
+    opacity: 0.42;
+  }
+}
+
+/* ---- touch midline activation (2026-09-07) ----
+ * On touch-only pointers (hover: none) a real :hover can never fire, so
+ * GatewayReveal drives the same reveal from scroll position: while a card's
+ * box covers the viewport midline it carries `.is-live` (closest-to-centre
+ * card only), and these rules replay the exact hover visuals — orb open,
+ * watermark yields, title pill frosts. Card lift/shadow stays desktop-only
+ * on purpose. Desktop pointers never match hover: none, so this is inert
+ * there even if the class somehow landed. */
+@media (hover: none) {
+  .gw-item.is-live .gateway-orb {
+    clip-path: circle(142% at calc(100% - 36px) calc(100% - 36px));
+  }
+  .gw-item.is-live .gateway-watermark {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  .gw-item.is-live .gw-title-pill {
+    background-color: color-mix(in srgb, var(--surface) 64%, transparent);
+    border-color: color-mix(in srgb, var(--line) 75%, transparent);
+    box-shadow: 0 2px 12px rgb(28 37 48 / 0.1);
+    -webkit-backdrop-filter: blur(9px) saturate(1.1);
+    backdrop-filter: blur(9px) saturate(1.1);
+  }
+  .gw-item.is-live .gw-title-pill-tint {
+    opacity: 0.42;
+  }
+}
+
+/* Anchored headings land below the pinned capsule nav, not underneath it. */
+.prose :is(h2, h3, h4) {
+  scroll-margin-top: 7rem;
+}
+
+/* ---- gateway launch confirm (2026-09-05) ----
+ * GatewayLink holds a click for one beat; the `.is-launching` class it adds
+ * plays this ack: the card presses down, then the original soft disc and halo
+ * pop around the existing central hover arrow before navigation (~360ms).
+ * Travel story tiles keep the separate pop/draw treatment. Native click semantics:
+ * modifier/middle clicks navigate immediately, no-JS visitors never see the
+ * stamp, reduced-motion users navigate with no delay. */
+.gateway-stamp {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.gateway-stamp-chip {
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  box-shadow:
+    0 6px 18px rgb(0 0 0 / 0.14),
+    0 0 0 4px color-mix(in srgb, var(--surface) 55%, transparent);
+  opacity: 0;
+  transform: scale(0.4);
+}
+.gateway-stamp-chip svg path {
+  stroke-dasharray: 32;
+  stroke-dashoffset: 32;
+}
+.gw-item .gateway-stamp-chip {
+  position: relative;
+  color: var(--confirm-tone);
+  opacity: 1;
+  transform: none;
+  box-shadow: none;
+}
+.gw-item .gateway-stamp-chip::before {
+  content: "";
+  position: absolute;
+  border-radius: inherit;
+  opacity: 0;
+  transform: scale(0.4);
+  inset: 0;
+  /* Original c752b37 graphics, animated separately from the shared arrow. */
+  background: var(--confirm-fill);
+  box-shadow:
+    0 6px 18px rgb(0 0 0 / 0.14),
+    0 0 0 4px color-mix(in srgb, var(--surface) 55%, transparent);
+}
+.gw-item .gateway-stamp-chip svg {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 180ms var(--ease), transform 180ms var(--ease);
+}
+.gw-item .gateway-stamp-chip svg path {
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+}
+.gw-item.is-launching .gateway-card {
+  /* overrides the resting hover lift — a deliberate "pressed" settle */
+  translate: 0 0;
+  transform: scale(0.985);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  transition-duration: 180ms;
+}
+.gw-item:focus-visible .gateway-stamp-chip svg,
+.gw-item.is-live .gateway-stamp-chip svg,
+.gw-item.is-launching .gateway-stamp-chip svg {
+  opacity: 1;
+  transform: none;
+}
+@media (hover: hover) {
+  .gw-item:hover .gateway-stamp-chip svg {
+    opacity: 1;
+    transform: none;
+  }
+}
+.gw-item.is-launching .gateway-stamp-chip::before {
+  animation: gw-stamp-pop 280ms var(--ease) forwards;
+}
+@keyframes gw-stamp-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes gw-arrow-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gw-item.is-launching .gateway-card,
+  .gw-item .gateway-stamp-chip svg,
+  .gw-item.is-launching .gateway-stamp-chip::before,
+  .gw-item.is-launching .gateway-stamp-chip svg path {
+    animation: none;
+    transition: none;
+  }
+  .gw-item.is-launching .gateway-card {
+    transform: none;
+  }
+  .gw-item.is-launching .gateway-stamp-chip::before {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- spoiler: concealed until hover / tap ---- */
+.heimu {
+  --heimu-bar: #454b52; /* light: soft gray-black ink bar (softer than pure ink) */
+  background-color: var(--heimu-bar);
+  color: transparent;
+  border-radius: 0.16em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0.02em 0.14em;
+  transition: color 120ms ease;
+}
+.dark .heimu {
+  --heimu-bar: #46586e; /* soft slate that reads gently on the #0c1219 canvas */
+}
+.heimu a {
+  color: inherit;
+  text-decoration-color: inherit;
+}
+.heimu:hover,
+.heimu:active,
+.heimu:focus-visible,
+.heimu.is-open {
+  color: #eef4fa; /* reveal inside the bar (kept, like the legacy rule) */
+  transition-delay: 0s;
+}
+
+/* ---- recommendation pill above a hovered link ---- */
+.prose a.rec {
+  position: relative;
+}
+.prose a.rec::after {
+  content: attr(data-rec);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.55em);
+  transform: translate(-50%, 4px) scale(0.96);
+  transform-origin: bottom center;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: min(46vw, 24rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.24em 0.9em;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  z-index: 30;
+  transition: opacity 140ms var(--ease), transform 180ms var(--ease);
+}
+.prose a.rec:hover::after,
+.prose a.rec:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* Blog search-result match highlight (LedText). Soft brand wash, no underline
+   change, inline so it never breaks line-clamp or the surrounding sentence. */
+.led-mark {
+  background: color-mix(in srgb, var(--brand) 22%, transparent);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 0.08em;
+  margin: 0 -0.02em;
+}
+.dark .led-mark {
+  background: color-mix(in srgb, var(--brand) 34%, transparent);
+}
+
+/* Room for typeset inline math inside card text (KaTeX spans are inline). */
+.led-math {
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
+/* ---- Clickable § section mark (SectionMark, 2026-09-07) ----
+   The glyph scales with its heading via font-size, so the hit-area is sized
+   in em too (padding + matching negative margin = no layout shift). The
+   anchor itself stays visually invisible when idle — the glow lives on the
+   inner .section-mark-glyph span, which hugs only the § character, so the
+   hover halo blooms from the glyph's own outline instead of reading as a
+   capsule around the whole hit-area (user direction 2026-09-07).
+   Click: the § never changes glyph — it flashes to the accent colour with a
+   small pop pulse (user direction 2026-09-07, replacing the old ✓ swap). */
+.section-mark {
+  color: var(--brand);
+  cursor: pointer;
+  padding: 0.18em 0.3em;
+  margin: -0.18em -0.3em;
+  transition:
+    color 0.2s var(--ease),
+    transform 0.18s var(--ease);
+}
+.section-mark:hover {
+  color: var(--brand-strong);
+}
+.section-mark:active {
+  transform: scale(0.85);
+}
+.section-mark.is-copied {
+  color: var(--accent);
+}
+.section-mark-glyph {
+  display: inline-block;
+  /* "Bolder" glow (user direction 2026-09-07): stacked close-radius
+     text-shadows hug the glyph's own strokes — the inner layer is nearly
+     opaque, so the § reads as if the strokes thicken and light up, with no
+     halo box at all. */
+  text-shadow:
+    0 0 2px transparent,
+    0 0 7px transparent,
+    0 0 16px transparent;
+  transition: text-shadow 0.25s var(--ease);
+}
+.section-mark:hover .section-mark-glyph {
+  text-shadow:
+    0 0 2px color-mix(in srgb, var(--brand) 90%, transparent),
+    0 0 7px color-mix(in srgb, var(--brand) 55%, transparent),
+    0 0 16px color-mix(in srgb, var(--brand) 28%, transparent);
+}
+.section-mark.is-copied .section-mark-glyph {
+  text-shadow:
+    0 0 2px color-mix(in srgb, var(--accent) 90%, transparent),
+    0 0 7px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 0 16px color-mix(in srgb, var(--accent) 28%, transparent);
+  animation: section-mark-pop 0.4s var(--ease);
+}
+@keyframes section-mark-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.section-mark:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Prose headings are plain inline contexts (not flex-with-gap), so the §
+   needs its own trailing gap before the title text. Declared here — after
+   and unlayered like .section-mark — because the negative hit-area margin
+   above would cancel any layered Tailwind mr-* utility. */
+.prose :is(h2, h3) > a.section-mark {
+  margin-right: 0.875rem;
+}
+@keyframes section-mark-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.section-mark:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* ---- Scroll-driven greeting (GreetingCycle, 2026-09-08) ----
+   SSR renders the full "a / b / c" list (the old markdown line). After
+   hydration the component rewrites the node into typewriter mode and flips
+   data-mode to "cycle", which lights the caret; text is driven by scroll
+   segments (see components/about/greeting-cycle.tsx). */
+.greeting-cycle {
+  min-height: 1.6em;
+  font-size: 1.0625rem;
+}
+.greeting-cycle[data-mode="cycle"]::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.16em;
+  background: var(--brand);
+  animation: greeting-caret 1.05s steps(1) infinite;
+}
+@keyframes greeting-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion is already flattened by the global `*` rule in @layer base. */
+
+/* ---- Trip-page theme tokens ----
+   The trip page is its own opaque "paper" surface, so it carries an explicit
+   --tl-* layer instead of the site's --surface/--ink set; the .dark block
+   flips the same names. Scope = body.tl-immersive, so a root-level exit wipe
+   (rendered outside the page's own wrapper) inherits them too.
+
+   2026-10-17 — MOVED HERE from the <style jsx global> block in
+   components/travel/TravelLog.tsx. That block is injected by JS when
+   TravelLog mounts, which made the tokens exist only on pages that render the
+   trip log. The pilgrimage page (/travel/just-because) sets the same body
+   class and styles itself entirely with these names, so every var(--tl-…)
+   there resolved to NOTHING — `background: var(--tl-panel-strong)` computed to
+   transparent, `color: var(--tl-ink)` fell back to the inherited ink. Measured
+   before the move: 3 stylesheets on the pilgrimage page, 5 on ptes, and
+   `getComputedStyle(body).getPropertyValue("--tl-panel-strong")` was "".
+   These are pure token declarations with no dependency on the trip log's
+   markup, so a plain stylesheet is the honest home: they now ship in the
+   critical CSS and are correct on first paint. TravelLog keeps its own
+   component-scoped rules and no longer redeclares the tokens. */
+body.tl-immersive {
+  --tl-paper: #faf9f7;
+  --tl-paper-2: #faf9f6;
+  --tl-surface: #ffffff;
+  --tl-surface-2: #f8f6f2;
+  --tl-surface-3: #f3f0ea;
+  --tl-panel: rgba(255, 255, 255, 0.88);
+  --tl-panel-strong: rgba(255, 255, 255, 0.92);
+  --tl-ink: #1f2937;
+  --tl-ink-2: #374151;
+  --tl-ink-3: #4b5563;
+  --tl-muted: #6b7280;
+  --tl-faint: #9ca3af;
+  --tl-line: #e5e7eb;
+  --tl-line-2: #e3e0da;
+  --tl-line-3: #d1d5db;
+  --tl-line-4: #cfd4da;
+  --tl-line-5: #c9ced4;
+  --tl-hair: rgba(15, 23, 42, 0.12);
+  --tl-paper-line: #d9d4cb;
+  --tl-divider: #eee9e2;
+  --tl-accent: #1ba7c9;
+  --tl-accent-strong: #0e7d9c;
+  --tl-accent-soft: #e8f5f9;
+  --tl-accent-soft-2: #eef9fd;
+  --tl-accent-soft-3: #e2f4fb;
+  --tl-chip: #cfeaf5;
+  --tl-on-accent: #ffffff;
+  --tl-strip: #ebe8e2;
+  --tl-strip-ink: #8a8478;
+  --tl-dot-off: #b9b2a7;
+  --tl-map-bg: #e9edf0;
+  --tl-attr: #c96f2f;
+  --tl-amber: #d97706;
+  --tl-amber-ink: #b45309;
+  --tl-gold: #d9a441;
+  --tl-slate: #5b6b9e;
+  --tl-gap: #a8a196;
+  --tl-scrim: rgba(31, 41, 55, 0.28);
+  --tl-tnav-fade: rgba(250, 249, 246, 0.96);
+  --tl-tnav-fade-97: rgba(250, 249, 246, 0.97);
+  --tl-tnav-fade-0: rgba(250, 249, 246, 0);
+}
+.dark body.tl-immersive {
+  --tl-paper: #15130f;
+  --tl-paper-2: #15130f;
+  --tl-surface: #201d18;
+  --tl-surface-2: #1e1b16;
+  --tl-surface-3: #232019;
+  --tl-panel: rgba(30, 27, 22, 0.88);
+  --tl-panel-strong: rgba(30, 27, 22, 0.92);
+  --tl-ink: #ebe6dc;
+  --tl-ink-2: #cdc6b8;
+  --tl-ink-3: #b6afa1;
+  --tl-muted: #9b9486;
+  --tl-faint: #7c7669;
+  --tl-line: #322e28;
+  --tl-line-2: #322e28;
+  --tl-line-3: #3a352e;
+  --tl-line-4: #3a352e;
+  --tl-line-5: #443f37;
+  --tl-hair: rgba(255, 255, 255, 0.12);
+  --tl-paper-line: #322e28;
+  --tl-divider: #2b2721;
+  --tl-accent: #3ccfff;
+  --tl-accent-strong: #7fdcff;
+  --tl-accent-soft: #10262e;
+  --tl-accent-soft-2: #0e2029;
+  --tl-accent-soft-3: #0e2029;
+  --tl-chip: #143039;
+  --tl-on-accent: #0c1a20;
+  --tl-strip: #1e1b16;
+  --tl-strip-ink: #9b9486;
+  --tl-dot-off: #5b554b;
+  --tl-map-bg: #1b1b1b;
+  --tl-attr: #e0915a;
+  --tl-amber: #e0a33a;
+  --tl-amber-ink: #e8b25a;
+  --tl-gold: #d9a441;
+  --tl-slate: #8f9ede;
+  --tl-gap: #7c7669;
+  --tl-scrim: rgba(0, 0, 0, 0.5);
+  --tl-tnav-fade: rgba(21, 19, 15, 0.96);
+  --tl-tnav-fade-97: rgba(21, 19, 15, 0.97);
+  --tl-tnav-fade-0: rgba(21, 19, 15, 0);
+}
+
+/* ---- Travel log immersive mode (2026-09-25) ----
+   Trip pages (/travel/<tripId>) toggle body.tl-immersive from
+   components/travel/TravelLog while mounted: the lab page is a standalone
+   full-viewport light "paper" experience (own progress bar, 100vh sticky
+   map), so the site chrome steps aside. The chrome wrappers live in
+   app/layout.tsx; a plain display:none is enough and keeps SSR/CSR markup
+   identical (no hydration risk). */
+/* The header wrapper must NOT create a box (2026-09-28): the capsule nav
+   inside SiteHeader is position:sticky, and a sticky element can only travel
+   within its containing block. While this wrapper was a real div (header +
+   nav tall ≈ 230px) the nav could never shift up at all — the site-wide
+   pin-to-top float silently died when the wrapper was introduced for
+   tl-immersive. display:contents removes the wrapper box, so the nav's
+   containing block is the body again and it rides the whole page. The
+   tl-immersive display:none below still wins (higher specificity) and keeps
+   hiding the chrome on trip pages. */
+.site-chrome-header {
+  display: contents;
+}
+body.tl-immersive .site-chrome-header,
+body.tl-immersive .site-chrome-footer {
+  display: none;
+}
+body.tl-immersive {
+  overflow-x: clip;
+}
+body.tl-immersive .route-fade {
+  /* The travel curtain owns entry; a second transform displaces fixed maps. */
+  animation: none;
+  transform: none;
+}
+
+/* ---- Travel page entry curtains ----
+   MOVED (v19, 2026-10-24): the v11 veil that lived here is gone. Its rules
+   are now part of the shared "entry curtain" block further down this file,
+   which BOTH the trip log (body.tl-veil-boot) and the pilgrimage page
+   (body.pj-boot) use. Keeping two definitions of the same pseudo-element
+   split across the stylesheet meant the old animation shorthand silently
+   won on order and the newer band form never played.
+   The full contract lives with the new block — search for
+   "entry curtain". */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Pilgrimage page (/travel/just-because) — added 2026-10-16
+   A lighter cousin of the ptes travel log: instead of a time-interpolated
+   narrative track, the right column simply advances stop by stop as you
+   scroll, and the map keeps one fixed scale the whole way. Layout, colour
+   tokens (--tl-*) and the OSM/MapLibre basemap are shared with the travel
+   log so the two pages read as one family; everything else is scoped under
+   .pj- so it can never leak into the trip log's own sheets.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.pj-page {
+  --pj-map-w: 46%;
+  display: flex;
+  min-height: 100vh;
+  background: var(--tl-paper);
+  color: var(--tl-ink);
+  /* SERIF, matching body and the trip log. This was `var(--font-ui)` until
+     2026-10-24, which meant the WHOLE page inherited sans — the reader's own
+     notes (`.pj-stop-note`), the overview prose and the outro body were all
+     system sans at 12–14px, while the trip log's `.scene-body p` was serif.
+     The titles only survived because `.pj-overview h1` / `.pj-outro-title`
+     redeclared the serif stack by hand, so the page read as "serif headings,
+     sans body" — the defect the user reported.
+     A page root is the wrong place for the UI exception: it silently rewrites
+     every descendant that does not opt back out. The sans elements are now
+     listed explicitly (`.pj-kicker`, `.pj-overview-meta`, the scroll hints,
+     the plate, the credits strip, the rail tips, the tool buttons) — add new
+     ones there instead of reaching for this line again. */
+  font-family: var(--font-serif-latin), var(--font-serif-zh);
+  -webkit-font-smoothing: antialiased;
+}
+body.pj-immersive .pj-page {
+  --pj-map-w: 46%;
+}
+
+/* ---- left: map ---- */
+.pj-map-col {
+  width: var(--pj-map-w);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 2px solid var(--tl-paper-line);
+  background: var(--tl-map-bg);
+  /* The licence strip's height, declared on the COLUMN so both the strip (a
+     descendant) and the map (a deeper descendant) can read it. The map uses
+     it to keep MapLibre's gesture veil off the strip — the veil is inset:0
+     against `.pj-map`, whose box extends behind the strip. */
+  --tl-attrib-h: 26px;
+}
+/* Absolute-fill wrapper. The MapLibre container must NOT be this element:
+   maplibre-gl.css ships `.maplibregl-map { position: relative }`, and since it
+   loads after this sheet at equal specificity it would win — turning our
+   `position: absolute; inset: 0` into `position: relative`, collapsing the
+   height to 0 and leaving a blank map. Wrapper here, MapLibre's own box
+   inside, and the two stylesheets never touch. */
+.pj-map-box {
+  position: absolute;
+  inset: 0;
+}
+/* MapLibre's cooperative-gesture hint — the grey "USE TWO FINGERS TO MOVE THE
+   MAP" veil. It is `position: absolute; inset: 0` (plus z-index 99999), sized
+   against the nearest positioned ancestor. Two things went wrong on a phone:
+
+   1. Neither the canvas holder nor `.pj-map-box` was positioned, so the veil
+      walked up to `.pj-map-col` / `.map-pane` and covered the whole column —
+      including the licence strip, which is opaque but sat UNDER the 40% black
+      (2026-10-24 user report: "灰色区域外溢到 license/拖动条"). Fix: the map
+      element itself is now the containing block, so the veil can never be
+      larger than the map.
+   2. Even then the map's box runs all the way to the strip's bottom edge, so
+      an `inset: 0` veil still covers the strip's last 26px (42px on a narrow
+      trip-log strip). Fix: pull the veil's bottom edge up by the strip height,
+      published as `--tl-attrib-h` on the map column.
+
+   `!important` is deliberate here: maplibre-gl.css is imported by the map
+   component and lands AFTER this sheet, and its selector is a plain class, so
+   the only way to win from the outside is specificity + importance. These two
+   properties are the whole reason the veil ever escaped the map. */
+.maplibregl-cooperative-gesture-screen {
+  bottom: var(--tl-attrib-h, 26px) !important;
+}
+.pj-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* (See the note below on why this must be `relative`, never `absolute`.) */
+}
+/* Attribution: anitabi is CC BY-NC-SA 4.0 — the credit must stay legible.
+   Shared by BOTH travel pages (2026-10-17): the pilgrimage page invented this
+   strip and the trip log adopted it, so the selector list keeps them from
+   drifting apart.
+
+   The strip occupies real space at the map's bottom edge, so anything else
+   anchored to that edge must clear it. `--tl-attrib-h` publishes its height;
+   consumers add it to their own `bottom`. The strip is 1 line of 0.68rem text
+   + 0.4rem padding both sides + a 1px hairline ≈ 26px, and stays 26px on
+   mobile for the pilgrimage page (its text fits one line at 390px). ptes'
+   two-segment text wraps to two lines there, hence the media-query bump. */
+.pj-attrib,
+.map-attrib {
+  --tl-attrib-h: 26px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: var(--tl-ink-3);
+  background: var(--tl-panel);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--tl-line);
+  /* Attribution is a UI label, not prose (2026-10-24). Both pages' strips read
+     sans on purpose; stated here rather than inherited from a page root. */
+  font-family: var(--font-ui);
+}
+@media (max-width: 640px) {
+  .map-attrib {
+    --tl-attrib-h: 42px;
+  }
+}
+/* ---- drag handle (2026-10-24) -------------------------------------------
+   Below the stacking breakpoint the licence strip doubles as the map/story
+   split handle: dragging it up or down resizes the map (see
+   lib/travel/map-split.tsx). The user's pick was "the whole strip is
+   draggable, the arrows only hint at it" — so the affordance is a 22px slot at
+   the right edge, absolutely positioned so it can never wrap with the text,
+   and the strip reserves that much padding on its right.
+
+   `touch-action: none` is what makes the vertical drag possible at all: without
+   it the browser claims every vertical touch for page scrolling and the first
+   pointermove is a pointercancel. `user-select: none` stops a long press from
+   starting a text selection instead of a drag. Neither applies on desktop,
+   where there is no split to drag and the strip must stay plain text. */
+@media (max-width: 1023px) {
+  .pj-attrib,
+  .pj-attrib a {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .pj-attrib {
+    /* NOT `position: relative`. The strip is `position: absolute; bottom: 0`
+       from the base rule, anchored to the map box — overriding that here left
+       it in normal flow at the TOP of the map (measured: strip at y=0, under
+       the time plate, whose own backdrop swallowed the tap on the licence
+       link). The grip positions against the strip, which is itself a
+       positioned box, so nothing here needs to change. */
+    padding-right: 2rem;
+  }
+  .pj-attrib.is-dragging {
+    cursor: grabbing;
+  }
+}
+/* The trip log stacks 100px EARLIER than the pilgrimage page (its sheet says
+   `max-width: 900px`), so these must not share one block: between 901 and 1023
+   the trip log is still two columns with a full-height map, and a grip there
+   would promise a drag that resizes a sidebar the reader cannot see move.
+   lib/travel/map-split.tsx keys its own viewport test off the same numbers. */
+@media (max-width: 900px) {
+  .map-attrib,
+  .map-attrib a {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .map-attrib {
+    padding-right: 2rem;
+  }
+  .map-attrib.is-dragging {
+    cursor: grabbing;
+  }
+}
+.tl-split-handle {
+  display: none;
+}
+@media (max-width: 1023px) {
+  /* The grip itself is shown per page below (see the 900px block): the element
+     is shared markup, but each layout reaches the stacked state at its own
+     breakpoint. */
+  .pj-attrib .tl-split-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2rem;
+    color: var(--tl-muted);
+    pointer-events: none;
+    transition: color 0.18s ease, background 0.18s ease;
+  }
+  /* Static, deliberately (2026-10-24 user: "提示可以拖动的上下箭头符号不需要
+     有上下浮动的动画效果"). The chevrons used to breathe via `tl-split-nudge`;
+     the grip now holds still and only the hover/drag tint changes. The colour
+     transition above is the whole affordance. */
+  .tl-split-grip {
+    animation: none;
+  }
+  .is-dragging .tl-split-handle {
+    color: var(--tl-accent-strong);
+    background: var(--tl-accent-soft);
+  }
+}
+/* The trip log's grip appears 100px later than the pilgrimage page's, matching
+   its `max-width: 900px` stacked layout. Everything inside this block is a copy
+   of the rules above for the other strip — kept as a duplicate rather than
+   hoisting the shared declarations, because the two breakpoints must be able to
+   move independently (the trip log added a 40:60 split at 900px, the
+   pilgrimage page has always stacked at 1024px). */
+@media (max-width: 900px) {
+  .map-attrib .tl-split-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2rem;
+    color: var(--tl-muted);
+    pointer-events: none;
+    transition: color 0.18s ease, background 0.18s ease;
+  }
+  /* Static, same as the pilgrimage grip (2026-10-24). */
+  .map-attrib .tl-split-grip {
+    animation: none;
+  }
+  .map-attrib.is-dragging .tl-split-handle {
+    color: var(--tl-accent-strong);
+    background: var(--tl-accent-soft);
+  }
+}
+.pj-attrib a,
+.map-attrib a {
+  color: var(--tl-accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* The separator is its own flex item, so `gap` already supplies both
+   neighbours' spacing — do NOT add a margin or a ::after nbsp here, it would
+   double the gap. Verified by screenshot 2026-10-17: the rendered strip reads
+   "Anitabi · CC BY-NC-SA 4.0 · 地图底图…" while textContent stays space-free
+   simply because flex `gap` is not a text node. `flex: 0 0 auto` only stops
+   the dot from being squeezed when the strip wraps on a narrow viewport. */
+.pj-attrib .pj-attrib-sep,
+.map-attrib .map-attrib-sep {
+  color: var(--tl-line-4);
+  flex: 0 0 auto;
+}
+
+/* ---- map overlays ---- */
+
+/* Time plate, top-left: which photo the map is currently reporting and when
+   it was taken. Mirrors the trip log's .timeline-indicator, and the numbers
+   here are the trip log's own (2026-10-17: the two pages read as one product,
+   so the plate must not drift — 14px inset, 10px radius, 8/12 padding, 12px
+   day line, 16px clock). No border: the trip log's plate is lifted by its
+   shadow alone, and a hairline made this one look like a different widget. */
+.pj-map-overlay-top {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 4;
+}
+.pj-time-plate {
+  /* FIXED width, not min/max (2026-10-17 user report: the card kept resizing
+     as the stop names scrolled past — "会随着地点名长度不停跳变"). The names on
+     this route run from 5 characters (藤沢駅南) to 19 (7-Eleven鎌倉常盤店付近),
+     and a shrink-to-fit box meant the whole card reshaped on every stop, with
+     the clock sliding sideways under the eye. The box is now pinned at the
+     same width for all 36 stops AND both chapters; the day line ellipsises
+     instead (`.pj-time-day`). 12.5rem holds the longest shipped name plus its
+     "34 / 36 · " prefix at 12px without clipping on desktop. */
+  width: 12.5rem;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  /* Map HUD: a timestamp plate over imagery, so it stays sans/mono-adjacent
+     like the trip log's `.timeline-indicator` (2026-10-24). */
+  font-family: var(--font-ui);
+  background: var(--tl-panel-strong);
+  backdrop-filter: blur(8px) saturate(1.2);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+.pj-time-day {
+  font-weight: 600;
+  color: var(--tl-muted);
+  /* One line, always: the plate's height must not change either. */
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pj-time-clock {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tl-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Controls, top-right: two independent pills, exactly like the trip log's
+   .basemap-ctl — LEFT is the page theme (自/昼/夜, a 3-way radio sharing the
+   site header's storage key), RIGHT is the camera mode. Geometry copied from
+   .basemap-ctl / .bm-group / .bm-btn verbatim (14px inset, 8px gap, 3px group
+   padding, 34×28 segments) so the two pages' map chrome is the same object.
+   The translucent panel — not an opaque one — is what the reader asked to
+   match: the basemap must stay readable underneath. */
+.pj-map-tools {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pj-tools-group {
+  display: flex;
+  align-items: stretch;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--tl-hair);
+  background: var(--tl-panel);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+.pj-tool-btn {
+  width: 34px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tl-ink-2);
+  /* `font: inherit` used to be enough because the page root was sans. The
+     buttons carry single characters (自/昼/夜/随/全), so they must keep the UI
+     stack explicitly now that `.pj-page` is serif (2026-10-24). */
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.pj-tool-btn:hover {
+  color: var(--tl-accent-strong);
+}
+.pj-tool-btn.on {
+  background: var(--tl-accent);
+  color: var(--tl-on-accent);
+  box-shadow: 0 1px 4px rgba(14, 125, 156, 0.35);
+}
+
+/* the thumbnail pinned beside the given stop — frosted glass, so the map stays
+   legible through and around it. Deliberately SMALL (2026-10-16 follow-up): it
+   only points at where the frame came from; the full composite, its stop name
+   and any note live in the story column, and the time plate already names the
+   stop. The old 300px card covered a third of the map. */
+.pj-popup {
+  position: absolute;
+  /* BELOW the map chrome, on purpose (2026-10-24 user report: the comparison
+     card "会把地区图左上角的位置卡片，以及右上角的按钮都挡住"). `.pj-map-overlay-top`
+     and `.pj-map-tools` sit at z-index 4; this card used to be 5, so a pin
+     near a corner painted its 80px frame straight over the time plate or the
+     two control pills — the reader lost the clock and the 自/昼/夜 switch
+     exactly while inspecting a stop.
+     Chrome wins over content here: the plate is how you know WHICH stop you
+     are looking at, and the pills are the only way out of a broken camera
+     mode. The popup is a peek at where a frame came from, so being clipped by
+     a HUD panel is the cheaper failure. Placed at 3 so it stays above the
+     MapLibre canvas (which is z-index auto inside `.pj-map-box`) while leaving
+     either inset a step free for a future panel. */
+  z-index: 3;
+  /* Must match POPUP_W in PilgrimageMap.tsx — the card is positioned by JS and
+     a mismatch would push it off the pin. 80 × 100 ≈ 1/10 the old card's area. */
+  width: 80px;
+  max-width: calc(100% - 1rem);
+  /* High-transmission frosted glass: the map reads straight through, but the
+     card still separates itself with a soft border, a blur and a lift. */
+  background: color-mix(in srgb, var(--tl-surface) 62%, transparent);
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  border: 1px solid color-mix(in srgb, var(--tl-line-2) 70%, transparent);
+  border-radius: 10px;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.16),
+    0 1px 4px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  overflow: hidden;
+  /* grow in from a hair smaller so the swap registers without a jump */
+  animation: pj-pop 0.22s var(--ease);
+}
+.dark .pj-popup {
+  background: color-mix(in srgb, var(--tl-surface) 58%, transparent);
+  border-color: color-mix(in srgb, var(--tl-line-2) 62%, transparent);
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.42),
+    0 1px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+@keyframes pj-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(3px);
+  }
+}
+.pj-popup-media {
+  position: relative;
+  background: color-mix(in srgb, var(--tl-surface-3) 70%, transparent);
+  /* Portrait, matching the composites' own 0.81 ratio — so `cover` crops by a
+     pixel rather than lopping the anime frame or the live shot off. */
+  aspect-ratio: 4 / 5;
+}
+.pj-popup-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.pj-popup-close {
+  position: absolute;
+  top: 0.14rem;
+  right: 0.14rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font: inherit;
+  font-size: 0.6rem;
+  line-height: 1;
+  color: #fff;
+  background: rgba(18, 26, 32, 0.5);
+  backdrop-filter: blur(4px);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
+}
+.pj-popup-close:hover,
+.pj-popup-close:focus-visible {
+  opacity: 1;
+  background: rgba(18, 26, 32, 0.82);
+}
+
+/* ---- right: story ---- */
+.pj-story-col {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 30vh;
+}
+.pj-inner {
+  max-width: 40rem;
+  margin: 0 auto;
+  /* Anitabi shares PTES' reserved right gutter instead of placing the rail
+     against the normal prose inset. */
+  padding: 0 4.5rem 0 2.5rem;
+}
+
+/* overview */
+.pj-overview {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 0;
+}
+/* The kicker above the title — same values as the trip log's `.kicker`
+   (uppercase, 0.14em tracking, 12px, accent, 700). Previously it inherited the
+   page's ink colour at weight 400 with 0.16em tracking, which read as a
+   caption rather than as a section label. */
+.pj-kicker {
+  margin: 0 0 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+  /* Section label — sans, like the trip log's `.kicker`. Explicit since the
+     page root stopped providing it (2026-10-24). */
+  font-family: var(--font-ui);
+  color: var(--tl-accent);
+  font-weight: 700;
+}
+.pj-overview h1 {
+  margin: 0;
+  font-family: var(--font-serif-zh), var(--font-serif-latin);
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  line-height: 1.2;
+  color: var(--tl-ink);
+}
+.pj-overview-meta {
+  margin: 0.9rem 0 0;
+  font-size: 0.82rem;
+  /* Date · time · distance — metadata, so sans (2026-10-24). The prose right
+     below it (`.pj-overview-body`) keeps the page's serif. */
+  font-family: var(--font-ui);
+  color: var(--tl-muted);
+}
+.pj-overview-body {
+  margin: 1.6rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.85;
+  color: var(--tl-ink-2);
+}
+.pj-overview-body p {
+  margin: 0 0 0.9rem;
+}
+.pj-placeholder {
+  padding: 0.75rem 0.95rem;
+  border: 1px dashed var(--tl-line-3);
+  border-radius: var(--radius-md);
+  color: var(--tl-faint);
+  font-size: 0.82rem;
+  font-style: italic;
+  background: var(--tl-surface-2);
+}
+/* The sentence above the chevrons — ptes' `.intro-hint`, adopted with its
+   values (2026-10-17 user request for the same two-layer cue). */
+.pj-intro-hint {
+  margin: 1.6rem 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+  /* UI cue, not prose — sans (2026-10-24). */
+  font-family: var(--font-ui);
+  color: var(--tl-muted);
+}
+
+/* Scroll cue — the trip log's boot-screen cue, adopted wholesale:
+   `.intro-scroll-hint` is a centred column, `.hint-chevrons` holds TWO stroked
+   chevrons that loop through `hint-drop` with a 0.2 s stagger, and `.hint-text`
+   is uppercase 12px/600/0.16em in the strip ink. The pilgrimage page used to
+   draw a single left-aligned chevron plus a sentence on one line, which was a
+   different gesture entirely.
+   The wrapper carries NO colour of its own: the chevrons are accent and the
+   label is strip-ink, and setting a colour here would leak into whatever text
+   is added later (measured: the wrapper inherited the page ink instead of the
+   trip log's strip ink). */
+.pj-scroll-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.25rem;
+}
+.pj-scroll-hint .hint-chevrons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--tl-accent);
+}
+.pj-scroll-hint .hint-chevrons svg {
+  display: block;
+  margin: -6px 0;
+  animation: pj-hint-drop 1.5s ease-in-out infinite;
+}
+.pj-scroll-hint .hint-chevrons svg:last-child {
+  animation-delay: 0.2s;
+}
+@keyframes pj-hint-drop {
+  0% {
+    transform: translateY(-5px);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  75%,
+  100% {
+    transform: translateY(5px);
+    opacity: 0;
+  }
+}
+.pj-scroll-hint .hint-text {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  /* Tracked caps label — sans (2026-10-24). */
+  font-family: var(--font-ui);
+  color: var(--tl-strip-ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pj-scroll-hint .hint-chevrons svg,
+  .pj-popup {
+    animation: none;
+  }
+  .pj-scroll-hint .hint-chevrons svg {
+    opacity: 0.85;
+    transform: none;
+  }
+}
+
+/* stops */
+.pj-stop {
+  /* No min-height on the section: its height is whatever the card's aspect
+     ratio plus the heading row comes to, and the card already reserves that
+     space from its `width`/`height` attributes. An earlier attempt set
+     `min-height: 78vh` (and later a calc() of the card's aspect) on the theory
+     that an ACTIVE section grew while a dot-click scroll was landing and
+     pushed every later section down. Measured on a 390 px phone: the section
+     is 526 px both idle and active — `justify-content: center` with
+     overflowing content does not grow the box — so that theory was wrong and
+     the rules were dropped. The real cause of the "one stop behind" landings
+     was the reading-band geometry in PilgrimageStory.tsx. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 0;
+  /* Dot clicks scroll with `scrollIntoView`, and the browser adds this to the
+     root's own `scroll-padding-top` (5.5 rem, from the capsule-nav offset) to
+     decide where the section comes to rest. Keep it small on desktop: the
+     reading band starts at 35% of a full-height column, far below either
+     value. The mobile override below is calibrated. */
+  scroll-margin-top: 1rem;
+  /* The story column lazily loads 36 large composites. Chrome's scroll
+     anchoring otherwise "compensates" for every layout shift while the
+     reader is scrolling — including the shifts caused by our own scroll-to-
+     stop jump — which silently moved the landing position by ~126 px and made
+     a click on the map land on the NEIGHBOURING stop. Sections are the thing
+     being anchored to, so opting them out is the narrowest fix; images keep
+     real aspect boxes from their width/height attributes so the page does not
+     jump during normal reading either. */
+  overflow-anchor: none;
+}
+.pj-stop.active .pj-stop-card {
+  border-color: var(--tl-accent);
+  box-shadow: var(--shadow-lift);
+}
+.pj-stop-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+}
+.pj-stop-no {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--tl-faint);
+  letter-spacing: 0.06em;
+}
+.pj-stop-time {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--tl-accent-strong);
+}
+.pj-stop-place {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--tl-ink);
+}
+.pj-stop-place .pj-ep {
+  margin-left: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--tl-muted);
+}
+.pj-stop-card {
+  border: 1px solid var(--tl-line-2);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--tl-surface);
+  box-shadow: var(--shadow-card);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  /* The aspect ratio comes from the stop's OWN pixel size, set inline by
+     PilgrimageStory — the composites are not uniformly shaped (see
+     PilgrimageStop.imgW). A hard-coded 1748/2160 here was both the wrong
+     typical value (most are 1920×2160) and, worse, a crop: img-2853 is
+     1121×2160, so `object-fit: cover` sliced its top and bottom off. */
+  margin: 0;
+}
+.pj-stop-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* contain, not cover: the box already has the picture's true ratio, so the
+     two agree — and if a future composite is replaced with a different shape
+     the whole frame stays visible instead of being silently cropped. */
+  object-fit: contain;
+  background: var(--tl-surface-3);
+}
+.pj-stop-note {
+  /* Above the picture now, so it needs bottom spacing, not top. */
+  margin: 0 0 0.85rem;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--tl-ink-3);
+}
+.pj-stop-note:empty {
+  display: none;
+}
+
+/* standalone prose between stops */
+.pj-interlude {
+  min-height: 42vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem 0;
+}
+.pj-interlude p {
+  margin: 0 0 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--tl-ink-3);
+}
+
+/* finale */
+.pj-outro {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 0;
+  text-align: center;
+}
+.pj-outro-title {
+  margin: 0;
+  font-family: var(--font-serif-zh), var(--font-serif-latin);
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  color: var(--tl-ink);
+}
+.pj-outro-line {
+  margin: 1.1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--tl-muted);
+}
+.pj-outro-body {
+  margin: 1.5rem auto 0;
+  max-width: 32rem;
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--tl-ink-2);
+}
+.pj-outro-body p {
+  margin: 0 0 0.85rem;
+}
+.pj-outro-hint {
+  margin-top: 1.6rem;
+  font-size: 0.8rem;
+  /* Small sign-off line, same role as the trip log's `.finale-hint`: sans. */
+  font-family: var(--font-ui);
+  color: var(--tl-faint);
+}
+
+/* Travel entry is the reverse of the return wipe: start with full coverage,
+   then retract to the RIGHT, revealing the page from LEFT to RIGHT.
+   Keep this on body::before so it paints before hydration and is unaffected
+   by RouteFade's temporary transform containing block. */
+body.travel-log-launch::before,
+body.tl-veil-boot::before,
+body.pj-boot::before,
+body.terrain-boot::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 96;
+  background: var(--tl-accent-soft-2, #eef9fd);
+  transform-origin: right center;
+  transform: scaleX(1);
+  pointer-events: none;
+  /* Covers the page throughout the delay; also works if hydration never runs. */
+  animation: travel-log-entry-fallback 0.58s linear 3.5s both;
+}
+body.travel-log-launch {
+  overflow-x: clip;
+}
+body.travel-log-launch::before {
+  background: #eef9fd;
+  animation: none;
+  pointer-events: auto;
+}
+.dark body.travel-log-launch::before {
+  background: #0e2029;
+}
+/* Existing vertical wordmark, over the full sheet until it begins to open. */
+.tl-veil-band {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 97;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  color: var(--tl-accent-strong, #0f7f99);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  writing-mode: vertical-lr;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+}
+body.tl-veil-boot .tl-veil-band,
+body.pj-boot .tl-veil-band,
+body.terrain-boot .tl-veil-band {
+  opacity: 1;
+  animation: travel-log-entry-wordmark 0.18s linear 3.5s forwards;
+}
+/* A distinct animation name restarts at full coverage when readiness arrives.
+   This rule must follow the fallback shorthand and reset its 3.5s delay. */
+body.tl-veil-boot.tl-veil-open::before,
+body.pj-boot.pj-veil-open::before,
+body.terrain-boot.terrain-veil-open::before {
+  animation: travel-log-entry-open 0.58s linear both;
+}
+body.tl-veil-boot.tl-veil-open .tl-veil-band,
+body.pj-boot.pj-veil-open .tl-veil-band,
+body.terrain-boot.terrain-veil-open .tl-veil-band {
+  opacity: 0;
+  animation: none;
+  transition: opacity 0.18s linear;
+}
+@keyframes travel-log-entry-open {
+  0% { transform: scaleX(1); background-color: var(--tl-accent-soft-2, #eef9fd); animation-timing-function: cubic-bezier(.45, 0, .7, .6); }
+  12% { transform: scaleX(.94); animation-timing-function: cubic-bezier(.25, .125, .7, .736); }
+  55% { transform: scaleX(.38); background-color: var(--tl-accent-soft-3, #e2f4fb); animation-timing-function: cubic-bezier(.3, .33, .7, .81); }
+  78% { transform: scaleX(.14); animation-timing-function: cubic-bezier(.3, .3, .7, .95); }
+  100% { transform: scaleX(-.01); background-color: var(--tl-accent-soft-2, #eef9fd); }
+}
+@keyframes travel-log-entry-fallback {
+  0% { transform: scaleX(1); background-color: var(--tl-accent-soft-2, #eef9fd); animation-timing-function: cubic-bezier(.45, 0, .7, .6); }
+  12% { transform: scaleX(.94); animation-timing-function: cubic-bezier(.25, .125, .7, .736); }
+  55% { transform: scaleX(.38); background-color: var(--tl-accent-soft-3, #e2f4fb); animation-timing-function: cubic-bezier(.3, .33, .7, .81); }
+  78% { transform: scaleX(.14); animation-timing-function: cubic-bezier(.3, .3, .7, .95); }
+  100% { transform: scaleX(-.01); background-color: var(--tl-accent-soft-2, #eef9fd); }
+}
+@keyframes travel-log-entry-wordmark {
+  to { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.travel-log-launch::before,
+  body.tl-veil-boot::before,
+  body.pj-boot::before,
+  body.terrain-boot::before,
+  .tl-veil-band { display: none; }
+}
+
+.pj-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-ui);
+  color: var(--tl-muted, #6b7280);
+  background: var(--tl-paper, #faf9f7);
+}
+
+/* ---- progress rail (ptes' .tnav-rail / .tnav, same object) ---- */
+.pjr-rail,
+.pjr-bar {
+  display: none;
+}
+/* Slider scrub layer (2026-10-24). The base .pjr-scrub / .pjr-scrub-box rules
+   live ONLY inside @media (max-width: 1023.9px) further down — writing a
+   `display: none` default here and re-enabling it in the media query would be
+   a same-weight cascade where the LATER rule (the default) wins, which is the
+   bug that bit .pjr-fill. Nothing above the query therefore mentions these
+   classes at all. */
+/* The chapter-index sheet and its trigger only exist on the phone/tablet
+   layout; hide them by default so a desktop window never paints the trigger
+   or, worse, a stray sheet at the right edge (the media query below owns
+   their real rules — these are the no-JS/desktop fallbacks). */
+.pjr-toc,
+.pjr-backdrop,
+.pjr-drawer {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .pjr-rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    /* below the top of the viewport, clear of the map's time plate row */
+    top: 12vh;
+    /* the x is written inline every frame from the measured story column —
+       this is only the no-JS fallback */
+    right: 2.5rem;
+    /* pin the container to the track's 4px width, so the percentage text
+       overhangs the axis symmetrically instead of shifting the track */
+    width: 4px;
+    height: max(320px, 76vh);
+    z-index: 30;
+    pointer-events: none;
+  }
+}
+.pjr-pct {
+  margin-bottom: 13px;
+  white-space: nowrap;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--tl-muted);
+  font-variant-numeric: tabular-nums;
+}
+.pjr-rail-track {
+  position: relative;
+  width: 4px;
+  flex: 1 1 0;
+  min-height: 0;
+  border-radius: 2px;
+  background: var(--tl-line-2);
+  pointer-events: auto;
+}
+/* vertical fill: stretch across, grow downwards */
+.pjr-rail-track .pjr-rail-fill {
+  top: 0;
+  left: 0;
+  right: 0;
+  width: auto;
+  height: 0%;
+  transition: height 0.1s linear;
+}
+.pjr-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  border-radius: 2px;
+  background: var(--tl-accent);
+  opacity: 0.55;
+  transition: width 0.1s linear;
+}
+/* back-to-top at the rail's foot — lit at 98% (ptes' .tnav-top-btn) */
+.pjr-top {
+  pointer-events: auto;
+  margin-top: 12px;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--tl-line-2);
+  border-radius: 50%;
+  background: var(--tl-surface-2);
+  color: var(--tl-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease,
+    transform 0.25s ease;
+}
+.pjr-top:hover {
+  color: var(--tl-accent-strong);
+  border-color: var(--tl-accent);
+  background: var(--tl-accent-soft);
+  transform: translateY(-2px);
+}
+.pjr-top.lit {
+  color: var(--tl-accent-strong);
+  border-color: var(--tl-accent);
+  background: var(--tl-accent-soft);
+  box-shadow: 0 0 0 3px rgba(27, 167, 201, 0.16);
+}
+.pjr-top:focus-visible {
+  outline: 2px solid rgba(27, 167, 201, 0.6);
+  outline-offset: 2px;
+}
+/* ticks ride ON the track */
+.pjr-tick {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid var(--tl-surface-2);
+  background: var(--tl-dot-off);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease;
+}
+.pjr-rail-track .pjr-tick {
+  left: 50%;
+  top: auto; /* the inline `top` percentage wins for the vertical axis */
+}
+.pjr-bar .pjr-tick {
+  top: 50%;
+}
+.pjr-tick:hover {
+  transform: translate(-50%, -50%) scale(1.45);
+  background: var(--tl-accent);
+  box-shadow: 0 0 0 4px rgba(27, 167, 201, 0.18);
+}
+.pjr-tick.read {
+  background: var(--tl-accent);
+}
+.pjr-tick.active {
+  background: var(--tl-accent);
+  box-shadow: 0 0 0 3px rgba(27, 167, 201, 0.22);
+}
+/* tooltip — always in from the LEFT for the vertical rail (there is no room to
+   its right: the rail sits beside the page edge), below for the horizontal bar
+   (above would render off-screen against the viewport edge) */
+.pjr-tip {
+  display: block;
+  position: absolute;
+  white-space: nowrap;
+  font-size: 12px;
+  /* Hover tooltip — UI text, so sans (2026-10-24). */
+  font-family: var(--font-ui);
+  color: var(--tl-ink-2);
+  background: var(--tl-surface-2);
+  border: 1px solid var(--tl-line-2);
+  border-radius: 6px;
+  padding: 3px 8px;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+.pjr-rail-track .pjr-tip {
+  top: 50%;
+  left: auto;
+  right: calc(100% + 12px);
+  transform: translateY(-50%) translateX(4px);
+}
+.pjr-rail-track .pjr-tick:hover .pjr-tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+  transition-delay: 0.12s;
+}
+.pjr-bar .pjr-tip {
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+}
+.pjr-bar .pjr-tick:hover .pjr-tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0.12s;
+}
+.pjr-bar .pjr-tick.edge-l .pjr-tip {
+  left: -6px;
+  transform: translateY(-4px);
+}
+.pjr-bar .pjr-tick.edge-r .pjr-tip {
+  left: auto;
+  right: -6px;
+  transform: translateY(-4px);
+}
+.pjr-bar .pjr-tick.edge-l:hover .pjr-tip,
+.pjr-bar .pjr-tick.edge-r:hover .pjr-tip {
+  transform: translateY(0);
+}
+
+/* ---- mobile ticks: dots → hairlines (2026-10-24) --------------------------
+   Thirty-four chapter ticks plus one 12px dot each do not fit on a phone: the
+   4px track is ~320px wide at 390px, i.e. 9.4px per tick against a 12px
+   diameter, so every neighbour overlapped. Shrinking the dots does not fix it
+   either — at 6px they read as a dotted rule, and the chapter boundary
+   (the thing the rail is FOR: "where am I, what is next") disappears.
+
+   The user's pick: drop the dots, keep a 1px hairline per chapter, let the
+   progress fill be the only bright object. Each tick keeps its full 22×22 hit
+   box, so jumping still works exactly as before — the line is a ::before
+   inside the same button, not a separate element.
+
+   DESKTOP IS UNCHANGED: the vertical rail has 600px of height for the same
+   34 chapters and the round dots are the established look there.
+   The trip log's .tnav-tick carries an IDENTICAL block inside
+   components/travel/TravelNav.tsx's styled-jsx, not here: that sheet is
+   emitted after this one and its base .tnav-tick rule would out-cascade these
+   (same specificity, later wins). Keep the two in step by hand. */
+@media (max-width: 1023.9px) {
+  /* ---- slider mode (2026-10-24) -------------------------------------
+     Mirrors the trip log's .tnav-scrub: "进度条还是不要刻度了，做成一个普通的
+     可拖动进度条就可以。不过在拖动的时候，端点上可以浮现出一个方框，标示拖到的
+     是哪个章节。" The graduations and the per-chapter dots both disappear, and
+     one transparent sheet over the whole tube becomes the drag surface.
+     Hiding the BUTTONS (not layering the sheet over them) is deliberate: a
+     captured pointer would still let the buttons keep their hover styles, and
+     their z-index 2 would eat the gesture anyway. */
+  .pjr-mark,
+  .pjr-tick {
+    display: none;
+  }
+  /* The base .pjr-scrub rule (display:none) is declared ABOVE this block and
+     is same-weight, so the selector here needs one extra class to win — the
+     cascade never looks at media queries, only at specificity and order. */
+  .pjr-scrub {
+    display: block;
+    position: absolute;
+    inset: -9px 0;
+    z-index: 6;
+    /* Without this the browser claims the vertical gesture for page scrolling
+       and pointermove never fires after the first frame. */
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* The chapter box. Sits ABOVE the tube (bottom: 100% + offset) so it never
+     covers the mercury it is pointing at, and is centred on the playhead by
+     the transform. `left` is written in px by paintScrub, never as a
+     percentage: the clamp that keeps it inside the bar's rounded ends is
+     expressed in px. */
+  .pjr-scrub-box {
+    position: absolute;
+    left: 0;
+    /* Anchored to .pjr-bar (NOT the tube — .pjr-track clips with
+       overflow:hidden, so a box above its top edge was painted, measured
+       correctly, reported opacity 1, and was completely invisible).
+       The bar's padding-top puts the tube's top edge 10px below the bar's
+       top, so bottom: 100% - 10px + 8px lifts the box 8px clear of the rim. */
+    bottom: calc(100% - 10px + 8px);
+    transform: translateX(-50%) scale(0.92);
+    transform-origin: bottom center;
+    padding: 4px 9px;
+    border-radius: 6px;
+    background: var(--tl-surface-2);
+    border: 1px solid var(--tl-line-2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    /* A control label — sans, stated explicitly (2026-10-24 font audit). */
+    font-family: var(--font-ui);
+    font-size: 11px;
+    line-height: 1.35;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    color: var(--tl-ink);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 7;
+    transition: opacity 0.14s ease, transform 0.14s ease;
+  }
+  .pjr-scrub-box.is-on {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  /* `z-index` matters: the ticks are siblings of the progress fill, which the
+     sheet declares AFTER them — so the fill painted on top and swallowed every
+     tap on an already-read chapter (elementFromPoint returned .pjr-tick on
+     ticks past the fill's head and .pjr-fill for the ones under it, i.e. the
+     earliest chapters were the unreachable ones). A positioned element with an
+     explicit z-index always beats a positioned sibling without one. */
+  /* 14px wide, not 22: thirty-eight chapters on a 358px track are 9.6px apart,
+     so a 22px box had three neighbours overlapping at every point and the
+     LATEST sibling in the DOM won the tap — with equal z-index and equal size
+     that is plain paint order, i.e. the reader who aimed at chapter 10 got 11
+     (measured: elementFromPoint returned 11 for 10's centre). At 14px the
+     overlap is one neighbour instead of two, and the hairline under the finger
+     is what the tap resolves to. The visible 1px line is untouched; only the
+     invisible box shrank, and 14x22 is still a comfortable target. */
+  .pjr-tick {
+    width: 14px;
+    height: 22px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+  /* v15 — `background: none !important` is load-bearing. The frame loop adds
+     `.read` to every chapter the reader has passed (kept for the DESKTOP rail,
+     whose dots do change colour), and the base `.pjr-tick.read` rule up the
+     sheet is (0,2,0) against this block's (0,1,0): the later position does not
+     help, specificity decides first. Without the !important every passed
+     chapter paints a 14x22 OPAQUE accent block over the mercury — the "column
+     cut into pills" the tube exists to avoid (this is exactly what broke the
+     trip log's tube). */
+  .pjr-tick,
+  .pjr-tick.read,
+  .pjr-tick.active,
+  .pjr-tick:hover,
+  .pjr-tick:active {
+    background: none !important;
+    box-shadow: none !important;
+  }
+  /* v15 (2026-10-24): the notches are now their own .pjr-mark elements under
+     the mercury, NOT the tick's ::before — see the note above .pjr-mark
+     below. The button keeps only its (invisible) 14x22 hit box. */
+  .pjr-tick::before {
+    content: none;
+  }
+  /* Hover/active must not scale or halo any more — a scaled tick and a 4px
+     ring bring the "wall of dots" straight back. The button is invisible in
+     every state (see the !important block above); the cursor is the only
+     affordance, which is enough on a tap-first layout. */
+  .pjr-tick:hover,
+  .pjr-tick:active {
+    transform: translate(-50%, -50%);
+    border-radius: 2px;
+  }
+  /* Graduations — one hairline per chapter, positioned by the inline `left`
+     written from the measured chapter offsets (days/chapters are not evenly
+     spaced in the document, so a fixed repeating period would drift off the
+     hit boxes). z-index 1: UNDER the opaque mercury (z 2), so the blue
+     column stays continuous instead of being cut into pills. Markings only —
+     no read/active tint (user 2026-10-24: "只作标识用，没有激活效果"). */
+  .pjr-mark {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    width: 1px;
+    margin-left: -0.5px;
+    z-index: 1;
+    background: color-mix(in srgb, var(--tl-ink) 26%, transparent);
+    pointer-events: none;
+  }
+  /* Focus must still be visible for keyboard users — a ring on the invisible
+     22px button, not on the hairline. */
+  .pjr-tick:focus-visible {
+    outline: 2px solid rgba(27, 167, 201, 0.55);
+    outline-offset: -3px;
+    border-radius: 4px;
+  }
+}
+
+/* phone / tablet: horizontal bar fixed to the viewport bottom (ptes v13 moved
+   it there for the same reason — at the top it fought the map's controls; on
+   this page the map owns the top 58 vh).
+   v14 (2026-10-24): the upward translucency fade is gone — the story ran
+   visibly through the control. The bar is now a solid sheet with a hairline
+   on top, and the track inside it is the same mercury tube as the trip log's
+   .tnav-track (see components/travel/TravelNav.tsx for the layer notes). */
+@media (max-width: 1023.9px) {
+  .pjr-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--tl-paper);
+    border-top: 1px solid var(--tl-divider);
+    box-shadow: 0 -6px 18px color-mix(in srgb, var(--tl-ink) 7%, transparent);
+    pointer-events: none;
+  }
+  .pjr-track {
+    position: relative;
+    flex: 1;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--tl-ink) 9%, var(--tl-surface-2)) 0%,
+      color-mix(in srgb, var(--tl-ink) 3%, var(--tl-surface)) 55%,
+      color-mix(in srgb, var(--tl-ink) 8%, var(--tl-surface-2)) 100%
+    );
+    box-shadow:
+      inset 0 1px 1.5px color-mix(in srgb, var(--tl-ink) 16%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, white 70%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--tl-ink) 8%, transparent);
+    overflow: hidden;
+  }
+  /* the bar itself is pointer-events:none so the page stays scrollable under
+     it; the tube re-enables taps on its notches */
+  .pjr-track {
+    pointer-events: auto;
+  }
+  /* soft shading at the two round caps; flat, no gloss (v16).
+     z-index 1 = UNDER the mercury, not 5 as in v16: at 5 the 72%-paper wash
+     covered the fill and turned its left cap into a pale wedge, which is what
+     the user reported as a raised/gradient liquid surface. Under the fill it
+     only shades the empty bore. See the trip log's .tnav-track::before. */
+  .pjr-track::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--tl-paper) 72%, transparent) 0,
+        transparent 8px
+      ),
+      linear-gradient(
+        270deg,
+        color-mix(in srgb, var(--tl-paper) 72%, transparent) 0,
+        transparent 8px
+      );
+  }
+  /* one hairline along the bore's top */
+  .pjr-track::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    z-index: 4;
+    border-radius: 1px;
+    background: color-mix(in srgb, white 72%, transparent);
+    pointer-events: none;
+  }
+  /* graduations: full height, ALWAYS GREY and ABOVE the mercury, so the
+     chapter markers survive the fill passing over them (v16 user request:
+     "刻度可以在上方一直为灰色，这样进度条通过后刻度还在").
+     1px at 30% ink, and the element's `left` is snapped to a whole CSS pixel
+     via round(…, 1px) at the call site. Before that the edges landed on
+     fractional DEVICE pixels (measured 53.59 / 109.47 / 150.84 at 2x) and the
+     same ruler showed marks that read 3px and marks that read 2px — the
+     "刻度线粗细不一" report. Widening the rule does not fix it; aligning the
+     edge does. See the full note on .tnav-mark in TravelNav.tsx. */
+  .pjr-mark {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    margin-left: -0.5px;
+    z-index: 3;
+    background: color-mix(in srgb, var(--tl-ink) 30%, transparent);
+    pointer-events: none;
+  }
+  /* ---- chapter index button (v16) -------------------------------------
+     Sized in the tube's range, not around it: 30x30 against a 10px tube
+     with 10px band padding keeps the band's top/bottom whitespace equal, so
+     the strip reads as one control. Bare glyph — a bordered chip next to the
+     capsule made two unrelated objects of one bar. */
+  .pjr-toc {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--tl-ink-3);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 0.2s ease, background 0.2s ease;
+  }
+  .pjr-toc:hover,
+  .pjr-toc:active {
+    color: var(--tl-accent);
+    background: color-mix(in srgb, var(--tl-accent) 12%, transparent);
+  }
+  .pjr-toc.is-open {
+    color: var(--tl-accent-strong);
+    background: var(--tl-accent-soft);
+  }
+  .pjr-toc:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--tl-accent) 60%, transparent);
+    outline-offset: 2px;
+  }
+  .pjr-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: var(--tl-scrim);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .pjr-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .pjr-drawer {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 41;
+    flex-direction: column;
+    width: 320px;
+    max-width: 88vw;
+    background: var(--tl-surface);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.14);
+    transform: translateX(106%);
+    visibility: hidden;
+    transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.34s;
+  }
+  .pjr-drawer.open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  .pjr-drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--tl-divider);
+    font-weight: 700;
+    color: var(--tl-ink);
+  }
+  .pjr-drawer-x {
+    border: 0;
+    background: transparent;
+    color: var(--tl-muted);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+  .pjr-drawer-x:hover {
+    color: var(--tl-accent);
+    background: var(--tl-accent-soft);
+  }
+  .pjr-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0 calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .pjr-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 11px 18px;
+    border: 0;
+    border-bottom: 1px solid var(--tl-divider);
+    background: transparent;
+    color: var(--tl-ink-2);
+    font-size: 14px;
+    line-height: 1.45;
+    cursor: pointer;
+  }
+  .pjr-row:hover,
+  .pjr-row:active {
+    background: var(--tl-surface-tint);
+    color: var(--tl-ink);
+  }
+  .pjr-row.active {
+    color: var(--tl-accent-strong);
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 var(--tl-accent);
+  }
+}
+
+/* ---- mercury in the mobile bar (v17) -----------------------------------
+   OUTSIDE every @media block, deliberately. The base .pjr-fill rule lives at
+   ~2450 — AFTER the block that ends just above — so any override inside it
+   lost the cascade and the bar kept opacity .55 / radius 2px / no z-index.
+   Scoped by .pjr-bar (0,2,0) so it beats the base (0,1,0) regardless of
+   order; the display rules further up keep it hidden on desktop anyway.
+   NOTE the :not(.pjr-rail-fill): the desktop VERTICAL rail reuses the same
+   .pjr-fill class, and the bar's fill sits inside the bar — without the
+   exclusion a probe (and any future override) can hit the rail's slug
+   instead and report opacity .55 / radius 2px as if the bar were unaffected.
+   Flat fill: a 3-stop vertical gradient shaded the slug across the tube's
+   10px height and read as a raised tube — a bulge, which the user rejected
+   ("液面不需要凸起效果"). */
+.pjr-bar .pjr-fill:not(.pjr-rail-fill) {
+  z-index: 2;
+  border-radius: 5px;
+  background: var(--tl-accent);
+  opacity: 1;
+}
+
+/* ---- responsive: stack on narrow screens ---- */
+@media (max-width: 1023px) {
+  .pj-page {
+    display: block;
+  }
+  .pj-map-col {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    /* Tall enough that the whole loop stays legible on a phone — at 52vh the
+       route's dense eastern cluster collapses into the right edge.
+       Since 2026-10-24 58vh is only the DEFAULT: the licence strip at the
+       map's bottom edge is a drag handle (lib/travel/map-split.tsx) that
+       writes --pj-map-h on this element in px. Everything derived from the
+       map height reads the same variable, so one write moves the whole
+       geometry (the 58vh → 100vh desktop rule above is untouched: the hook
+       only writes while the layout is stacked).
+       The hook also parents `--pj-band-top` and `--pj-land` here, which the
+       story column's `.pj-stop` reads by inheritance. They MUST stay on an
+       ancestor of the sections — see the note on `.pj-page .pj-stop` below. */
+    --pj-map-h: 58vh;
+    height: var(--pj-map-h);
+    border-right: 0;
+    border-bottom: 2px solid var(--tl-paper-line);
+    z-index: 10;
+  }
+  .pj-story-col {
+    padding-bottom: 8vh;
+  }
+  /* On a phone the story column lives BELOW the sticky map, so a section must
+     land at the top of the *reading band*, not at the top of the viewport —
+     otherwise the previous section still owns most of the band (a 526 px
+     section parked flush under the map leaves 194 px of the section above it
+     inside the band, so the map reported stop N−1 for a click on N).
+     `scrollIntoView` applies scroll-padding and scroll-margin ADDITIVELY, and
+     the root carries `scroll-padding-top: 5.5rem` = 79.2 px at the site's
+     --page-scale of 0.9, so the landing offset is
+         scrollMarginTop = bandTop − 79.2
+     for the 614 px band top of a 390×844 phone at the default split.
+
+     THE NUMBER ARRIVES AT RUNTIME — and it has to. Three forms were tried and
+     only the third works, so please do not "simplify" this back:
+       • `calc(var(--pj-map-h) + .35 * (100vh - var(--pj-map-h)) - 79px)` — the
+         height variable is declared on `.pj-map-col` while `.pj-stop` lives in
+         the SIBLING story column, and a custom property inherits down the tree,
+         never across to a sibling. The substitution came back empty, the whole
+         declaration was invalid at computed-value time, and the section kept
+         the 1rem from the component block above. (Confirmed in the browser,
+         which is what closed this out: both rules matched `.pj-stop`, the
+         later and more specific one still computed to 1rem.)
+       • moving the declaration to a shared ANCESTOR so it would inherit down —
+         the ancestor above both columns is `.pj-page`, and making the rule
+         reach `.pj-stop` from there costs a descendant combinator that also
+         matches on desktop, where 1rem is correct. A `calc()` cannot undo
+         itself inside a media query.
+       • **what is here now**: the hook (map-split.tsx) measures
+         `scroll-padding-top` and writes the finished px as `--pj-land` on the
+         map column, which DOES inherit down to the sibling story column's
+         sections. It also publishes `--pj-band-top`, the number the scorer in
+         PilgrimageStory.tsx reads, so the landing offset and the "which stop am
+         I looking at" answer are the same measurement and cannot disagree after
+         a drag.
+     `var(--pj-land, 535px)` — 535 is the resolved default (614.4 − 79.2 for a
+     390×844 phone at 58vh), used only for the prerendered frame and the no-JS
+     build (where nothing scrolls). Everything is in px, deliberately: a
+     percentage `scroll-margin-top` resolves against the ELEMENT's own height,
+     not the viewport — that mistake once put every landing 190 px off.
+     `.pj-page` is only the desktop guard: the same selector appears in the
+     `min-width: 1024px` block at the end of the responsive rules, and this one
+     must not outrank it. */
+  .pj-page .pj-stop {
+    scroll-margin-top: var(--pj-land, 535px);
+  }
+  .pj-inner {
+    padding: 0 1.25rem;
+  }
+  .pj-overview,
+  .pj-outro {
+    min-height: 42vh;
+  }
+  .pj-stop {
+    min-height: 0;
+    padding: 2rem 0;
+  }
+  /* The popup keeps its 80px size on phones too — the placement maths in
+     PilgrimageMap.tsx assumes POPUP_W, so overriding the width here would
+     drift the card off its pin. */
+  /* On narrow screens the map is a sticky band at the top. Keep the two
+     control pills at the top-right; the back chip goes UNDER them at the
+     top-right corner (matching the trip log), not the bottom-left.
+     Two pills (3 theme + 2 camera segments) run wider than one — trim the gap
+     and each segment exactly as the trip log does, or the pair overruns the
+     time plate at 390 px. */
+  .pj-map-tools {
+    gap: 6px;
+  }
+  .pj-tool-btn {
+    width: 30px;
+  }
+  /* On a phone the plate keeps a fixed width too — a fixed width matters MORE
+     here than on desktop: a jumping card in a 58 vh strip is very visible.
+     The HEIGHT is pinned as well. Two lines (day + clock) at 12px/1.4 and 16px
+     come to 55px with the 8px padding; the base rule's nowrap did not stop the
+     16px clock line from WRAPPING to two lines, so the card still reshaped on
+     the stops whose name is long.
+
+     2026-10-17 follow-up: pinning the height alone left the card ellipsising
+     BOTH lines on the chapter stops ("开场·出发·2026-0… / 06:43 镰仓高校…"),
+     because the old `calc(100vw - 16.5rem)` resolved to ~126px on a 390px
+     phone while the two pills end at x=376. Measured budget: 14 (left inset)
+     + plate + 12 (gap to the tools) + 172 (tools) + 14 (right inset) = 390,
+     so the plate may be 178px. Take 176px and let `max-width` only protect
+     against oddly narrow viewports. */
+  .pj-time-plate {
+    /* 390 - 14 (left inset) - 12 (gap) - 172 (tools) - 16 (breathing room
+       before the right inset) = 176. Expressed as 100vw - 214px so it tracks
+       other phone widths; max-width stops it ballooning on a tablet, where
+       the controls also grow. */
+    width: calc(100vw - 214px);
+    max-width: 13rem;
+    height: 55px;
+    overflow: hidden;
+  }
+  .pj-time-clock {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Back chip on narrow screens, positioned EXACTLY like the trip log's
+     .tl-back-strip: fixed at the top right, 58px down (clearing the top
+     inset) and 14px in, 42x42.
+
+     2026-10-17 user report: it rendered "not correctly". It was pinned to the
+     bottom-LEFT, which is where this page's own progress rail lives — the
+     blue chip sat on top of the rail's blue ticks, and because the rail is
+     `position: fixed; z-index: 30` against the chip's z-index 40 the button
+     looked welded into the scrollbar. The trip log has no bottom rail, so its
+     bottom-left never hurt, but here the top-right spot is the only one that
+     is free: the map band's top-left is the time plate and its top-right is
+     the basemap tools, both of which start BELOW this chip at 58px. */
+  .pj-back {
+    top: 58px;
+    right: 14px;
+    bottom: auto;
+    left: auto;
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* The split hook keeps writing --pj-land while the viewport is stacked, and a
+   desktop window can be reached by widening without a reload (or by rotating a
+   tablet), so the desktop layout must not inherit a phone's landing offset. It
+   has no reading band to park under anyway, so the value written in the
+   component block above — 1rem, against the capsule-nav offset — stands. */
+@media (min-width: 1024px) {
+  .pj-page .pj-stop {
+    scroll-margin-top: 1rem;
+  }
+}

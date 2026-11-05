@@ -1,0 +1,37 @@
+{
+  "id": "ptes-2025",
+  "title": {
+    "en": "Iberia 2025 — Christmas",
+    "zh": "伊比利亚 2025 — 圣诞"
+  },
+  "blurb": {
+    "en": "Two weeks in Iberia for Christmas!",
+    "zh": "伊比利亚半岛的圣诞游~"
+  },
+  "start": "2025-12-15",
+  "end": "2026-01-01",
+  "days": 17,
+  "distanceKm": 18039.7,
+  "gpsPoints": 21863,
+  "beta": true,
+  "pinned": true,
+  "featured": true,
+  "showPinnedBadge": true,
+  "stops": {
+    "en": [
+      "Lisbon",
+      "Porto",
+      "Madrid",
+      "Barcelona",
+      "+6 towns"
+    ],
+    "zh": [
+      "里斯本",
+      "波尔图",
+      "马德里",
+      "巴塞罗那",
+      "+6 小城"
+    ]
+  },
+  "cover": "/assets/photos/gallery/thumb/img-5489.webp"
+}

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+
+<html lang="en" style=""><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Inter:wght@300..700&amp;family=Noto+Serif+SC:wght@300..700&amp;display=swap" rel="stylesheet"/><style>
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    overscroll-behavior: none;
+    font-family: 'EB Garamond', 'Palatino Linotype', 'Book Antiqua', Palatino, 'Noto Serif SC', serif;
+  }
+  main > :first-child {
+    margin-top: 0 !important;
+  }
+  main > :last-child {
+    margin-bottom: 0 !important;
+  }
+}
+.font-sans-ui {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "primary-fixed": "#bce9ff",
+        "surface": "#f5fafd",
+        "outline-variant": "#bcc8cf",
+        "on-secondary": "#ffffff",
+        "tertiary-fixed-dim": "#ffb952",
+        "on-tertiary-container": "#6d4600",
+        "secondary-fixed-dim": "#a0cde2",
+        "on-surface-variant": "#3d484e",
+        "inverse-surface": "#2b3134",
+        "on-secondary-fixed-variant": "#1d4c5e",
+        "secondary-container": "#b9e6fc",
+        "outline": "#6d797f",
+        "on-primary-container": "#00556d",
+        "inverse-primary": "#62d4ff",
+        "on-error-container": "#93000a",
+        "error": "#ba1a1a",
+        "surface-container-highest": "#dee3e7",
+        "surface-bright": "#f5fafd",
+        "secondary": "#376476",
+        "on-secondary-fixed": "#001f29",
+        "background": "#f5fafd",
+        "surface-variant": "#dee3e7",
+        "surface-container-lowest": "#ffffff",
+        "primary-fixed-dim": "#62d4ff",
+        "on-primary-fixed": "#001f29",
+        "tertiary": "#825500",
+        "on-surface": "#171c1f",
+        "secondary-fixed": "#bce9ff",
+        "on-tertiary-fixed": "#291800",
+        "surface-container": "#e9eff2",
+        "on-primary": "#ffffff",
+        "tertiary-fixed": "#ffddb3",
+        "tertiary-container": "#feb136",
+        "surface-container-high": "#e3e9ec",
+        "surface-dim": "#d5dbde",
+        "on-tertiary-fixed-variant": "#633f00",
+        "on-secondary-container": "#3c687b",
+        "inverse-on-surface": "#ecf1f5",
+        "primary-container": "#41cfff",
+        "error-container": "#ffdad6",
+        "on-tertiary": "#ffffff",
+        "surface-tint": "#006783",
+        "on-error": "#ffffff",
+        "surface-container-low": "#eff4f8",
+        "primary": "#006783",
+        "on-primary-fixed-variant": "#004d63",
+        "on-background": "#171c1f"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "section-gap": "3.5rem",
+        "container-max": "72rem",
+        "container-reading": "60rem",
+        "gutter-sm": "0.5rem",
+        "gutter-md": "1rem",
+        "gutter-lg": "1.5rem",
+        "gutter-xl": "2rem",
+        "gutter-xs": "0.25rem"
+      },
+      "fontFamily": {
+        "headline": ["EB Garamond", "Palatino Linotype", "Book Antiqua", "Palatino", "Noto Serif SC", "serif"],
+        "display": ["EB Garamond", "Palatino Linotype", "Book Antiqua", "Palatino", "serif"],
+        "body": ["EB Garamond", "Palatino Linotype", "Book Antiqua", "Palatino", "Noto Serif SC", "serif"],
+        "label": ["Inter", "-apple-system", "sans-serif"],
+        "stamp-badge": ["Inter", "-apple-system", "sans-serif"]
+      }
+    }
+  }
+};
+</script></head><body class="bg-surface text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><main class="w-full bg-surface pb-16"><div class="flex flex-col w-full">
+<!-- 1. Unified Academic Dossier Top Bar & Header -->
+<header class="w-full pt-8 pb-4 max-w-container-max mx-auto px-gutter-lg">
+<!-- Top Bar with status & metadata -->
+<!-- Main Headline Block -->
+<div class="pt-6 pb-2 flex flex-col md:flex-row md:items-baseline md:justify-between gap-2">
+<div>
+<h1 class="font-display text-4xl sm:text-5xl md:text-6xl text-primary tracking-tight font-semibold">
+<a class="hover:opacity-85 transition-opacity" href="#">Tuorui “v1ncent19” Peng</a>
+</h1>
+<p class="font-headline italic text-lg sm:text-xl text-on-surface-variant mt-1">
+        « En voyage dans l'espace de Hilbert. »
+      </p>
+</div>
+<div class="flex items-center gap-2 font-sans-ui pt-2 md:pt-0">
+<a class="text-xs font-semibold px-2.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface bg-surface-container-lowest border border-outline-variant/20 hover:bg-surface-container transition-colors" data-path="zh-archive" href="#">/zh</a>
+<button aria-label="Toggle appearance" class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface bg-surface-container-lowest border border-outline-variant/20 hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">dark_mode</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- 2. Integrated Navigation Bar -->
+<nav class="max-w-container-max mx-auto px-gutter-lg w-full mb-8 font-sans-ui">
+<div class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-2 shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-1 sm:gap-2 text-sm font-medium">
+<a aria-current="page" class="px-3.5 py-1.5 rounded-lg bg-surface-container text-primary font-semibold transition-colors" data-path="about" href="#">About</a>
+<a class="px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" data-path="cv" href="#">CV</a>
+<a class="px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" data-path="gallery" href="#">Gallery</a>
+<a class="px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" data-path="blog" href="#">Blog</a>
+<a class="px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" data-path="project" href="#">Project</a>
+</div>
+</div>
+</nav>
+<!-- 3. Variant A: Split Academic Dossier Hero (Side-Anchored Portrait + Bio Block) -->
+<section class="max-w-container-max mx-auto px-gutter-lg pb-10 w-full">
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="p-6 sm:p-8 md:p-10">
+<!-- Floated Portrait Vignette Container (Right-floated for text wrap on md/lg screens) -->
+<div class="w-full sm:w-72 md:w-80 sm:float-right sm:ml-8 mb-6 bg-surface-container-low p-4 sm:p-5 rounded-2xl border border-outline-variant/20 shadow-sm">
+<div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-md group bg-surface-container">
+<img alt="Tuorui Peng smiling slightly in academic graduation regalia holding chalk before a green chalkboard densely covered in mathematical formulas" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD50KSD5RGwyyQg9_L3Yxpp0EdpOt1ap6duuS5FeDTl0VxCJ2Zw0lZSU7j5kKF8pXbaMVp6paZZHaNyp215zKavyuahQVXNeD3vQCjtqmJ2nnciRljtSfqMXcmFLdbphseN1dUb0-GuAVWF5TUT4G3RO9upVnyaQVY8PnC64Es5_TVsg6Ce2010NPT-eoEjakrJu6aQ6VxyKEY5jLkEyywsE62g4oKTXHccwJyzJNG3XMZ3QeZ_IP87"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/85 via-transparent to-transparent"></div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-outline-variant/20 flex items-center justify-between text-on-surface-variant font-sans-ui text-xs tracking-wider">
+</div>
+</div>
+<!-- Narrative Bio Text wrapping around the floated portrait -->
+<div class="font-body text-base sm:text-lg text-on-surface leading-relaxed">
+<div class="flex items-center gap-2 mb-3">
+<span class="text-primary font-display text-2xl font-semibold">§</span>
+<h2 class="font-headline text-2xl sm:text-3xl text-on-surface font-semibold">hi, there.</h2>
+</div>
+<p class="mb-4">
+      I am a <strong class="font-semibold text-primary">Ph.D. student in Statistics</strong> at the
+      <a class="text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary transition-all" href="#">Department of Statistics and Data Science</a> at <span class="text-on-surface font-medium">Northwestern University</span>. Prior to this, I received my B.S. degree in Mathematics and Physics from the
+      <a class="text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary transition-all" href="#">Department of Physics</a> at <span class="text-on-surface font-medium">Tsinghua University</span> in 2023, accompanied by a minor B.S. in Statistics.
+    </p>
+<p class="mb-4">
+      Both disciplines of theoretical Physics and high-dimensional Statistics captivate me. Here, I record working notes, mathematical derivations, and open-source course digests such as the <span class="text-primary font-medium">Statistics summary notes</span> and the <a class="text-secondary font-medium underline underline-offset-4 decoration-secondary/30 hover:decoration-secondary" href="#">THU Stat Wiki</a> repository.
+    </p>
+<p class="text-on-surface-variant text-base mb-6">
+      Beyond mathematical rigor, this archive mirrors an intellectual cabinet of curiosities—spanning philology, culinary craft (<em class="italic">l'art culinaire</em>), and travel stamps. Please inspect the index below or browse topics directly.
+    </p>
+</div>
+<!-- Quick Action Buttons arranged inline (cleared below float) -->
+<div class="pt-5 flex flex-wrap items-center gap-3 font-sans-ui border-t border-outline-variant/20" style="clear: both;">
+<a class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-on-primary text-sm font-medium hover:bg-primary/90 transition-all shadow-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">description</span>
+<span class="">Download Curriculum Vitae</span>
+<span class="text-[11px] uppercase tracking-wider font-semibold opacity-90 px-1.5 py-0.5 rounded bg-on-primary/20">PDF · 184 KB</span>
+</a>
+<a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-surface-container text-on-surface text-sm font-medium hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px] text-secondary">terminal</span>
+<span class="">GitHub Profile</span>
+</a>
+<a class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-surface-container text-on-surface text-sm font-medium hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px] text-tertiary">mail</span>
+<span class="">Contact Email</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Mathematical Divider -->
+<div class="max-w-container-max mx-auto px-gutter-lg w-full flex items-center justify-center gap-4 py-2 text-outline-variant opacity-60">
+<span class="h-px bg-outline-variant flex-1"></span>
+<span class="text-lg select-none text-primary font-sans-ui">∫ • ∇ • ∑</span>
+<span class="h-px bg-outline-variant flex-1"></span>
+</div>
+<!-- 4. Variant A: Asymmetrical Editorial Gallery Grid (1 Featured Card + 2x2 Grid) -->
+<section class="max-w-container-max mx-auto px-gutter-lg py-8 w-full">
+<div class="flex items-baseline justify-between mb-6">
+<div>
+<span class="font-sans-ui text-xs font-semibold tracking-widest text-primary uppercase block">Navigation Folio</span>
+<h2 class="font-headline text-2xl sm:text-3xl text-on-surface font-semibold tracking-tight">Archival Collections</h2>
+</div>
+<span class="font-body text-sm text-on-surface-variant hidden sm:inline-block">5 Selected Gateways</span>
+</div>
+<!-- Asymmetrical Showcase Grid: Left Feature (5 cols) + Right 2x2 Cards (7 cols) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+<!-- Featured Showcase Card: About (5 cols, full height matching the 2x2 grid) -->
+<a class="lg:col-span-5 group relative rounded-2xl overflow-hidden bg-surface-container-lowest shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-end min-h-[360px] lg:min-h-full border border-outline-variant/20" data-path="about" href="#">
+<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCNo-T6ebMv1cd9JmopHz1P2sBGA1e1tNyY5m0vwaKMJtq5Za72vj7YlLUej6UWWYTYt1qtVAt0nI9o_C97vhX6PzJRHQ480ACDa54xKH8nmCMM0drU3YbGd3qppJF-mRohiD2aLttOP7AQ7QEUuFTxSQnyduVkqqY91tOG8DEVCRCJvpAA04pxPHQ9D5KbogwmL5fI81v7dbGchxJKKgpvqS8KyZ6ncx-HuhM90q86dtf4JmEl9e0w");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface via-inverse-surface/40 to-transparent"></div>
+<div class="relative p-6 sm:p-8 text-inverse-on-surface flex flex-col justify-end">
+<div class="flex items-center gap-2 mb-2 font-sans-ui">
+<span class="text-[10px] px-2 py-0.5 rounded bg-primary text-on-primary font-bold uppercase tracking-widest">01 / Profile</span>
+<span class="text-xs text-surface-container-high tracking-wider">Bio &amp; Research</span>
+</div>
+<h3 class="font-headline text-3xl text-surface-bright font-semibold group-hover:text-primary-fixed transition-colors mb-2">About Me</h3>
+<p class="font-body text-base text-inverse-on-surface/90">Personal background, academic lineage, and Hilbert space journeys.</p>
+</div>
+</a>
+<!-- Right Side 2x2 Grid (7 cols) -->
+<div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5">
+<!-- Card 2: CV -->
+<a class="group relative rounded-xl overflow-hidden bg-surface-container-lowest shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-52 border border-outline-variant/20" data-path="cv" href="#">
+<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB_tmx2ETpYLRkjOgZWYy20eRMJ6GgouV-u3sWFQgCpNxGgnPBukxZgOGUQUA23jThYZ3CWUSJhwlp62CMt6F0RZOYemrfTcVXTu6PBSm7DWGXvbUnz6yyDAAhOEI6uBSyBqJtlRFzkCa-dZMio3W32OgDex-vbJ6cjb2gO4tocH_ubJaXdvrOhM_UZgWjnj-SB-yqGDulsO2S2ckyUp_1kMfU4DEt85KgQQ3NUmDjADFnQED-NcMxX");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface via-inverse-surface/40 to-transparent"></div>
+<div class="relative mt-auto p-5 text-inverse-on-surface flex flex-col justify-end">
+<div class="flex items-center gap-2 mb-1 font-sans-ui">
+<span class="text-[10px] px-2 py-0.5 rounded bg-secondary text-on-secondary font-bold uppercase tracking-widest">02 / Dossier</span>
+<span class="text-xs text-secondary-fixed tracking-wider">Timeline &amp; Honors</span>
+</div>
+<h3 class="font-headline text-xl text-surface-bright font-semibold group-hover:text-secondary-fixed transition-colors">Curriculum Vitae</h3>
+<p class="font-body text-xs sm:text-sm text-inverse-on-surface/85 line-clamp-1">Northwestern, Tsinghua honors, publications, and awards.</p>
+</div>
+</a>
+<!-- Card 3: Gallery -->
+<a class="group relative rounded-xl overflow-hidden bg-surface-container-lowest shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-52 border border-outline-variant/20" data-path="gallery" href="#">
+<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBu9_Wl3EG6z4k5rEylpWr870sss4WBI2fHaxKkLAog17_n08jbsfHbn-paAAYVfGOIUHut-_cmz3J83nW2sM3nchaAqrQEVvdcw8X8vCk985qSiQjEmbWLqwd-1DZckLqyacm1cvpONOs1yChyFCee57FksbMRN6AzFI97VMIgP1fiPpYmu9AqianQxydE5dn2dPr0zsTUdrlDgXZNZDXA9VcPagmN6uIiG5p9lm0yVel8XRBJxfm2");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface via-inverse-surface/50 to-transparent"></div>
+<div class="relative mt-auto p-5 text-inverse-on-surface flex flex-col justify-end">
+<div class="flex items-center gap-1.5 mb-1 font-sans-ui">
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-primary uppercase font-bold">03 / Lens</span>
+</div>
+<h3 class="font-headline text-xl text-surface-bright font-semibold group-hover:text-primary-fixed transition-colors">Gallery</h3>
+<p class="font-body text-xs sm:text-sm text-inverse-on-surface/85 line-clamp-1">Location stamps, visual field notes &amp; life.</p>
+</div>
+</a>
+<!-- Card 4: Blog -->
+<a class="group relative rounded-xl overflow-hidden bg-surface-container-lowest shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-52 border border-outline-variant/20" data-path="blog" href="#">
+<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBhSbmeX6r3KvSOt3bf_i3MGB4yY35as__JMAxCtgmKjnD43vag7qy88FyK6Gn33dOJAAGjpXJ0Yfh7Zxt8vrt2-cV6fBEarWqDKxDFbFbYyzqhbouTIUd4OSJVcFm0GWlKAS8ZU9ihnqlk22fInomo9RJAHdGSb2nf3GzsviSYbdZlXP35fOCfdvRVHxP4SIE_hDoIjwsv-lvdJaU67VhY4G5P3k_8nWr5HiVWQyLCCJbHPVu8ZWUY");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface via-inverse-surface/50 to-transparent"></div>
+<div class="relative mt-auto p-5 text-inverse-on-surface flex flex-col justify-end">
+<div class="flex items-center gap-1.5 mb-1 font-sans-ui">
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-tertiary-container text-on-tertiary-container uppercase font-bold">04 / Texts</span>
+</div>
+<h3 class="font-headline text-xl text-surface-bright font-semibold group-hover:text-tertiary-fixed transition-colors">Blogs &amp; Essays</h3>
+<p class="font-body text-xs sm:text-sm text-inverse-on-surface/85 line-clamp-1">Thoughts, statistics, language, and culinary arts.</p>
+</div>
+</a>
+<!-- Card 5: Project -->
+<a class="group relative rounded-xl overflow-hidden bg-surface-container-lowest shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-52 border border-outline-variant/20" data-path="project" href="#">
+<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCn94vNU6r-PxhAhp2oMVA5mR2CITuelS1OfX9mGBNQT74KuyiMeu0JiF5XfvqaX26phpzvktN7YvGYBhfHeD8kOz0WZMOT4AbDMfiDUGpf4wUKOMVtnyugviglADubFwUBGQ-t_EprSsu1NhLDP79OJLgwtPLnvUKLGykSbABeiSMOrWCTYcs1IXPvVWu-dFJqALU_NrBMtUkZfsrQsoN1RiRuIJUfVjqlBtad4UR49ZaCiuFcFUOq");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface via-inverse-surface/50 to-transparent"></div>
+<div class="relative mt-auto p-5 text-inverse-on-surface flex flex-col justify-end">
+<div class="flex items-center gap-1.5 mb-1 font-sans-ui">
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-primary text-on-primary uppercase font-bold">05 / Code</span>
+</div>
+<h3 class="font-headline text-xl text-surface-bright font-semibold group-hover:text-primary-fixed transition-colors">Projects &amp; Notes</h3>
+<p class="font-body text-xs sm:text-sm text-inverse-on-surface/85 line-clamp-1">THU Stat Wiki, R packages, summary notes.</p>
+</div>
+</a>
+</div>
+</div>
+</section>
+<!-- 5. Search Bar & Topic Filter Station (Seamless Linear Strip) -->
+<section class="max-w-container-max mx-auto px-gutter-lg py-4 w-full font-sans-ui">
+<div class="bg-surface-container-lowest rounded-xl p-4 sm:p-5 shadow-sm border border-outline-variant/30 flex flex-col items-stretch justify-between gap-4">
+<!-- Search Input -->
+<div class="relative flex-1"><span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-primary text-[20px]">search</span>
+<div class="w-full pl-11 pr-24 py-2.5 bg-surface-container-lowest rounded-lg text-sm text-on-surface border-2 border-primary shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-0.5">
+<span class="font-medium text-on-surface text-[15px]">Statistics</span>
+<span class="inline-block w-0.5 h-4 bg-primary animate-pulse"></span>
+</div>
+<div class="flex items-center gap-1.5">
+<button aria-label="Clear search" class="w-5 h-5 rounded-full bg-surface-container-high hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface text-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+<span class="text-[10px] font-mono font-semibold text-on-surface-variant px-1.5 py-0.5 rounded bg-surface-container-high border border-outline-variant/30 select-none">ESC</span>
+</div>
+</div>
+<!-- Instant Matching Autocomplete Dropdown -->
+<div class="absolute left-0 right-0 top-full mt-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-xl z-30 overflow-hidden font-sans-ui">
+<div class="px-4 py-2.5 bg-surface-container-low/70 border-b border-outline-variant/20 flex items-center justify-between text-xs">
+<div class="flex items-center gap-1.5 text-primary font-semibold">
+<span class="material-symbols-outlined text-[15px]">manage_search</span>
+<span>Instant Matching Hits (3 results for "Statistics")</span>
+</div>
+<span class="text-[11px] text-on-surface-variant">3 found in archive</span>
+</div>
+<div class="divide-y divide-outline-variant/15">
+<!-- Hit 1 -->
+<a class="p-3 sm:px-4 sm:py-3 hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group bg-surface-container/40" href="#">
+<div class="flex items-center gap-3 min-w-0">
+<span class="w-7 h-7 rounded-lg bg-primary-fixed text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">article</span>
+</span>
+<div class="min-w-0">
+<div class="font-headline text-base text-on-surface font-semibold truncate group-hover:text-primary transition-colors">
+            High Dimensional <mark class="bg-primary-fixed text-on-primary-fixed rounded px-1 py-0.2">Statistics</mark> Note (2025 Summer Ver)
+          </div>
+<p class="font-body text-xs text-on-surface-variant truncate mt-0.5">
+            PCA in asymptotic regimes, random matrix spectral limits &amp; concentration inequalities.
+          </p>
+</div>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed flex-shrink-0">Note</span>
+</a>
+<!-- Hit 2 -->
+<a class="p-3 sm:px-4 sm:py-3 hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group" href="#">
+<div class="flex items-center gap-3 min-w-0">
+<span class="w-7 h-7 rounded-lg bg-secondary-fixed text-secondary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+</span>
+<div class="min-w-0">
+<div class="font-headline text-base text-on-surface font-semibold truncate group-hover:text-primary transition-colors">
+            Summary of <mark class="bg-secondary-fixed text-on-secondary-fixed rounded px-1 py-0.2">Statistics</mark> Courses
+          </div>
+<p class="font-body text-xs text-on-surface-variant truncate mt-0.5">
+            Core mathematical statistics, hypothesis testing, empirical process theory · 120 Pages PDF.
+          </p>
+</div>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container flex-shrink-0">Dossier</span>
+</a>
+<!-- Hit 3 -->
+<a class="p-3 sm:px-4 sm:py-3 hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group" href="#">
+<div class="flex items-center gap-3 min-w-0">
+<span class="w-7 h-7 rounded-lg bg-tertiary-fixed text-tertiary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">person</span>
+</span>
+<div class="min-w-0">
+<div class="font-headline text-base text-on-surface font-semibold truncate group-hover:text-primary transition-colors">
+            About Me: Ph.D. in <mark class="bg-tertiary-fixed text-on-tertiary-fixed rounded px-1 py-0.2">Statistics</mark> &amp; Hilbert Space
+          </div>
+<p class="font-body text-xs text-on-surface-variant truncate mt-0.5">
+            Northwestern University Statistics &amp; Data Science dossier, Tsinghua math-physics roots.
+          </p>
+</div>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-surface-container-high text-primary flex-shrink-0">Profile</span>
+</a>
+</div>
+<div class="px-4 py-2 bg-surface-container-lowest border-t border-outline-variant/20 flex items-center justify-between text-[11px] text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded bg-surface-container font-mono text-[10px]">↑</kbd><kbd class="px-1.5 py-0.5 rounded bg-surface-container font-mono text-[10px]">↓</kbd> navigate</span>
+<span class="inline-flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded bg-surface-container font-mono text-[10px]">↵</kbd> open</span>
+<span class="inline-flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded bg-surface-container font-mono text-[10px]">esc</kbd> dismiss</span>
+</div>
+<a class="text-primary hover:underline font-medium" href="#">Jump to search archive →</a>
+</div>
+</div></div>
+<!-- Filter Tags -->
+<div class="flex flex-wrap items-center gap-1.5 text-xs font-medium justify-start"><span class="text-on-surface-variant uppercase tracking-wider text-[11px] font-semibold mr-1">Topics:</span>
+<button class="filter-chip px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors font-medium" data-filter="all" type="button">All (38)</button>
+<button class="filter-chip active px-3 py-1.5 rounded-full bg-primary text-on-primary font-semibold shadow-sm flex items-center gap-1.5 transition-colors" data-filter="knowledge" type="button">
+<span class="material-symbols-outlined text-[13px]">check</span>
+<span>Knowledge (14)</span>
+</button>
+<button class="filter-chip px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors font-medium" data-filter="cuisine" type="button">Cuisine</button>
+<button class="filter-chip px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors font-medium" data-filter="documentation" type="button">Documentation</button>
+<button class="filter-chip px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors font-medium" data-filter="travel" type="button">Travel &amp; Life</button>
+<span class="text-xs text-primary font-medium ml-auto flex items-center gap-1 cursor-pointer hover:underline">
+<span class="material-symbols-outlined text-[14px]">restart_alt</span> Reset filters
+</span></div>
+</div>
+</section>
+<!-- 6 & 7. Dual-Column Core Section: Chronological Timeline Dispatches & Document Archive Matrix -->
+<section class="max-w-container-max mx-auto px-gutter-lg py-6 w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Timeline-Framed Recent Dispatches (7 cols) -->
+<div class="lg:col-span-7">
+<div class="flex items-center justify-between mb-5 pb-3 border-b border-outline-variant/20"><div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-sans-ui text-xs font-semibold tracking-widest text-primary uppercase block">Filtered Chronicle</span>
+<span class="text-[11px] font-sans-ui font-bold px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed">3 matches</span>
+</div>
+<h2 class="font-headline text-2xl text-on-surface font-semibold">Matching Dispatches <span class="text-base font-normal font-sans-ui text-on-surface-variant">(Filtered by "Statistics" + Knowledge)</span></h2>
+</div>
+<a class="font-sans-ui text-xs font-semibold text-primary hover:text-on-primary-container flex items-center gap-1 group" data-path="blog" href="#">
+<span>View Full Index</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a></div>
+<!-- Timeline Structured Entries -->
+<div class="space-y-4" id="postsList"><!-- Filtered Post 1 -->
+<article class="post-item p-5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all shadow-sm border border-primary/30 ring-1 ring-primary/20 flex flex-col sm:flex-row sm:items-start justify-between gap-4 group" data-category="knowledge">
+<div class="flex items-start gap-3.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary mt-2 flex-shrink-0 group-hover:scale-125 transition-transform ring-4 ring-primary-fixed"></span>
+<div>
+<div class="flex items-center gap-2 mb-1 sm:hidden font-sans-ui">
+<span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed">Knowledge</span>
+<span class="font-headline italic text-xs text-on-surface-variant">Sept 10, 2024</span>
+</div>
+<a class="font-headline text-xl text-on-surface hover:text-primary font-medium transition-colors block" href="#">
+        High Dimensional <mark class="bg-primary-fixed text-on-primary-fixed rounded px-1.5 py-0.5 font-semibold">Statistics</mark> Note (2025 Summer Ver)
+      </a>
+<p class="font-body text-base text-on-surface-variant mt-1.5 leading-relaxed">
+        Principal Component Analysis in asymptotic regimes, random matrix spectral limits, and concentration of measure in mathematical <mark class="bg-primary-fixed text-on-primary-fixed rounded px-1">statistics</mark>.
+      </p>
+</div>
+</div>
+<div class="hidden sm:flex flex-col items-end gap-1.5 flex-shrink-0 font-sans-ui text-right">
+<span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed">Knowledge</span>
+<span class="font-headline italic text-sm text-on-surface-variant">Sept 10, 2024</span>
+</div>
+</article>
+<!-- Filtered Post 2 -->
+<article class="post-item p-5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all shadow-sm border border-outline-variant/30 flex flex-col sm:flex-row sm:items-start justify-between gap-4 group" data-category="knowledge">
+<div class="flex items-start gap-3.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary mt-2 flex-shrink-0 group-hover:scale-125 transition-transform"></span>
+<div>
+<div class="flex items-center gap-2 mb-1 sm:hidden font-sans-ui">
+<span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed">Knowledge</span>
+<span class="font-headline italic text-xs text-on-surface-variant">May 18, 2024</span>
+</div>
+<a class="font-headline text-xl text-on-surface hover:text-primary font-medium transition-colors block" href="#">
+        Empirical Process Theory &amp; Nonparametric <mark class="bg-primary-fixed text-on-primary-fixed rounded px-1.5 py-0.5 font-semibold">Statistics</mark>
+</a>
+<p class="font-body text-base text-on-surface-variant mt-1.5 leading-relaxed">
+        Uniform laws of large numbers, chaining methods, Dudley's entropy integral, and metric entropy bounds across function spaces.
+      </p>
+</div>
+</div>
+<div class="hidden sm:flex flex-col items-end gap-1.5 flex-shrink-0 font-sans-ui text-right">
+<span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed">Knowledge</span>
+<span class="font-headline italic text-sm text-on-surface-variant">May 18, 2024</span>
+</div>
+</article>
+<!-- Filtered Post 3 -->
+<article class="post-item p-5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all shadow-sm border border-outline-variant/30 flex flex-col sm:flex-row sm:items-start justify-between gap-4 group" data-category="knowledge">
+<div class="flex items-start gap-3.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary mt-2 flex-shrink-0 group-hover:scale-125 transition-transform"></span>
+<div>
+<div class="flex items-center gap-2 mb-1 sm:hidden font-sans-ui">
+<span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed">Knowledge</span>
+<span class="font-headline italic text-xs text-on-surface-variant">Jan 12, 2024</span>
+</div>
+<a class="font-headline text-xl text-on-surface hover:text-primary font-medium transition-colors block" href="#">
+        Markov Chain Monte Carlo &amp; Computational <mark class="bg-primary-fixed text-on-primary-fixed rounded px-1.5 py-0.5 font-semibold">Statistics</mark>
+</a>
+<p class="font-body text-base text-on-surface-variant mt-1.5 leading-relaxed">
+        Geometric ergodicity proofs, Hamiltonian Monte Carlo symplectic integrators, and variance reduction techniques.
+      </p>
+</div>
+</div>
+<div class="hidden sm:flex flex-col items-end gap-1.5 flex-shrink-0 font-sans-ui text-right">
+<span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed">Knowledge</span>
+<span class="font-headline italic text-sm text-on-surface-variant">Jan 12, 2024</span>
+</div>
+</article></div>
+</div>
+<!-- Right Column: Primary Documents & Compilations (5 cols) -->
+<div class="lg:col-span-5 space-y-6">
+<div>
+<div class="flex items-center justify-between mb-5 pb-3 border-b border-outline-variant/20 font-sans-ui">
+<div>
+<span class="text-xs font-semibold tracking-widest text-primary uppercase block">Primary Documents</span>
+<h2 class="font-headline text-2xl text-on-surface font-semibold font-serif">Compilations</h2>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">Direct Access</span>
+</div>
+<div class="space-y-3.5">
+<!-- PDF Item 1 -->
+<div class="p-4 sm:p-5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all shadow-sm border border-outline-variant/30 flex items-center justify-between gap-3 group">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-11 h-11 rounded-lg bg-primary-fixed flex items-center justify-center flex-shrink-0 text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[24px]">badge</span>
+</div>
+<div class="min-w-0">
+<h4 class="font-headline text-lg text-on-surface font-medium truncate">Curriculum Vitae (Academic)</h4>
+<span class="font-body text-sm text-on-surface-variant block truncate">Northwestern Statistics · Tsinghua University</span>
+</div>
+</div>
+<a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-primary font-sans-ui text-xs font-semibold group-hover:bg-primary group-hover:text-on-primary transition-colors flex-shrink-0" href="#">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span class="">PDF</span>
+</a>
+</div>
+<!-- PDF Item 2 -->
+<div class="p-4 sm:p-5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all shadow-sm border border-outline-variant/30 flex items-center justify-between gap-3 group">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-11 h-11 rounded-lg bg-secondary-fixed flex items-center justify-center flex-shrink-0 text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[24px]">functions</span>
+</div>
+<div class="min-w-0">
+<h4 class="font-headline text-lg text-on-surface font-medium truncate">Summary of Statistics Courses</h4>
+<span class="font-body text-sm text-on-surface-variant block truncate">A Brief Summary of Statistics Course · 120 Pages</span>
+</div>
+</div>
+<a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-secondary font-sans-ui text-xs font-semibold group-hover:bg-secondary group-hover:text-on-secondary transition-colors flex-shrink-0" href="#">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span class="">PDF</span>
+</a>
+</div>
+<!-- Resource Item 3 -->
+<div class="p-4 sm:p-5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all shadow-sm border border-outline-variant/30 flex items-center justify-between gap-3 group">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-11 h-11 rounded-lg bg-tertiary-fixed flex items-center justify-center flex-shrink-0 text-tertiary group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[24px]">account_tree</span>
+</div>
+<div class="min-w-0">
+<h4 class="font-headline text-lg text-on-surface font-medium truncate">THU Stat Wiki &amp; Minor Repositories</h4>
+<span class="font-body text-sm text-on-surface-variant block truncate">Collaborative notes, problem sets, and guides</span>
+</div>
+</div>
+<a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-tertiary font-sans-ui text-xs font-semibold group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors flex-shrink-0" href="#">
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+<span class="">Visit</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Integrated Endorsement & Action Pod -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-outline-variant/30 font-sans-ui">
+<span class="text-xs uppercase tracking-widest text-on-surface-variant font-medium block mb-3">Archive Endorsement</span>
+<div class="flex items-center justify-between">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container hover:bg-primary-fixed text-on-surface text-sm font-medium transition-all shadow-sm border border-outline-variant/20" id="reactionBtn">
+<span class="">🎉</span>
+<span class="" id="reactionCount">2 赞赏</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface-container hover:bg-primary hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors shadow-sm" id="backToTopBtn" title="Back to top">
+<span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 8. Archive Discussion (Giscus style) -->
+<section class="max-w-container-max mx-auto px-gutter-lg pt-4 pb-12 w-full font-sans-ui">
+<div class="bg-surface-container-lowest rounded-xl p-5 sm:p-7 md:p-8 shadow-sm border border-outline-variant/30 space-y-6">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="font-headline text-xl text-on-surface font-semibold">3 条讨论</span>
+<span class="text-xs text-on-surface-variant">· 由 giscus 驱动</span>
+</div>
+<div class="flex items-center gap-1 text-xs">
+<button class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-semibold">最新</button>
+<button class="px-2.5 py-1 rounded text-on-surface-variant hover:bg-surface-container transition-colors">最热</button>
+</div>
+</div>
+<!-- Comment Input Box -->
+<div class="rounded-lg bg-surface-container-low p-3.5 space-y-3">
+<textarea class="w-full bg-surface-container-lowest rounded p-3 font-body text-base text-on-surface placeholder:text-outline border border-outline-variant/20 focus:outline-none focus:border-primary transition-all resize-none" placeholder="撰写评论 / Write a reflection or theoretical remark (Supports Markdown)..." rows="3"></textarea>
+<div class="flex items-center justify-between pt-1">
+<span class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">markdown</span> Markdown supported
+        </span>
+<button class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[15px]">send</span>
+<span class="">使用 GitHub 登录发表</span>
+</button>
+</div>
+</div>
+<!-- Thread Comments -->
+<div class="space-y-3 pt-1">
+<div class="p-3.5 rounded-lg bg-surface-container-low space-y-1.5">
+<div class="flex items-center justify-between text-xs">
+<span class="font-semibold text-primary">SamSeven777</span>
+<span class="text-on-surface-variant">2023 年 10 月 13 日</span>
+</div>
+<p class="font-body text-base text-on-surface">
+          High-resolution profile picture loads crisp! Thanks for compiling the THU Stat course summaries—immensely helpful for qualifying prep.
+        </p>
+<div class="flex items-center gap-3 pt-1 text-xs text-on-surface-variant">
+<button class="hover:text-primary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">thumb_up</span> 1
+          </button>
+<span class="">0 条回复</span>
+</div>
+</div>
+<div class="p-3.5 rounded-lg bg-surface-container-low space-y-1.5">
+<div class="flex items-center justify-between text-xs">
+<span class="font-semibold text-primary">hanshuo-shuo</span>
+<span class="text-on-surface-variant">2024 年 5 月 10 日</span>
+</div>
+<p class="font-body text-base text-on-surface">
+          来人呐，催更芝加哥/埃文斯顿的美食探访日记！Clam Chowder 那篇的浓汤稠度参数太硬核了。
+        </p>
+<div class="flex items-center gap-3 pt-1 text-xs text-on-surface-variant">
+<button class="hover:text-primary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">favorite</span> 1
+          </button>
+<span class="">0 条回复</span>
+</div>
+</div>
+<div class="p-3.5 rounded-lg bg-surface-container-low space-y-1.5">
+<div class="flex items-center justify-between text-xs">
+<span class="font-semibold text-primary">stat-junda</span>
+<span class="text-on-surface-variant">2024 年 5 月 12 日</span>
+</div>
+<p class="font-body text-base text-on-surface">
+          高维统计的协方差阵集中不等式章节整理得极为清晰，期待后续关于谱理论与自由概率论的更新。
+        </p>
+<div class="flex items-center gap-3 pt-1 text-xs text-on-surface-variant">
+<button class="hover:text-primary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">thumb_up</span> 2
+          </button>
+<span class="">0 条回复</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div></main>
+<!-- Footer -->
+<footer class="w-full bg-surface-container-low border-t border-outline-variant/30">
+<div class="max-w-container-max mx-auto px-gutter-lg py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-2">
+<span class="font-headline text-lg text-on-surface font-semibold">v1ncent19</span>
+<span class="text-on-surface-variant">·</span>
+<span class="font-body text-sm text-on-surface-variant">Tuorui Peng</span>
+</div>
+<div class="font-sans-ui text-xs tracking-widest text-on-surface-variant uppercase text-center md:text-right font-medium">
+      Academic Index · Mathematics &amp; Computation · © 2024
+    </div>
+</div>
+</footer>
+<!-- Interactive Scripts -->
+<script>
+  (function() {
+    const searchInput = document.getElementById('postSearchInput');
+    const posts = document.querySelectorAll('.post-item');
+    const filterChips = document.querySelectorAll('.filter-chip');
+
+    let currentFilter = 'all';
+
+    function filterEntries() {
+      const query = (searchInput.value || '').toLowerCase().trim();
+      posts.forEach(post => {
+        const title = post.querySelector('a').textContent.toLowerCase();
+        const desc = post.querySelector('p').textContent.toLowerCase();
+        const category = post.getAttribute('data-category');
+
+        const matchesQuery = title.includes(query) || desc.includes(query);
+        const matchesCategory = (currentFilter === 'all') || (category === currentFilter);
+
+        if (matchesQuery && matchesCategory) {
+          post.style.display = 'flex';
+        } else {
+          post.style.display = 'none';
+        }
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', filterEntries);
+    }
+
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => {
+          c.classList.remove('bg-primary', 'text-on-primary', 'active');
+          c.classList.add('bg-surface-container', 'text-on-surface-variant');
+        });
+        chip.classList.remove('bg-surface-container', 'text-on-surface-variant');
+        chip.classList.add('bg-primary', 'text-on-primary', 'active');
+        currentFilter = chip.getAttribute('data-filter');
+        filterEntries();
+      });
+    });
+
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    if (backToTopBtn) {
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    const reactionBtn = document.getElementById('reactionBtn');
+    const reactionCount = document.getElementById('reactionCount');
+    let count = 2;
+    let reacted = false;
+    if (reactionBtn && reactionCount) {
+      reactionBtn.addEventListener('click', () => {
+        if (!reacted) {
+          count += 1;
+          reacted = true;
+          reactionCount.textContent = count + ' 赞赏';
+          reactionBtn.classList.add('bg-secondary-container', 'text-on-secondary-container');
+        }
+      });
+    }
+  })();
+</script>
+</body></html>

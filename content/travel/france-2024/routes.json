@@ -1,0 +1,2394 @@
+{
+  "schemaVersion": 1,
+  "basis": "route-ledger-v2.json; all geometry absent in source",
+  "geometryPolicy": "All connectors on the draft map are schematic endpoint links, never observed GPS paths.",
+  "legs": [
+    {
+      "id": "L0314-01",
+      "date": "2024-03-14",
+      "from": "CDG机场",
+      "to": "Châtelet–Les Halles换乘区域",
+      "mode": "RER B",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3039-02",
+        "S3056-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0314-02",
+      "date": "2024-03-14",
+      "from": "Châtelet–Les Halles换乘区域",
+      "to": "巴黎前段住处",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M4: Les Halles/Châtelet → Strasbourg–Saint-Denis/Château d’Eau",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "S3056-02",
+        "S3056-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0314-03",
+      "date": "2024-03-14",
+      "from": "巴黎前段住处",
+      "to": "奥赛美术馆",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M8: Strasbourg–Saint-Denis → Concorde，步行至奥赛",
+      "metroGrade": "ambiguous",
+      "sourceRefs": [
+        "S3056-03",
+        "S3039-03",
+        "S3056-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0314-04",
+      "date": "2024-03-14",
+      "from": "奥赛美术馆",
+      "to": "罗丹美术馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3039-03",
+        "S3039-05",
+        "S3056-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0314-05",
+      "date": "2024-03-14",
+      "from": "罗丹美术馆",
+      "to": "蒙马特／圣心堂外（夕阳）",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "Pigalle站",
+          "precedingMode": "metro"
+        },
+        {
+          "place": "蒙马特上山步行",
+          "precedingMode": "walk"
+        }
+      ],
+      "metroCandidate": "步行至 Solférino 后 M12 → Pigalle，再步行上山",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "S3039-05",
+        "S3040-01",
+        "S3056-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-01",
+      "date": "2024-03-15",
+      "from": "巴黎前段住处",
+      "to": "圣米歇尔喷泉／换乘区域",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M4: Strasbourg–Saint-Denis/Château d’Eau → Saint-Michel",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "S3057-02",
+        "S3040-02",
+        "S3057-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-02",
+      "date": "2024-03-15",
+      "from": "圣米歇尔喷泉／换乘区域",
+      "to": "凡尔赛宫",
+      "mode": "RER C",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3040-02",
+        "S3040-03",
+        "S3057-01",
+        "S3057-03",
+        "M16"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-03",
+      "date": "2024-03-15",
+      "from": "凡尔赛宫",
+      "to": "Invalides站（RER C返程下车）",
+      "mode": "RER C",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3040-03",
+        "S3057-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-04",
+      "date": "2024-03-15",
+      "from": "Invalides站（RER C返程下车）",
+      "to": "荣军院／拿破仑墓",
+      "mode": "walk",
+      "modeBasis": "user-note",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3057-03",
+        "S3040-05",
+        "S3057-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-05",
+      "date": "2024-03-15",
+      "from": "荣军院／拿破仑墓",
+      "to": "亚历山大三世桥",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3040-05",
+        "S3041-02",
+        "S3057-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-06",
+      "date": "2024-03-15",
+      "from": "亚历山大三世桥",
+      "to": "小皇宫",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3041-02",
+        "S3041-03",
+        "S3057-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-07",
+      "date": "2024-03-15",
+      "from": "小皇宫",
+      "to": "海军府",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3041-03",
+        "S3041-04",
+        "S3057-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-08",
+      "date": "2024-03-15",
+      "from": "海军府",
+      "to": "卢浮宫（首次入馆）",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3041-04",
+        "S3041-05",
+        "S3057-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-09",
+      "date": "2024-03-15",
+      "from": "卢浮宫（首次入馆）",
+      "to": "Le Florentin晚餐",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3041-05",
+        "T00",
+        "S3057-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0315-10",
+      "date": "2024-03-15",
+      "from": "Le Florentin晚餐",
+      "to": "巴黎前段住处",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M8: Concorde → Strasbourg–Saint-Denis",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "T00",
+        "S3057-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-01",
+      "date": "2024-03-16",
+      "from": "卢浮宫邮局",
+      "to": "玛蒙丹·莫奈美术馆",
+      "mode": "bus",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T16-01",
+        "T16-02",
+        "S3058-01",
+        "S3058-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-02",
+      "date": "2024-03-16",
+      "from": "玛蒙丹·莫奈美术馆",
+      "to": "Le Bois午餐",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T16-02",
+        "T16-03",
+        "S3058-01"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-03",
+      "date": "2024-03-16",
+      "from": "Le Bois午餐",
+      "to": "吉美亚洲艺术博物馆",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M9: La Muette → Iéna，步行至吉美",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "T16-03",
+        "T16-04",
+        "S3058-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-04",
+      "date": "2024-03-16",
+      "from": "吉美亚洲艺术博物馆",
+      "to": "建筑与遗产之城",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M9: Iéna → Trocadéro",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "T16-04",
+        "T16-05",
+        "S3058-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-05",
+      "date": "2024-03-16",
+      "from": "建筑与遗产之城",
+      "to": "特罗卡德罗花园",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T16-05",
+        "T16-06",
+        "S3058-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-06",
+      "date": "2024-03-16",
+      "from": "特罗卡德罗花园",
+      "to": "比尔阿克姆桥",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T16-06",
+        "T16-07",
+        "S3058-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-07",
+      "date": "2024-03-16",
+      "from": "比尔阿克姆桥",
+      "to": "埃菲尔铁塔",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T16-07",
+        "T16-08",
+        "S3058-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-08",
+      "date": "2024-03-16",
+      "from": "埃菲尔铁塔",
+      "to": "蒙帕纳斯附近（未登塔）",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M6: Bir-Hakeim → Montparnasse–Bienvenüe",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "T16-08",
+        "S3058-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-09",
+      "date": "2024-03-16",
+      "from": "蒙帕纳斯附近（未登塔）",
+      "to": "Chez Gladines／Les Halles",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M4: Montparnasse–Bienvenüe → Les Halles",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "S3058-04",
+        "T16-09",
+        "S3058-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-10",
+      "date": "2024-03-16",
+      "from": "Chez Gladines／Les Halles",
+      "to": "西岱岛",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T16-09",
+        "T16-10",
+        "S3058-06"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-11",
+      "date": "2024-03-16",
+      "from": "西岱岛",
+      "to": "巴黎圣母院外",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T16-10",
+        "T16-11",
+        "S3058-06"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0316-12",
+      "date": "2024-03-16",
+      "from": "巴黎圣母院外",
+      "to": "巴黎前段住处",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M4: Cité/Saint-Michel → Strasbourg–Saint-Denis/Château d’Eau",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "T16-11",
+        "S3058-06"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-01",
+      "date": "2024-03-17",
+      "from": "巴黎前段住处",
+      "to": "橘园美术馆",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M8: Strasbourg–Saint-Denis → Concorde，再步行至橘园",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "S3059-01",
+        "T17-01",
+        "S3059-02",
+        "M05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-02",
+      "date": "2024-03-17",
+      "from": "橘园美术馆",
+      "to": "玛德莱娜教堂",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-01",
+        "T17-02",
+        "S3059-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-03",
+      "date": "2024-03-17",
+      "from": "玛德莱娜教堂",
+      "to": "圣奥古斯丁教堂",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-02",
+        "T17-03",
+        "S3059-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-04",
+      "date": "2024-03-17",
+      "from": "圣奥古斯丁教堂",
+      "to": "圣拉扎尔车站",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-03",
+        "T17-04",
+        "S3059-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-05",
+      "date": "2024-03-17",
+      "from": "圣拉扎尔车站",
+      "to": "Pierre Hermé Opéra店",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-04",
+        "T17-05",
+        "S3059-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-06",
+      "date": "2024-03-17",
+      "from": "Pierre Hermé Opéra店",
+      "to": "巴黎歌剧院",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-05",
+        "T17-06",
+        "S3059-03",
+        "M07"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-07",
+      "date": "2024-03-17",
+      "from": "巴黎歌剧院",
+      "to": "古监狱",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "巴黎前段住处（休息约一小时）",
+          "precedingMode": "metro"
+        },
+        {
+          "place": "古监狱",
+          "precedingMode": "metro"
+        }
+      ],
+      "metroCandidate": "第一程 M8: Opéra → Strasbourg–Saint-Denis；第二程 M4: Strasbourg–Saint-Denis → Cité/Châtelet",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "T17-06",
+        "T17-07",
+        "S3059-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-08",
+      "date": "2024-03-17",
+      "from": "古监狱",
+      "to": "货币博物馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-07",
+        "T17-08",
+        "S3059-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-09",
+      "date": "2024-03-17",
+      "from": "货币博物馆",
+      "to": "莎士比亚书店",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-08",
+        "T17-09",
+        "S3059-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-10",
+      "date": "2024-03-17",
+      "from": "莎士比亚书店",
+      "to": "巴黎圣母院外",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-09",
+        "T17-10",
+        "S3059-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-11",
+      "date": "2024-03-17",
+      "from": "巴黎圣母院外",
+      "to": "巴黎市政厅",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-10",
+        "T17-11",
+        "S3059-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-12",
+      "date": "2024-03-17",
+      "from": "巴黎市政厅",
+      "to": "蓬皮杜中心",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-11",
+        "T17-12",
+        "S3059-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-13",
+      "date": "2024-03-17",
+      "from": "蓬皮杜中心",
+      "to": "圣心堂（夜访）",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "Barbès–Rochechouart站",
+          "precedingMode": "metro"
+        },
+        {
+          "place": "圣心堂上山步行",
+          "precedingMode": "walk"
+        }
+      ],
+      "metroCandidate": "M4: Étienne Marcel/Châtelet → Barbès–Rochechouart，再步行上山",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "T17-12",
+        "T17-13",
+        "S3059-06",
+        "M11"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-14",
+      "date": "2024-03-17",
+      "from": "圣心堂（夜访）",
+      "to": "Bouillon Julien晚餐",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "Blanche／红磨坊街区",
+          "precedingMode": "walk"
+        }
+      ],
+      "metroCandidate": "步行经红磨坊至 Blanche；M2: Blanche → Barbès–Rochechouart，换 M4 → Strasbourg–Saint-Denis",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "T17-13",
+        "T17-14",
+        "S3059-06"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0317-15",
+      "date": "2024-03-17",
+      "from": "Bouillon Julien晚餐",
+      "to": "巴黎前段住处",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "T17-14",
+        "S3059-06"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-01",
+      "date": "2024-03-18",
+      "from": "巴黎前段住处",
+      "to": "Gare de Lyon",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M4 → M14: Strasbourg–Saint-Denis → Châtelet → Gare de Lyon",
+      "metroGrade": "ambiguous",
+      "sourceRefs": [
+        "S3060-01",
+        "S3060-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-02",
+      "date": "2024-03-18",
+      "from": "Gare de Lyon",
+      "to": "Fontainebleau–Avon站",
+      "mode": "rail R",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3060-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-03",
+      "date": "2024-03-18",
+      "from": "Fontainebleau–Avon站",
+      "to": "枫丹白露宫",
+      "mode": "bus",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3060-02",
+        "S3036-01",
+        "S3060-01",
+        "M17"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-04",
+      "date": "2024-03-18",
+      "from": "枫丹白露宫",
+      "to": "Fontainebleau–Avon站（返程）",
+      "mode": "bus",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-01",
+        "S3060-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-05",
+      "date": "2024-03-18",
+      "from": "Fontainebleau–Avon站（返程）",
+      "to": "Gare de Lyon（返程）",
+      "mode": "rail R",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3060-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-06",
+      "date": "2024-03-18",
+      "from": "Gare de Lyon（返程）",
+      "to": "Pedra Alta午餐（25 Rue Marbeuf）",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M1: Gare de Lyon → Franklin D. Roosevelt，再步行至 25 Rue Marbeuf",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "S3060-02",
+        "S3036-02",
+        "S3060-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-07",
+      "date": "2024-03-18",
+      "from": "Pedra Alta午餐（25 Rue Marbeuf）",
+      "to": "凯旋门",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-02",
+        "S3036-03",
+        "S3060-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-08",
+      "date": "2024-03-18",
+      "from": "凯旋门",
+      "to": "邮政博物馆",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M6: Charles de Gaulle–Étoile → Montparnasse–Bienvenüe",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "S3036-03",
+        "S3036-04",
+        "S3060-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-09",
+      "date": "2024-03-18",
+      "from": "邮政博物馆",
+      "to": "先贤祠",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M4: Montparnasse–Bienvenüe → Odéon/ Saint-Michel，再步行至先贤祠",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "S3036-04",
+        "S3036-05",
+        "S3060-03",
+        "S3060-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-10",
+      "date": "2024-03-18",
+      "from": "先贤祠",
+      "to": "小王子店",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-05",
+        "S3036-06",
+        "S3060-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-11",
+      "date": "2024-03-18",
+      "from": "小王子店",
+      "to": "卢森堡公园",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-06",
+        "S3036-07",
+        "S3060-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-12",
+      "date": "2024-03-18",
+      "from": "卢森堡公园",
+      "to": "埃菲尔铁塔",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "巴黎前段住处（取行李）",
+          "precedingMode": "metro"
+        },
+        {
+          "place": "巴黎后段住处（提前寄放行李，非当晚住宿）",
+          "precedingMode": "metro"
+        },
+        {
+          "place": "战神广场／铁塔",
+          "precedingMode": "walk"
+        }
+      ],
+      "metroCandidate": "第一程 M4: Saint-Sulpice 一带 → Strasbourg–Saint-Denis；第二程 M8: Strasbourg–Saint-Denis → École Militaire",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "S3036-07",
+        "S3036-08",
+        "S3060-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-13",
+      "date": "2024-03-18",
+      "from": "埃菲尔铁塔",
+      "to": "Chez Loulou晚餐",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M8: École Militaire → République；M11 → Rambuteau",
+      "metroGrade": "ambiguous",
+      "sourceRefs": [
+        "S3036-08",
+        "S3036-09",
+        "S3060-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0318-14",
+      "date": "2024-03-18",
+      "from": "Chez Loulou晚餐",
+      "to": "巴黎前段住处",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M11: Rambuteau → Châtelet，换 M4 → Strasbourg–Saint-Denis",
+      "metroGrade": "ambiguous",
+      "sourceRefs": [
+        "S3036-09",
+        "S3060-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-01",
+      "date": "2024-03-19",
+      "from": "巴黎前段住处",
+      "to": "Carton早餐",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3061-02",
+        "S3036-10"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-02",
+      "date": "2024-03-19",
+      "from": "Carton早餐",
+      "to": "巴黎北站",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-10",
+        "S3047-03",
+        "S3061-01",
+        "S3061-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-03",
+      "date": "2024-03-19",
+      "from": "巴黎北站",
+      "to": "科隆中央车站",
+      "mode": "Eurostar 9411",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3047-03",
+        "S3036-11",
+        "S3061-01",
+        "S3062-01"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-04",
+      "date": "2024-03-19",
+      "from": "科隆中央车站",
+      "to": "Augustiner午餐",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-11",
+        "S3036-12",
+        "S3062-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-05",
+      "date": "2024-03-19",
+      "from": "Augustiner午餐",
+      "to": "巧克力博物馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-12",
+        "S3036-13",
+        "S3062-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-06",
+      "date": "2024-03-19",
+      "from": "巧克力博物馆",
+      "to": "Farina香水博物馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-13",
+        "S3036-14",
+        "S3062-03",
+        "S3062-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-07",
+      "date": "2024-03-19",
+      "from": "Farina香水博物馆",
+      "to": "科隆大教堂",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-14",
+        "S3036-15",
+        "S3062-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-08",
+      "date": "2024-03-19",
+      "from": "科隆大教堂",
+      "to": "霍亨索伦桥",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-15",
+        "S3036-16",
+        "S3062-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-09",
+      "date": "2024-03-19",
+      "from": "霍亨索伦桥",
+      "to": "KölnTriangle",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-16",
+        "S3036-17",
+        "S3062-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-10",
+      "date": "2024-03-19",
+      "from": "KölnTriangle",
+      "to": "科隆中央车站（返程）",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-17",
+        "S3048-03",
+        "S3062-02",
+        "S3062-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-11",
+      "date": "2024-03-19",
+      "from": "科隆中央车站（返程）",
+      "to": "阿姆斯特丹中央车站",
+      "mode": "ICE 104",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3048-03",
+        "S3036-18",
+        "S3062-01",
+        "S3063-01"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-12",
+      "date": "2024-03-19",
+      "from": "阿姆斯特丹中央车站",
+      "to": "阿姆斯特丹住处",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-18",
+        "S3063-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-13",
+      "date": "2024-03-19",
+      "from": "阿姆斯特丹住处",
+      "to": "伦勃朗像",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3063-02",
+        "S3036-19"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-14",
+      "date": "2024-03-19",
+      "from": "伦勃朗像",
+      "to": "铸币塔",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-19",
+        "S3036-20",
+        "S3063-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0319-15",
+      "date": "2024-03-19",
+      "from": "铸币塔",
+      "to": "阿姆斯特丹住处（返回）",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-20",
+        "S3063-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-01",
+      "date": "2024-03-20",
+      "from": "阿姆斯特丹住处",
+      "to": "梵高博物馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3064-06",
+        "S3036-21",
+        "S3064-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-02",
+      "date": "2024-03-20",
+      "from": "梵高博物馆",
+      "to": "阿姆斯特丹中央车站",
+      "mode": "tram",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-21",
+        "S3036-22",
+        "S3064-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-03",
+      "date": "2024-03-20",
+      "from": "阿姆斯特丹中央车站",
+      "to": "国家海事博物馆",
+      "mode": "bus",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3036-22",
+        "S3037-01",
+        "S3064-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-04",
+      "date": "2024-03-20",
+      "from": "国家海事博物馆",
+      "to": "伦勃朗故居",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-01",
+        "S3037-02",
+        "S3064-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-05",
+      "date": "2024-03-20",
+      "from": "伦勃朗故居",
+      "to": "水坝广场／皇宫",
+      "mode": "unknown",
+      "modeBasis": "user-cannot-recall",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-02",
+        "S3037-03",
+        "S3064-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-06",
+      "date": "2024-03-20",
+      "from": "水坝广场／皇宫",
+      "to": "运河博物馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-03",
+        "S3037-04",
+        "S3064-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-07",
+      "date": "2024-03-20",
+      "from": "运河博物馆",
+      "to": "阿姆斯特丹铁路上车站（未定）",
+      "mode": "tram",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-04",
+        "S3064-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-08",
+      "date": "2024-03-20",
+      "from": "阿姆斯特丹铁路上车站（未定）",
+      "to": "Zaandijk Zaanse Schans站",
+      "mode": "rail",
+      "modeBasis": "baseline-evidence",
+      "via": [
+        {
+          "place": "Zaandijk Zaanse Schans站",
+          "precedingMode": "rail"
+        }
+      ],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3064-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-09",
+      "date": "2024-03-20",
+      "from": "Zaandijk Zaanse Schans站",
+      "to": "Pier - best photos of the mills／风车村观光区",
+      "mode": "walk",
+      "modeBasis": "user-note",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3064-04",
+        "S3037-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-10",
+      "date": "2024-03-20",
+      "from": "Pier - best photos of the mills／风车村观光区",
+      "to": "Zaandijk Zaanse Schans站（返程）",
+      "mode": "walk",
+      "modeBasis": "user-note",
+      "via": [
+        {
+          "place": "Zaandijk Zaanse Schans站（返程）",
+          "precedingMode": "walk"
+        }
+      ],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-05",
+        "S3064-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-11",
+      "date": "2024-03-20",
+      "from": "Zaandijk Zaanse Schans站（返程）",
+      "to": "阿姆斯特丹中央车站",
+      "mode": "rail",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3064-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-12",
+      "date": "2024-03-20",
+      "from": "阿姆斯特丹中央车站",
+      "to": "中央车站附近游船登船点",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3064-04",
+        "S3037-06",
+        "S3064-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-13",
+      "date": "2024-03-20",
+      "from": "中央车站附近游船登船点",
+      "to": "运河游船（航线未定）",
+      "mode": "boat",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-06",
+        "S3064-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-14",
+      "date": "2024-03-20",
+      "from": "运河游船（航线未定）",
+      "to": "Café Sonneveld晚餐",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-06",
+        "S3037-07",
+        "S3064-05",
+        "S3064-06"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0320-15",
+      "date": "2024-03-20",
+      "from": "Café Sonneveld晚餐",
+      "to": "阿姆斯特丹住处",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-07",
+        "S3064-06"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-01",
+      "date": "2024-03-21",
+      "from": "阿姆斯特丹住处",
+      "to": "荷兰国立博物馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3063-03",
+        "S3037-08"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-02",
+      "date": "2024-03-21",
+      "from": "荷兰国立博物馆",
+      "to": "The Pantry午餐",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-08",
+        "S3037-09",
+        "S3063-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-03",
+      "date": "2024-03-21",
+      "from": "The Pantry午餐",
+      "to": "阿姆斯特丹中央车站",
+      "mode": "tram",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-09",
+        "S3063-04",
+        "S3063-01"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-04",
+      "date": "2024-03-21",
+      "from": "阿姆斯特丹中央车站",
+      "to": "巴黎北站",
+      "mode": "Eurostar 9352",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3063-04",
+        "S3037-10",
+        "S3063-01",
+        "S3061-01"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-05",
+      "date": "2024-03-21",
+      "from": "巴黎北站",
+      "to": "Lafayette百货／天台",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M4/M5 → Gare de l’Est，换 M7 → Chaussée d’Antin–La Fayette",
+      "metroGrade": "ambiguous",
+      "sourceRefs": [
+        "S3037-10",
+        "S3037-11",
+        "S3061-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-06",
+      "date": "2024-03-21",
+      "from": "Lafayette百货／天台",
+      "to": "装饰艺术馆",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "Palais Royal–Musée du Louvre站",
+          "precedingMode": "metro"
+        },
+        {
+          "place": "卢浮宫广场／外部晚霞",
+          "precedingMode": "walk"
+        }
+      ],
+      "metroCandidate": "M7: Chaussée d’Antin–La Fayette → Palais Royal–Musée du Louvre；后续步行",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "S3037-11",
+        "S3037-12",
+        "S3061-03",
+        "M09"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-07",
+      "date": "2024-03-21",
+      "from": "装饰艺术馆",
+      "to": "奥赛美术馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-12",
+        "S3037-13",
+        "S3061-03",
+        "S3061-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-08",
+      "date": "2024-03-21",
+      "from": "奥赛美术馆",
+      "to": "巴黎后段住处",
+      "mode": "bus",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-13",
+        "S3061-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-09",
+      "date": "2024-03-21",
+      "from": "巴黎后段住处",
+      "to": "Café du Marché晚餐",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3061-04",
+        "S3037-14"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0321-10",
+      "date": "2024-03-21",
+      "from": "Café du Marché晚餐",
+      "to": "巴黎后段住处（返回）",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-14",
+        "S3061-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-01",
+      "date": "2024-03-22",
+      "from": "巴黎后段住处",
+      "to": "橘园美术馆",
+      "mode": "bus",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3065-01",
+        "S3037-15",
+        "S3065-02",
+        "M05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-02",
+      "date": "2024-03-22",
+      "from": "橘园美术馆",
+      "to": "皇家宫殿",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-15",
+        "S3037-16",
+        "S3065-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-03",
+      "date": "2024-03-22",
+      "from": "皇家宫殿",
+      "to": "BnF黎塞留馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-16",
+        "S3037-17",
+        "S3065-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-04",
+      "date": "2024-03-22",
+      "from": "BnF黎塞留馆",
+      "to": "圣厄斯塔什教堂",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-17",
+        "S3037-18",
+        "S3065-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-05",
+      "date": "2024-03-22",
+      "from": "圣厄斯塔什教堂",
+      "to": "La Jacobine午餐",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "Les Halles站",
+          "precedingMode": "walk"
+        },
+        {
+          "place": "Odéon站",
+          "precedingMode": "metro"
+        }
+      ],
+      "metroCandidate": "M4: Les Halles → Odéon；两端步行",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "S3037-18",
+        "S3037-19",
+        "S3065-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-06",
+      "date": "2024-03-22",
+      "from": "La Jacobine午餐",
+      "to": "法兰西学院",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-19",
+        "S3037-20",
+        "S3065-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-07",
+      "date": "2024-03-22",
+      "from": "法兰西学院",
+      "to": "卢浮宫（第二次入馆）",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-20",
+        "S3037-21",
+        "S3065-03",
+        "S3065-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-08",
+      "date": "2024-03-22",
+      "from": "卢浮宫（第二次入馆）",
+      "to": "巴黎后段住处",
+      "mode": "bus",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-21",
+        "S3065-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-09",
+      "date": "2024-03-22",
+      "from": "巴黎后段住处",
+      "to": "Le Roussillon晚餐",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3065-04",
+        "S3037-22",
+        "S3065-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0322-10",
+      "date": "2024-03-22",
+      "from": "Le Roussillon晚餐",
+      "to": "巴黎后段住处（返回）",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3037-22",
+        "S3065-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0323-01",
+      "date": "2024-03-23",
+      "from": "巴黎后段住处",
+      "to": "拉雪兹公墓",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "Varenne站",
+          "precedingMode": "walk"
+        },
+        {
+          "place": "拉雪兹公墓",
+          "precedingMode": "metro"
+        }
+      ],
+      "metroCandidate": "步行至 Varenne；M13 → Saint-Lazare，换 M3 → Père Lachaise",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "S3066-01",
+        "S3038-01",
+        "S3066-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0323-02",
+      "date": "2024-03-23",
+      "from": "拉雪兹公墓",
+      "to": "雨果故居",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M3: Père Lachaise → République；M8 → Bastille",
+      "metroGrade": "ambiguous",
+      "sourceRefs": [
+        "S3038-01",
+        "S3038-02",
+        "S3066-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0323-03",
+      "date": "2024-03-23",
+      "from": "雨果故居",
+      "to": "圣礼拜堂",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M1: Bastille → Châtelet，步行至圣礼拜堂",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "S3038-02",
+        "S3038-03",
+        "S3066-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0323-04",
+      "date": "2024-03-23",
+      "from": "圣礼拜堂",
+      "to": "梅里爱博物馆",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "Bibliothèque François Mitterrand站",
+          "precedingMode": "metro"
+        },
+        {
+          "place": "Simone de Beauvoir桥",
+          "precedingMode": "walk"
+        }
+      ],
+      "metroCandidate": "M14: Châtelet → Bibliothèque François Mitterrand；步行经 Simone de Beauvoir 桥至梅里爱馆",
+      "metroGrade": "strong",
+      "sourceRefs": [
+        "S3038-03",
+        "S3038-04",
+        "S3066-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0323-05",
+      "date": "2024-03-23",
+      "from": "梅里爱博物馆",
+      "to": "毕加索博物馆",
+      "mode": "metro",
+      "modeBasis": "user-note",
+      "via": [
+        {
+          "place": "Bercy站",
+          "precedingMode": "walk"
+        }
+      ],
+      "metroCandidate": "M14: Bercy → Gare de Lyon；M1 → Saint-Paul",
+      "metroGrade": "ambiguous",
+      "sourceRefs": [
+        "S3038-04",
+        "S3038-05",
+        "S3066-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0323-06",
+      "date": "2024-03-23",
+      "from": "毕加索博物馆",
+      "to": "Café du Marché晚餐",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M8: Chemin Vert/Saint-Sébastien–Froissart → École Militaire",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "S3038-05",
+        "S3038-06",
+        "S3066-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0323-07",
+      "date": "2024-03-23",
+      "from": "Café du Marché晚餐",
+      "to": "埃菲尔铁塔",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [
+        {
+          "place": "巴黎后段住处（短暂休息）",
+          "precedingMode": "walk"
+        }
+      ],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-06",
+        "S3038-07",
+        "S3066-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0323-08",
+      "date": "2024-03-23",
+      "from": "埃菲尔铁塔",
+      "to": "凯旋门",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-07",
+        "S3038-08",
+        "S3066-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0323-09",
+      "date": "2024-03-23",
+      "from": "凯旋门",
+      "to": "巴黎后段住处",
+      "mode": "bus",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-08",
+        "S3066-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-01",
+      "date": "2024-03-24",
+      "from": "巴黎后段住处",
+      "to": "卡蒙多博物馆",
+      "mode": "metro",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": "M8 École Militaire → Concorde；M12 → Saint-Lazare；M3 → Villiers",
+      "metroGrade": "ambiguous",
+      "sourceRefs": [
+        "S3067-02",
+        "S3038-09",
+        "M12"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-02",
+      "date": "2024-03-24",
+      "from": "卡蒙多博物馆",
+      "to": "蒙索公园",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-09",
+        "S3038-10",
+        "S3067-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-03",
+      "date": "2024-03-24",
+      "from": "蒙索公园",
+      "to": "Henner博物馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-10",
+        "S3038-11",
+        "S3067-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-04",
+      "date": "2024-03-24",
+      "from": "Henner博物馆",
+      "to": "巴黎Saint-Lazare站",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-11",
+        "S3038-12",
+        "S3067-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-05",
+      "date": "2024-03-24",
+      "from": "巴黎Saint-Lazare站",
+      "to": "鲁昂站",
+      "mode": "TER 13125",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-12",
+        "S3067-02",
+        "S3068-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-06",
+      "date": "2024-03-24",
+      "from": "鲁昂站",
+      "to": "圣女贞德塔",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-12",
+        "S3038-13",
+        "S3068-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-07",
+      "date": "2024-03-24",
+      "from": "圣女贞德塔",
+      "to": "鲁昂美术馆",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-13",
+        "S3038-14",
+        "S3068-03",
+        "S3068-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-08",
+      "date": "2024-03-24",
+      "from": "鲁昂美术馆",
+      "to": "大时钟",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-14",
+        "S3038-15",
+        "S3068-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-09",
+      "date": "2024-03-24",
+      "from": "大时钟",
+      "to": "鲁昂大教堂",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-15",
+        "S3038-16",
+        "S3068-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-10",
+      "date": "2024-03-24",
+      "from": "鲁昂大教堂",
+      "to": "Saint-Maclou教堂",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-16",
+        "S3038-17",
+        "S3068-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-11",
+      "date": "2024-03-24",
+      "from": "Saint-Maclou教堂",
+      "to": "鲁昂站（返程）",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-17",
+        "S3038-18",
+        "S3068-05",
+        "S3068-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-12",
+      "date": "2024-03-24",
+      "from": "鲁昂站（返程）",
+      "to": "巴黎Saint-Lazare站",
+      "mode": "TER 13150",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-18",
+        "S3067-02"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-13",
+      "date": "2024-03-24",
+      "from": "巴黎Saint-Lazare站",
+      "to": "Trocadéro广场",
+      "mode": "metro",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": "M13: Saint-Lazare → Miromesnil；M9 → Trocadéro",
+      "metroGrade": "partial",
+      "sourceRefs": [
+        "S3038-18",
+        "S3038-19",
+        "S3067-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-14",
+      "date": "2024-03-24",
+      "from": "Trocadéro广场",
+      "to": "塞纳河游船登船点（未定）",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-19",
+        "S3038-20",
+        "S3067-03",
+        "S3067-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-15",
+      "date": "2024-03-24",
+      "from": "塞纳河游船登船点（未定）",
+      "to": "塞纳河游船（航线待核）",
+      "mode": "boat",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-20",
+        "S3067-03"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-16",
+      "date": "2024-03-24",
+      "from": "塞纳河游船（航线待核）",
+      "to": "L’éclair晚餐",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-20",
+        "S3038-21",
+        "S3067-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0324-17",
+      "date": "2024-03-24",
+      "from": "L’éclair晚餐",
+      "to": "巴黎后段住处",
+      "mode": "walk",
+      "modeBasis": "user-selection",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3038-21",
+        "S3067-04"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0325-01",
+      "date": "2024-03-25",
+      "from": "巴黎后段住处",
+      "to": "Saint-Michel–Notre-Dame站",
+      "mode": "walk + RER C",
+      "modeBasis": "user-note",
+      "via": [
+        {
+          "place": "Pont de l’Alma站",
+          "precedingMode": "walk"
+        },
+        {
+          "place": "Saint-Michel–Notre-Dame站",
+          "precedingMode": "RER C"
+        }
+      ],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3067-05"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0325-02",
+      "date": "2024-03-25",
+      "from": "Saint-Michel–Notre-Dame站",
+      "to": "CDG机场",
+      "mode": "RER B",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3067-05",
+        "S3067-01"
+      ],
+      "geometry": null
+    },
+    {
+      "id": "L0325-03",
+      "date": "2024-03-25",
+      "from": "CDG机场",
+      "to": "Chicago ORD",
+      "mode": "AF0136",
+      "modeBasis": "baseline-evidence",
+      "via": [],
+      "metroCandidate": null,
+      "metroGrade": null,
+      "sourceRefs": [
+        "S3067-05",
+        "S3038-22",
+        "S3067-01"
+      ],
+      "geometry": null
+    }
+  ]
+}

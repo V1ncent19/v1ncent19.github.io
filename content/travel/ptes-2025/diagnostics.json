@@ -1,0 +1,433 @@
+{
+  "tripId": "ptes-2025",
+  "generatedAt": "2026-09-25T00:23:57+00:00",
+  "source": "gps-data/backUpData-all.csv",
+  "counts": {
+    "archiveTotalRows": 181414,
+    "archiveValid": 180223,
+    "droppedInvalidCoords": 0,
+    "droppedLowAccuracy": 1191,
+    "duplicatesRemoved": 0,
+    "windowPoints": 20704,
+    "retainedCleaned": 20704,
+    "renderRoutePoints": 21937
+  },
+  "sampling": {
+    "medianIntervalS": 4,
+    "buckets": {
+      ">1h": 52,
+      "1-10min": 1827,
+      "10-60s": 2164,
+      "10-60min": 220,
+      "<=10s": 16440
+    }
+  },
+  "linkKinds": {
+    "ground": 20432,
+    "gap": 50,
+    "air": 221
+  },
+  "dayCoverage": {
+    "2025-12-15": 432,
+    "2025-12-16": 2702,
+    "2025-12-17": 187,
+    "2025-12-18": 2069,
+    "2025-12-19": 2255,
+    "2025-12-20": 6095,
+    "2025-12-21": 264,
+    "2025-12-22": 1435,
+    "2025-12-23": 1374,
+    "2025-12-24": 243,
+    "2025-12-25": 166,
+    "2025-12-26": 1235,
+    "2025-12-27": 1436,
+    "2025-12-28": 215,
+    "2025-12-29": 190,
+    "2025-12-30": 400,
+    "2025-12-31": 1238,
+    "2026-01-01": 1
+  },
+  "flights": [
+    {
+      "kind": "flight (recording hole)",
+      "from": "2025-12-15T16:36:57-05:00",
+      "to": "2025-12-15T17:15:20-05:00",
+      "minutes": 38,
+      "distanceKm": 592
+    },
+    {
+      "kind": "flight (recording hole)",
+      "from": "2025-12-15T17:15:20-05:00",
+      "to": "2025-12-15T17:44:24-05:00",
+      "minutes": 29,
+      "distanceKm": 436
+    },
+    {
+      "kind": "flight (recording hole)",
+      "from": "2025-12-15T19:58:06-05:00",
+      "to": "2025-12-16T08:31:31+00:00",
+      "minutes": 453,
+      "distanceKm": 5435
+    },
+    {
+      "kind": "flight (recording hole)",
+      "from": "2025-12-31T06:32:15+01:00",
+      "to": "2025-12-31T09:54:45+01:00",
+      "minutes": 202,
+      "distanceKm": 1096
+    },
+    {
+      "kind": "flight (recording hole)",
+      "from": "2025-12-31T17:55:06+01:00",
+      "to": "2025-12-31T19:45:41-05:00",
+      "minutes": 471,
+      "distanceKm": 6442
+    },
+    {
+      "kind": "flight (recording hole)",
+      "from": "2025-12-31T19:54:56-05:00",
+      "to": "2025-12-31T20:05:19-05:00",
+      "minutes": 10,
+      "distanceKm": 152
+    },
+    {
+      "kind": "flight (recording hole)",
+      "from": "2025-12-31T20:11:53-05:00",
+      "to": "2025-12-31T20:48:41-05:00",
+      "minutes": 37,
+      "distanceKm": 234
+    },
+    {
+      "kind": "flight (stitched connector)",
+      "from": "2025-12-31T19:45:41-05:00",
+      "to": "2025-12-31T19:54:56-05:00",
+      "minutes": 9,
+      "distanceKm": 135
+    },
+    {
+      "kind": "flight (stitched connector)",
+      "from": "2025-12-31T20:05:19-05:00",
+      "to": "2025-12-31T20:11:53-05:00",
+      "minutes": 7,
+      "distanceKm": 94
+    }
+  ],
+  "recordingGaps": [
+    {
+      "from": "2025-12-15T16:21:39-05:00",
+      "to": "2025-12-15T16:36:31-05:00",
+      "minutes": 15,
+      "distanceKm": 24.7
+    },
+    {
+      "from": "2025-12-15T17:44:24-05:00",
+      "to": "2025-12-15T17:53:35-05:00",
+      "minutes": 9,
+      "distanceKm": 82.2
+    },
+    {
+      "from": "2025-12-15T17:56:50-05:00",
+      "to": "2025-12-15T18:02:15-05:00",
+      "minutes": 5,
+      "distanceKm": 30.8
+    },
+    {
+      "from": "2025-12-16T08:47:58+00:00",
+      "to": "2025-12-16T09:21:05+00:00",
+      "minutes": 33,
+      "distanceKm": 2.5
+    },
+    {
+      "from": "2025-12-16T13:35:20+00:00",
+      "to": "2025-12-16T14:03:47+00:00",
+      "minutes": 28,
+      "distanceKm": 45.2
+    },
+    {
+      "from": "2025-12-16T14:38:41+00:00",
+      "to": "2025-12-16T14:46:01+00:00",
+      "minutes": 7,
+      "distanceKm": 2.6
+    },
+    {
+      "from": "2025-12-18T09:29:04+00:00",
+      "to": "2025-12-18T09:44:23+00:00",
+      "minutes": 15,
+      "distanceKm": 3.6
+    },
+    {
+      "from": "2025-12-18T09:44:23+00:00",
+      "to": "2025-12-18T09:59:20+00:00",
+      "minutes": 15,
+      "distanceKm": 3.0
+    },
+    {
+      "from": "2025-12-19T07:29:33+00:00",
+      "to": "2025-12-19T07:44:57+00:00",
+      "minutes": 15,
+      "distanceKm": 3.0
+    },
+    {
+      "from": "2025-12-19T19:09:24+00:00",
+      "to": "2025-12-19T19:28:25+00:00",
+      "minutes": 19,
+      "distanceKm": 9.4
+    },
+    {
+      "from": "2025-12-19T19:29:29+00:00",
+      "to": "2025-12-19T19:31:46+00:00",
+      "minutes": 2,
+      "distanceKm": 2.9
+    },
+    {
+      "from": "2025-12-19T19:31:46+00:00",
+      "to": "2025-12-19T19:35:08+00:00",
+      "minutes": 3,
+      "distanceKm": 2.2
+    },
+    {
+      "from": "2025-12-19T21:32:55+00:00",
+      "to": "2025-12-19T21:52:53+00:00",
+      "minutes": 20,
+      "distanceKm": 3.0
+    },
+    {
+      "from": "2025-12-19T21:52:53+00:00",
+      "to": "2025-12-19T22:00:54+00:00",
+      "minutes": 8,
+      "distanceKm": 3.6
+    },
+    {
+      "from": "2025-12-22T07:12:52+01:00",
+      "to": "2025-12-22T07:14:54+01:00",
+      "minutes": 2,
+      "distanceKm": 3.2
+    },
+    {
+      "from": "2025-12-23T19:34:50+01:00",
+      "to": "2025-12-23T19:58:47+01:00",
+      "minutes": 24,
+      "distanceKm": 78.5
+    },
+    {
+      "from": "2025-12-23T19:59:02+01:00",
+      "to": "2025-12-23T20:05:11+01:00",
+      "minutes": 6,
+      "distanceKm": 22.4
+    },
+    {
+      "from": "2025-12-23T20:11:00+01:00",
+      "to": "2025-12-23T20:41:23+01:00",
+      "minutes": 30,
+      "distanceKm": 45.1
+    },
+    {
+      "from": "2025-12-23T20:41:48+01:00",
+      "to": "2025-12-23T20:52:18+01:00",
+      "minutes": 10,
+      "distanceKm": 37.1
+    },
+    {
+      "from": "2025-12-23T20:52:27+01:00",
+      "to": "2025-12-23T21:01:01+01:00",
+      "minutes": 9,
+      "distanceKm": 28.8
+    },
+    {
+      "from": "2025-12-23T21:01:06+01:00",
+      "to": "2025-12-23T21:13:07+01:00",
+      "minutes": 12,
+      "distanceKm": 36.5
+    },
+    {
+      "from": "2025-12-26T11:17:19+01:00",
+      "to": "2025-12-26T11:23:02+01:00",
+      "minutes": 6,
+      "distanceKm": 1.9
+    },
+    {
+      "from": "2025-12-26T13:15:37+01:00",
+      "to": "2025-12-26T13:17:39+01:00",
+      "minutes": 2,
+      "distanceKm": 1.6
+    },
+    {
+      "from": "2025-12-26T13:42:30+01:00",
+      "to": "2025-12-26T13:44:48+01:00",
+      "minutes": 2,
+      "distanceKm": 3.6
+    },
+    {
+      "from": "2025-12-26T20:03:19+01:00",
+      "to": "2025-12-26T20:06:31+01:00",
+      "minutes": 3,
+      "distanceKm": 5.1
+    },
+    {
+      "from": "2025-12-26T20:23:29+01:00",
+      "to": "2025-12-26T20:27:28+01:00",
+      "minutes": 4,
+      "distanceKm": 4.0
+    },
+    {
+      "from": "2025-12-26T20:30:05+01:00",
+      "to": "2025-12-26T20:33:26+01:00",
+      "minutes": 3,
+      "distanceKm": 4.0
+    },
+    {
+      "from": "2025-12-26T20:36:06+01:00",
+      "to": "2025-12-26T21:03:01+01:00",
+      "minutes": 27,
+      "distanceKm": 5.1
+    },
+    {
+      "from": "2025-12-27T14:25:58+01:00",
+      "to": "2025-12-27T14:40:50+01:00",
+      "minutes": 15,
+      "distanceKm": 2.4
+    },
+    {
+      "from": "2025-12-27T16:31:36+01:00",
+      "to": "2025-12-27T16:33:41+01:00",
+      "minutes": 2,
+      "distanceKm": 2.0
+    },
+    {
+      "from": "2025-12-27T16:41:55+01:00",
+      "to": "2025-12-27T16:44:54+01:00",
+      "minutes": 3,
+      "distanceKm": 14.0
+    },
+    {
+      "from": "2025-12-27T17:07:29+01:00",
+      "to": "2025-12-27T17:14:40+01:00",
+      "minutes": 7,
+      "distanceKm": 31.9
+    },
+    {
+      "from": "2025-12-27T17:16:30+01:00",
+      "to": "2025-12-27T17:22:20+01:00",
+      "minutes": 6,
+      "distanceKm": 27.2
+    },
+    {
+      "from": "2025-12-27T17:29:32+01:00",
+      "to": "2025-12-27T17:32:21+01:00",
+      "minutes": 3,
+      "distanceKm": 12.9
+    },
+    {
+      "from": "2025-12-27T17:43:22+01:00",
+      "to": "2025-12-27T17:52:06+01:00",
+      "minutes": 9,
+      "distanceKm": 5.8
+    },
+    {
+      "from": "2025-12-27T18:17:02+01:00",
+      "to": "2025-12-27T18:26:04+01:00",
+      "minutes": 9,
+      "distanceKm": 40.6
+    },
+    {
+      "from": "2025-12-27T18:26:55+01:00",
+      "to": "2025-12-27T19:48:34+01:00",
+      "minutes": 82,
+      "distanceKm": 131.7
+    },
+    {
+      "from": "2025-12-28T19:23:18+01:00",
+      "to": "2025-12-28T19:32:55+01:00",
+      "minutes": 10,
+      "distanceKm": 1.8
+    },
+    {
+      "from": "2025-12-29T10:27:33+01:00",
+      "to": "2025-12-29T10:42:13+01:00",
+      "minutes": 15,
+      "distanceKm": 3.1
+    },
+    {
+      "from": "2025-12-29T12:08:32+01:00",
+      "to": "2025-12-29T12:20:00+01:00",
+      "minutes": 11,
+      "distanceKm": 2.5
+    },
+    {
+      "from": "2025-12-29T13:30:30+01:00",
+      "to": "2025-12-29T14:09:11+01:00",
+      "minutes": 39,
+      "distanceKm": 1.8
+    },
+    {
+      "from": "2025-12-30T08:44:28+01:00",
+      "to": "2025-12-30T08:53:36+01:00",
+      "minutes": 9,
+      "distanceKm": 1.4
+    },
+    {
+      "from": "2025-12-30T08:54:39+01:00",
+      "to": "2025-12-30T09:10:46+01:00",
+      "minutes": 16,
+      "distanceKm": 4.8
+    },
+    {
+      "from": "2025-12-31T09:54:45+01:00",
+      "to": "2025-12-31T10:05:33+01:00",
+      "minutes": 11,
+      "distanceKm": 4.7
+    },
+    {
+      "from": "2025-12-31T10:08:19+01:00",
+      "to": "2025-12-31T10:25:14+01:00",
+      "minutes": 17,
+      "distanceKm": 5.6
+    },
+    {
+      "from": "2025-12-31T10:57:54+01:00",
+      "to": "2025-12-31T11:05:02+01:00",
+      "minutes": 7,
+      "distanceKm": 1.2
+    },
+    {
+      "from": "2025-12-31T13:25:39+01:00",
+      "to": "2025-12-31T13:38:48+01:00",
+      "minutes": 13,
+      "distanceKm": 4.9
+    },
+    {
+      "from": "2025-12-31T13:38:48+01:00",
+      "to": "2025-12-31T13:44:16+01:00",
+      "minutes": 5,
+      "distanceKm": 4.7
+    },
+    {
+      "from": "2025-12-31T17:48:57+01:00",
+      "to": "2025-12-31T17:53:36+01:00",
+      "minutes": 5,
+      "distanceKm": 1.7
+    },
+    {
+      "from": "2025-12-31T20:05:19-05:00",
+      "to": "2025-12-31T20:10:11-05:00",
+      "minutes": 5,
+      "distanceKm": 71.4
+    },
+    {
+      "from": "2025-12-31T20:48:41-05:00",
+      "to": "2025-12-31T20:57:55-05:00",
+      "minutes": 9,
+      "distanceKm": 2.2
+    }
+  ],
+  "glitchJumps": [],
+  "largeGaps2h": [],
+  "stationaryClusters": [],
+  "assumptions": {
+    "timestamps": "dataTime is true Unix epoch UTC (verified via KIX->HKG return flight geometry and JST overnight quiet hours)",
+    "narrativeTimezone": "base UTC-5 with 3 boundary steps (--tz-boundaries) for narrative times; day splits use each point's local offset",
+    "accuracy": "points with accuracy > 500.0 m dropped; > 100.0 m flagged in report only",
+    "classification": "glitch: dt<=15s & implied>1500km/h (absorbed into adjacent fast runs or >50km, else rendered as gap); gap: dt>120s; air: fast run (>200km/h) spanning >300km straight-line, or hole covering >100km at speed; flights drawn as great-circle arcs densified ~10km with distance-linear timestamps",
+    "dedupe": "same-timestamp rows and <0.5 m moves within 5 s removed"
+  }
+}

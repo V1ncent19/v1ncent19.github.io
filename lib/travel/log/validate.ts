@@ -1,0 +1,50 @@
+import type { PilgrimageData } from "../pilgrimage";
+import type { Attraction, TravelScene, TripInfo } from "../types";
+import type { TerrainTravelData } from "../terrain";
+
+export function loadTerrain(raw: unknown): TerrainTravelData {
+  const data = raw as TerrainTravelData;
+  const bad: string[] = [];
+  if (!Array.isArray(data.route?.points) || data.route.points.length < 2) bad.push("route.points");
+  if (data.route?.points?.some(point => !Array.isArray(point) || point.length !== 4 || !point.every(Number.isFinite)))
+    bad.push("route.points entries");
+  if (!Array.isArray(data.photos) || data.photos.some(photo => !photo.id || !photo.src ||
+    !["photo", "video"].includes(photo.kind) ||
+    (photo.kind === "video" && (!photo.videoSrc || !Number.isFinite(photo.durationS))) ||
+    !Number.isFinite(photo.lat) || !Number.isFinite(photo.lon) || !Number.isInteger(photo.routeIndex) ||
+    (photo.mapVisible !== undefined && typeof photo.mapVisible !== "boolean")))
+    bad.push("photos");
+  if (!Array.isArray(data.scenes) || !data.scenes.length || data.scenes.some(scene =>
+    !scene.id || !scene.title || !Array.isArray(scene.route) || scene.route.length !== 2 ||
+    scene.route.some(index => !Number.isInteger(index) || index < 0 || index >= (data.route?.points?.length ?? 0))))
+    bad.push("scenes");
+  if (bad.length) throw new Error(`Malformed terrain travel data: ${bad.join(", ")}`);
+  return data;
+}
+
+export function loadPilgrimage(raw: unknown): PilgrimageData {
+  const d = raw as PilgrimageData;
+  const bad: string[] = [];
+  if (!Array.isArray(d.stops) || !d.stops.length) bad.push("stops");
+  if (!Array.isArray(d.route?.coordinates) || d.route.coordinates.length < 2)
+    bad.push("route.coordinates");
+  if (d.route?.coordinates?.some(c => !Array.isArray(c) || c.length !== 2 || !c.every(Number.isFinite)))
+    bad.push("route.coordinates entries");
+  if (d.route?.offsets?.length !== d.route?.coordinates?.length || !d.route?.offsets?.every(Number.isFinite))
+    bad.push("route.offsets");
+  if (d.stops?.some(s => !s.id || !s.src || !Number.isFinite(s.lat) || !Number.isFinite(s.lon) ||
+    !Number.isInteger(s.routeIdx) || s.routeIdx < 0 || s.routeIdx >= (d.route?.coordinates?.length ?? 0)))
+    bad.push("stops[] identity, coordinates or routeIdx");
+  if (bad.length) throw new Error(`Malformed pilgrimage data: ${bad.join(", ")}`);
+  return d;
+}
+
+export function loadJournal(tripRaw: unknown, scenesRaw: unknown, attractionsRaw: unknown) {
+  const trip = tripRaw as TripInfo;
+  const { scenes } = scenesRaw as { scenes: TravelScene[] };
+  const { attractions = [] } = attractionsRaw as { attractions?: Attraction[] };
+  if (!trip.tripId || !trip.days?.length || !scenes?.length ||
+    scenes.some(s => !s.id || !Number.isFinite(Date.parse(s.startTime)) || !Number.isFinite(Date.parse(s.endTime))))
+    throw new Error("Malformed journal itinerary or scenes");
+  return { trip, scenes, attractions };
+}

@@ -1,0 +1,408 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Serif:ital,wght@0,400;0,500;0,600;1,400&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}#nav-drawer:checked ~ #drawer-backdrop{display:block;}#nav-drawer:checked ~ #drawer-panel{transform:translateX(0);}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary-fixed": "#9cf2e8", "error-container": "#ffdad6", "on-primary-fixed": "#001551", "inverse-primary": "#b7c4ff", "error": "#ba1a1a", "surface": "#f9f9ff", "surface-container-low": "#f0f3ff", "inverse-surface": "#263143", "surface-bright": "#f9f9ff", "secondary": "#006a63", "primary-fixed": "#dce1ff", "inverse-on-surface": "#ecf1ff", "surface-container": "#e7eeff", "on-tertiary-container": "#ffcaae", "surface-container-high": "#dee8ff", "on-tertiary-fixed": "#331200", "on-secondary": "#ffffff", "surface-variant": "#d8e3fb", "tertiary-container": "#984300", "surface-container-lowest": "#ffffff", "outline": "#747686", "tertiary": "#733100", "surface-dim": "#cfdaf2", "tertiary-fixed": "#ffdbca", "primary-container": "#1d4ed8", "surface-tint": "#2151da", "background": "#f9f9ff", "primary": "#0037b0", "on-primary": "#ffffff", "on-primary-container": "#cad3ff", "primary-fixed-dim": "#b7c4ff", "on-background": "#111c2d", "on-secondary-container": "#006f67", "on-primary-fixed-variant": "#0039b5", "on-tertiary": "#ffffff", "outline-variant": "#c4c5d7", "secondary-container": "#99efe5", "on-error": "#ffffff", "on-secondary-fixed-variant": "#00504a", "secondary-fixed-dim": "#80d5cb", "on-tertiary-fixed-variant": "#763300", "on-surface": "#111c2d", "on-error-container": "#93000a", "on-secondary-fixed": "#00201d", "tertiary-fixed-dim": "#ffb68e", "surface-container-highest": "#d8e3fb", "on-surface-variant": "#434655" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "section-gap": "3.5rem", "container-max": "54rem", "gutter-sm": "0.5rem", "gutter-md": "1rem", "gutter-lg": "1.5rem", "gutter-xl": "2rem", "gutter-xs": "0.25rem", "container-reading": "42rem" }, "fontFamily": { "label-md": ["Inter"], "label-sm": ["Inter"], "display": ["Noto Serif"], "headline-sm": ["Noto Serif"], "body-lg": ["Source Serif 4"], "stamp-badge": ["Inter"], "body-md": ["Source Serif 4"], "body-sm": ["Source Serif 4"], "headline-lg": ["Noto Serif"], "headline-md": ["Noto Serif"], "headline-lg-mobile": ["Noto Serif"] }, "fontSize": { "label-md": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0.02em", "fontWeight": "500" }], "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.05em", "fontWeight": "600" }], "display": ["2.5rem", { "lineHeight": "3rem", "letterSpacing": "-0.02em", "fontWeight": "600" }], "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "0", "fontWeight": "500" }], "body-lg": ["1.125rem", { "lineHeight": "1.875rem", "letterSpacing": "0.005em", "fontWeight": "400" }], "stamp-badge": ["0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.08em", "fontWeight": "700" }], "body-md": ["1rem", { "lineHeight": "1.75rem", "letterSpacing": "0.01em", "fontWeight": "400" }], "body-sm": ["0.875rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "400" }], "headline-lg": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-md": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-lg-mobile": ["1.625rem", { "lineHeight": "2.125rem", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed"><input class="hidden peer" id="nav-drawer" type="checkbox"><div class="hidden fixed inset-0 z-50 bg-inverse-surface/40 backdrop-blur-sm transition-opacity duration-300" id="drawer-backdrop" onclick="document.getElementById('nav-drawer').checked=false;"></div><aside class="fixed top-0 left-0 bottom-0 z-50 w-[82vw] max-w-xs bg-surface-container-lowest flex flex-col justify-between -translate-x-full transition-transform duration-300 ease-out shadow-[0_1px_8px_rgba(0,0,0,0.08)]" id="drawer-panel"><div class="flex flex-col pt-safe px-gutter-lg"><div class="h-16 flex items-center justify-between"><div class="flex items-center gap-gutter-sm"><span class="font-display text-headline-sm font-semibold tracking-tight text-primary">v1ncent19</span><span class="font-stamp-badge text-stamp-badge px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant uppercase">Archival</span></div><label class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer" for="nav-drawer"><span class="material-symbols-outlined">close</span></label></div><div class="mt-gutter-xs mb-gutter-md"><p class="font-body-sm text-body-sm text-on-surface-variant italic">Tuorui Peng · Mathematical Sciences &amp; Systems</p></div><nav class="flex flex-col gap-1 mt-gutter-xs" data-active-classes="bg-surface-container text-primary font-semibold"><a aria-current="page" class="flex items-center gap-3 px-gutter-md py-3 rounded-lg transition-colors bg-surface-container text-primary font-semibold" data-path="archive-hub" href="#"><span class="material-symbols-outlined text-[20px]">account_balance</span><span class="">Archive Index</span></a><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md" data-path="curriculum-vitae" href="#"><span class="material-symbols-outlined text-[20px]">description</span><span class="">Curriculum Vitae</span></a><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md" data-path="research-projects" href="#"><span class="material-symbols-outlined text-[20px]">terminal</span><span class="">Projects</span></a><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md" data-path="essays-blog" href="#"><span class="material-symbols-outlined text-[20px]">history_edu</span><span class="">Blog &amp; Notes</span></a><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md" data-path="visual-gallery" href="#"><span class="material-symbols-outlined text-[20px]">photo_library</span><span class="">Field Gallery</span></a><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md" data-path="about-scholar" href="#"><span class="material-symbols-outlined text-[20px]">person_book</span><span class="">About Tuorui</span></a></nav></div><div class="pb-safe p-gutter-lg flex flex-col gap-gutter-md bg-surface-container-low/60"><div class="flex items-center justify-between"><div class="flex items-center gap-1.5 p-1 rounded-lg bg-surface-container"><button class="px-2.5 py-1 rounded text-on-primary bg-primary font-label-sm text-label-sm shadow-[0_1px_4px_rgba(0,0,0,0.06)]" type="button">EN</button><a class="px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm" href="#">中文</a></div><button aria-label="Toggle theme" class="w-11 h-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button></div><div class="flex items-center justify-between text-on-surface-variant font-stamp-badge text-stamp-badge tracking-widest uppercase"><span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>ARCHIVE REG. 2024</span><span class="">TRP·NET</span></div></div></aside><header class="fixed top-0 w-full z-40 bg-surface/85 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.03)]"></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface px-gutter-md mx-auto px-gutter-lg"><div class="flex flex-col w-full">
+<!-- 1. Top Header & Identity Bar -->
+<header class="w-full pt-4 pb-6 flex flex-col gap-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4">
+<div class="flex flex-col">
+<h1 class="font-display font-semibold tracking-tight text-3xl sm:text-4xl text-on-surface flex flex-wrap items-baseline gap-x-2">
+<span class="">Tuorui</span>
+<span class="text-primary font-bold">“v1ncent19”</span>
+<span class="">Peng</span>
+</h1>
+<p class="font-body text-base italic text-on-surface-variant mt-1">
+          «&nbsp;En voyage dans l'espace de Hilbert.&nbsp;»
+        </p>
+</div>
+<!-- Right Utility Controls -->
+<div class="flex items-center gap-3 self-start md:self-auto">
+<div class="inline-flex items-center p-0.5 rounded-full bg-surface-container shadow-sm">
+<button class="px-3 py-1 rounded-full text-xs font-label font-semibold text-on-primary bg-primary shadow-sm transition-all" type="button">
+            EN
+          </button>
+<button class="px-3 py-1 rounded-full text-xs font-label font-medium text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+            中文
+          </button>
+</div>
+<button aria-label="Toggle theme" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[19px]">dark_mode</span>
+</button>
+<a class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors shadow-sm" href="#" title="Curator Identity">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</a>
+</div>
+</div>
+<!-- Global Capsule Navigation -->
+<nav class="flex items-center gap-1.5 p-1 rounded-full bg-surface-container w-fit max-w-full overflow-x-auto no-scrollbar shadow-sm">
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" href="#">
+        About
+      </a>
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" href="#">
+        CV
+      </a>
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" href="#">
+        Gallery
+      </a>
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide font-semibold text-on-primary bg-primary shadow-sm" href="#">
+        Blog &amp; Dispatches
+      </a>
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" href="#">
+        Project
+      </a>
+</nav>
+</header>
+<!-- 2. Blog Section Title & Archival Index Block -->
+<section class="mt-4 pt-6 pb-6 flex flex-col gap-5">
+<div class="flex items-center gap-2 text-xs font-label uppercase tracking-widest text-primary font-semibold">
+<span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="">INDEX TP-MANUSCRIPTS // VOL. VII · DISPATCHES &amp; ESSAYS</span>
+</div>
+<div class="flex flex-col gap-3">
+<h2 class="font-display text-3xl sm:text-4xl text-on-surface font-semibold tracking-tight">
+        博文与学术手稿 / Writings &amp; Dispatches
+      </h2>
+<p class="font-body text-lg text-on-surface-variant leading-relaxed max-w-2xl">
+        A multilingual scholarly compendium spanning asymptotic high-dimensional estimation, random matrix limits, culinary thermodynamics, philology kan-on registries, and digital archive preservation.
+      </p>
+</div>
+<!-- Archival Census Stat Cards -->
+<div class="grid grid-cols-3 gap-3 pt-2">
+<div class="p-3 rounded-xl bg-surface-container-low shadow-sm flex flex-col">
+<span class="font-label text-[11px] uppercase tracking-wider text-on-surface-variant">Corpus Total</span>
+<span class="font-display text-xl font-bold text-primary mt-0.5">38 Dispatches</span>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low shadow-sm flex flex-col">
+<span class="font-label text-[11px] uppercase tracking-wider text-on-surface-variant">Taxonomy</span>
+<span class="font-display text-xl font-bold text-secondary mt-0.5">4 Themes</span>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low shadow-sm flex flex-col">
+<span class="font-label text-[11px] uppercase tracking-wider text-on-surface-variant">Catalog Epoch</span>
+<span class="font-display text-xl font-bold text-tertiary mt-0.5">2026.03</span>
+</div>
+</div>
+</section>
+<!-- 3. Blog Search Box -->
+<section class="w-full my-2">
+<div class="relative flex items-center w-full bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary text-xl absolute left-4 pointer-events-none">
+        search
+      </span>
+<input class="w-full py-3.5 pl-12 pr-20 bg-transparent text-sm font-label text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-xl" placeholder="Search in 38 blogs, notes, theorems &amp; course guides (e.g. Hilbert, Matrix, Chowder, 芝士)..." type="search">
+<div class="absolute right-3 flex items-center gap-1 pointer-events-none">
+<kbd class="px-2 py-0.5 text-[11px] font-label font-medium text-on-surface-variant bg-surface-container rounded shadow-sm">
+          ⌘K
+        </kbd>
+</div>
+</div>
+</section>
+<!-- 4. Tag Selection Interface -->
+<section class="w-full mt-4 flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+<button class="whitespace-nowrap px-4 py-2 rounded-full font-label text-xs font-semibold bg-primary text-on-primary shadow-sm flex items-center gap-1.5 transition-transform active:scale-95" type="button">
+<span class="">All Topics</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-on-primary/20 text-on-primary">38</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Statistics &amp; Math / 数理与统计</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-surface-variant text-on-surface-variant">14</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Cuisine &amp; Lab / 料理与感官</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-surface-variant text-on-surface-variant">9</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Philology / 语言哲学</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-surface-variant text-on-surface-variant">5</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Archival &amp; Retrospective / 档案与记事</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-surface-variant text-on-surface-variant">6</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container hover:text-on-surface shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Computing &amp; Systems / 计算与代码</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-surface-variant text-on-surface-variant">4</span>
+</button>
+</section>
+<!-- 5. Blog Sorting Functionality Toolbar -->
+<section class="w-full mt-5 mb-6 pt-3 pb-3 flex flex-wrap items-center justify-between gap-3 bg-surface-container-low/80 px-4 rounded-xl shadow-sm">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-xs font-label text-on-surface-variant font-medium flex items-center gap-1 mr-1">
+<span class="material-symbols-outlined text-sm">tune</span>
+        Sort by / 排序方式:
+      </span>
+<button class="px-2.5 py-1 rounded-lg text-xs font-label font-semibold text-on-primary bg-primary shadow-sm" type="button">
+        按发布时间倒序 (Newest First)
+      </button>
+<button class="px-2.5 py-1 rounded-lg text-xs font-label text-on-surface-variant hover:bg-surface-container transition-colors" type="button">
+        按阅读热度 (Most Read)
+      </button>
+<button class="px-2.5 py-1 rounded-lg text-xs font-label text-on-surface-variant hover:bg-surface-container transition-colors" type="button">
+        按学术分类 (Taxonomy)
+      </button>
+<button class="px-2.5 py-1 rounded-lg text-xs font-label text-on-surface-variant hover:bg-surface-container transition-colors" type="button">
+        按修改时间 (Recently Updated)
+      </button>
+</div>
+<span class="text-xs font-label font-medium text-outline">
+      Showing 1–5 of 38 manuscripts
+    </span>
+</section>
+<!-- 6. Post List (Academic Literary Stream) -->
+<div class="flex flex-col gap-6 w-full">
+<!-- Entry 1: Statistics & Random Matrix -->
+<article class="p-6 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-secondary-container text-on-secondary-container">
+            Statistics &amp; Math
+          </span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-on-surface-variant font-medium">18 min read</span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-primary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">code</span>
+            R &amp; Julia Notebook
+          </span>
+</div>
+<time class="text-xs font-label text-outline font-medium tracking-wide">March 14, 2026</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-on-surface group-hover:text-primary transition-colors">
+<a class="focus:outline-none" href="#">
+              高维协方差估计与 Marchenko-Pastur 极限态测度解耦
+            </a>
+</h3>
+<p class="font-body text-base text-on-surface-variant leading-relaxed">
+            在高维小样本制度（$p/n \to \gamma \in (0, \infty)$）下，样本协方差特征谱的边缘行为偏离传统极限定理。本文系统回顾并数值模拟了 Stieltjes 变换核在重正化降噪中的应用，附伴随矩阵剪枝算法与实证资产回报数据重构。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<div class="flex items-center gap-2 text-xs font-label text-outline">
+<span class="">#SpectralMeasure</span>
+<span class="">#Covariance</span>
+<span class="">#RMT</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-primary group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Entry 2: Cuisine Lab (Clam Chowder) -->
+<article class="p-6 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-tertiary-fixed text-on-tertiary-fixed">
+            Cuisine &amp; Lab
+          </span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-on-surface-variant font-medium">11 min read</span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-tertiary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">soup_kitchen</span>
+            Field Notes · Boston
+          </span>
+</div>
+<time class="text-xs font-label text-outline font-medium tracking-wide">February 28, 2026</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-on-surface group-hover:text-primary transition-colors">
+<a class="focus:outline-none" href="#">
+              新英格兰蛤蜊浓汤黏度模型与淀粉糊化动力学考
+            </a>
+</h3>
+<p class="font-body text-base text-on-surface-variant leading-relaxed">
+            从北大西洋圆蛤（Mercenaria mercenaria）原汁提取出发，对比白鲁（Roux）配比与马铃薯溶出支链淀粉对流体剪切稀化（Shear-Thinning）行为的影响。记录了 68°C–82°C 区间内盐分对胶体稳定度的反直觉抑制现象。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<div class="flex items-center gap-2 text-xs font-label text-outline">
+<span class="">#FluidRheology</span>
+<span class="">#Gastronomy</span>
+<span class="">#NewEngland</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-primary group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Entry 3: Philology & Historical Linguistics -->
+<article class="p-6 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-secondary-container text-on-secondary-container">
+            Philology &amp; Sound Laws
+          </span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-on-surface-variant font-medium">14 min read</span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-secondary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">translate</span>
+            Diachronic Corpus
+          </span>
+</div>
+<time class="text-xs font-label text-outline font-medium tracking-wide">January 19, 2026</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-on-surface group-hover:text-primary transition-colors">
+<a class="focus:outline-none" href="#">
+              汉音入声韵尾在平安期古写本假名注音中的异读层析
+            </a>
+</h3>
+<p class="font-body text-base text-on-surface-variant leading-relaxed">
+            基于东大寺本《三宝绘词》与西寺藏梵汉双语陀罗尼经卷，追踪 /-p, -t, -k/ 闭塞韵尾在向促音 /Q/ 与开音节 /ku, ki, tu, ti/ 演化过程中的音系重组规律，并比对中古长安音系与南方吴音的沉积层次。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<div class="flex items-center gap-2 text-xs font-label text-outline">
+<span class="">#HistoricalPhonology</span>
+<span class="">#Kan-on</span>
+<span class="">#Sino-Japanese</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-primary group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Entry 4: Cuisine & Lab (Baked Seafood Rice) -->
+<article class="p-6 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-tertiary-fixed text-on-tertiary-fixed">
+            Cuisine &amp; Lab
+          </span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-on-surface-variant font-medium">9 min read</span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-tertiary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">local_fire_department</span>
+            Thermodynamics
+          </span>
+</div>
+<time class="text-xs font-label text-outline font-medium tracking-wide">December 22, 2025</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-on-surface group-hover:text-primary transition-colors">
+<a class="focus:outline-none" href="#">
+              焗海鲜芝士炒饭之美拉德反应梯度与乳脂油水分离临界点
+            </a>
+</h3>
+<p class="font-body text-base text-on-surface-variant leading-relaxed">
+            探讨高熔点马苏里拉与陈年车达在 210°C 辐射加热下的相变曲线。通过预混蛋黄膜隔绝籼米水分，成功控制了底层焦香壳（Socarrat-like crust）生成时的水活度，避免甲壳素香气成分在长时间焗烤中挥发逸散。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<div class="flex items-center gap-2 text-xs font-label text-outline">
+<span class="">#MaillardReaction</span>
+<span class="">#LipidEmulsion</span>
+<span class="">#CulinaryPhysics</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-primary group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Entry 5: Computing & Systems Preservation -->
+<article class="p-6 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-primary-fixed text-on-primary-fixed">
+            Computing &amp; Systems
+          </span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-on-surface-variant font-medium">15 min read</span>
+<span class="text-xs font-label text-outline">·</span>
+<span class="text-xs font-label text-primary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">terminal</span>
+            Emulator &amp; Spec
+          </span>
+</div>
+<time class="text-xs font-label text-outline font-medium tracking-wide">November 10, 2025</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-on-surface group-hover:text-primary transition-colors">
+<a class="focus:outline-none" href="#">
+              NeXTSTEP 3.3 环境复原与 HyperCard 堆栈二进位制解析
+            </a>
+</h3>
+<p class="font-body text-base text-on-surface-variant leading-relaxed">
+            在现代 ARM 架构上通过 Previous 模拟器搭建 68040 NeXTcube 环境的完整记录。重构了针对早期 HyperCard 格式卡片的逆向解析器，提取出包含九十年代早期高校学术讨论组的超文本索引元数据。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<div class="flex items-center gap-2 text-xs font-label text-outline">
+<span class="">#DigitalArchiving</span>
+<span class="">#NeXTSTEP</span>
+<span class="">#RetroComputing</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-primary group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+</div>
+<!-- Pagination / Load More Bar -->
+<div class="w-full mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+<span class="text-xs font-label text-on-surface-variant">
+      Showing page 1 of 8 · 33 archived entries remaining
+    </span>
+<div class="flex items-center gap-2">
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-label font-semibold text-outline bg-surface-container-low cursor-not-allowed opacity-50" disabled="" type="button">
+        ← Previous
+      </button>
+<div class="flex items-center gap-1">
+<span class="w-7 h-7 rounded-lg text-xs font-label font-semibold bg-primary text-on-primary flex items-center justify-center">1</span>
+<button class="w-7 h-7 rounded-lg text-xs font-label text-on-surface-variant hover:bg-surface-container flex items-center justify-center" type="button">2</button>
+<button class="w-7 h-7 rounded-lg text-xs font-label text-on-surface-variant hover:bg-surface-container flex items-center justify-center" type="button">3</button>
+<span class="text-xs font-label text-outline px-1">…</span>
+<button class="w-7 h-7 rounded-lg text-xs font-label text-on-surface-variant hover:bg-surface-container flex items-center justify-center" type="button">8</button>
+</div>
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-label font-semibold text-primary bg-surface-container hover:bg-surface-container-high transition-colors" type="button">
+        Next →
+      </button>
+</div>
+</div>
+<!-- 7. Academic Footer matching Home -->
+<footer class="w-full mt-16 pt-8 pb-4 flex flex-col gap-6">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+<div class="flex flex-col">
+<span class="font-display font-semibold text-lg text-on-surface">
+          Tuorui Peng · v1ncent19
+        </span>
+<span class="text-xs font-body text-on-surface-variant italic mt-0.5">
+          Archivist, Mathematical Statistician, Culinary Chronicler
+        </span>
+</div>
+<div class="flex items-center gap-4 text-xs font-label text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">RSS Feed</a>
+<span class="">·</span>
+<a class="hover:text-primary transition-colors" href="#">Colophon</a>
+<span class="">·</span>
+<a class="hover:text-primary transition-colors" href="#">PGP Key</a>
+<span class="">·</span>
+<a class="hover:text-primary transition-colors" href="#">Sitemap</a>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 text-xs font-label text-outline">
+<span class="">© 2026 Tuorui Peng. Handcrafted under rigorous academic typesetting standards.</span>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-mono text-[11px] tracking-wide">TRP-ARCHIVE-NODE // BOSTON &amp; BEIJING</span>
+</div>
+</div>
+</footer>
+</div></main><nav class="fixed bottom-0 w-full z-40 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.05)]" data-active-classes="text-primary font-semibold"><div class="flex justify-around items-center h-16 mx-auto px-gutter-sm"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-11 transition-colors text-primary font-semibold" data-path="archive-hub" href="#"><span class="material-symbols-outlined text-[22px]">roofing</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">Archive</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" data-path="research-projects" href="#"><span class="material-symbols-outlined text-[22px]">code_blocks</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">Projects</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" data-path="essays-blog" href="#"><span class="material-symbols-outlined text-[22px]">menu_book</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">Notes</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" data-path="visual-gallery" href="#"><span class="material-symbols-outlined text-[22px]">local_see</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">Gallery</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" data-path="about-scholar" href="#"><span class="material-symbols-outlined text-[22px]">account_circle</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">About</span></a></div></nav>
+
+</body></html>

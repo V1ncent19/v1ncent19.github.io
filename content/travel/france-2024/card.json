@@ -1,0 +1,26 @@
+{
+  "id": "france-2024",
+  "title": { "en": "Europe 2024", "zh": "西欧春游 2024" },
+  "blurb": {
+    "en": "A map journal for my spring vacation in 2024 across Paris, Cologne, Amsterdam, and Rouen.",
+    "zh": "2024 年春假的ひとりたび西欧游记，途经巴黎、科隆、阿姆斯特丹和鲁昂。"
+  },
+  "start": "2024-03-14",
+  "end": "2024-03-25",
+  "days": 12,
+  "distanceKm": 0,
+  "gpsPoints": 0,
+  "beta": true,
+  "featured": true,
+  "showPinnedBadge": false,
+  "stops": {
+    "en": ["Paris", "Cologne", "Amsterdam", "Rouen"],
+    "zh": ["巴黎", "科隆", "阿姆斯特丹", "鲁昂"]
+  },
+  "cardMeta": { "en": "Travel journal", "zh": "旅行简评" },
+  "cardCta": { "en": "Read", "zh": "阅读" },
+  "cardFacts": {
+    "en": ["12 days", "4 cities"],
+    "zh": ["12 日", "4 城"]
+  }
+}

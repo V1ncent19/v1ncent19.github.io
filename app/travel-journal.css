@@ -1,0 +1,891 @@
+
+        .travel-layout {
+          display: flex;
+          min-height: 100vh;
+          /* Site integration (2026-09-25): landing (non-immersive) keeps the
+             site chrome visible — the map is a 60vh preview pinned below the
+             floating header pill (--tl-top), and body.tl-immersive (opt-in
+             via hero CTA / corner chip) switches to the lab's full-viewport
+             mode. Opaque paper background isolates the site theme; the lab's
+             own sans stack (the site body is serif). */
+          --tl-top: 4.5rem;
+          --tl-map-h: 60vh;
+          background: var(--tl-paper);
+          color: var(--tl-ink);
+          font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+            Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+          -webkit-font-smoothing: antialiased;
+        }
+        body.tl-immersive .travel-layout {
+          --tl-top: 0px;
+          --tl-map-h: 100vh;
+        }
+        /* v19 (2026-10-09): trip-page theme tokens — MOVED to app/globals.css
+           on 2026-10-17. They are plain custom-property declarations scoped to
+           body.tl-immersive, and this styled-jsx block only exists once
+           TravelLog mounts. The pilgrimage page (/travel/just-because) sets
+           the same body class but does not render TravelLog, so every
+           var(--tl-…) there resolved to nothing (measured:
+           getComputedStyle(body).getPropertyValue("--tl-panel-strong") === "").
+           A global stylesheet is the right home — the tokens now ship in the
+           critical CSS and are correct on first paint. Do not redeclare them
+           here; edit the globals.css block instead. */
+        .map-col {
+          width: 46%;
+          position: sticky;
+          top: var(--tl-top);
+          height: var(--tl-map-h);
+          transition: height 0.45s ease;
+          /* The licence strip's height, published on the COLUMN so the map
+             inside can trim MapLibre's gesture veil (see the note on the
+             gesture-screen rule further down). This 26px is only the
+             prerendered/first-paint guess: lib/travel/map-split.tsx measures
+             the real strip and overwrites this property inline, so a wrapped
+             two-line credit on a narrow phone is handled without a breakpoint
+             here. */
+          --tl-attrib-h: 26px;
+          /* Map/story divider (2026-09-26): neutral paper gray as of v6 —
+             the brand blue was reserved for interactive elements (user
+             2026-09-26: "地图和文本区的分界线改成灰色"). */
+          border-right: 2px solid var(--tl-paper-line);
+        }
+        /* Entry veil (v11, 2026-09-28 user request): the time-reverse of the
+           exit wipe above. The page boots UNDER a full-viewport sheet and
+           the sheet retracts toward the right edge (where the back strip
+           lives) once trip data AND the map are ready. Colour runs the exit
+           fade backwards: #eef9fd while covering, deepening to the strip's
+           hover blue #cfeaf5 as it pulls away. NOTE: the veil's CSS lives in
+           globals.css, NOT here — this styled-jsx block only renders once
+           the trip data is loaded, so veil styles here would miss the
+           static-HTML first paint (the whole point of the veil). */
+        .story-col {
+          width: 54%;
+        }
+
+        /* ---- map ---- */
+        .map-pane {
+          position: relative;
+          height: var(--tl-map-h);
+          transition: height 0.45s ease;
+        }
+        /* Draggable split (2026-10-24). Below 900px the layout stacks and
+           --tl-map-h becomes the reader's number; the hook writes it onto this
+           element as --tl-map-h-mobile. Kept SEPARATE from --tl-map-h because
+           that one also drives the day capsule's top and the finale's
+           min-height, and on desktop it must stay 100vh (immersive) / 60vh
+           (landing). */
+        @media (max-width: 1023px) {
+          .map-pane {
+            height: var(--tl-map-h-mobile, var(--tl-map-h));
+            /* No height transition while a finger is on the strip: the 0.45s
+               ease would lag the map half a second behind the pointer. The
+               hook adds .is-dragging for the duration of the gesture. */
+            transition: none;
+          }
+        }
+        /* MapLibre CSS may load after this static sheet; keep our absolute box. */
+        .travel-layout .map-container {
+          position: absolute;
+          inset: 0;
+          /* v13 (2026-09-28 user request): opaque neutral ground under the
+             tiles — if the basemap hasn't finished loading (fast scroll on
+             mobile), the story text underneath no longer shows through. */
+          background: var(--tl-map-bg);
+        }
+        /* MapLibre's cooperative-gesture veil ("USE TWO FINGERS TO MOVE THE
+           MAP") is inset:0 against the nearest positioned ancestor. Here that
+           is already .map-container, so it never escaped the map — but the
+           container's bottom edge IS the pane's bottom edge, which the licence
+           strip sits on, so the veil's last 26px (42px under 640px) fell on the
+           strip and greyed it out. Pull the veil's bottom up by exactly the
+           strip's height. !important because maplibre-gl.css is imported by
+           the map component and lands after this sheet at equal specificity.
+           The value comes from .map-col above. */
+        .maplibregl-cooperative-gesture-screen {
+          bottom: var(--tl-attrib-h, 26px) !important;
+        }
+        /* Map's top-right control (2026-09-26 v4; split into two groups
+           v21 2026-10-09): TWO separate segmented pills so the reader sees at
+           a glance that they are independent switches. LEFT pill = 自/昼/夜,
+           the PAGE THEME (a 3-way radio, always exactly one selected) — the
+           same value as the site header toggle. RIGHT pill = 卫/地, a
+           theme-agnostic basemap OVERRIDE (a toggle: at most one, click the
+           active one to clear). Each pill is the old joined "slider" track;
+           the active segment fills blue like a knob. */
+        .basemap-ctl {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          z-index: 5;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .bm-group {
+          display: flex;
+          align-items: stretch;
+          padding: 3px;
+          border-radius: 999px;
+          border: 1px solid var(--tl-hair);
+          background: var(--tl-panel);
+          backdrop-filter: blur(6px);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+        }
+        .bm-btn {
+          width: 34px;
+          height: 28px;
+          border: none;
+          border-radius: 999px;
+          background: transparent;
+          color: var(--tl-ink-2);
+          font-size: 13px;
+          line-height: 1;
+          cursor: pointer;
+          transition: background 0.2s ease, color 0.2s ease;
+        }
+        .bm-btn:hover {
+          color: var(--tl-accent-strong);
+        }
+        .bm-btn.on {
+          background: var(--tl-accent);
+          color: var(--tl-on-accent);
+          box-shadow: 0 1px 4px rgba(14, 125, 156, 0.35);
+        }
+        .map-overlay-top {
+          position: absolute;
+          top: 14px;
+          left: 14px;
+          z-index: 4;
+        }
+        .timeline-indicator {
+          background: var(--tl-panel-strong);
+          border-radius: 10px;
+          padding: 8px 12px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+          font-size: 12px;
+          line-height: 1.4;
+          max-width: 240px;
+        }
+        .timeline-day {
+          font-weight: 600;
+          color: var(--tl-muted);
+        }
+        .timeline-time {
+          font-size: 16px;
+          font-weight: 700;
+          color: var(--tl-ink);
+        }
+        .timeline-scene {
+          color: var(--tl-ink-2);
+          margin-top: 2px;
+        }
+        .map-legend {
+          position: absolute;
+          left: 14px;
+          /* 2026-10-17: the licence strip now owns the map's bottom edge
+             (.map-attrib, shared with the pilgrimage page), so the legend has
+             to sit ABOVE it or the two overlap — the strip is a licence
+             obligation and must never be covered. --tl-attrib-h is published
+             by the strip itself (26px desktop, 42px when it wraps on mobile).
+             NOTE: no backticks in this comment — it lives inside a styled-jsx
+             template literal and a stray backtick closes the string. */
+          bottom: calc(var(--tl-attrib-h, 26px) + 14px);
+          z-index: 4;
+          background: var(--tl-panel-strong);
+          border-radius: 10px;
+          padding: 9px 12px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+          font-size: 11.5px;
+          color: var(--tl-ink-2);
+          /* 2026-09-26: fixed-width symbol column + label column — every
+             swatch (lines and the dot) shares the same grid track, so the
+             labels align (the old flex rows had ragged symbols). */
+          display: grid;
+          grid-template-columns: 22px auto;
+          column-gap: 8px;
+          row-gap: 7px;
+          align-items: center;
+        }
+        /* v14 (2026-09-28 user request): collapsible legend, collapsed by
+           default. The toggle is a header row spanning both grid columns;
+           when closed the pill shrinks to just that row. */
+        .map-legend:not(.open) {
+          padding: 7px 11px;
+          row-gap: 0;
+        }
+        .lg-toggle {
+          grid-column: 1 / -1;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: none;
+          border: 0;
+          padding: 0;
+          margin: 0;
+          font: inherit;
+          font-weight: 600;
+          color: var(--tl-ink-3);
+          cursor: pointer;
+          user-select: none;
+        }
+        .lg-toggle:hover {
+          color: var(--tl-ink);
+        }
+        .lg-swatch {
+          display: inline-flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 2px;
+          width: 22px;
+          height: 12px;
+        }
+        .map-legend .lg-swatch .lg {
+          width: 100%;
+          border-top-width: 1.5px;
+        }
+        .lg-caret {
+          transition: transform 0.2s ease;
+        }
+        .map-legend.open .lg-caret {
+          transform: rotate(90deg);
+        }
+        .map-legend .lg {
+          display: inline-block;
+          width: 22px;
+          height: 0;
+          border-top-style: solid;
+        }
+        .map-legend .lg-attr {
+          justify-self: center;
+        }
+        .lg-ground {
+          border-top: 2px solid var(--tl-accent);
+        }
+        /* v9 (2026-09-28): flight must read as an ORANGE DASHED line — the
+           generic .map-legend .lg rule (0,2,0) outranked .lg-air (0,1,0)
+           and forced solid. Re-declare with matching specificity so the
+           later-in-sheet dashed shorthand wins. */
+        .map-legend .lg-air {
+          border-top: 2px dashed var(--tl-amber);
+        }
+        .lg-gap {
+          border-top: 2px dotted var(--tl-gap);
+        }
+        .lg-attr {
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--tl-attr);
+          border: 1.5px solid #fff;
+          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+        }
+        /* v14.2: planned-but-not-entered — the same dot, hollow: white core,
+           terracotta ring (mirrors the map's data-driven marker style) */
+        .lg-attr-planned {
+          background: #fff;
+          border-color: var(--tl-attr);
+          box-shadow: 0 0 0 1px rgba(201, 111, 47, 0.25);
+        }
+
+        /* v16 (2026-10-07): the attraction review popup was removed, so its
+           .attraction-popup / .ap-* rules went with it — the dots below the
+           legend are pure context markers now. */
+
+        /* ---- story ---- */
+        .story-pane {
+          /* v9 (2026-09-28, user pick: plan A): cap raised 545→627 — the text
+             column grows ~15% at wide viewports (413 → up to 495px); the pane
+             floats centred in the 54% story column. Note: for viewports below
+             ~1161px the pane simply fills the column, so the old hand-computed
+             rail formula no longer holds there — TravelNav now measures the
+             pane per frame instead (plan A). */
+          max-width: 627px;
+          margin: 0 auto;
+          /* v12: no bottom padding — the finale is the last element and is
+             exactly 100vh tall, so trailing padding would offset its "centred
+             at full scroll" geometry (the old 80px footer-era pad made the
+             finale centre land 80px below the viewport midline). */
+          padding: 0 28px;
+        }
+        /* ≥1024: day capsules stretch back out over the freed gutter while
+           PINNED (stuck at the sticky top) — v10 (2026-09-28 user request):
+           the overhang no longer requires .on. A capsule that is deactivated
+           while stuck keeps its length (only the lit colour goes out) and
+           shortens when the next day block pushes it off — TravelStory's
+           exact-stuck pinned test un-pins it at that moment. Mid-viewport
+           activation still just lights the capsule up (colour/glow below),
+           so it can never interfere with the progress rail while still
+           travelling. */
+        @media (min-width: 1024px) {
+          .story-pane {
+            padding-right: 104px;
+          }
+          .story-pane .day-block.pinned .day-capsule {
+            /* +56 (not +76): the rail sits closer to the pane edge than the
+               raw formula suggests (vw includes the scrollbar), and this
+               range has no left overhang — the right reach must clear it */
+            width: calc(100% + 56px);
+            margin-right: -56px;
+          }
+        }
+        /* ≥1280 (user 2026-09-26): a PINNED Day capsule grows ~15% longer
+           (413+76=489 → 561px) by overhanging BOTH ways — the dot axis and
+           the spine that tracks it slide left, the capsule's right end
+           reaches toward the rail. v10: .on no longer required (deactivated
+           capsules stay long until pushed off). Travelling capsules stay at
+           text width. NOTE: the matching .scene-section overrides live AFTER
+           the base spine rules below — same-specificity media overrides must
+           come later in the sheet or the base rule wins. */
+        @media (min-width: 1280px) {
+          .story-pane .day-block.pinned .day-capsule {
+            width: calc(100% + 148px);
+            margin-left: -74px;
+            margin-right: -74px;
+          }
+        }
+        /* Active-scene spine (2026-09-26 user tweak): the blue line shares the
+           Day capsule's dot axis — dot centre sits 21px in from the section's
+           outer edge (1px capsule border + 16px padding + 4px half-dot) — so
+           the line is drawn by a ::before instead of the border (a border
+           can't move inward). NOTE: absolute offsets resolve against the
+           PADDING box, which starts inside the 3px transparent border —
+           left must be 16.5px (not 19.5px) for the 3px line to centre on
+           21px. Text keeps a clear gap (border 3px + padding 34px = 37px). */
+        .scene-section {
+          position: relative;
+          padding: 48px 0 32px;
+          border-left: 3px solid transparent;
+          padding-left: 34px;
+          opacity: 0.62;
+          transition: opacity 0.35s ease;
+        }
+        .scene-section::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 16.5px;
+          width: 3px;
+          border-radius: 2px;
+          background: var(--tl-accent);
+          opacity: 0;
+          /* v9 (2026-09-28 user request): fade in/out IN PLACE — the old
+             left slide ("pops out right-to-left") collided with neighbouring
+             content. v10: at ≥1280 the position is constant anyway (see the
+             media block below), so opacity is the only thing that ever
+             animates. */
+          transition: opacity 0.35s ease;
+        }
+        .scene-section.active {
+          opacity: 1;
+        }
+        .scene-section.active::before {
+          opacity: 1;
+        }
+        .scene-section.unit-title {
+          min-height: 12vh;
+          opacity: 1;
+        }
+        .scene-section.unit-title::before {
+          opacity: 0;
+        }
+        /* ≥1280: the spine sits at the overhanging capsule's dot axis ALWAYS
+           — active or not (v12 2026-09-28 user report: with the offset on
+           .active only, DEactivation flipped left back to 16.5px instantly,
+           so the fading-out bar visibly jumped back to the text edge; the
+           transition only covers opacity). Position is now constant at this
+           breakpoint; opacity is the only thing that ever animates. The dot
+           axis sits at section outer left - 53 (pinned capsule overhangs 74
+           left); padding-box offset = -53 - 3 (border) - 1.5 (half line) =
+           -57.5px. The reduced padding-left centers the text between spine
+           and rail (user 2026-09-26). Must come AFTER the base rules (same
+           specificity, later in the sheet wins). */
+        @media (min-width: 1280px) {
+          .scene-section::before {
+            left: -57.5px;
+          }
+          .scene-section {
+            padding-left: 26px;
+          }
+        }
+        .day-block {
+          position: relative;
+        }
+        /* a gap between consecutive day blocks: the incoming capsule pushes
+           the previous one out without ever touching it */
+        .day-block + .day-block {
+          padding-top: 26px;
+        }
+        /* sticky day capsule: pins under the trip progress bar while its day
+           is on screen; the next day block pushes it out. Opaque bg so story
+           text cannot show through while stuck. */
+        .day-capsule {
+          position: sticky;
+          top: calc(var(--tl-top) + 46px);
+          z-index: 5;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          padding: 7px 16px;
+          border: 1px solid var(--tl-line);
+          border-radius: 999px;
+          background: var(--tl-paper-2);
+          overflow: hidden;
+          /* width/margin animate the pinned grow (travelling capsules sit at
+             text width; pinned ones overhang with or without .on — v10) */
+          transition: border-color 0.35s ease, box-shadow 0.35s ease,
+            background 0.35s ease, width 0.35s ease, margin 0.35s ease;
+          cursor: pointer;
+        }
+        .day-capsule:hover {
+          border-color: var(--tl-line-4);
+        }
+        .day-capsule:focus-visible {
+          outline: 2px solid rgba(27, 167, 201, 0.6);
+          outline-offset: 2px;
+        }
+        /* B: day-progress fill, width driven by --fill from a rAF loop */
+        .dc-fill {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: var(--fill, 0%);
+          background: rgba(27, 167, 201, 0.13);
+          border-radius: 999px;
+          transition: background 0.4s ease;
+        }
+        /* a day already read: fill fades to gray */
+        .day-capsule.done .dc-fill {
+          background: rgba(100, 116, 139, 0.16);
+        }
+        .dc-dot,
+        .dc-label,
+        .dc-date,
+        .dc-km {
+          position: relative;
+          z-index: 1;
+        }
+        .dc-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--tl-line-5);
+          transition: background 0.35s ease, transform 0.35s ease;
+        }
+        .dc-label {
+          font-weight: 800;
+          font-size: 14px;
+        }
+        .dc-date {
+          margin-left: auto;
+          color: var(--tl-ink-2);
+          font-weight: 600;
+          font-size: 13px;
+        }
+        .dc-km {
+          color: var(--tl-faint);
+          font-size: 12px;
+        }
+        .dc-plane {
+          color: var(--tl-accent);
+          font-size: 12px;
+          margin-right: 5px;
+        }
+        /* A: lit state while the day is the active one */
+        .day-capsule.on {
+          border-color: rgba(27, 167, 201, 0.85);
+          box-shadow: 0 1px 12px rgba(27, 167, 201, 0.28);
+          background: var(--tl-accent-soft-2);
+        }
+        .day-capsule.on .dc-dot {
+          background: var(--tl-accent);
+          transform: scale(1.35);
+          animation: dc-breathe 2s ease-in-out infinite;
+        }
+        @keyframes dc-breathe {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(27, 167, 201, 0.5); }
+          55% { box-shadow: 0 0 0 7px rgba(27, 167, 201, 0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .day-capsule.on .dc-dot { animation: none; }
+        }
+        .scene-section.unit-transit {
+          min-height: 55vh;
+        }
+        /* v12 (2026-09-28): tighter approach to the finale — the old story
+           footer (deleted) plus 75vh of scroll room put the finale far from
+           the last scene. 20vh is enough for the band to reach the final
+           anchor without feeling like a dead stretch. */
+        .end-spacer {
+          min-height: 20vh;
+        }
+        /* v12: exactly 100vh — anchored at the page bottom at full scroll,
+           the block's vertical centre then lands exactly on the viewport
+           midline (user: "拉到底的时候完结撒花正好垂直在中间"). */
+        .finale {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          border-left-color: transparent;
+        }
+        .finale-title {
+          font-size: 34px;
+          margin: 6px 0 12px;
+        }
+        .finale-line {
+          color: var(--tl-ink-3);
+          font-size: 15px;
+          line-height: 1.8;
+          max-width: 460px;
+        }
+        /* The sign-off line ("感谢阅读 ~ See you on the next trip!"). It had NO
+           rule at all, so it inherited the layout root's sans and read as a
+           caption while the sentence above it is a stat line. It is a human
+           sentence in a story, so it takes the serif — 2026-10-24. */
+        .finale-hint {
+          font-family: var(--font-serif-latin), var(--font-serif-zh);
+        }
+        /* v12: the deleted story-footer's data-source note, kept as a small
+           caption inside the finale */
+        .finale-src {
+          margin: 22px 0 0;
+          color: var(--tl-faint);
+          font-size: 12px;
+          line-height: 1.7;
+          max-width: 460px;
+        }
+        .intro {
+          /* v12: full-viewport boot screen (was 88vh — the Day 0 capsule
+             peeked in at the bottom, an odd first impression). Column layout:
+             the text block centres itself in the space above the scroll cue
+             (auto margins), the cue anchors the bottom edge. */
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          border-left: none;
+          opacity: 1;
+        }
+        .intro-inner {
+          margin: auto 0;
+        }
+        .intro-inner h1 {
+          font-size: 40px;
+          margin: 6px 0 10px;
+          line-height: 1.15;
+        }
+        .kicker {
+          text-transform: uppercase;
+          letter-spacing: 0.14em;
+          font-size: 12px;
+          color: var(--tl-accent);
+          font-weight: 700;
+          margin: 0;
+        }
+        .intro-meta {
+          color: var(--tl-ink-3);
+          margin: 0 0 18px;
+        }
+        .intro-hint {
+          color: var(--tl-muted);
+          font-size: 14px;
+        }
+        /* v12 (2026-09-28 user request): bottom scroll cue of the boot
+           screen — a downward double chevron (user pick) with a looping
+           drop animation plus "Scroll to read". */
+        .intro-scroll-hint {
+          align-self: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 34px;
+        }
+        .hint-chevrons {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          color: var(--tl-accent);
+        }
+        .hint-chevrons svg {
+          display: block;
+          margin: -6px 0;
+          animation: hint-drop 1.5s ease-in-out infinite;
+        }
+        .hint-chevrons svg:last-child {
+          animation-delay: 0.2s;
+        }
+        @keyframes hint-drop {
+          0% {
+            transform: translateY(-5px);
+            opacity: 0;
+          }
+          35% {
+            opacity: 1;
+          }
+          75%,
+          100% {
+            transform: translateY(5px);
+            opacity: 0;
+          }
+        }
+        .intro-scroll-hint .hint-text {
+          margin-top: 12px;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--tl-strip-ink);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hint-chevrons svg {
+            animation: none;
+            opacity: 0.85;
+            transform: none;
+          }
+        }
+
+        .night-divider {
+          min-height: 26vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          color: var(--tl-muted);
+          font-size: 13.5px;
+          letter-spacing: 0.02em;
+        }
+        .night-moon {
+          font-size: 18px;
+          color: var(--tl-slate);
+        }
+        .day-header {
+          display: flex;
+          align-items: baseline;
+          gap: 10px;
+          padding: 42px 0 0 21px;
+          border-top: 1px solid var(--tl-line);
+          margin-top: 10px;
+        }
+        .day-label {
+          font-weight: 800;
+          font-size: 18px;
+        }
+        .day-date {
+          color: var(--tl-ink-2);
+          font-weight: 600;
+        }
+        .day-distance {
+          color: var(--tl-faint);
+          font-size: 13px;
+          margin-left: auto;
+        }
+
+        .scene-index {
+          display: inline-block;
+          margin-right: 8px;
+          color: var(--tl-faint);
+          font-size: 11px;
+          font-variant-numeric: tabular-nums;
+          letter-spacing: 0.06em;
+        }
+        .scene-head h2 {
+          margin: 6px 0 2px;
+          font-size: 22px;
+        }
+        .scene-meta {
+          color: var(--tl-muted);
+          font-size: 13px;
+        }
+        .confidence {
+          color: var(--tl-amber-ink);
+        }
+        .chip {
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          padding: 2px 8px;
+          border-radius: 999px;
+          color: var(--tl-on-accent);
+        }
+        .chip-morning {
+          background: var(--tl-gold);
+        }
+        .chip-afternoon {
+          background: var(--tl-attr);
+        }
+        .chip-evening {
+          background: var(--tl-slate);
+        }
+        .chip-transit {
+          background: var(--tl-muted);
+        }
+        .day-heading {
+          color: var(--tl-ink-3);
+          font-size: 13.5px;
+          padding: 6px 0 0 21px;
+          margin: 0;
+        }
+        .scene-body {
+          margin-top: 14px;
+        }
+        .scene-body p {
+          margin: 0 0 14px;
+          color: var(--tl-ink);
+          font-size: 15px;
+          line-height: 1.85;
+          /* CONVENTIONS §44: 标题/正文长文用衬线，UI 控件用无衬线. The journal
+             prose is the reading surface — it must take the site serif stack
+             (GenWanMin2 TC first), not inherit .travel-layout's sans UI stack.
+             Before 2026-10-10 <p> had no rule here, so the body silently fell
+             through to a system CJK sans (Microsoft YaHei UI). */
+          font-family: var(--font-serif-latin), var(--font-serif-zh);
+        }
+        .scene-note {
+          color: var(--tl-muted);
+          font-style: italic;
+          font-size: 14px;
+        }
+        .attraction {
+          margin: 18px 0;
+        }
+        .attraction h3 {
+          margin: 0 0 6px;
+          font-size: 17px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .not-visited {
+          font-size: 11px;
+          color: var(--tl-faint);
+          border: 1px solid var(--tl-line-3);
+          border-radius: 999px;
+          padding: 1px 8px;
+          font-weight: 500;
+        }
+        .excerpt {
+          margin: 0;
+          color: var(--tl-ink-2);
+          font-size: 14.5px;
+          line-height: 1.65;
+          /* journal excerpt = body copy → serif (see .scene-body p) */
+          font-family: var(--font-serif-latin), var(--font-serif-zh);
+        }
+        .match-warning {
+          color: var(--tl-amber-ink);
+          font-size: 12.5px;
+          margin: 4px 0;
+        }
+        .boot-loading,
+        .boot-error {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          min-height: 60vh;
+          color: var(--tl-muted);
+        }
+        /* quiet pulse, so the fallback state still reads as "working" — it is
+           what shows if the curtain is off (reduced motion) or its CSS dies */
+        .boot-loading-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: var(--tl-accent);
+          animation: tl-boot-pulse 1.2s ease-in-out infinite;
+        }
+        @keyframes tl-boot-pulse {
+          0%,
+          100% {
+            opacity: 0.25;
+            transform: scale(0.8);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .boot-loading-dot {
+            animation: none;
+            opacity: 0.6;
+          }
+        }
+
+        @media (max-width: 1023px) {
+          .travel-layout {
+            flex-direction: column;
+            /* v14 (2026-09-28 user request): 4:6 map/text split (was 44:56) —
+               leaves more room for the story text. --tl-map-h also drives the
+               day-capsule sticky top and the finale height below. */
+            --tl-map-h: 40vh;
+          }
+          body.tl-immersive .travel-layout {
+            --tl-map-h: 40vh;
+          }
+          .map-col {
+            width: 100%;
+            position: sticky;
+            z-index: 10;
+            border-right: none;
+            /* 2026-10-24: the column, not just the pane, has to follow the
+               split. The map pane was already reading --tl-map-h-mobile, but
+               this element still pinned itself to --tl-map-h (40vh) — and the
+               GRAY SEAM (border-bottom) is drawn HERE. Dragging the map
+               taller moved the pane and left the divider behind, hovering in
+               the middle of the map (user: "灰色线标识顶部没有同步变化").
+               The column is the one that owns the sticky geometry, so the
+               reader's height belongs on it; the pane follows it at 100%. */
+            height: var(--tl-map-h-mobile, var(--tl-map-h));
+            transition: none;
+            /* v13 (2026-09-28 user request): the map/text seam on mobile was
+               a bare cut — same paper-gray rule as the desktop border-right. */
+            border-bottom: 2px solid var(--tl-paper-line);
+          }
+          .story-col {
+            width: 100%;
+          }
+          .intro {
+            min-height: 60vh;
+          }
+          /* v13: the map is sticky over the top for the WHOLE scroll, so the
+             day capsule must pin just BELOW it — the old top (46px) put it
+             behind the map (z-index 5 vs the map's 10) where it vanished
+             (user report).
+             2026-10-24: reads --tl-map-h-mobile, NOT --tl-map-h.
+             --tl-map-h is declared on .travel-layout while the capsule
+             lives in the SIBLING .story-col, so the old calc on --tl-map-h
+             substituted empty and was invalid at computed-value time — the
+             capsule stayed at the fallback 40vh + 8px (345.6px) no matter where
+             the strip was dragged (measured: map bottom 338px, capsule 345.6px,
+             so the capsule and its gray line started INSIDE the map and the
+             story text scrolled underneath them). --tl-map-h-mobile is
+             written by lib/travel/map-split.tsx on the shared frame AND on the
+             map column, so it inherits down to .day-capsule — the same fix as
+             the pilgrimage page's --pj-land. --tl-map-h stays behind it as
+             the no-JS/prerender fallback. */
+          .day-capsule {
+            top: calc(var(--tl-map-h-mobile, var(--tl-map-h)) + 8px);
+          }
+          /* v13 (2026-09-28 user request): same centre-at-full-scroll
+             geometry as desktop, rebased to the VISIBLE area. The map always
+             covers the top 40vh, so height = 100vh − map puts the block's
+             centre exactly on the midline of the strip between the map's
+             bottom edge and the viewport bottom. */
+          .finale {
+            min-height: calc(100vh - var(--tl-map-h-mobile, var(--tl-map-h)));
+          }
+          /* v21: two pills (3 theme + 2 basemap segments) run wider than the
+             old single track — trim each segment and the gap so the pair still
+             clears the timeline pill on the map's left at 390px. */
+          .basemap-ctl {
+            gap: 6px;
+          }
+          .bm-btn {
+            width: 30px;
+          }
+        }
+      

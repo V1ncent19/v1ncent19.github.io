@@ -1,0 +1,239 @@
+{
+  "_readme": "旅行清单数据（About 页「在路上」信封内）。visited = 已解锁足迹；wishlist = 待解锁心愿。每条字段：name（必填，{ \"en\", \"zh\" }——en 是基准，zh 缺省回退英文）、year（visited 可选，如 2025）、note（可选，{ \"en\", \"zh\" } 一句话备注）、lat / lon（可选，十进制度 WGS84——两个都填了才会在地球上落点；不填只出现在清单里，不填不会虚构位置）。旧写法 name / nameEn 已于 2026-10-17 废弃。",
+  "visited": [
+    {
+      "name": {
+        "en": "France/Netherlands",
+        "zh": "髪/荷"
+      },
+      "lat": 48.8566,
+      "lon": 2.3522
+    },
+    {
+      "name": {
+        "en": "Portugal/Spain",
+        "zh": "葡/西"
+      },
+      "lat": 40.4168,
+      "lon": -3.7038
+    },
+    {
+      "name": {
+        "en": "Cambodia",
+        "zh": "柬埔寨"
+      },
+      "lat": 13.3611,
+      "lon": 103.8594
+    },
+    {
+      "name": {
+        "en": "Thailand",
+        "zh": "泰国"
+      },
+      "lat": 15.87,
+      "lon": 100.9925
+    },
+    {
+      "name": {
+        "en": "Japan",
+        "zh": "日本"
+      },
+      "lat": 36.2048,
+      "lon": 138.2529
+    },
+    {
+      "name": {
+        "en": "Guatemala",
+        "zh": "危地马拉"
+      },
+      "lat": 15.7835,
+      "lon": -90.2308
+    },
+    {
+      "name": {
+        "en": "Austria",
+        "zh": "奥地利"
+      },
+      "lat": 47.5162,
+      "lon": 14.5501
+    },
+    {
+      "name": {
+        "en": "Taiwan",
+        "zh": "台湾"
+      },
+      "lat": 23.6978,
+      "lon": 120.9605
+    },
+    {
+      "name": {
+        "en": "St.Louis, MO, USA",
+        "zh": "美国圣路易斯"
+      },
+      "lat": 38.627,
+      "lon": -90.1994
+    },
+    {
+      "name": {
+        "en": "New York, NY, USA",
+        "zh": "美国纽约"
+      },
+      "lat": 40.7128,
+      "lon": -74.006
+    },
+    {
+      "name": {
+        "en": "Boston, MA, USA",
+        "zh": "美国波士顿"
+      },
+      "lat": 42.3601,
+      "lon": -71.0589
+    },
+    {
+      "name": {
+        "en": "Alaska, USA",
+        "zh": "美国阿拉斯加"
+      },
+      "lat": 64.2008,
+      "lon": -149.4937
+    },
+    {
+      "name": {
+        "en": "Nanjing, China",
+        "zh": "中国南京"
+      },
+      "lat": 32.0603,
+      "lon": 118.7969
+    },
+    {
+      "name": {
+        "en": "Xinjiang, China",
+        "zh": "中国新疆"
+      },
+      "lat": 41.2971,
+      "lon": 86.9226
+    },
+    {
+      "name": {
+        "en": "Hefei, China",
+        "zh": "中国合肥"
+      },
+      "lat": 31.8206,
+      "lon": 117.2272
+    },
+    {
+      "name": {
+        "en": "Tianjin, China",
+        "zh": "中国天津"
+      },
+      "lat": 39.3434,
+      "lon": 117.3616
+    },
+    {
+      "name": {
+        "en": "South Korea",
+        "zh": "韩国"
+      },
+      "lat": 35.9078,
+      "lon": 127.7669
+    },
+    {
+      "name": {
+        "en": "Singapore/Malaysia",
+        "zh": "新加坡/马来西亚"
+      },
+      "lat": 1.3521,
+      "lon": 103.8198
+    }
+  ],
+  "wishlist": [
+    {
+      "name": {
+        "en": "Brazil/Argentina",
+        "zh": "巴西/阿根廷"
+      },
+      "lat": -14.235,
+      "lon": -51.9253
+    },
+    {
+      "name": {
+        "en": "Japan (Hokuriku)",
+        "zh": "日本北陆"
+      },
+      "lat": 36.2048,
+      "lon": 138.2529
+    },
+    {
+      "name": {
+        "en": "Japan (Kyushu)",
+        "zh": "日本九州"
+      },
+      "lat": 32.7503,
+      "lon": 130.0
+    },
+    {
+      "name": {
+        "en": "Mexico",
+        "zh": "Mexico"
+      },
+      "lat": 23.6345,
+      "lon": -102.5528
+    },
+    {
+      "name": {
+        "en": "Peru",
+        "zh": "秘鲁"
+      },
+      "lat": -9.19,
+      "lon": -75.0152
+    },
+    {
+      "name": {
+        "en": "Central Asia",
+        "zh": "中亚五国"
+      },
+      "lat": 41.2044,
+      "lon": 74.7661
+    },
+    {
+      "name": {
+        "en": "Russia",
+        "zh": "俄罗斯"
+      },
+      "lat": 55.7558,
+      "lon": 37.6173
+    },
+    {
+      "name": {
+        "en": "Great Britain",
+        "zh": "大不列颠"
+      },
+      "lat": 51.5074,
+      "lon": -0.1278
+    },
+    {
+      "name": {
+        "en": "Egypt",
+        "zh": "埃及"
+      },
+      "lat": 26.8206,
+      "lon": 30.8025
+    },
+    {
+      "name": {
+        "en": "Greece",
+        "zh": "希腊"
+      },
+      "lat": 39.0742,
+      "lon": 21.8243
+    },
+    {
+      "name": {
+        "en": "Kenya",
+        "zh": "肯尼亚"
+      },
+      "lat": -0.0236,
+      "lon": 37.9062
+    }
+  ]
+}

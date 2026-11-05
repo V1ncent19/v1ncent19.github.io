@@ -1,0 +1,1775 @@
+"use client";
+
+import "./gallery-hover.css";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import {
+  ArrowDownUp,
+  ArrowDownWideNarrow,
+  ArrowRight,
+  ArrowUpNarrowWide,
+  Camera,
+  ChevronUp,
+  Download,
+  LayoutGrid,
+  MapPin,
+  Pin,
+  Shuffle,
+  Star,
+  X,
+} from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+} from "react";
+import { createPortal } from "react-dom";
+import type { GalleryItem } from "@/lib/content";
+import type { Lang } from "@/lib/i18n";
+import { copy } from "@/lib/i18n";
+import { pick } from "@/lib/localized";
+import { TravelStamp } from "./travel-stamps";
+import { useCardLaunch } from "@/lib/use-card-launch";
+import { beginTravelEntry } from "@/lib/travel/log/entry-transition";
+
+type SortMode = "date" | "place" | "shuffle";
+type ReturnView = { mode: SortMode; dir: "asc" | "desc"; featuredFirst: boolean; shuffleNonce: number; prefCols: number };
+// Keep the existing wall arrangement when a client-side story visit returns.
+const returnViews = new Map<string, ReturnView>();
+
+/**
+ * A non-photo "story" card in the masonry flow (2026-09-25 travel hub): trip
+ * logs and blog posts rendered as tiles that look native in
+ * the waterfall but navigate to their post instead of opening the lightbox.
+ * Deliberately image-less (user decision): a typographic card — big index
+ * numeral + serif title + meta + call-to-action on a tinted surface — reads as
+ * something other than a photo at a glance. All strings are pre-localised by
+ * the host page — this component stays i18n-free.
+ */
+export interface GalleryStoryTile {
+  /** Stable DOM/FLIP key; must not collide with any GalleryItem id. */
+  id: string;
+  href: string;
+  /** The destination owns the full-screen travel-entry curtain. */
+  travelLog?: boolean;
+  /** Large ghost numeral at the card's top, e.g. "01". */
+  index?: string;
+  title: string;
+  /** One-line context, e.g. "Interactive map log · 18 days". */
+  meta: string;
+  /** Call-to-action line at the card's bottom, e.g. "Read". */
+  cta?: string;
+  /** Small pill under the title, e.g. "Beta". */
+  badge?: string;
+  /** Keep the tile above every featured and regular entry. */
+  pinned?: boolean;
+  /**
+   * Place the tile in the same curated band as featured photos. Featured
+   * stories still obey the active date sort inside that band.
+   */
+  featured?: boolean;
+  /** Draw the pin icon only when explicitly requested; does not affect order. */
+  showPinnedBadge?: boolean;
+  /**
+   * YYYY-MM-DD anchor used to merge the tile into the photo stream in date
+   * mode (2026-09-25 user request — the Paris food diary sits at 2024-03-20).
+   */
+  date?: string;
+  /**
+   * 2–3 line summary clamped under the title. Retired from rendering
+   * (2026-09-26 user request: tiles carry basic metainfo only) — the field
+   * stays for backwards compatibility but StoryTile no longer shows it.
+   */
+  excerpt?: string;
+  /** Small place/topic chips between title and excerpt. */
+  tags?: string[];
+  /** Bottom stat line under a hairline divider, joined with "·". */
+  facts?: string[];
+  /**
+   * Cover photo for the hover circle-reveal (2026-09-26, mirroring the home
+   * gateway cards): a gallery thumb URL revealed by a clip-path circle
+   * anchored at the card's bottom-right corner on hover/focus.
+   */
+  cover?: string;
+  /** object-position for the cover image, e.g. "center 40%". */
+  coverPos?: string;
+  /**
+   * Label of the "latest post" tag cell rendered beside the index numeral
+   * (2026-09-26) — pre-localised by the host, e.g. "Latest".
+   */
+  latest?: string;
+}
+
+/* ----------------------------------------------------------------------------
+ * Column layout
+ * -------------------------------------------------------------------------
+ * The grid is split into N explicit flex columns (user picks 3/4/5, default 4)
+ * because we need row-band time ordering: items are handed to columns in a
+ * round-robin, so the top band reads 1 2 3, the next 4 5 6, … — temporally
+ * adjacent frames sit next to each other across columns (CSS multi-column, by
+ * contrast, fills one column before the next and scatters times across rows).
+ * Round-robin means a very tall frame makes its column drift a little — that
+ * staggered drift is the accepted masonry look. On narrow screens the count is
+ * clamped down to whatever keeps each tile ≥ MIN_TILE px wide.
+ * ------------------------------------------------------------------------- */
+const GAP = 12; // gap-3
+const MIN_TILE = 148; // smallest comfortable thumb width, px
+const COLUMN_CHOICES = [2,3,4] as const;
+const DEFAULT_COLUMNS = 3;
+
+/* Lightbox geometry (2026-09-04, Request B): on wide screens the opened card is
+ * a two-pane row — a left image column whose WIDTH hugs the photo's own aspect
+ * (so a portrait renders tall with no black side margins) plus a fixed-width
+ * caption rail on the right. Below the breakpoint it falls back to the stacked
+ * image-over-caption card. Equal-height cards were dropped with this change:
+ * the card now takes the natural height of whichever pane is taller.
+ */
+const LIGHTBOX_TWO_COL = 768; // px overlay content width that enables the panes
+const CAPTION_RAIL_NARROW = 320; // rail width below the widest desktop widths
+const CAPTION_RAIL_WIDE = 380;
+const LIGHTBOX_IMAGE_MAX_WIDTH = 1040; // cap wide photos on large desktop displays
+const LIGHTBOX_IMAGE_MAX_HEIGHT = 820; // keep portrait photos off viewport edges
+
+const EN_MONTHS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/** Deterministic date strings (no locale API → identical on server & client). */
+function formatDate(iso: string, lang: Lang): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  return lang === "zh" ? `${y} 年 ${m} 月 ${d} 日` : `${EN_MONTHS[m - 1]} ${d}, ${y}`;
+}
+
+/** "YYYY-MM-DD" → month-year label ("Sep 2024" / "2024 年 9 月"). */
+function formatYearMonth(iso: string, lang: Lang): string {
+  const [y, m] = iso.split("-").map(Number);
+  if (!y || !m) return iso;
+  return lang === "zh" ? `${y} 年 ${m} 月` : `${EN_MONTHS[m - 1]} ${y}`;
+}
+
+/** Compact, language-neutral "2026.08" used on the resting glass bar. */
+function formatDotMonth(iso: string): string {
+  const [y, m] = iso.split("-");
+  if (!y || !m) return iso;
+  return `${y}.${m}`;
+}
+
+/** Whole days from a "YYYY-MM-DD" capture date to today (0 = today; null when
+ * the date is missing). Both instants are local midnights compared as UTC so a
+ * daylight-saving shift can never make the count one day off. */
+function wholeDays(iso: string): number | null {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const today = new Date();
+  const then = new Date(y, m - 1, d);
+  const midnight = (t: Date) =>
+    Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
+  return Math.round((midnight(today) - midnight(then)) / 86400000);
+}
+
+/** Relative age for the hover card ("N days ago" / "N 天前"); null when the
+ * date is missing or in the future (caller then keeps the absolute date). */
+function daysAgoLabel(iso: string, lang: Lang): string | null {
+  const days = wholeDays(iso);
+  if (days === null || days < 0) return null;
+  if (days === 0) return lang === "zh" ? "今天" : "Today";
+  if (days === 1) return lang === "zh" ? "昨天" : "Yesterday";
+  return lang === "zh" ? `${days} 天前` : `${days} days ago`;
+}
+
+/** Route-appropriate "place · placeLocal" line for the lightbox header. */
+function locText(item: GalleryItem, lang: Lang): string {
+  return [
+    pick(item.place, lang),
+    pick(item.placeLocal, lang),
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/** Accessible one-line description (title · place · date) fallback. */
+function describe(item: GalleryItem, lang: Lang): string {
+  return [
+    pick(item.title, lang) || locText(item, lang),
+    formatDate(item.date, lang),
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/** Decimal degrees → "22.625°N, 120.274°E" (trailing zeros trimmed). */
+function coordsLine(item: GalleryItem): string | null {
+  if (typeof item.lat !== "number" || typeof item.lon !== "number") return null;
+  const coord = (value: number, axis: "lat" | "lon") => {
+    const s = Number(Math.abs(value).toFixed(3)).toString();
+    const hemi =
+      axis === "lat"
+        ? value >= 0
+          ? "N"
+          : "S"
+        : value >= 0
+          ? "E"
+          : "W";
+    return `${s}°${hemi}`;
+  };
+  return `${coord(item.lat, "lat")}, ${coord(item.lon, "lon")}`;
+}
+
+/**
+ * Per-item theme accent as CSS variables: `--tile-accent` (the strong colour —
+ * resting dot, badge + hover title) and `--tile-soft` (a translucent tint for
+ * badge chips). The `featured` (精选集) flag is the source of truth: featured
+ * photos always take the curated orange-red `--curated` (theme-paired like the
+ * brand, so dark mode gets its brighter shade); everything else falls back to
+ * the site brand — the default blue. `color` in items.json is derived from
+ * `featured` on each gallery:gen run, so for featured rows it is informational
+ * (the live accent keys off the flag and recolours instantly when you flip it);
+ * for non-featured rows a hand-written `color` still acts as an override.
+ */
+function accentVars(item: GalleryItem): CSSProperties {
+  const accent =
+    item.featured === true
+      ? "var(--curated)"
+      : item.color.trim() || "var(--brand)";
+  return {
+    "--tile-accent": accent,
+    "--tile-soft": `color-mix(in srgb, ${accent} 13%, transparent)`,
+  } as CSSProperties;
+}
+
+/**
+ * Decorative world map for the open card. The sheet is an external amCharts
+ * Mercator SVG (public/data/vendor/worldOutlineLow.svg, kept untouched);
+ * its viewBox is "-2 168.36 964 623.29" and its path data was projected with
+ * the world centred at x = 480 (lon 0) and the equator at y = 610, at 960
+ * viewBox units per 2π radians of longitude.
+ *
+ * Moved out of gallery/ into assets/vendor/ (2026-10-17): amCharts geography,
+ * not a photo anyone here took. Licence notes in assets/vendor/LICENSE.md.
+ */
+const WORLD_MAP_SRC = "/data/vendor/worldOutlineLow.svg";
+const WORLD_VB = { x: -2, y: 168.36, w: 964, h: 623.29 } as const;
+
+/**
+ * Mercator-project one lat/lon into the world map's OWN user coordinates.
+ * Returns the raw SVG-space x/y (same coordinate system as the sheet's path,
+ * so the caller places a marker directly at these values — no viewBox-origin
+ * subtraction and no linear lat/lon normalisation). Latitude is clamped to
+ * ±85° so `ln(tan(π/4 + φ/2))` never diverges. Returns null for non-finite
+ * input or a point that projects outside the drawn sheet, so the caller just
+ * omits the marker (never shows a dot at 0,0 or at a faked location).
+ */
+function projectToWorldMap(
+  latitude: number,
+  longitude: number,
+): { x: number; y: number } | null {
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+  const lat = Math.max(-85, Math.min(85, latitude));
+  const scale = 960 / (2 * Math.PI);
+  const x = ((longitude + 180) / 360) * 960;
+  const latRad = lat * (Math.PI / 180);
+  const y = 610 - scale * Math.log(Math.tan(Math.PI / 4 + latRad / 2));
+  if (x < 0 || x > WORLD_VB.w) return null;
+  if (y < WORLD_VB.y || y > WORLD_VB.y + WORLD_VB.h) return null;
+  return { x, y };
+}
+
+/**
+ * Largest on-screen size for the lightbox image that fits a `maxW × maxH`
+ * box while keeping the photo's own aspect ratio (from the generated manifest
+ * dimensions). The image column is then given exactly this size, so the black
+ * stage hugs the photo — no object-contain side margins.
+ */
+function fitImage(
+  item: GalleryItem,
+  maxW: number,
+  maxH: number,
+): { imgW: number; imgH: number } {
+  if (maxW <= 0 || maxH <= 0) return { imgW: 0, imgH: 0 };
+  const ratio =
+    item.width > 0 && item.height > 0 ? item.width / item.height : 1.5;
+  const imgW = Math.min(maxW, Math.round(maxH * ratio));
+  return { imgW, imgH: Math.round(imgW / ratio) };
+}
+
+/** Small deterministic PRNG (mulberry32) so a shuffle is stable for a seed. */
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Fisher–Yates driven by the given PRNG (seeded by the shuffle nonce). */
+function shuffleList<T>(list: readonly T[], seed: number): T[] {
+  const rnd = mulberry32(seed);
+  const out = [...list];
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rnd() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+export function GalleryView({
+  lang,
+  items,
+  embedded = false,
+  storyTiles = [],
+}: {
+  lang: Lang;
+  items: GalleryItem[];
+  /**
+   * Embedded mode (2026-09-25, travel hub): the same grid + toolbar + lightbox,
+   * but without this component's own page header / census tile / colophon and
+   * without the outer `shell` section — the host page supplies the section
+   * heading, container width and vertical rhythm. Nothing else changes: sort
+   * chips, curated filter, column chooser and the lightbox behave exactly
+   * like the /gallery page.
+   */
+  embedded?: boolean;
+  /** Story cards that share the masonry flow and its date/featured ordering. */
+  storyTiles?: GalleryStoryTile[];
+}) {
+  const s = copy[lang];
+  const unit = lang === "zh" ? "张" : "photos";
+
+  const returnKey = `${embedded ? "embedded" : "page"}:${lang}`;
+  const [returnView] = useState(() => returnViews.get(returnKey));
+  const [mode, setMode] = useState<SortMode>(returnView?.mode ?? "date");
+  /** Sort direction for the date/place keys ("shuffle" ignores it). Each key
+   *  carries its own natural default: newest-first for dates, A→Z for places. */
+  const [dir, setDir] = useState<"asc" | "desc">(returnView?.dir ?? "desc");
+  /** Curated PIN (精选集): when on, `featured` rows lead the wall and every
+   *  other photo follows — it does not hide anything (2026-10-25). */
+  const [featuredFirst, setFeaturedFirst] = useState(returnView?.featuredFirst ?? true);
+  const [shuffleNonce, setShuffleNonce] = useState(returnView?.shuffleNonce ?? 0);
+  const [prefCols, setPrefCols] = useState<number>(returnView?.prefCols ?? DEFAULT_COLUMNS);
+  const rememberView = () => { returnViews.set(returnKey, { mode, dir, featuredFirst, shuffleNonce, prefCols }); };
+  const [containerW, setContainerW] = useState(0);
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  /** Lightbox overlay's content box (viewport minus its padding), px. */
+  const [box, setBox] = useState({ w: 0, h: 0 });
+
+  /* Shared-element open/close (2026-09-04, Request C). Open expands the panel
+   * from the clicked thumbnail's rect; close collapses back to it. */
+  const tileRect = useRef<{ x: number; y: number; w: number; h: number } | null>(
+    null,
+  );
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const panelStarted = useRef(false); // entrance FLIP ran for this open session
+  const closingRef = useRef(false); // guards double close (ref: survives renders)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [closing, setClosing] = useState(false); // drives .gb-overlay-out
+
+  /** Curated mode (精选集). 2026-10-25 user decision: it is a PIN, not a
+   *  filter — featured frames are grouped at the front and every other photo
+   *  follows, so the wall never hides anything. (Before this it filtered the
+   *  list down to `featured` only, which made a new, non-featured upload look
+   *  like it had not been added at all.) The `visible` list is therefore the
+   *  full set again; the ordering work happens in `ordered` below. */
+  const visible = items;
+
+  /** Photos in the current display order. Date = newest/oldest by `dir`;
+   *  place = alphabetical by `dir` (unlabelled frames always sink); the
+   *  tiebreaker follows the same direction.
+   *
+   *  Curated mode (2026-10-25) PINS featured frames to the front instead of
+   *  filtering them: a stable two-band partition, featured first, then the
+   *  rest — each band keeps the exact order it would have had anyway, so
+   *  toggling the pin never reshuffles within a band. This supersedes the
+   *  2026-09-05 "featured rows no longer lead" decision; that one was made
+   *  when the alternative was *filtering*, and the user has since asked for
+   *  the wall to show everything with favourites up front.
+   *
+   *  Shuffle is the exception: the point of shuffling is a fresh, unbiased
+   *  arrangement, so a pinned band would defeat it. Featured still leads there
+   *  (the pin is a deliberate user-facing choice), but the random order inside
+   *  each band is freshly drawn. */
+  const ordered = useMemo(() => {
+    const base = mode === "shuffle" ? shuffleList(visible, shuffleNonce) : (() => {
+      const flip = dir === "asc" ? 1 : -1; // asc: natural order; desc: reversed
+      if (mode === "place") {
+        return [...visible].sort((a, b) => {
+          const pa = pick(a.place, lang).toLowerCase();
+          const pb = pick(b.place, lang).toLowerCase();
+          if (!pa && pb) return 1; // unlabelled frames sink to the end
+          if (pa && !pb) return -1;
+          if (pa !== pb) return (pa < pb ? -1 : 1) * flip;
+          return (a.date || "").localeCompare(b.date || "") * flip;
+        });
+      }
+      return [...visible].sort(
+        (a, b) =>
+          ((a.date || "").localeCompare(b.date || "") ||
+            a.id.localeCompare(b.id)) * flip,
+      );
+    })();
+    if (!featuredFirst) return base;
+    // Array#filter is stable, so this is a partition, not a re-sort.
+    return [
+      ...base.filter((i) => i.featured === true),
+      ...base.filter((i) => i.featured !== true),
+    ];
+  }, [visible, mode, dir, lang, shuffleNonce, featuredFirst]);
+
+  // Measure the grid once + on resize (state updates only inside rAF / events).
+  useEffect(() => {
+    let raf = 0;
+    const measure = () => {
+      raf = requestAnimationFrame(() => {
+        setContainerW(gridRef.current?.clientWidth ?? 0);
+      });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("resize", measure);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // While the lightbox is open, keep the overlay's usable content box measured
+  // (viewport minus the overlay's own padding). Sizes only feed the adaptive
+  // two-pane geometry, so they update inside rAF and never race a key press.
+  useEffect(() => {
+    if (openIdx === null) return;
+    let raf = 0;
+    const measure = () => {
+      raf = requestAnimationFrame(() => {
+        const el = overlayRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const cs = getComputedStyle(el);
+        const px = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+        const py = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+        setBox({ w: Math.max(0, rect.width - px), h: Math.max(0, rect.height - py) });
+      });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("resize", measure);
+      cancelAnimationFrame(raf);
+    };
+  }, [openIdx]);
+
+  /**
+   * Column layout numbers. `fits` = how many columns the measured container can
+   * hold at MIN_TILE each; `columns` = the user's preference clamped to that.
+   * Before the container is measured (SSR + first client render) `fits` is
+   * irrelevant and we render exactly `prefCols`, keeping hydration DOM equal.
+   */
+  const { columns, fits } = useMemo(() => {
+    if (containerW <= 0) {
+      return { columns: prefCols, fits: COLUMN_CHOICES.length };
+    }
+    const fits = Math.max(
+      1,
+      Math.floor((containerW + GAP) / (MIN_TILE + GAP)),
+    );
+    return { columns: Math.max(1, Math.min(prefCols, fits)), fits };
+  }, [containerW, prefCols]);
+
+  /**
+   * The full tile flow has three priorities: pinned stories, the featured
+   * band, then regular entries. Inside those bands every entry obeys the active
+   * date/place/shuffle order. Photos keep their index INTO `ordered` so the
+   * lightbox (which indexes `ordered`) stays untouched by story inserts.
+   */
+  type FlowEntry =
+    | { kind: "story"; story: GalleryStoryTile }
+    | { kind: "photo"; item: GalleryItem; photoIndex: number };
+
+  const flow = useMemo<FlowEntry[]>(() => {
+    const photos: FlowEntry[] = ordered.map((item, photoIndex) => ({
+      kind: "photo" as const,
+      item,
+      photoIndex,
+    }));
+    const stories: FlowEntry[] = storyTiles.map((story) => ({
+      kind: "story" as const,
+      story,
+    }));
+    const dateOf = (entry: FlowEntry) =>
+      entry.kind === "story" ? entry.story.date || "" : entry.item.date || "";
+    const placeOf = (entry: FlowEntry) =>
+      entry.kind === "story"
+        ? entry.story.tags?.[0]?.toLowerCase() || ""
+        : pick(entry.item.place, lang).toLowerCase();
+    const isPinned = (entry: FlowEntry) =>
+      entry.kind === "story" && entry.story.pinned === true;
+    const isFeatured = (entry: FlowEntry) =>
+      entry.kind === "story"
+        ? entry.story.featured === true
+        : entry.item.featured === true;
+
+    let sorted: FlowEntry[];
+    if (mode === "shuffle") {
+      // Photos already carry the lightbox's seeded shuffle order. Insert the
+      // stories at seeded positions without changing that relative photo order.
+      sorted = [...photos];
+      const rnd = mulberry32(shuffleNonce ^ 0x53a9f17b);
+      shuffleList(stories, shuffleNonce ^ 0x2742e51d).forEach((story) => {
+        sorted.splice(Math.floor(rnd() * (sorted.length + 1)), 0, story);
+      });
+    } else {
+      const flip = dir === "asc" ? 1 : -1;
+      sorted = [...photos, ...stories].sort((a, b) => {
+        if (mode === "place") {
+          const pa = placeOf(a);
+          const pb = placeOf(b);
+          if (!pa && pb) return 1;
+          if (pa && !pb) return -1;
+          if (pa !== pb) return (pa < pb ? -1 : 1) * flip;
+        }
+        return dateOf(a).localeCompare(dateOf(b)) * flip;
+      });
+    }
+
+    const pinned = sorted.filter(isPinned);
+    const unpinned = sorted.filter((entry) => !isPinned(entry));
+    if (!featuredFirst) return [...pinned, ...unpinned];
+    return [
+      ...pinned,
+      ...unpinned.filter(isFeatured),
+      ...unpinned.filter((entry) => !isFeatured(entry)),
+    ];
+  }, [storyTiles, ordered, mode, dir, featuredFirst, lang, shuffleNonce]);
+
+  /** Round-robin split of the flow into columns (see header note). */
+  const columnList = useMemo(() => {
+    const cols: FlowEntry[][] = Array.from({ length: columns }, () => []);
+    flow.forEach((entry, i) => cols[i % columns].push(entry));
+    return cols;
+  }, [flow, columns]);
+
+  /* FLIP reorder animation (2026-09-05, Task D #6 — user-approved). When the
+     display order or column count changes (sort chip, featured toggle, column
+     buttons), tiles glide to their new slots instead of teleporting.
+     Mechanics: the previous SETTLED rect of every tile is kept in prevRectsRef
+     (captured on each stable layout). On the first commit whose order signature
+     differs, each still-present tile is snapped back to its old rect (invert),
+     then a double-rAF releases it to rest (play) so the browser interpolates.
+     Tiles that just entered fade in; removed tiles are unmounted before the
+     effect runs. Tiles are keyed by item.id across the whole grid, so even a
+     tile that moves to a different column (React remounts it there) is matched
+     through the id → rect map. Transforms are written to the <button> elements
+     directly — React never sets `transform` on them — so no state churn. Runs
+     in a layout effect so the invert lands before the first painted frame.
+     Reduced motion skips the whole thing (the global rule would flatten it, but
+     this avoids the single-frame snap it would otherwise leave). */
+  const prevSig = useRef<string>("");
+  const prevRects = useRef<Map<string, DOMRect> | null>(null);
+  const animTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const els = Array.from(grid.querySelectorAll<HTMLElement>("[data-gid]"));
+    const now = new Map<string, DOMRect>();
+    for (const el of els) {
+      const id = el.dataset.gid;
+      if (id) now.set(id, el.getBoundingClientRect());
+    }
+    const sig = `${columns}|${flow
+      .map((e) => (e.kind === "story" ? e.story.id : e.item.id))
+      .join(",")}`;
+    const prev = prevRects.current;
+    const changed = prevSig.current !== "" && prevSig.current !== sig;
+    prevSig.current = sig;
+    prevRects.current = now;
+    if (!changed || !prev) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    // Invert — snap every persistent tile back to where it just was.
+    for (const el of els) {
+      const id = el.dataset.gid;
+      if (!id) continue;
+      const nr = now.get(id);
+      if (!nr) continue;
+      el.style.transition = "none";
+      const pr = prev.get(id);
+      if (pr && (pr.left !== nr.left || pr.top !== nr.top)) {
+        el.style.transform =
+          `translate(${pr.left - nr.left}px, ${pr.top - nr.top}px)`;
+        el.style.willChange = "transform";
+      } else if (!pr) {
+        el.style.opacity = "0"; // brand-new tile — fade it in
+      }
+    }
+
+    // Play — release everything to rest on the next frames.
+    grid.style.pointerEvents = "none";
+    if (animTimer.current) clearTimeout(animTimer.current);
+    animTimer.current = setTimeout(() => {
+      grid.style.pointerEvents = "";
+      for (const el of els) {
+        el.style.transition = "";
+        el.style.transform = "";
+        el.style.willChange = "";
+        el.style.opacity = "";
+      }
+    }, 480);
+    const raf = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        for (const el of els) {
+          const id = el.dataset.gid;
+          if (!id || !now.has(id)) continue;
+          el.style.transition =
+            "transform 420ms var(--ease), opacity 240ms ease";
+          el.style.transform = "";
+          el.style.opacity = "1";
+        }
+      }),
+    );
+    return () => cancelAnimationFrame(raf);
+  }, [flow, columns]);
+
+  // Clear a pending FLIP cleanup if the grid unmounts mid-animation.
+  useEffect(
+    () => () => {
+      if (animTimer.current) clearTimeout(animTimer.current);
+    },
+    [],
+  );
+
+  function sortTo(next: SortMode) {
+    if (next === "shuffle") setShuffleNonce((n) => n + 1);
+    // Each sort key carries its natural default direction: newest-first for
+    // dates, A→Z for places. The toggle then flips from there.
+    setDir(next === "place" ? "asc" : "desc");
+    setMode(next);
+  }
+
+  const chips = [
+    { key: "date" as const, label: s.gallery.byDate, icon: ArrowDownUp },
+    { key: "place" as const, label: s.gallery.byPlace, icon: MapPin },
+    { key: "shuffle" as const, label: s.gallery.shuffle, icon: Shuffle },
+  ];
+
+  const active = ordered[openIdx ?? -1];
+  const metaChip = active ? photoMeta(active, lang) : null;
+
+  /** Open a tile: capture its rect for the shared-element animation, set the
+   * overlay's box synchronously (no stacked-layout flash on wide screens), and
+   * reset the per-session animation guards. */
+  const openAt = (index: number) => {
+    const item = ordered[index];
+    const tile = item
+      ? (document.querySelector(`[data-gid="${CSS.escape(item.id)}"]`) as
+          | HTMLElement
+          | null)
+      : null;
+    const r = tile?.getBoundingClientRect();
+    tileRect.current = r
+      ? { x: r.x, y: r.y, w: r.width, h: r.height }
+      : null;
+    triggerRef.current = tile;
+    closingRef.current = false;
+    panelStarted.current = false;
+    setClosing(false);
+    const pad = window.innerWidth >= 640 ? 24 : 12;
+    setBox({
+      w: Math.max(0, window.innerWidth - pad * 2),
+      h: Math.max(0, window.innerHeight - pad * 2),
+    });
+    setOpenIdx(index);
+  };
+
+  /**
+   * Close with a shared-element collapse: shrink the panel back onto the
+   * thumbnail it opened from (and fade the overlay), then unmount after the
+   * transition. Reached from the Close button, the backdrop (click-any-blank)
+   * and Escape; arrow keys never call this.
+   */
+  const requestClose = useCallback(() => {
+    if (openIdx === null || closingRef.current) return;
+    closingRef.current = true;
+    setClosing(true);
+    const panel = dialogRef.current;
+    // Re-measure the trigger tile NOW instead of reusing the rect captured at
+    // open time: the tile was hovered when clicked (its hover lift shifts
+    // the rect up), and by close the pointer is over the overlay, so the
+    // resting rect is the correct collapse target — reusing the stale one made
+    // the panel land ~4px high and pop on unmount.
+    const r = triggerRef.current?.getBoundingClientRect();
+    const T =
+      r && r.width > 0 && r.height > 0
+        ? { x: r.x, y: r.y, w: r.width, h: r.height }
+        : tileRect.current;
+    const unmount = () => {
+      // preventScroll: plain focus() scrolls a not-fully-visible tile into
+      // view (honouring scroll-padding-top) WHILE the scrollbar is hidden by
+      // the scroll lock — the viewport then sits at a different offset when
+      // the overlay unmounts, which reads as a vertical page jump on close.
+      triggerRef.current?.focus({ preventScroll: true });
+      setOpenIdx(null);
+    };
+    if (!panel || !T || T.w <= 0 || T.h <= 0) {
+      closeTimer.current = setTimeout(unmount, 180);
+      return;
+    }
+    const P = panel.getBoundingClientRect();
+    if (P.width === 0 || P.height === 0) {
+      unmount();
+      return;
+    }
+    const ox = T.x + T.w / 2 - P.x;
+    const oy = T.y + T.h / 2 - P.y;
+    const s = Math.max(0.02, Math.min(T.w / P.width, T.h / P.height));
+    panel.style.transformOrigin = `${ox}px ${oy}px`;
+    panel.style.transition = "transform 240ms var(--ease), opacity 190ms ease";
+    panel.style.transform = `scale(${s})`;
+    panel.style.opacity = "0";
+    closeTimer.current = setTimeout(unmount, 280);
+  }, [openIdx]);
+
+  const isOpen = openIdx !== null;
+
+  // Scroll-lock the page while the lightbox is open, WITHOUT the sideways
+  // jitter: hiding the scrollbar (`overflow:hidden`) on classic scrollbars
+  // widens the layout by the scrollbar width, so centred columns would
+  // recentre — a visible left/right shift when the box opens and again when
+  // the scrollbar returns at unmount. Reserving that same width as body
+  // padding-right keeps the page pixel-identical for the whole session. Keyed
+  // on the boolean (not openIdx) so ←/→ photo changes never re-run it.
+  useEffect(() => {
+    if (!isOpen) return;
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
+    const prevPadRight = body.style.paddingRight;
+    const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+    body.style.overflow = "hidden";
+    if (scrollbarW > 0) body.style.paddingRight = `${scrollbarW}px`;
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPadRight;
+    };
+  }, [isOpen]);
+
+  // While open: keep focus inside, and let Esc / arrow keys navigate. Esc (or
+  // any non-button click) animates out.
+  useEffect(() => {
+    if (openIdx === null) return;
+    dialogRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (closingRef.current) return;
+      if (e.key === "Escape") {
+        requestClose();
+      } else if (e.key === "ArrowRight") {
+        setOpenIdx((i) => (i === null ? i : (i + 1) % ordered.length));
+      } else if (e.key === "ArrowLeft") {
+        setOpenIdx((i) =>
+          i === null ? i : (i - 1 + ordered.length) % ordered.length,
+        );
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openIdx, ordered.length, requestClose]);
+
+  // Warm the cache for the current + both neighbour `large` images so arrow
+  // switching never waits on a decode; the only visible cost is the quick
+  // .gb-img-in fade on the keyed <img>.
+  useEffect(() => {
+    if (openIdx === null) return;
+    for (let k = -1; k <= 1; k += 1) {
+      const item = ordered[(openIdx + k + ordered.length) % ordered.length];
+      if (item?.large) {
+        const im = new Image();
+        im.decoding = "async";
+        im.src = item.large;
+      }
+    }
+  }, [openIdx, ordered]);
+
+  /**
+   * Shared-element open: expand the panel from the clicked thumbnail's rect.
+   * Runs once per open session (panelStarted); photo changes while open only
+   * fade the <img> (keyed remount → .gb-img-in), they never replay this.
+   * Set in a layout effect so the first painted frame is already scaled down.
+   */
+  useLayoutEffect(() => {
+    if (openIdx === null || panelStarted.current) return;
+    const panel = dialogRef.current;
+    const T = tileRect.current;
+    if (!panel || !T || T.w <= 0 || T.h <= 0) return;
+    const P = panel.getBoundingClientRect();
+    if (P.width === 0 || P.height === 0) return;
+    const ox = T.x + T.w / 2 - P.x;
+    const oy = T.y + T.h / 2 - P.y;
+    const s = Math.max(0.02, Math.min(T.w / P.width, T.h / P.height));
+    panel.style.transformOrigin = `${ox}px ${oy}px`;
+    panel.style.transition = "none";
+    panel.style.transform = `scale(${s})`;
+    panel.style.opacity = "0";
+    panelStarted.current = true;
+    const raf = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        panel.style.transition =
+          "transform 360ms var(--ease), opacity 200ms ease";
+        panel.style.transform = "scale(1)";
+        panel.style.opacity = "1";
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [openIdx]);
+
+  // Clear a pending close timer if the component unmounts mid-animation.
+  useEffect(
+    () => () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    },
+    [],
+  );
+
+  /* Two-pane geometry for the opened card. Keep the image bounded on large
+   * displays while leaving it aspect-fit, so arrows stay attached to a
+   * predictable image stage instead of the entire viewport. */
+  const wide = box.w >= LIGHTBOX_TWO_COL;
+  const railW = box.w >= 1040 ? CAPTION_RAIL_WIDE : CAPTION_RAIL_NARROW;
+  const imageMaxW = Math.max(
+    0,
+    Math.min(box.w - railW, LIGHTBOX_IMAGE_MAX_WIDTH, Math.round(box.w * 0.68)),
+  );
+  const fit =
+    active && wide
+      ? fitImage(
+          active,
+          imageMaxW,
+          Math.min(box.h, LIGHTBOX_IMAGE_MAX_HEIGHT),
+        )
+      : { imgW: 0, imgH: 0 };
+  const paneImage = fit.imgW > 0 && fit.imgH > 0 ? fit : null;
+
+  /** Photo metadata stays attached to the image stage as its aspect changes. */
+  const stageControls = () =>
+    active ? (
+      <>
+        {metaChip ? (
+          <span
+            aria-hidden
+            className="badge-text ui-text pointer-events-none absolute bottom-3 left-3 z-20 flex max-w-[75%] items-center gap-1 rounded-lg border border-white/20 bg-black/55 px-3 py-1.5 font-medium tracking-wide text-white/95 backdrop-blur-md tabular-nums"
+          >
+            <span className="min-w-0 truncate">{metaChip}</span>
+          </span>
+        ) : null}
+        <span
+          aria-hidden
+          className="badge-text ui-text pointer-events-none absolute right-3 bottom-3 z-20 rounded-full bg-black/45 px-3 py-1 font-medium tracking-wider text-white/90 backdrop-blur-md tabular-nums"
+        >
+          {(openIdx ?? 0) + 1} / {ordered.length}
+        </span>
+      </>
+    ) : null;
+
+  /**
+   * Close button of the opened card (2026-09-05 mobile review): lives INSIDE
+   * the image stage at the photo's top-right corner — on a phone the card
+   * spans nearly the full viewport, so a viewport-fixed ✕ visually fused with
+   * the card's corner while floating over the dimmed page behind it. Anchored
+   * to the stage it reads as part of the photo viewer (and rides the FLIP
+   * entrance with the panel). Rendered right after `stageControls()` in both
+   * branches; the stage chips are pointer-events-none, this one is interactive.
+   */
+  const closeButton = (
+    <button
+      type="button"
+      aria-label={s.gallery.close}
+      title={s.gallery.close}
+      onClick={requestClose}
+      className="absolute top-3 right-3 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/55 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+    >
+      <X className="h-5 w-5" aria-hidden />
+    </button>
+  );
+
+  /**
+   * Caption content of the opened card (both layouts). Redesigned 2026-09-05
+   * as an editorial "exhibition card" (user brief): the travel-stamp badge is
+   * now a large emblem / "seal" left-aligned at the top of the rail, the
+   * per-language `place` / `placeLocal` sit beneath as restrained
+   * theme-coloured metadata, the authored `title` is the big serif focal
+   * point, then `alt` reads as a boxed "Thoughts / 随想" card (2026-09-06
+   * user brief: thin border on a faint accent wash, first line is a small
+   * accent label with a graphic backtick glyph, the text flows italic
+   * beneath), followed by the location map. The download link (shown only
+   * when the row carries a hand-authored EXTERNAL `originalUrl` — the local
+   * original tier is no longer published, see `items.json` / `.gitignore`)
+   * becomes a full-width CTA that settles at the bottom of the
+   * rail on the two-pane layout (`pin`) while stacked/mobile content flows
+   * naturally. As before, the accent location block is withheld while `title`
+   * is empty — then the heading itself falls back to the place line, so the
+   * two would just duplicate. `alt` is deliberately a SINGLE language-neutral
+   * caption (2026-09-05) — shown verbatim in both languages, never translated.
+   * The month/country/coords line lives in the frosted chip over the image
+   * instead.
+   */
+  const captionContent = (item: GalleryItem, pin: boolean) => {
+    const title = pick(item.title, lang);
+    const hasTitle = title.length > 0;
+    const place = pick(item.place, lang);
+    const spot = pick(item.placeLocal, lang);
+    const altText = item.alt.trim();
+    const heading =
+      "font-serif font-bold text-ink break-words " +
+      (pin
+        ? "text-[1.65rem] leading-[1.2]"
+        : "text-[1.8rem] leading-[1.18] sm:text-[2rem]");
+    // Metadata only beside an authored title (else it would duplicate the
+    // heading's own place fallback); each line shown when it has content.
+    const meta = hasTitle && Boolean(place || spot);
+    return (
+      <div
+        className={pin ? "flex w-full flex-1 flex-col" : "flex w-full flex-col"}
+      >
+        {/* Emblem — the entry's "seal": the stamp enlarged to ~40% of the rail
+            content width, square, on the faint theme tint. Left-aligned at the
+            top to sit flush with the metadata / title below; no heavy card. */}
+        <div className="flex w-full">
+          <StampBadge
+            preset={item.badge}
+            box="aspect-square w-[clamp(5rem,40%,7.5rem)] rounded-2xl"
+            mark="h-full w-full"
+          />
+        </div>
+
+        {meta ? (
+          <div className="mt-7">
+            {place ? (
+              <p className="ui-text text-[11.5px] font-bold uppercase tracking-[0.16em] text-[var(--tile-accent)]">
+                {place}
+              </p>
+            ) : null}
+            {spot && spot !== place ? (
+              <p className="ui-text mt-1 text-xs font-semibold text-[var(--tile-accent)] opacity-75">
+                {spot}
+              </p>
+            ) : null}
+            <h2 className={`${heading} mt-4`}>{bigTitle(item, lang)}</h2>
+          </div>
+        ) : (
+          <h2 className={`${heading} mt-7`}>{bigTitle(item, lang)}</h2>
+        )}
+
+        {/* Alt quote — boxed "Thoughts" card (2026-09-06 user brief), now
+            between the title block and the location map. A thin bordered
+            frame on a faint accent wash; line 1 is the small accent label
+            (a graphic backtick glyph + "Thoughts" / "随想"), the authored
+            alt text flows italic beneath it. Hidden while empty. */}
+        {altText ? (
+          <figure className="mt-7 rounded-xl border border-line bg-[var(--tile-soft)]/45 px-5 py-4">
+            <figcaption className="ui-text flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] text-[var(--tile-accent)] uppercase">
+              {/* Material Icons "format_quote" (filled, Apache 2.0) —
+                  reproduces the user's reference sample exactly; inlined as
+                  raw SVG instead of loading the icon font. Inherits the
+                  accent colour via currentColor. */}
+              <svg
+                aria-hidden
+                viewBox="0 0 24 24"
+                className="h-[18px] w-[18px]"
+                fill="currentColor"
+              >
+                <path d="M7.17 17c.51 0 .98-.29 1.2-.74l1.42-2.84c.14-.28.21-.58.21-.89V8c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h2.5l-1.46 2.93c-.32.63.14 1.37.84 1.37H7.17zM17.17 17c.51 0 .98-.29 1.2-.74l1.42-2.84c.14-.28.21-.58.21-.89V8c0-.55-.45-1-1-1h-5c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h2.5l-1.46 2.93c-.32.63.14 1.37.84 1.37h1.29z" />
+              </svg>
+              {lang === "zh" ? "随想" : "Thoughts"}
+            </figcaption>
+            <blockquote className="mt-2.5">
+              <p className="font-serif text-[15px] leading-relaxed text-muted italic">
+                {altText}
+              </p>
+            </blockquote>
+          </figure>
+        ) : null}
+
+        {/* Location map — follows the quote box: a subtle world outline with
+            one breathing dot at the capture point. Decorative (aria-hidden
+            inside); place/date lines carry the info. */}
+        <div className="mt-7">
+          <WorldLocationMap lat={item.lat} lon={item.lon} />
+        </div>
+
+        {item.originalUrl ? (
+          <div className={pin ? "mt-auto pt-8" : "mt-7"}>
+            {/* download attribute: a same-origin url saves straight to disk
+                with the camera filename (IMG_xxxx.jpeg) instead of opening in
+                a tab; browsers ignore it for cross-origin urls, where
+                target=_blank is the behaviour (the normal case now that
+                originalUrl is external-only). */}
+            <a
+              href={item.originalUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              download={item.source}
+              className="ui-text inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-on-brand shadow-sm transition hover:bg-brand-strong hover:no-underline"
+            >
+              <Download className="h-4 w-4" aria-hidden />
+              {s.gallery.downloadOriginal}
+            </a>
+          </div>
+        ) : null}
+      </div>
+    );
+  };
+
+  const body = (
+    <div className="mx-auto max-w-5xl">
+        {!embedded && (
+        <>
+        {/* ---- Header / intro ---- */}
+        {/* pt-2 sm:pt-4 keeps the § title row aligned with every other page's
+            header (PageHeader / blog / CV use the same top padding; Task D #3). */}
+        <header className="flex flex-col justify-between gap-6 pt-2 pb-8 sm:pt-4 md:flex-row md:items-end">
+          <div className="max-w-2xl space-y-3">
+            <h1 className="flex items-center gap-3 text-balance text-4xl tracking-tight sm:text-5xl">
+              <span
+                aria-hidden
+                className="font-serif text-xl italic font-normal leading-none text-brand"
+              >
+                §
+              </span>
+              {s.gallery.title}
+            </h1>
+            <p className="text-[1.05rem] leading-relaxed text-muted">
+              {s.gallery.lead}
+            </p>
+          </div>
+
+          {/* Census tile */}
+          <div className="flex shrink-0 items-center gap-4 self-start rounded-xl border border-line bg-surface p-4 shadow-sm md:self-auto">
+            <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-surface-sink text-brand">
+              <Camera className="h-6 w-6" aria-hidden />
+            </span>
+            <div className="flex flex-col">
+              <span className="ui-text text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
+                {s.gallery.statLabel}
+              </span>
+              <span className="font-serif text-2xl font-bold leading-tight text-ink">
+                {items.length}
+                <span className="ml-1.5 text-base font-medium text-muted">
+                  {unit}
+                </span>
+              </span>
+            </div>
+          </div>
+        </header>
+        </>
+        )}
+
+        {/* ---- Sort strip + column chooser ---- */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border border-line bg-surface-tint px-4 py-3">
+          {/* Curated PIN (精选集) — pinned to the very front of the strip.
+              Since 2026-10-25 this no longer filters the wall down to the
+              featured frames: it partitions the order so favourites lead and
+              everything else follows (see `ordered`). aria-pressed therefore
+              describes "the pin is on", not "a subset is being shown".
+              The accent follows the same rule as the tiles — featured = orange. */}
+          <button
+            type="button"
+            onClick={() => setFeaturedFirst((v) => !v)}
+            aria-pressed={featuredFirst}
+            className={[
+              "ui-text inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors hover:no-underline",
+              featuredFirst
+                ? "border-[var(--curated)] bg-[var(--curated-soft)] text-[var(--curated)]"
+                : "border-line bg-surface text-muted shadow-sm hover:bg-surface-tint hover:text-ink",
+            ].join(" ")}
+          >
+            <Star
+              className="h-3.5 w-3.5"
+              aria-hidden
+              fill={featuredFirst ? "currentColor" : "none"}
+            />
+            {s.gallery.featured}
+          </button>
+
+          {/* v14 (2026-09-28 user request): the SORT/排序 word removed — the
+              bare chips can't drift out of alignment with Featured above. */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {chips.map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => sortTo(key)}
+                  aria-pressed={mode === key}
+                  className={[
+                    "ui-text inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors hover:no-underline",
+                    mode === key
+                      ? "border-brand/30 bg-brand text-on-brand"
+                      : "border-line bg-surface text-muted shadow-sm hover:bg-surface-tint hover:text-ink",
+                  ].join(" ")}
+                >
+                  <Icon className="h-3.5 w-3.5" aria-hidden />
+                  {label}
+                </button>
+              ))}
+              {/* Dimension divider (2026-09-26 user request): the sort KEY
+                  (date/place/shuffle) and the DIRECTION (newest/oldest first)
+                  are two separate axes — a hairline separates them so the
+                  direction toggle reads as its own control group, not a
+                  fourth sort key. */}
+              {mode !== "shuffle" ? (
+                <span
+                  aria-hidden
+                  className="mx-0.5 hidden h-5 w-px shrink-0 bg-line sm:block"
+                />
+              ) : null}
+              {/* Direction toggle (date/place only — shuffle has no order).
+                  Icon + label mirror the current direction; place uses the
+                  neutral A→Z / Z→A shorthand.
+                  v13 (2026-09-28 user report): when the sort KEY switched
+                  (bydate ↔ shuffle), this button mounted/unmounted inside the
+                  same flex-wrap as the chips, so the wrap point drifted and
+                  the cell "ran around". Below sm it now always owns the LAST
+                  full-width row (w-full): switching to shuffle removes the
+                  whole row and nothing else moves. sm:contents dissolves the
+                  wrapper so desktop keeps the original inline layout. */}
+              {mode !== "shuffle" ? (
+                <div className="flex w-full items-center gap-2 sm:contents">
+                  <span
+                    aria-hidden
+                    className="mx-0.5 hidden h-5 w-px shrink-0 bg-line sm:block"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setDir((d) => (d === "desc" ? "asc" : "desc"))}
+                    aria-label={s.gallery.sortDir}
+                    title={s.gallery.sortDir}
+                    className="ui-text inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted shadow-sm transition-colors hover:text-ink"
+                  >
+                    {dir === "desc" ? (
+                      <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden />
+                    ) : (
+                      <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden />
+                    )}
+                    <span className="text-xs font-semibold">
+                      {mode === "place"
+                        ? dir === "asc"
+                          ? "A→Z"
+                          : "Z→A"
+                        : dir === "desc"
+                          ? s.gallery.dirNew
+                          : s.gallery.dirOld}
+                    </span>
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          {/* Column count: 3 / 4 / 5, default 4 (buttons that cannot fit are
+              dimmed). Mobile-only decision 2026-09-05: hidden below md — the
+              width clamp alone decides 1/2 columns there, freeing the strip's
+              right side for the sort controls. Desktop keeps manual control. */}
+          <div className="ml-auto hidden items-center gap-2.5 md:flex">
+            <span className="ui-text hidden items-center gap-1.5 text-xs font-medium uppercase tracking-widest text-muted sm:inline-flex">
+              <LayoutGrid className="h-3.5 w-3.5 text-brand" aria-hidden />
+              {s.gallery.columns}
+            </span>
+            <div
+              role="group"
+              aria-label={s.gallery.columns}
+              className="flex items-center gap-0.5 rounded-full border border-line bg-surface p-0.5 shadow-sm"
+            >
+              {COLUMN_CHOICES.map((n) => {
+                // A choice is unselectable only when the container literally
+                // cannot fit that many MIN_TILE-wide columns right now.
+                const disabled = containerW > 0 && n > fits;
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setPrefCols(n)}
+                    disabled={disabled}
+                    aria-pressed={columns === n}
+                    className={[
+                      "ui-text inline-flex h-6.5 min-w-[26px] items-center justify-center rounded-full px-1.5 text-xs font-semibold tabular-nums transition-colors",
+                      columns === n
+                        ? "bg-brand text-on-brand"
+                        : disabled
+                          ? "cursor-not-allowed text-faint"
+                          : "text-muted hover:bg-surface-sink hover:text-ink",
+                    ].join(" ")}
+                  >
+                    {n}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* ---- Masonry grid (explicit columns); story cards lead the flow,
+            then the photos. Since 2026-10-25 the featured chip is a PIN, not a
+            filter, so this empty state can only mean "there are no photos at
+            all" — it no longer fires just because nothing is featured. ---- */}
+        {visible.length === 0 && storyTiles.length === 0 ? (
+          <div className="mt-8 flex items-center justify-center rounded-xl border border-dashed border-line bg-surface-tint/60 px-6 py-14 text-center">
+            <p className="ui-text max-w-md text-sm leading-relaxed text-muted">
+              {s.gallery.featuredEmpty}
+            </p>
+          </div>
+        ) : (
+          <div ref={gridRef} className="mt-8 flex items-start gap-3">
+            {columnList.map((col, ci) => (
+              <div key={ci} className="flex min-w-0 flex-1 flex-col gap-3">
+                {col.map((entry) =>
+                  entry.kind === "story" ? (
+                    <StoryTile key={entry.story.id} story={entry.story} onLeave={rememberView} />
+                  ) : (
+                    <GalleryTile
+                      key={entry.item.id}
+                      item={entry.item}
+                      lang={lang}
+                      onOpen={() => openAt(entry.photoIndex)}
+                    />
+                  ),
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ---- Colophon / storage note (page mode only) ---- */}
+        {!embedded && (
+        <div className="mt-8 flex items-start gap-3.5 rounded-xl border border-line bg-surface-tint p-5">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand text-on-brand">
+            <Camera className="h-5 w-5" aria-hidden />
+          </span>
+          <p className="ui-text pt-1 text-sm leading-relaxed text-muted">
+            {s.gallery.note}
+          </p>
+        </div>
+        )}
+
+        {/* ---- Lightbox ----
+            Portalled to <body> (same trick as the blog TOC): rendered inline
+            it lives inside <main>'s `relative z-10` stacking context, so even
+            at z-50 the whole overlay painted BELOW the sticky z-40 capsule
+            nav — on mobile the photo's top edge was covered by the nav bar.
+            Outside of main it also stays clear of the route-fade transform. */}
+        {openIdx !== null && active
+          ? createPortal(
+              <div
+            ref={overlayRef}
+            className={
+              (closing ? "gb-overlay-out " : "gb-overlay-in ") +
+              "fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-3 sm:p-6"
+            }
+            role="presentation"
+            onClick={(e) => {
+              // Clicking ANY non-interactive surface closes the lightbox — the
+              // backdrop, the photo, the caption, the image stage… only actual
+              // controls (Close button, download link) are exempt, and they
+              // close/navigate through their own handlers.
+              if (closingRef.current) return;
+              const t = e.target as HTMLElement;
+              if (t.closest("button, a, [role='button'], input, select, textarea, label, summary")) {
+                return;
+              }
+              requestClose();
+            }}
+          >
+            {/* Frosted dim behind everything (no own handler — the overlay
+                root's non-button click close covers it). */}
+            <div
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              aria-hidden
+            />
+
+            {wide && paneImage ? (
+              /* Desktop / two-pane: the left image column is EXACTLY as large as
+                 the fitted photo (paneImage hugs the photo's own aspect), so a
+                 portrait renders tall with no black side margins; the caption
+                 lives in a fixed-width rail on the right. The card takes the
+                 natural height of whichever pane is taller — the equal-height
+                 rule was dropped with this change (2026-09-04). Panel entrance
+                 (expand from the clicked thumbnail) is driven by inline FLIP
+                 styles from the useLayoutEffect above, not a CSS animation. */
+              <figure
+                ref={dialogRef}
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-label={s.gallery.title}
+                className="relative z-10 flex rounded-2xl border border-line bg-surface text-ink shadow-2xl outline-none"
+                style={{ width: paneImage.imgW + railW }}
+              >
+                <div
+                  className="relative flex-none self-center overflow-hidden bg-black/95"
+                  style={{ width: paneImage.imgW, height: paneImage.imgH }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    key={active.id}
+                    src={active.large}
+                    alt={active.alt.trim() || describe(active, lang)}
+                  className="gb-img-in block h-full w-full select-none"
+                />
+                {stageControls()}
+                {closeButton}
+              </div>
+                <aside
+                  style={{
+                    ...accentVars(active),
+                    width: railW,
+                    maxHeight: box.h,
+                  }}
+                  className="
+                    flex
+                    min-h-0
+                    flex-col
+                    overflow-y-auto
+                    bg-surface
+                    px-8
+                    py-7
+                  "
+                >
+                  {captionContent(active, true)}
+                </aside>
+              </figure>
+            ) : (
+              /* Narrow / stacked fallback (below LIGHTBOX_TWO_COL px): image over
+                 the caption as before, but the card has no fixed height and tall
+                 content is reached by scrolling the overlay itself. */
+              <figure
+                ref={dialogRef}
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-label={s.gallery.title}
+                className="relative z-10 flex h-[min(90vh,880px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-line bg-surface text-ink shadow-2xl outline-none"
+              >
+                <div className="relative flex h-[min(52vh,540px)] flex-none items-center justify-center overflow-hidden bg-black/95">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    key={active.id}
+                    src={active.large}
+                    alt={active.alt.trim() || describe(active, lang)}
+                    className="gb-img-in h-full w-full object-contain select-none"
+                  />
+                  {stageControls()}
+                  {closeButton}
+                </div>
+                <div
+                  style={accentVars(active)}
+                  className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-surface p-6 md:p-8"
+                >
+                  {captionContent(active, false)}
+                </div>
+              </figure>
+            )}
+              </div>,
+              document.body,
+            )
+          : null}
+    </div>
+  );
+  return embedded ? (
+    body
+  ) : (
+    <section className="shell pb-20">{body}</section>
+  );
+}
+
+/**
+ * Main heading of the opened card: the per-language `title`. Until the user
+ * writes one it falls back to the place line, then to the month-year.
+ */
+function bigTitle(item: GalleryItem, lang: Lang): string {
+  const title = pick(item.title, lang);
+  if (title) return title;
+  const place = locText(item, lang);
+  if (place) return place;
+  return formatYearMonth(item.date, lang);
+}
+
+/**
+ * Frosted chip text over the lightbox image: year-month · country code ·
+ * coordinates (each piece only when present). Returns "" when there is nothing
+ * to show so the caller can omit the chip entirely.
+ */
+function photoMeta(item: GalleryItem, lang: Lang): string {
+  const when = formatYearMonth(item.date, lang);
+  const cc = item.country_code.trim();
+  const coord = coordsLine(item);
+  return [when, cc, coord].filter(Boolean).join(" · ");
+}
+
+/**
+ * Tinted square chip that hosts a photo's travel-stamp badge — small on the
+ * masonry hover card, large as the caption rail's emblem/seal. Colour comes
+ * from the --tile-accent / --tile-soft CSS vars set by the nearest accentVars.
+ * The caller supplies the full box geometry (size + rounding) so the same
+ * component scales from h-7 tile chip to the ~40%-of-rail emblem.
+ *
+ * Since 2026-09-06 the badge SVG itself carries the two-ring frame (inlined
+ * from badge-frame.svg at build time), so no CSS rings are drawn here and the
+ * mark fills the whole box — the frame's own r=45 leaves the margin.
+ */
+function StampBadge({
+  preset,
+  box,
+  mark,
+}: {
+  preset: string;
+  box: string;
+  mark: string;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={
+        "relative flex shrink-0 items-center justify-center bg-[var(--tile-soft)] text-[var(--tile-accent)] " +
+        box
+      }
+    >
+      <TravelStamp preset={preset} className={mark} />
+    </span>
+  );
+}
+
+/**
+ * Decorative one-dot location map shown in the open card's caption between the
+ * title and the alt quote. Minimal world outline (external asset, as-is) with
+ * EXACTLY ONE breathing marker at the photo's capture point — no pins, labels,
+ * grid, zoom or controls, and no map library. Purely decorative: place / date
+ * carry the information, so the whole block is aria-hidden.
+ *
+ * The dot is a <circle> in an overlay <svg> that shares the sheet's viewBox, so
+ * it is placed at the RAW projected x/y (projectToWorldMap) — SVG children
+ * already use the sheet's user coordinate system, no viewBox-origin arithmetic.
+ * The overlay box always matches the <img>'s rendered box (same aspect ratio),
+ * so the marker lands exactly on the geographic point at any size. Marker
+ * colour is the card accent via --tile-accent (set on the caption rail). The
+ * halo only animates when motion is allowed; its resting state is opacity 0, so
+ * under prefers-reduced-motion (or before the first tick) it is simply a static
+ * dot. Missing / non-finite / off-sheet coords render the map without a marker.
+ */
+function WorldLocationMap({
+  lat,
+  lon,
+}: {
+  lat: number | null;
+  lon: number | null;
+}) {
+  const pt =
+    lat !== null && lon !== null ? projectToWorldMap(lat, lon) : null;
+  return (
+    <div
+      aria-hidden
+      className="world-map pointer-events-none mx-auto w-[88%] select-none"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={WORLD_MAP_SRC}
+        alt=""
+        draggable={false}
+        className="world-map-img block w-full"
+      />
+      {pt ? (
+        <svg
+          className="world-map-marker"
+          viewBox={`${WORLD_VB.x} ${WORLD_VB.y} ${WORLD_VB.w} ${WORLD_VB.h}`}
+          focusable="false"
+        >
+          <circle className="world-map-halo" cx={pt.x} cy={pt.y} r={11} />
+          <circle className="world-map-core" cx={pt.x} cy={pt.y} r={11} />
+        </svg>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * A story card in the masonry flow (2026-09-25, travel hub): an image-less
+ * typographic card (user decision — "一眼就能看出这不是照片") on the tinted
+ * surface with the site's serif title language. The 4/5 aspect keeps its
+ * masonry footprint in rhythm with the surrounding photo tiles. Same tile
+ * shell (rounded-xl, hover lift) as GalleryTile, but an <a> that navigates to
+ * the post instead of opening the lightbox.
+ */
+/**
+ * One non-photo story card (2026-09-26 v2). Basic metainfo only — the
+ * explanatory excerpt is gone (user request); what remains is index numeral
+ * (+ optional "latest post" tag cell), serif title, badge, place chips, stat
+ * line and CTA. Hover mirrors the home gateway cards: a cover photo (when the
+ * host provides one) is uncovered by a clip-path circle anchored at the
+ * card's bottom-right corner, under a surface veil that keeps the type
+ * readable. Click plays the gateway's "launching" confirmation — the card
+ * settles (scale 0.985) and the CTA arrow nudges — before navigation.
+ */
+function StoryTile({ story, onLeave }: { story: GalleryStoryTile; onLeave: () => void }) {
+  const router = useRouter();
+  const { ref, onClick, onPointerMove, onPointerDown, onFocus } = useCardLaunch({
+    delay: 320,
+    navigate: () => {
+      onLeave();
+      if (story.travelLog) beginTravelEntry();
+      router.push(story.href);
+    },
+    resetHoverOnReturn: true,
+  });
+  return (
+    <Link
+      ref={ref}
+      href={story.href}
+      data-gid={story.id}
+      onClick={onClick}
+      onPointerMove={onPointerMove}
+      onPointerDown={onPointerDown}
+      onFocus={onFocus}
+      className="story-tile no-underline hover:no-underline relative flex aspect-[4/5] w-full flex-col overflow-hidden rounded-xl border border-line bg-surface-tint p-4 text-left shadow-sm transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:p-5"
+    >
+      {/* Hover circle-reveal cover (home gateway effect, 2026-09-26). Sits
+          under the type; the veil keeps the card readable while open. */}
+      {story.cover ? (
+        <span aria-hidden className="story-orb">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={story.cover}
+            alt=""
+            style={story.coverPos ? { objectPosition: story.coverPos } : undefined}
+          />
+          <span className="story-orb-veil" />
+        </span>
+      ) : null}
+
+      {story.pinned && story.showPinnedBadge ? (
+        <span
+          aria-hidden
+          className="absolute right-3.5 top-3.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft text-brand sm:right-4 sm:top-4"
+        >
+          <Pin size={13} strokeWidth={2.5} />
+        </span>
+      ) : null}
+
+      {story.index ? (
+        <span className="z-10 flex items-start gap-2">
+          <span
+            aria-hidden
+            className="font-serif text-3xl leading-none text-brand/45"
+          >
+            {story.index}
+          </span>
+          {story.latest ? (
+            <span
+              data-latest
+              className="badge-pill badge-text-sm ui-text mt-0.5 rounded-full border border-brand/30 bg-brand-soft font-bold uppercase tracking-wider text-brand"
+            >
+              {story.latest}
+            </span>
+          ) : null}
+        </span>
+      ) : null}
+
+      {/* No text/icon hover effects (user 2026-09-27): hovering a story tile
+          only plays the .story-orb background reveal — the type stays put. */}
+      <span className="z-10 mt-2 line-clamp-2 font-serif text-lg font-semibold leading-snug text-ink">
+        {story.title}
+      </span>
+
+      {story.badge ? (
+        <span className="badge-pill badge-text-sm ui-text z-10 mt-2.5 self-start rounded-full bg-brand-soft font-bold uppercase tracking-wider text-brand">
+          {story.badge}
+        </span>
+      ) : null}
+
+      {/* v13 (2026-09-28 user pick: 极简): below sm the tile keeps only the
+          index + title + badges — the chips / facts / meta / CTA stack was
+          unreadable clutter at two-column widths. Desktop is unchanged. */}
+      {story.tags?.length ? (
+        <span className="z-10 mt-3 hidden flex-wrap gap-1.5 sm:flex">
+          {story.tags.map((t) => (
+            <span
+              key={t}
+              className="badge-pill badge-text rounded-full border border-line bg-surface font-medium text-muted"
+            >
+              {t}
+            </span>
+          ))}
+        </span>
+      ) : null}
+
+      <span className="z-10 mt-auto">
+        {story.facts?.length ? (
+          <span className="mb-1.5 hidden border-t border-line pt-2 text-[10.5px] font-medium tabular-nums text-muted sm:block">
+            {story.facts.join(" · ")}
+          </span>
+        ) : null}
+        <span className="hidden truncate text-xs text-muted sm:block">{story.meta}</span>
+        {story.cta ? (
+          <span className="mt-1.5 hidden items-center gap-1 text-sm font-medium text-brand sm:inline-flex">
+            {story.cta}
+            <span aria-hidden>→</span>
+          </span>
+        ) : null}
+      </span>
+
+      {/* Launch stamp (user 2026-09-28, mirrors the home navigation pane):
+          while .is-launching holds the click for one beat, a brand circle
+          pops in around a drawn right arrow — visible "click registered"
+          proof before the page navigates. Animation lives in globals.css
+          (reuses the gateway's gw-stamp-pop / gw-arrow-draw keyframes). */}
+      <span aria-hidden className="gateway-stamp">
+        <span className="gateway-stamp-chip h-14 w-14 bg-brand-soft text-brand">
+          <ArrowRight className="h-7 w-7" strokeWidth={2.5} />
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+/**
+ * One masonry tile. At rest a thin frosted-glass bar floats over the frame's
+ * lower edge: a theme-coloured dot + per-language place · YYYY.MM. On hover the
+ * frame zooms, the bottom gradient deepens, the whole tile lifts, and the bar
+ * morphs into a themed card (bg-surface, so it follows light/dark — Task D #7):
+ * travel-stamp badge + theme-coloured place title + muted placeLocal line, a
+ * divider, then a relative date — "N days ago" once mounted (left) ·
+ * coordinates (right). The card reveal grows to its own height (grid-rows
+ * 0fr→1fr), so short and long captions both animate smoothly. The scoped
+ * gallery-hover.css owns the 280ms reveal / 200ms return, delayed text fade
+ * and restrained image/lift motion, shared by hover and keyboard focus.
+ */
+function GalleryTile({
+  item,
+  lang,
+  onOpen,
+}: {
+  item: GalleryItem;
+  lang: Lang;
+  onOpen: () => void;
+}) {
+  const ym = formatYearMonth(item.date, lang);
+  const place = pick(item.place, lang);
+  const spot = pick(item.placeLocal, lang);
+  const base = place || spot; // what the resting bar + accent title show
+  const big = base || ym;
+  const sub = spot && spot !== base ? spot : ""; // grey placeLocal line
+  const rest = base ? `${base} · ${formatDotMonth(item.date)}` : ym;
+  const coord = coordsLine(item);
+
+  // Hover-card time flips from the absolute month-year to a client-computed
+  // "N days ago" (Task D #7). `client` flips true only after hydration (this
+  // uses useSyncExternalStore so there is no set-state-in-effect), keeping the
+  // first client render identical to the SSG HTML and avoiding a mismatch.
+  const client = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const ago = daysAgoLabel(item.date, lang);
+  const when = client && ago ? ago : ym;
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      data-gid={item.id}
+      style={accentVars(item)}
+      aria-label={item.alt.trim() || describe(item, lang)}
+      className="gallery-photo-tile relative block w-full overflow-hidden rounded-xl border border-line bg-surface text-left shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+    >
+      <div className="relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={item.thumb}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          width={item.width}
+          height={item.height}
+          style={{ aspectRatio: `${item.width} / ${item.height}` }}
+          className="gallery-photo-image block h-auto w-full"
+        />
+
+        {/* Bottom gradient deepens on hover */}
+        <div
+          aria-hidden
+          className="gallery-photo-shade pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
+        />
+
+        {/* Caption: frosted bar (rest) morphs into the white card (hover).
+            Two stacked rows, each animating its own grid height: rest 1fr→0fr
+            as the detail 0fr→1fr grows into place. */}
+        <div
+          aria-hidden
+          className="gallery-photo-caption pointer-events-none absolute inset-x-2 bottom-2 z-10 overflow-hidden rounded-lg border border-white/15 bg-black/45 shadow-sm backdrop-blur-md"
+        >
+          {/* Resting frosted line */}
+          <div className="gallery-photo-rest">
+            <div className="min-h-0 overflow-hidden">
+              <div className="gallery-photo-rest-text flex h-8 items-center justify-between gap-2 px-2.5 whitespace-nowrap sm:px-3">
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span
+                    aria-hidden
+                    className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--tile-accent)]"
+                  />
+                  <span className="truncate text-[11px] font-medium tracking-wide text-white/95">
+                    {rest}
+                  </span>
+                </span>
+                <ChevronUp
+                  className="h-3.5 w-3.5 shrink-0 text-white/70"
+                  aria-hidden
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Hover white card detail */}
+          <div className="gallery-photo-detail">
+            <div className="min-h-0 overflow-hidden">
+              <div className="gallery-photo-detail-text flex flex-col px-2.5 py-2 sm:px-3 sm:py-2.5">
+                <div className="flex items-start gap-2">
+                  <StampBadge
+                    preset={item.badge}
+                    box="mt-0.5 h-7 w-7 rounded-md"
+                    mark="h-full w-full"
+                  />
+                  <div className="min-w-0">
+                    <p className="font-serif line-clamp-2 text-[13px] leading-snug font-bold text-[var(--tile-accent)]">
+                      {big}
+                    </p>
+                    {sub ? (
+                      <p className="mt-0.5 truncate text-[10.5px] font-medium text-muted">
+                        {sub}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="mt-1.5 flex items-center justify-between gap-3 border-t border-line pt-1">
+                  <span className="text-[10.5px] font-semibold text-ink tabular-nums">
+                    {when}
+                  </span>
+                  {coord ? (
+                    <span className="truncate text-[10px] tracking-wide text-muted/80 tabular-nums">
+                      {coord}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+}

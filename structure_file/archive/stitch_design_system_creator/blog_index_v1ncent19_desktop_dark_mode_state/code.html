@@ -1,0 +1,426 @@
+<!DOCTYPE html><html class="scroll-smooth dark" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Serif+SC:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Noto+Serif:ital,wght@0,400;0,500;0,600;1,400&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}#nav-drawer:checked ~ #drawer-backdrop{display:block;}#nav-drawer:checked ~ #drawer-panel{transform:translateX(0);}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary-fixed": "#9cf2e8", "error-container": "#93000a", "on-primary-fixed": "#001551", "inverse-primary": "#0037b0", "error": "#ffb4ab", "surface": "#0a1016", "surface-container-low": "#0e1720", "inverse-surface": "#f0f3ff", "surface-bright": "#162330", "secondary": "#4ed8c7", "primary-fixed": "#dce1ff", "inverse-on-surface": "#111c2d", "surface-container": "#131d27", "on-tertiary-container": "#ffdcc5", "surface-container-high": "#182430", "on-tertiary-fixed": "#331200", "on-secondary": "#003733", "surface-variant": "#1c2a38", "tertiary-container": "#ffb076", "surface-container-lowest": "#060b0f", "outline": "#4d6275", "tertiary": "#ffb882", "surface-dim": "#080d12", "tertiary-fixed": "#ffdbca", "primary-container": "#0047b3", "surface-tint": "#3ccfff", "background": "#0a1016", "primary": "#3ccfff", "on-primary": "#002b55", "on-primary-container": "#d9e2ff", "primary-fixed-dim": "#b7c4ff", "on-background": "#e8f1f8", "on-secondary-container": "#00201d", "on-primary-fixed-variant": "#0039b5", "on-tertiary": "#4a1e00", "outline-variant": "#233547", "secondary-container": "#00504a", "on-error": "#690005", "on-secondary-fixed-variant": "#00504a", "secondary-fixed-dim": "#80d5cb", "on-tertiary-fixed-variant": "#763300", "on-surface": "#e8f1f8", "on-error-container": "#ffdad6", "on-secondary-fixed": "#00201d", "tertiary-fixed-dim": "#ffb68e", "surface-container-highest": "#1f2f3e", "on-surface-variant": "#8fa4b8" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "section-gap": "3.5rem", "container-max": "54rem", "gutter-sm": "0.5rem", "gutter-md": "1rem", "gutter-lg": "1.5rem", "gutter-xl": "2rem", "gutter-xs": "0.25rem", "container-reading": "42rem" }, "fontFamily": { "label-md": ["Inter", "sans-serif"], "label-sm": ["Inter", "sans-serif"], "label": ["Inter", "sans-serif"], "display": ["Noto Serif", "Noto Serif SC", "serif"], "headline-sm": ["Noto Serif", "Noto Serif SC", "serif"], "body-lg": ["Source Serif 4", "Noto Serif SC", "serif"], "stamp-badge": ["Inter", "monospace"], "body-md": ["Source Serif 4", "Noto Serif SC", "serif"], "body-sm": ["Source Serif 4", "Noto Serif SC", "serif"], "body": ["Source Serif 4", "Noto Serif SC", "serif"], "headline-lg": ["Noto Serif", "Noto Serif SC", "serif"], "headline-md": ["Noto Serif", "Noto Serif SC", "serif"], "headline-lg-mobile": ["Noto Serif", "Noto Serif SC", "serif"] }, "fontSize": { "label-md": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0.02em", "fontWeight": "500" }], "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.05em", "fontWeight": "600" }], "display": ["2.5rem", { "lineHeight": "3rem", "letterSpacing": "-0.02em", "fontWeight": "600" }], "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "0", "fontWeight": "500" }], "body-lg": ["1.125rem", { "lineHeight": "1.875rem", "letterSpacing": "0.005em", "fontWeight": "400" }], "stamp-badge": ["0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.08em", "fontWeight": "700" }], "body-md": ["1rem", { "lineHeight": "1.75rem", "letterSpacing": "0.01em", "fontWeight": "400" }], "body-sm": ["0.875rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "400" }], "headline-lg": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-md": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-lg-mobile": ["1.625rem", { "lineHeight": "2.125rem", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col selection:bg-primary selection:text-surface-container-lowest"><input class="hidden peer" id="nav-drawer" type="checkbox"><div class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300" id="drawer-backdrop" onclick="document.getElementById('nav-drawer').checked=false;"></div><aside class="fixed top-0 left-0 bottom-0 z-50 w-[82vw] max-w-xs bg-surface-container-low border-r border-outline-variant flex flex-col justify-between -translate-x-full transition-transform duration-300 ease-out shadow-[0_4px_24px_rgba(0,0,0,0.5)]" id="drawer-panel"><div class="flex flex-col pt-safe px-gutter-lg"><div class="h-16 flex items-center justify-between"><div class="flex items-center gap-gutter-sm"><span class="font-display text-headline-sm font-semibold tracking-tight text-primary">v1ncent19</span><span class="font-stamp-badge text-stamp-badge px-1.5 py-0.5 rounded bg-surface-container-highest text-primary border border-primary/20 uppercase">Night Archive</span></div><label class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer" for="nav-drawer"><span class="material-symbols-outlined">close</span></label></div><div class="mt-gutter-xs mb-gutter-md"><p class="font-body-sm text-body-sm text-on-surface-variant italic">Tuorui Peng · Mathematical Sciences &amp; Systems</p></div><nav class="flex flex-col gap-1 mt-gutter-xs"><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md" data-path="archive-hub" href="#"><span class="material-symbols-outlined text-[20px]">account_balance</span><span class="">Archive Index</span></a><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md" data-path="curriculum-vitae" href="#"><span class="material-symbols-outlined text-[20px]">description</span><span class="">Curriculum Vitae</span></a><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md" data-path="research-projects" href="#"><span class="material-symbols-outlined text-[20px]">terminal</span><span class="">Projects</span></a><a aria-current="page" class="flex items-center gap-3 px-gutter-md py-3 rounded-lg transition-colors bg-[#0047b3] text-white font-semibold font-label-md text-label-md" data-path="essays-blog" href="#"><span class="material-symbols-outlined text-[20px]">history_edu</span><span class="">Blog &amp; Notes</span></a><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md" data-path="visual-gallery" href="#"><span class="material-symbols-outlined text-[20px]">photo_library</span><span class="">Field Gallery</span></a><a class="flex items-center gap-3 px-gutter-md py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md" data-path="about-scholar" href="#"><span class="material-symbols-outlined text-[20px]">person_book</span><span class="">About Tuorui</span></a></nav></div><div class="pb-safe p-gutter-lg flex flex-col gap-gutter-md bg-surface-container/60 border-t border-outline-variant"><div class="flex items-center justify-between"><div class="flex items-center gap-1.5 p-1 rounded-lg bg-surface-container-highest border border-outline-variant"><button class="px-2.5 py-1 rounded text-white bg-[#0047b3] font-label-sm text-label-sm shadow-[0_1px_4px_rgba(0,0,0,0.3)]" type="button">EN</button><a class="px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm" href="#">中文</a></div><button aria-label="Toggle theme" class="w-11 h-11 flex items-center justify-center rounded-lg text-primary bg-surface-container-high border border-outline-variant hover:bg-surface-container-highest transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button></div><div class="flex items-center justify-between text-on-surface-variant font-stamp-badge text-stamp-badge tracking-widest uppercase"><span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_#4ed8c7]"></span>ARCHIVE REG. 2024</span><span class="">TRP·NET</span></div></div></aside><header class="fixed top-0 w-full z-40 bg-surface/85 backdrop-blur-xl pt-safe border-b border-outline-variant/60 shadow-[0_1px_12px_rgba(0,0,0,0.4)]"></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface px-gutter-md mx-auto px-gutter-lg"><div class="flex flex-col w-full">
+<!-- 1. Top Header & Identity Bar -->
+<header class="w-full pt-4 pb-6 flex flex-col gap-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4">
+<div class="flex flex-col">
+<h1 class="font-display font-semibold tracking-tight text-3xl sm:text-4xl text-white flex flex-wrap items-baseline gap-x-2">
+<span class="text-white">Tuorui</span>
+<span class="text-[#3ccfff] font-bold drop-shadow-[0_0_12px_rgba(60,207,255,0.25)]">“v1ncent19”</span>
+<span class="text-white">Peng</span>
+</h1>
+<p class="font-body text-base italic text-[#8fa4b8] mt-1">
+          «&nbsp;En voyage dans l'espace de Hilbert.&nbsp;»
+        </p>
+</div>
+<!-- Right Utility Controls -->
+<div class="flex items-center gap-3 self-start md:self-auto">
+<div class="inline-flex items-center p-0.5 rounded-full bg-[#131d27] border border-[#233547] shadow-sm">
+<button class="px-3 py-1 rounded-full text-xs font-label font-semibold text-white bg-[#0047b3] shadow-sm transition-all" type="button">
+            EN
+          </button>
+<button class="px-3 py-1 rounded-full text-xs font-label font-medium text-[#8fa4b8] hover:text-white transition-colors" type="button">
+            中文
+          </button>
+</div>
+<!-- Night mode toggle button set to active/checked night state -->
+<button aria-label="Toggle theme active night mode" class="w-9 h-9 rounded-full bg-[#182430] border border-[#3ccfff]/40 flex items-center justify-center text-[#3ccfff] shadow-[0_0_10px_rgba(60,207,255,0.2)] transition-colors" type="button">
+<span class="material-symbols-outlined text-[19px]">dark_mode</span>
+</button>
+<a class="w-9 h-9 rounded-full bg-[#131d27] border border-[#233547] flex items-center justify-center text-[#8fa4b8] hover:text-[#3ccfff] hover:border-[#3ccfff]/50 transition-colors shadow-sm" href="#" title="Curator Identity">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</a>
+</div>
+</div>
+<!-- Global Capsule Navigation -->
+<nav class="flex items-center gap-1.5 p-1 rounded-full bg-[#131d27] border border-[#233547] w-fit max-w-full overflow-x-auto no-scrollbar shadow-sm">
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide text-[#8fa4b8] hover:text-white hover:bg-[#182430] transition-all" href="#">
+        About
+      </a>
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide text-[#8fa4b8] hover:text-white hover:bg-[#182430] transition-all" href="#">
+        CV
+      </a>
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide text-[#8fa4b8] hover:text-white hover:bg-[#182430] transition-all" href="#">
+        Gallery
+      </a>
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide font-semibold text-white bg-[#0047b3] shadow-[0_0_12px_rgba(0,71,179,0.5)] border border-[#3ccfff]/30" href="#">
+        Blog &amp; Dispatches
+      </a>
+<a class="px-4 py-1.5 rounded-full font-label text-xs tracking-wide text-[#8fa4b8] hover:text-white hover:bg-[#182430] transition-all" href="#">
+        Project
+      </a>
+</nav>
+</header>
+<!-- 2. Blog Section Title & Archival Index Block -->
+<section class="mt-4 pt-6 pb-6 flex flex-col gap-5">
+<div class="flex items-center gap-2 text-xs font-label uppercase tracking-widest text-[#3ccfff] font-semibold">
+<span class="inline-block w-2 h-2 rounded-full bg-[#3ccfff] shadow-[0_0_8px_#3ccfff] animate-pulse"></span>
+<span class="">INDEX TP-MANUSCRIPTS // VOL. VII · DISPATCHES &amp; ESSAYS</span>
+</div>
+<div class="flex flex-col gap-3">
+<h2 class="font-display text-3xl sm:text-4xl text-[#e8f1f8] font-semibold tracking-tight">
+        博文与学术手稿 / Writings &amp; Dispatches
+      </h2>
+<p class="font-body text-lg text-[#8fa4b8] leading-relaxed">
+        A multilingual scholarly compendium spanning asymptotic high-dimensional estimation, random matrix limits, culinary thermodynamics, philology kan-on registries, and digital archive preservation.
+      </p>
+</div>
+<!-- Archival Census Stat Cards -->
+<div class="grid grid-cols-3 gap-3 pt-2">
+<div class="p-3.5 rounded-xl bg-[#131d27] border border-[#233547] shadow-sm flex flex-col">
+<span class="font-label text-[11px] uppercase tracking-wider text-[#8fa4b8]">Corpus Total</span>
+<span class="font-display text-xl font-bold text-[#3ccfff] mt-0.5">38 Dispatches</span>
+</div>
+<div class="p-3.5 rounded-xl bg-[#131d27] border border-[#233547] shadow-sm flex flex-col">
+<span class="font-label text-[11px] uppercase tracking-wider text-[#8fa4b8]">Taxonomy</span>
+<span class="font-display text-xl font-bold text-[#4ed8c7] mt-0.5">4 Themes</span>
+</div>
+<div class="p-3.5 rounded-xl bg-[#131d27] border border-[#233547] shadow-sm flex flex-col">
+<span class="font-label text-[11px] uppercase tracking-wider text-[#8fa4b8]">Catalog Epoch</span>
+<span class="font-display text-xl font-bold text-[#ffb882] mt-0.5">2026.03</span>
+</div>
+</div>
+</section>
+<!-- 3. Blog Search Box -->
+<section class="w-full my-2">
+<div class="relative flex items-center w-full bg-[#131d27] border border-[#233547] rounded-xl shadow-sm hover:border-[#3ccfff]/40 focus-within:border-[#3ccfff] focus-within:ring-1 focus-within:ring-[#3ccfff]/30 transition-all">
+<span class="material-symbols-outlined text-[#3ccfff] text-xl absolute left-4 pointer-events-none">
+        search
+      </span>
+<input class="w-full py-3.5 pl-12 pr-20 bg-transparent text-sm font-label text-[#e8f1f8] placeholder:text-[#4d6275] focus:outline-none rounded-xl" placeholder="Search in 38 blogs, notes, theorems &amp; course guides (e.g. Hilbert, Matrix, Chowder, 芝士)..." type="search">
+<div class="absolute right-3 flex items-center gap-1 pointer-events-none">
+<kbd class="px-2 py-0.5 text-[11px] font-label font-medium text-[#8fa4b8] bg-[#182430] border border-[#233547] rounded shadow-sm">
+          ⌘K
+        </kbd>
+</div>
+</div>
+</section>
+<!-- 4. Tag Selection Interface -->
+<section class="w-full mt-4 flex flex-wrap items-center gap-2 py-1.5">
+<button class="whitespace-nowrap px-4 py-2 rounded-full font-label text-xs font-semibold bg-[#0047b3] text-white border border-[#3ccfff]/40 shadow-[0_0_10px_rgba(0,71,179,0.4)] flex items-center gap-1.5 transition-transform active:scale-95" type="button">
+<span class="">All Topics</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-mono">38</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-[#131d27] text-[#8fa4b8] border border-[#233547] hover:bg-[#182430] hover:text-[#e8f1f8] hover:border-[#3ccfff]/30 shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Statistics &amp; Math / 数理与统计</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-[#1c2a38] text-[#8fa4b8] font-mono">14</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-[#131d27] text-[#8fa4b8] border border-[#233547] hover:bg-[#182430] hover:text-[#e8f1f8] hover:border-[#3ccfff]/30 shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Cuisine &amp; Lab / 料理与感官</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-[#1c2a38] text-[#8fa4b8] font-mono">9</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-[#131d27] text-[#8fa4b8] border border-[#233547] hover:bg-[#182430] hover:text-[#e8f1f8] hover:border-[#3ccfff]/30 shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Philology / 语言哲学</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-[#1c2a38] text-[#8fa4b8] font-mono">5</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-[#131d27] text-[#8fa4b8] border border-[#233547] hover:bg-[#182430] hover:text-[#e8f1f8] hover:border-[#3ccfff]/30 shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Archival &amp; Retrospective / 档案与记事</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-[#1c2a38] text-[#8fa4b8] font-mono">6</span>
+</button>
+<button class="whitespace-nowrap px-3.5 py-2 rounded-full font-label text-xs font-medium bg-[#131d27] text-[#8fa4b8] border border-[#233547] hover:bg-[#182430] hover:text-[#e8f1f8] hover:border-[#3ccfff]/30 shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="">Computing &amp; Systems / 计算与代码</span>
+<span class="px-1.5 py-0.2 rounded-full text-[10px] bg-[#1c2a38] text-[#8fa4b8] font-mono">4</span>
+</button>
+</section>
+<!-- 5. Blog Sorting Functionality Toolbar -->
+<section class="w-full mt-5 mb-6 p-4 flex flex-col gap-3 bg-[#131d27]/90 border border-[#233547] rounded-xl shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[#233547]">
+<div class="flex items-center gap-1.5 text-xs font-label text-[#8fa4b8] font-semibold">
+<span class="material-symbols-outlined text-base text-[#3ccfff]">tune</span>
+<span class="">排序维度与顺序 / Ordering &amp; Sorting</span>
+</div>
+<span class="text-xs font-label font-medium text-[#4d6275]">
+Showing 1–5 of 38 manuscripts
+</span>
+</div>
+<div class="flex flex-wrap items-center gap-4">
+<div class="flex items-center gap-1.5">
+<span class="text-[11px] font-label uppercase tracking-wider text-[#4d6275] font-medium">发布时间:</span>
+<div class="inline-flex p-0.5 rounded-lg bg-[#0e1720] border border-[#233547] shadow-sm">
+<button class="px-2.5 py-1 rounded-md text-xs font-label font-semibold text-white bg-[#0047b3] shadow-sm flex items-center gap-1 transition-all" type="button">
+<span class="">新→旧 (Newest)</span>
+<span class="material-symbols-outlined text-[13px]">south</span>
+</button>
+<button class="px-2.5 py-1 rounded-md text-xs font-label text-[#8fa4b8] hover:text-[#e8f1f8] hover:bg-[#182430] flex items-center gap-1 transition-colors" type="button">
+<span class="">旧→新 (Oldest)</span>
+<span class="material-symbols-outlined text-[13px]">north</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-[11px] font-label uppercase tracking-wider text-[#4d6275] font-medium">字母顺序:</span>
+<div class="inline-flex p-0.5 rounded-lg bg-[#0e1720] border border-[#233547] shadow-sm">
+<button class="px-2.5 py-1 rounded-md text-xs font-label text-[#8fa4b8] hover:text-[#e8f1f8] hover:bg-[#182430] flex items-center gap-1 transition-colors" type="button">
+<span class="">A → Z</span>
+<span class="material-symbols-outlined text-[13px]">north</span>
+</button>
+<button class="px-2.5 py-1 rounded-md text-xs font-label text-[#8fa4b8] hover:text-[#e8f1f8] hover:bg-[#182430] flex items-center gap-1 transition-colors" type="button">
+<span class="">Z → A</span>
+<span class="material-symbols-outlined text-[13px]">south</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. Post List (Academic Literary Stream) -->
+<div class="flex flex-col gap-6 w-full">
+<!-- Entry 1: Statistics & Random Matrix -->
+<article class="p-6 rounded-xl bg-[#131d27] border border-[#233547] shadow-sm hover:border-[#3ccfff]/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-[#0e2733] border border-[#3ccfff]/30 text-[#3ccfff]">
+            Statistics &amp; Math
+          </span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#8fa4b8] font-medium">18 min read</span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#3ccfff] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">code</span>
+            R &amp; Julia Notebook
+          </span>
+</div>
+<time class="text-xs font-label text-[#8fa4b8] font-medium tracking-wide">March 14, 2026</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-[#e8f1f8] group-hover:text-[#3ccfff] transition-colors">
+<a class="focus:outline-none" href="#">
+              高维协方差估计与 Marchenko-Pastur 极限态测度解耦
+            </a>
+</h3>
+<p class="font-body text-base text-[#a4b8ca] leading-relaxed">
+            在高维小样本制度（$p/n \to \gamma \in (0, \infty)$）下，样本协方差特征谱的边缘行为偏离传统极限定理。本文系统回顾并数值模拟了 Stieltjes 变换核在重正化降噪中的应用，附伴随矩阵剪枝算法与实证资产回报数据重构。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between border-t border-[#233547]/50 mt-1">
+<div class="flex items-center gap-2 text-xs font-label text-[#4d6275]">
+<span class="hover:text-[#8fa4b8] transition-colors">#SpectralMeasure</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#Covariance</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#RMT</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-[#3ccfff] group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Entry 2: Cuisine Lab (Clam Chowder) -->
+<article class="p-6 rounded-xl bg-[#131d27] border border-[#233547] shadow-sm hover:border-[#ffb882]/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-[#2a1a0f] border border-[#ffb882]/30 text-[#ffb882]">
+            Cuisine &amp; Lab
+          </span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#8fa4b8] font-medium">11 min read</span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#ffb882] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">soup_kitchen</span>
+            Field Notes · Boston
+          </span>
+</div>
+<time class="text-xs font-label text-[#8fa4b8] font-medium tracking-wide">February 28, 2026</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-[#e8f1f8] group-hover:text-[#ffb882] transition-colors">
+<a class="focus:outline-none" href="#">
+              新英格兰蛤蜊浓汤黏度模型与淀粉糊化动力学考
+            </a>
+</h3>
+<p class="font-body text-base text-[#a4b8ca] leading-relaxed">
+            从北大西洋圆蛤（Mercenaria mercenaria）原汁提取出发，对比白鲁（Roux）配比与马铃薯溶出支链淀粉对流体剪切稀化（Shear-Thinning）行为的影响。记录了 68°C–82°C 区间内盐分对胶体稳定度的反直觉抑制现象。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between border-t border-[#233547]/50 mt-1">
+<div class="flex items-center gap-2 text-xs font-label text-[#4d6275]">
+<span class="hover:text-[#8fa4b8] transition-colors">#FluidRheology</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#Gastronomy</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#NewEngland</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-[#3ccfff] group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Entry 3: Philology & Historical Linguistics -->
+<article class="p-6 rounded-xl bg-[#131d27] border border-[#233547] shadow-sm hover:border-[#4ed8c7]/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-[#0c2624] border border-[#4ed8c7]/30 text-[#4ed8c7]">
+            Philology &amp; Sound Laws
+          </span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#8fa4b8] font-medium">14 min read</span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#4ed8c7] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">translate</span>
+            Diachronic Corpus
+          </span>
+</div>
+<time class="text-xs font-label text-[#8fa4b8] font-medium tracking-wide">January 19, 2026</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-[#e8f1f8] group-hover:text-[#4ed8c7] transition-colors">
+<a class="focus:outline-none" href="#">
+              汉音入声韵尾在平安期古写本假名注音中的异读层析
+            </a>
+</h3>
+<p class="font-body text-base text-[#a4b8ca] leading-relaxed">
+            基于东大寺本《三宝绘词》与西寺藏梵汉双语陀罗尼经卷，追踪 /-p, -t, -k/ 闭塞韵尾在向促音 /Q/ 与开音节 /ku, ki, tu, ti/ 演化过程中的音系重组规律，并比对中古长安音系与南方吴音的沉积层次。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between border-t border-[#233547]/50 mt-1">
+<div class="flex items-center gap-2 text-xs font-label text-[#4d6275]">
+<span class="hover:text-[#8fa4b8] transition-colors">#HistoricalPhonology</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#Kan-on</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#Sino-Japanese</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-[#3ccfff] group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Entry 4: Cuisine & Lab (Baked Seafood Rice) -->
+<article class="p-6 rounded-xl bg-[#131d27] border border-[#233547] shadow-sm hover:border-[#ffb882]/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-[#2a1a0f] border border-[#ffb882]/30 text-[#ffb882]">
+            Cuisine &amp; Lab
+          </span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#8fa4b8] font-medium">9 min read</span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#ffb882] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">local_fire_department</span>
+            Thermodynamics
+          </span>
+</div>
+<time class="text-xs font-label text-[#8fa4b8] font-medium tracking-wide">December 22, 2025</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-[#e8f1f8] group-hover:text-[#ffb882] transition-colors">
+<a class="focus:outline-none" href="#">
+              焗海鲜芝士炒饭之美拉德反应梯度与乳脂油水分离临界点
+            </a>
+</h3>
+<p class="font-body text-base text-[#a4b8ca] leading-relaxed">
+            探讨高熔点马苏里拉与陈年车达在 210°C 辐射加热下的相变曲线。通过预混蛋黄膜隔绝籼米水分，成功控制了底层焦香壳（Socarrat-like crust）生成时的水活度，避免甲壳素香气成分在长时间焗烤中挥发逸散。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between border-t border-[#233547]/50 mt-1">
+<div class="flex items-center gap-2 text-xs font-label text-[#4d6275]">
+<span class="hover:text-[#8fa4b8] transition-colors">#MaillardReaction</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#LipidEmulsion</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#CulinaryPhysics</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-[#3ccfff] group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Entry 5: Computing & Systems Preservation -->
+<article class="p-6 rounded-xl bg-[#131d27] border border-[#233547] shadow-sm hover:border-[#3ccfff]/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all flex flex-col gap-3 group">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-label font-semibold bg-[#0e2733] border border-[#3ccfff]/30 text-[#3ccfff]">
+            Computing &amp; Systems
+          </span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#8fa4b8] font-medium">15 min read</span>
+<span class="text-xs font-label text-[#4d6275]">·</span>
+<span class="text-xs font-label text-[#3ccfff] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">terminal</span>
+            Emulator &amp; Spec
+          </span>
+</div>
+<time class="text-xs font-label text-[#8fa4b8] font-medium tracking-wide">November 10, 2025</time>
+</div>
+<div class="flex flex-col md:flex-row md:items-start gap-4 justify-between mt-1">
+<div class="flex flex-col gap-2 flex-1">
+<h3 class="font-display text-2xl font-semibold text-[#e8f1f8] group-hover:text-[#3ccfff] transition-colors">
+<a class="focus:outline-none" href="#">
+              NeXTSTEP 3.3 环境复原与 HyperCard 堆栈二进位制解析
+            </a>
+</h3>
+<p class="font-body text-base text-[#a4b8ca] leading-relaxed">
+            在现代 ARM 架构上通过 Previous 模拟器搭建 68040 NeXTcube 环境的完整记录。重构了针对早期 HyperCard 格式卡片的逆向解析器，提取出包含九十年代早期高校学术讨论组的超文本索引元数据。
+          </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between border-t border-[#233547]/50 mt-1">
+<div class="flex items-center gap-2 text-xs font-label text-[#4d6275]">
+<span class="hover:text-[#8fa4b8] transition-colors">#DigitalArchiving</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#NeXTSTEP</span>
+<span class="hover:text-[#8fa4b8] transition-colors">#RetroComputing</span>
+</div>
+<a class="inline-flex items-center gap-1 text-xs font-label font-semibold text-[#3ccfff] group-hover:translate-x-0.5 transition-transform" href="#">
+          Read Dispatch
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</article>
+</div>
+<!-- Pagination / Load More Bar -->
+<div class="w-full mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#233547]">
+<span class="text-xs font-label text-[#8fa4b8]">
+      Showing page 1 of 8 · 33 archived entries remaining
+    </span>
+<div class="flex items-center gap-2">
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-label font-semibold text-[#4d6275] bg-[#131d27] border border-[#233547] cursor-not-allowed opacity-50" disabled="" type="button">
+        ← Previous
+      </button>
+<div class="flex items-center gap-1">
+<span class="w-7 h-7 rounded-lg text-xs font-label font-semibold bg-[#0047b3] text-white border border-[#3ccfff]/30 flex items-center justify-center shadow-sm">1</span>
+<button class="w-7 h-7 rounded-lg text-xs font-label text-[#8fa4b8] hover:text-white hover:bg-[#182430] flex items-center justify-center transition-colors" type="button">2</button>
+<button class="w-7 h-7 rounded-lg text-xs font-label text-[#8fa4b8] hover:text-white hover:bg-[#182430] flex items-center justify-center transition-colors" type="button">3</button>
+<span class="text-xs font-label text-[#4d6275] px-1">…</span>
+<button class="w-7 h-7 rounded-lg text-xs font-label text-[#8fa4b8] hover:text-white hover:bg-[#182430] flex items-center justify-center transition-colors" type="button">8</button>
+</div>
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-label font-semibold text-[#3ccfff] bg-[#131d27] border border-[#233547] hover:bg-[#182430] hover:border-[#3ccfff]/40 transition-colors" type="button">
+        Next →
+      </button>
+</div>
+</div>
+<!-- 7. Academic Footer matching Home -->
+<footer class="w-full mt-16 pt-8 pb-4 flex flex-col gap-6 border-t border-[#233547]">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+<div class="flex flex-col">
+<span class="font-display font-semibold text-lg text-white">
+          Tuorui Peng · v1ncent19
+        </span>
+<span class="text-xs font-body text-[#8fa4b8] italic mt-0.5">
+          Archivist, Mathematical Statistician, Culinary Chronicler
+        </span>
+</div>
+<div class="flex items-center gap-4 text-xs font-label text-[#8fa4b8]">
+<a class="hover:text-[#3ccfff] transition-colors" href="#">RSS Feed</a>
+<span class="text-[#4d6275]">·</span>
+<a class="hover:text-[#3ccfff] transition-colors" href="#">Colophon</a>
+<span class="text-[#4d6275]">·</span>
+<a class="hover:text-[#3ccfff] transition-colors" href="#">PGP Key</a>
+<span class="text-[#4d6275]">·</span>
+<a class="hover:text-[#3ccfff] transition-colors" href="#">Sitemap</a>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 text-xs font-label text-[#4d6275]">
+<span class="">© 2026 Tuorui Peng. Handcrafted under rigorous academic typesetting standards.</span>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#4ed8c7] shadow-[0_0_8px_#4ed8c7]"></span>
+<span class="font-mono text-[11px] tracking-wide text-[#8fa4b8]">TRP-ARCHIVE-NODE // BOSTON &amp; BEIJING</span>
+</div>
+</div>
+</footer>
+</div></main><nav class="fixed bottom-0 w-full z-40 pb-safe bg-[#0a1016]/90 backdrop-blur-xl border-t border-[#233547] shadow-[0_-1px_12px_rgba(0,0,0,0.5)]" data-active-classes="text-[#3ccfff] font-semibold"><div class="flex justify-around items-center h-16 mx-auto px-gutter-sm w-full"><a class="flex flex-col items-center justify-center min-w-[56px] h-11 text-[#8fa4b8] hover:text-[#e8f1f8] transition-colors" data-path="archive-hub" href="#"><span class="material-symbols-outlined text-[22px]">roofing</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">Archive</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-11 text-[#8fa4b8] hover:text-[#e8f1f8] transition-colors" data-path="research-projects" href="#"><span class="material-symbols-outlined text-[22px]">code_blocks</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">Projects</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-11 transition-colors text-[#3ccfff] font-semibold" data-path="essays-blog" href="#"><span class="material-symbols-outlined text-[22px]">menu_book</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">Notes</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-11 text-[#8fa4b8] hover:text-[#e8f1f8] transition-colors" data-path="visual-gallery" href="#"><span class="material-symbols-outlined text-[22px]">local_see</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">Gallery</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-11 text-[#8fa4b8] hover:text-[#e8f1f8] transition-colors" data-path="about-scholar" href="#"><span class="material-symbols-outlined text-[22px]">account_circle</span><span class="font-label-sm text-[11px] mt-0.5 tracking-tight">About</span></a></div></nav>
+
+
+</body></html>

@@ -1,0 +1,37 @@
+{
+  "id": "guatemala-2026",
+  "title": {
+    "en": "A Hiking toward Fuego",
+    "zh": "向 Fuego 进发"
+  },
+  "blurb": {
+    "en": "A volcano eruption is definitely a must-see in lifetime.",
+    "zh": "如果我有一张人生清单，那么其中肯定有一项是亲眼看一次火山喷发。"
+  },
+  "start": "2026-05-31",
+  "end": "2026-06-01",
+  "days": 2,
+  "distanceKm": 73.6,
+  "gpsPoints": 906,
+  "beta": false,
+  "featured": true,
+  "showPinnedBadge": false,
+  "stops": {
+    "en": ["Antigua", "Acatenango", "Fuego"],
+    "zh": ["安提瓜", "Acatenango", "Fuego"]
+  },
+  "cover": "/assets/photos/travel/guatemala-2026/img-0813.webp",
+  "coverPos": "center 44%",
+  "cardMeta": {
+    "en": "Interactive 3D terrain log",
+    "zh": "攀登地图"
+  },
+  "cardCta": {
+    "en": "Climb the route",
+    "zh": "阅读旅行志"
+  },
+  "cardFacts": {
+    "en": ["2 days", "June 1, 2026", "3,617 m"],
+    "zh": ["2 日", "2026.06.01", "3,617 m"]
+  }
+}

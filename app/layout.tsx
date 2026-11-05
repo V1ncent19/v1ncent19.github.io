@@ -1,0 +1,89 @@
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
+import "./prose.css";
+import "./travel-journal.css";
+import "./travel-log.css";
+import "./travel-navigation.css";
+import "./travel-reconstructed.css";
+import "katex/dist/katex.min.css";
+import { ThemeScript } from "@/components/theme/theme-script";
+import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { RouteFade } from "@/components/layout/route-fade";
+import { SpacetimeCanvas } from "@/components/background/spacetime-canvas";
+import { site } from "@/lib/site";
+
+const baseTitle = 'Tuorui "v1ncent19" Peng';
+
+export const metadata: Metadata = {
+  title: {
+    default: baseTitle,
+    template: `%s · v1ncent19`,
+  },
+  description: `${baseTitle} — ${site.tagline}`,
+  authors: [{ name: baseTitle, url: site.github }],
+  creator: baseTitle,
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5fafd" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c1219" },
+  ],
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="en" suppressHydrationWarning className="h-full">
+      {/* The spacetime canvas sits at z-0 (see component); every real content
+          layer carries relative z-10 so it stays above the backdrop. The page
+          background stays on <body>. */}
+      {/* suppressHydrationWarning on <body> for the same reason <html> needs
+          it: trip pages add `tl-immersive` / `pj-immersive` from a parse-time
+          inline script (so the site chrome never flashes), and React does not
+          own that class. Without this, React 19 reports "attributes didn't
+          match" on every trip page entry — the class is intentional, the
+          mismatch is the price of painting correctly on frame one. */}
+      <body
+        suppressHydrationWarning
+        className="flex min-h-svh flex-col bg-canvas font-serif text-ink antialiased"
+      >
+        <ThemeScript />
+        {/* Site-wide spacetime backdrop: faint grid behind all content,
+            pointer acts as a mass (see CONFIG in the component). */}
+        <SpacetimeCanvas />
+        <a
+          href="#main"
+          className="ui-text sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-surface focus:px-4 focus:py-2 focus:text-sm focus:text-ink focus:shadow-lift"
+        >
+          Skip to content
+        </a>
+        {/* Site chrome wrappers: travel-log trip pages toggle
+            body.tl-immersive (see components/travel/TravelLog) and these
+            wrappers are what that class hides, so the 100vh map + own
+            progress bar get the full viewport. The header wrapper must not
+            create a box (globals.css gives it display:contents): the capsule
+            nav is position:sticky and can only travel within its containing
+            block — a real wrapper div would pin it to that short box and the
+            site-wide float would never reach the viewport top. */}
+        <div className="site-chrome-header">
+          <SiteHeader />
+        </div>
+        <main id="main" className="relative z-10 flex-1">
+          {/* Client wrapper keys on the pathname so every internal navigation
+              remounts the page content and replays the CSS content fade
+              (Task D #4); first load fades in too. */}
+          <RouteFade>{children}</RouteFade>
+        </main>
+        <div className="site-chrome-footer relative z-10">
+          <SiteFooter />
+        </div>
+      </body>
+    </html>
+  );
+}
