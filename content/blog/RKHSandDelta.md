@@ -8,7 +8,7 @@ category: Knowledge
 
 Recently I was introduced a new point of view of RKHS by my advisor. I think it's quite interesting and worth sharing. It provides a new understanding of how RKHS is constructed and, it's surprisingly related to the Dirac delta function in physics (and it does provide me some more 'maths' understanding of the delta function).
 
-The original note could be found in *Scattered Data Approximation* by Holger Wendland. Thus here I directly write my understanding of the note in Chinese, with some of my own understanding added. 
+The original note could be found in 『Scattered Data Approximation』 by Holger Wendland. Thus here I directly write my understanding of the note in Chinese, with some of my own understanding added.
 
 For some preliminary knowledge about RKHS see [my note in RKHS theory](/blog/2022/rkhs/).
 

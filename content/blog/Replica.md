@@ -6,7 +6,7 @@ date: 2022/8/15
 category: Knowledge
 ---
 
-Here is my reading note for the book '[*Statistical Physics of Spin Glasses and Information Processing: An Introduction*](https://www.researchgate.net/publication/235410255_Statistical_Physics_of_Spin_Glasses_and_Information_Processing)' by [Hidetoshi Nishimori](http://q-annealing.org/index-e.html). I am still not quite clear about this field so please discuss your insights and understanding with me if you are also interested.
+Here is my reading note for the book 『[Statistical Physics of Spin Glasses and Information Processing: An Introduction](https://www.researchgate.net/publication/235410255_Statistical_Physics_of_Spin_Glasses_and_Information_Processing)』 by [Hidetoshi Nishimori](http://q-annealing.org/index-e.html). I am still not quite clear about this field so please discuss your insights and understanding with me if you are also interested.
 
 ## Prerequisites
 
