@@ -14,7 +14,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "content" / "travel" / "france-2024"
+OUT = ROOT / "generated" / "travel" / "france-2024"
 CACHE = OUT / "geocode-cache.json"
 PLACES = [
     # id, display label, search string, city, aliases used in the route ledger

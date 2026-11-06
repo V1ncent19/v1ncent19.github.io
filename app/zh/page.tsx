@@ -519,7 +519,7 @@ export default function ZhHomePage() {
               {/* 站点数据：浏览量（不倒翁 + 旧站基线）、评论数（GitHub
                   Discussions 汇总）与许可协议。 */}
               <section className="mt-12">
-                <ModuleHeader id="meta" caption="页面浏览量（busuanzi 实时 + 旧站基线）、评论数（GitHub Discussions 汇总）与许可协议。">
+                <ModuleHeader id="meta" caption="">
                   站点数据
                 </ModuleHeader>
                 <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface shadow-sm">

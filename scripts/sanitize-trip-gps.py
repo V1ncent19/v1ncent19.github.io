@@ -27,10 +27,9 @@ hand-written hub card stats stay consistent.
 Usage:
   python scripts/sanitize-trip-gps.py content/travel/ptes-2025 [--radius-m 3000] [--dry-run]
 
-  Point it at the trip folder (the source), not the generated mirror under
-  public/data/ — sync:data regenerates the mirror from the source on the next
-  build, so sanitizing there would silently undo itself. The trip folder is
-  flat since 2026-10-17; there is no data/ subfolder any more.
+  The script reads/writes track.json in generated/travel/<trip>/ and the
+  authored scene/trip files in content/travel/<trip>/. Do not sanitize the
+  runtime mirror under public/data/; sync:data would overwrite that copy.
 """
 
 import json
@@ -63,7 +62,7 @@ def bounds_of(points):
 
 
 def sanitize(dirpath: Path, radius_m: float, dry_run: bool):
-    track_path = dirpath / "track.json"
+    track_path = Path(__file__).resolve().parents[1] / "generated" / "travel" / dirpath.name / "track.json"
     scenes_path = dirpath / "scenes.json"
     trip_path = dirpath / "trip.json"
 

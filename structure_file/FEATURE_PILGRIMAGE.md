@@ -1,7 +1,7 @@
 # FEATURE — 巡礼地图（Just Because! @ 藤泽）
 
 **状态：已完成并上线**（`○ /travel/just-because` + `○ /travel/zh/just-because`），等用户补完文案。
-**最后核对：2026-10-24**（对照 `components/travel/Pilgrimage*.tsx` 与 `content/travel/just-because/page.json` 逐项核实）。
+**最后核对：2026-11-05**（内容与派生数据分层；页面展示字段逐项对照原 `page.json` 一致）。
 
 > **怎么读这份文档**
 > - 只想了解现状 / 判断还差什么 → §0 + §7。
@@ -19,14 +19,14 @@
 
 | 项 | 值 |
 |---|---|
-| 页面 | `app/travel/just-because/page.tsx`、`app/travel/zh/just-because/page.tsx`，构建期 **import** `content/travel/just-because/page.json` |
+| 页面 | `app/travel/just-because/page.tsx`、`app/travel/zh/just-because/page.tsx`；定义文件组合 `content/travel/just-because/story.json` 与 `generated/travel/just-because/page.json` |
 | 站点 | 36 个对比点（用户手工合成，只上线对比图，无兜底动画帧） |
 | 路线 | 273 点闭环环线，2.47 h / 17.68 km，`06:43:59` 鎌倉高校前駅 → `09:11:55` 回到同站 |
 | 图 | `public/assets/photos/pilgrimage/just-because/compare/{id}.webp` 36 张 / 16.4 MB / q82 / 2400 px / 零 EXIF；封面 `cover.png` |
 | 母版 | `assets-src/pilgrimage-masters/just-because/{IMG_xxxx}.jpg` 36 张 / 29.9 MB，**入库** |
 | 位置真源 | `assets-src/travel-data/pilgrimage/photos.json`（119 张的 id ↔ 坐标 ↔ 时间，gitignored） |
-| 可 fetch 数据 | `public/data/travel/just-because/{route.json, anitabi-212278.json}`，**入库**（不可再生，由 `sync-trip-data.mjs` 的 `KEEP` 名单保护） |
-| 文案 | `overview.text` 已写（但 `_placeholder` 仍为 `true`）；`outro.text` 空；36 站 `note` 全空 |
+| 派生源数据 | `generated/travel/just-because/{route.json, anitabi-212278.json}`，**入库**（私有 GPS／历史快照在干净 CI 不可再生）；页面不直接 fetch 这两份文件 |
+| 文案 | `story.json` 中的 `overview.text` 已写（但 `_placeholder` 仍为 `true`）；`outro.text` 空；36 站中已有 6 条非空 `note` |
 | 交互 | 可缩放可拖动、跟随镜头默认开、五枚控件（`自/昼/夜` + `随` + `全`）、滚动联动、点标点跳章节、**移动端可拖拽进度条（2026-10-24）** |
 | 待决 | ① 底图合规（OSM/Carto vs 腾讯/高德）；② ptes-2025 轨迹隐私（**不属本功能**，见 §7） |
 
@@ -70,7 +70,7 @@ IMG_2746.jpg  →  小写 + 下划线换连字符  →  img-2746  →  photos.js
 |---|---|---|---|
 | **母版：对比图 jpg** | `assets-src/pilgrimage-masters/just-because/{IMG_xxxx}.jpg` | **入库** | 36 张手工合成原稿（29.9 MB）。2026-10-17 从 `assets-src/photos/` 迁出并入库：实测 0/36 带 EXIF，无隐私，此前被「原图」的忽略规则误伤 |
 | **上线：对比图 webp** | `public/assets/photos/pilgrimage/just-because/compare/{id}.webp` | 入库 | 2400 px / q82，36 张 / 16.4 MB，零 EXIF |
-| **快照：巡礼点数据** | `public/data/travel/just-because/anitabi-212278.json` | 入库 | 154 个点，供反查坐标/名称/集数 |
+| **快照：巡礼点数据** | `generated/travel/just-because/anitabi-212278.json` | 入库 | 154 个点，供反查坐标/名称/集数 |
 | **真源：位置表** | `assets-src/travel-data/pilgrimage/photos.json` | gitignored | 119 张照片的 id ↔ 坐标 ↔ 时间 |
 
 **已删除（2026-10-16，回收 ~1.4 GB）**：`assets-src/photos/just-because/original/`（119 张 / 701 MB，用户他处有备份）、`public/assets/pilgrimage/just-because/{shot,thumb,anime}/`、`assets-src/travel-data/anitabi-cache/`（19 MB）、`pilgrimage-review.csv`。
@@ -89,10 +89,10 @@ IMG_2746.jpg  →  小写 + 下划线换连字符  →  img-2746  →  photos.js
 |---|---|---|---|
 | 1 | `npm run pilgrimage:photos`<br>`scripts/pilgrimage-photos.mjs` | 实景原图目录（`--dir`） | `photos.json`（**任何合成之前**跑） |
 | 2 | `npm run anitabi:snapshot`<br>`scripts/anitabi-points.mjs` | anitabi 静态分片 | `anitabi-212278.json`（一次性快照，之后不常跑） |
-| 3 | `scripts/pilgrimage-route.mjs` | `assets-src/travel-data/gps/2026.01.01-2026.12.31.csv` | `public/data/travel/just-because/route.json` |
+| 3 | `scripts/pilgrimage-route.mjs` | `assets-src/travel-data/gps/2026.01.01-2026.12.31.csv` | `generated/travel/just-because/route.json` |
 | 4 | **人工**：在 anitabi 网站 magiconch 合成对比图，文件名保持 `IMG_xxxx.jpg` | 实景照 + 动画帧 | `assets-src/pilgrimage-masters/just-because/` |
 | 5 | `npm run pilgrimage:derive`<br>`scripts/pilgrimage-derive.mjs` | 母版 jpg | `compare/{id}.webp` + `cover.png` |
-| 6 | `scripts/pilgrimage-map.mjs` | `compare/*.webp` + `photos.json` + `route.json` + `anitabi-212278.json` | `content/travel/just-because/page.json` |
+| 6 | `scripts/pilgrimage-map.mjs` | `compare/*.webp` + `photos.json` + `route.json` + `anitabi-212278.json` | `generated/travel/just-because/page.json` |
 
 全部脚本幂等、可增量、支持 `--limit` 冒烟。
 
@@ -159,7 +159,7 @@ npm run pilgrimage:derive -- --limit 5 # 冒烟
 
 组页面数据。为每站预算 `routeIdx`（**按时间锚定**，见 §5.3）与真实图片尺寸 `imgW`/`imgH`（sharp 读，见 §6）。
 
-- **`page.json` 是半手工文件**：生成器产出，但 `overview` / `outro` / 各站 `note` 手写且**跨次 preserving**。改文案只需 `npm run build`，**不要重跑生成脚本**。
+- **`story.json` 是唯一文案文件**：标题、`overview`、`outro`、各站 `note` 由人维护；`page.json` 只含生成的路线、站点和署名。改文案只需重新运行网站构建，不要重跑数据生成脚本。
 - 每个站会报告两个几乎等距的 anitabi 候选点（`_runnerUpM`），当前取最近的那个；9 处歧义待人工复查（§7）。
 - `main()` 是 **async**（因为要 await sharp 读尺寸）。
 
@@ -175,9 +175,9 @@ npm run pilgrimage:derive -- --limit 5 # 冒烟
 
 ## 4. 数据格式
 
-### 4.1 `content/travel/just-because/page.json`（页面唯一数据源，构建期 import）
+### 4.1 `content/travel/just-because/story.json` + `generated/travel/just-because/page.json`（构建期组合）
 
-顶层：`_note` · `_generator` · `generatedAt` · `title` · `subtitle` · `overview` · `outro` · `attribution` · `route` · `stops`（36）。
+`story.json`：`title` · `subtitle` · `overview` · `outro` · `notes`（按站点 ID）。`page.json`：`attribution` · `route` · `stops`（36，只有位置/图片/动画匹配等派生字段）。
 
 每站字段：
 
@@ -201,7 +201,7 @@ npm run pilgrimage:derive -- --limit 5 # 冒烟
 
 **读法**：`lib/travel/log/validate.ts` 的 `loadPilgrimage()` 做显式形状校验 —— JSON import 推断出的是 `number[][]` 而非 `[number,number][]`，**不能硬 cast**；另外校验 `routeIdx` 存在。
 
-### 4.2 `public/data/travel/just-because/anitabi-212278.json`（快照，入库）
+### 4.2 `generated/travel/just-because/anitabi-212278.json`（快照，入库）
 
 154 个点。顶层含署名与来源信息：
 
@@ -245,7 +245,7 @@ npm run pilgrimage:derive -- --limit 5 # 冒烟
 }
 ```
 
-### 4.4 `public/data/travel/just-because/route.json`（入库）
+### 4.4 `generated/travel/just-because/route.json`（入库）
 
 `{ startedAtLocal, endedAtLocal, coordinates: [lat,lon][], offsets: number[], distanceKm }`。`offsets` 是相对起点的秒数，**`routeIdx` 的下标域**。
 
@@ -350,10 +350,10 @@ type CameraMode = "follow" | "overview" | "manual";
 
 ## 7. 待办与待决
 
-1. **文案（不是代码活）** —— `page.json` 里 `outro.text` 空、36 站 `note` 全空、`overview.text` 已写但 `_placeholder` 仍为 `true`（可清掉标记）。改完**只需 `npm run build`**。
-2. **复查 9 处歧义标点** —— 每站有两个几乎等距的 anitabi 点（例：`img-2748` 藤沢駅南口バス停 19 m vs runner-up 20 m），当前取最近。`_runnerUpM` 已写进 `page.json` 供人工核对。
+1. **文案（不是代码活）** —— `content/travel/just-because/story.json` 里 `outro.text` 空、36 站中 30 条 `note` 仍空、`overview.text` 已写但 `_placeholder` 仍为 `true`（可清掉标记）。改完**只需网站构建**。
+2. **复查 9 处歧义标点** —— 每站有两个几乎等距的 anitabi 点（例：`img-2748` 藤沢駅南口バス停 19 m vs runner-up 20 m），当前取最近。`_runnerUpM` 已写进 `generated/travel/just-because/page.json` 供人工核对。
 3. **⚠️ 待决 A —— 底图合规** —— `geo-map-compliance-guard` 要求腾讯/高德/百度/天地图，本页与 ptes-2025 都在用 Carto Positron/Dark Matter。**必须用户拍板**，未擅改基线。
-4. **⚠️ 待决 B —— ptes-2025 隐私泄漏（不属本功能，但发现了要说）** —— `content/travel/ptes-2025/track.json` 含 **1217 个北美点位**（从 `2025-12-15T12:40:55-05:00` 起，lat 42.04 / lon −87.72，Evanston/Northwestern，住址级），`diagnostics.json` 还含原始 `dataTime` / `stepType`。`scripts/sanitize-trip-gps.py`（`--radius-m` 默认 3000）显然没跑在这份数据上。**注意它把轨迹首点当 home anchor，对藤泽这种环线会误裁。**
+4. **PTES GPS 隐私复核** —— PTES 的已发布轨迹仍包含 1217 个北美点位，现位于 `generated/travel/ptes-2025/track.json`，浏览器镜像仍为原 URL。本轮只迁移文件、不裁点，以保持地图呈现；任何进一步坐标清洗都需单独核对行程范围与索引。
 5. **中文子集字体** —— 36 个日文点名（如 `湘南深沢駅ホーム`）需确认 `scripts/subset-cjk-fonts.py` 的 `SCAN_DIRS` 覆盖 `content/travel/`，然后重跑子集。
 6. **（可选）finale 措辞** —— 现在完结章读 `endedAtLocal`，若想更口语可加「完结 · 回到鎌倉高校前」。
 
@@ -395,7 +395,7 @@ type CameraMode = "follow" | "overview" | "manual";
 | `.pj-back` 移动端在左下 `bottom:1.1rem; left:1rem` | 右上 `top:58px; right:14px; 42×42`，见 §5.5 |
 | `--tl-*` 令牌定义在 `TravelLog.tsx` | 已搬进 `app/globals.css` |
 | 封面 `card/img-2748.webp` | `cover.png`（`card/` 目录已删 —— `cover` 本来只是 `card.json` 的字段） |
-| 数据在 `content/.../source/` | 在 `public/data/travel/just-because/`（`KEEP` 保护） |
+| 数据在 `content/.../source/` 或 `public/data/travel/just-because/` | 可编辑文案在 `content/travel/just-because/story.json`；派生数据在 `generated/travel/just-because/` |
 | `FOLLOW_ZOOM_DELTA = 5` | 现值 `2` / `2.5`（`NARROW` / `WIDE`） |
 | 「§8 未提交的改动清单」 | 已过时；提交状态只看 `git status` |
 

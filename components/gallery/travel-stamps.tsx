@@ -1,13 +1,13 @@
 import type { CSSProperties } from "react";
-import { BADGE_ART, BADGE_FRAME } from "./badge-art.generated";
+import { BADGE_ART, BADGE_FRAME } from "@/generated/gallery/badge-art";
 
 /**
  * Travel-stamp badges for the gallery — composed INLINE at build time
  * (user-confirmed plan B, 2026-09-06).
  *
  * A badge is ONE inline <svg>: the shared two-ring frame from
- * `public/assets/gallery/badges/badge-frame.svg` plus the per-key icon from
- * `badges/<key>.svg`, both flattened into `badge-art.generated.ts` by
+ * `assets-src/gallery-badges/badge-frame.svg` plus the per-key icon from
+ * `assets-src/gallery-badges/<key>.svg`, both flattened into `generated/gallery/badge-art.ts` by
  * `scripts/build-badges.mjs` (rerun via `npm run badges`, wired as prebuild).
  *
  * Why inline instead of <img>: the artwork is drawn with

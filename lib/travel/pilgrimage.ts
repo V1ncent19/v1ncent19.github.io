@@ -6,8 +6,8 @@
 // ordered list of stops plus one fixed-scale polyline. Sharing the trip log's
 // types would drag in a pile of fields the page never reads.
 //
-// The rendered source of truth is content/travel/just-because/page.json, produced
-// by scripts/pilgrimage-map.mjs.
+// The rendered page combines authored content/travel/just-because/story.json
+// with generated/travel/just-because/page.json in the trip definition.
 
 /**
  * Sentinel stop ids for the two text-only chapters.

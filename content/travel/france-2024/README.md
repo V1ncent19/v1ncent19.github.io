@@ -6,11 +6,11 @@ This is a draft public derivative of the author's reviewed handwritten journal a
 |---|---|
 | `card.json` | Featured Travel card and draft label; no pinned badge |
 | `story.json` | Twelve days, 67 reading chapters from 80 reviewed manuscript fragments, and timetable anchors |
-| `places.json` | Public landmark, restaurant and station-area coordinates, source and precision |
-| `routes.json` | Archived 135-leg reviewed place ledger; used at build time only to order each day's markers |
-| `route-geometries.json`, `metro-geometries.json` | Archived navigation and track candidates; **not imported by the site** |
-| `route-pilot-source-cache.json`, `metro-network-source-cache.json` | Archived public routing and rail source responses; no site runtime calls |
-| `geocode-cache.json`, `geocode-review.csv` | One-time public place lookup and matching review |
+| `generated/travel/france-2024/places.json` | Public landmark, restaurant and station-area coordinates, source and precision |
+| `generated/travel/france-2024/routes.json` | Archived 135-leg reviewed place ledger; used at build time only to order each day's markers |
+| `generated/travel/france-2024/{route,metro}-geometries.json` | Archived navigation and track candidates; **not imported by the site** |
+| `generated/travel/france-2024/*-source-cache.json` | Archived public routing and rail source responses; no site runtime calls |
+| `generated/travel/france-2024/geocode-cache.json`, `geocode-review.csv` | One-time public place lookup and matching review |
 
 The site derives a compact ordered place-ID list for each day from the reviewed ledger and any story block focus places. The client receives this list and the public place records, never route geometry. Daily markers carry no numbers; the overview marks Paris, Köln, Amsterdam and Rouen. Clicking a marker navigates to its restaurant review or diary block when one exists. The timetable remains available below each day's prose. Unlocated private stays and uncertain boarding points have no marker. Marker positions are reviewed public-place coordinates, not recorded GPS visits.
 
@@ -27,8 +27,8 @@ The twelve day subtitles follow the author's revised Chinese headings and are de
 To rebuild after manuscript or place corrections:
 
 1. Update the private reconciled review and `route-ledger-v2.json` outside the repository. Do not copy originals or exact lodging addresses here.
-2. Review public place aliases, coordinates and ambiguous matches in `geocode-review.csv`. If the cache changes, run `python scripts/build-france-2024-places.py`.
-3. Run `python scripts/build-france-2024.py --review-dir <private-review-dir>` to regenerate `story.json` and the archived `routes.json`; the editorial grouping runs automatically. Inspect date, order, source IDs and privacy. The route ledger still supplies marker order, but does not become a visible route.
+2. Review public place aliases, coordinates and ambiguous matches in `generated/travel/france-2024/geocode-review.csv`. If the cache changes, run `python scripts/build-france-2024-places.py`.
+3. Run `python scripts/build-france-2024.py --review-dir <private-review-dir>` to regenerate `content/travel/france-2024/story.json` and `generated/travel/france-2024/routes.json`; the editorial grouping runs automatically. Inspect date, order, source IDs and privacy. The route ledger still supplies marker order, but does not become a visible route.
 4. If the cuisine article changes, confirm its headings still match `france-cuisine.ts` and recheck date/place mapping. The page builder fails if a new review has no mapping.
 5. Build the site, then run `scripts/check-france-2024.mjs` with Playwright/Chrome. Check both languages at desktop and mobile widths, marker navigation, inline dining order, timetable display and rail placement.
 

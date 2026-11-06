@@ -4,7 +4,7 @@
  * publish them as EXIF-free WebP under public/.
  *
  *   npm run anitabi:images
- *   node scripts/anitabi-images.mjs --points public/data/travel/just-because/anitabi-212278.json
+ *   node scripts/anitabi-images.mjs --points generated/travel/just-because/anitabi-212278.json
  *   node scripts/anitabi-images.mjs --limit 3 --force        # smoke test
  *
  * WHY THESE ARE COMMITTED (unlike the shot photos)
@@ -50,7 +50,7 @@ function arg(name, fallback = null) {
 }
 const flag = (name) => argv.includes(`--${name}`);
 
-const POINTS = path.resolve(root, arg("points", "public/data/travel/just-because/anitabi-212278.json"));
+const POINTS = path.resolve(root, arg("points", "generated/travel/just-because/anitabi-212278.json"));
 const OUT_DIR = path.resolve(
   root,
   arg("out", "public/assets/photos/pilgrimage/just-because/anime"),

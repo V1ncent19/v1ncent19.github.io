@@ -14,16 +14,16 @@
 | 相册照片地点/标题 | `content/travel/gallery/items.json` | 服务于 `/travel` 的「Stories & frames」；`place` / `placeLocal` / `title` 是 `{ en, zh }`；人工字段，`gallery:gen` 不会覆盖 |
 | 站点身份（名字/站训/邮箱/GitHub） | `content/site/profile.json` | `lib/site.ts` 只是它的类型化出口，勿再硬编码 |
 | 游记 trip 注册表（标题/日期/统计行） | `content/travel/<trip>/card.json` | 每 trip 一个，`lib/travel/trips.ts` 扫描目录，无中央注册表 |
-| 游记叙事（每站文字） | ptes：`trip.json` + `scenes.json` + `attractions.json`（+ `diagnostics.json` 溯源）<br>巡礼：`page.json` 的 `overview` / `outro` / 各站 `note`<br>Guatemala：`story.json` | 构建期 import 进 bundle；Guatemala 派生地图数据位于 `generated/travel/guatemala-2026/data.json`，不含正文，规则见 `FEATURE_GUATEMALA_TERRAIN_LOG.md` |
+| 游记叙事（每站文字） | PTES：`trip.json` + `scenes.json` + `attractions.json`<br>巡礼、Guatemala、France：各自 `story.json` | 人工正文只在 `content/travel/<id>/`；地图派生数据在 `generated/travel/<id>/`，定义文件在构建时组合 |
 | 界面文案（按钮/标题/图例/标签） | `lib/i18n.ts`（双语字典） | 全站 UI copy 唯一出处；发现组件内硬编码文案应收拢到这里 |
 | zh 首页文案 | `app/zh/page.tsx`（内嵌） | **有意保留**：手写翻译约定（zh 首页不走自动翻译，en/zh 是两个平行维护的页面） |
 | 照片/字体素材 | `public/assets/`（上网）＋ `assets-src/`（原始，勿放 public） | 内部**按页面归属**，见下方 § public/assets 布局 |
 
 ### `content/` 布局 = 站点架构（2026-10-17）
 
-Guatemala 已把可编辑 `story.json` 与不可手编的 `generated/travel/guatemala-2026/data.json` 分开。其他游记仍有历史例外：PTES 的 `track.json`、巡礼的 `page.json`、France 的部分派生位置/路线 JSON 尚在 `content/`；不要把这些例外当作新增游记的模板。`out/` 是 Next.js 最终静态导出，不作为源数据目录。
+旅行日志的可编辑内容在 `content/travel/<id>/`；GPS、站点、路线账本与工作缓存迁到 `generated/travel/<id>/`。PTES 的大轨迹由 `sync:data` 镜像到 `public/data/travel/ptes-2025/track.json`，保持原浏览器 URL。`out/` 是 Next.js 最终静态导出，不作为源数据目录。
 
-**一个子目录对应一个路由段**，没有例外：
+**通常一个子目录对应一个路由段**；独立行程草案可不加入公开索引：
 
 ```
 content/
@@ -33,12 +33,17 @@ content/
   project/   → /project  · /project/zh
   travel/    → /travel   · /travel/zh
     gallery/items.json    ← /travel 页的「Stories & frames」照片墙，不是 trip
-    <id>/                 ← 每趟旅行一个，见 content/travel/README.md
+    <id>/                 ← 旅行日志或独立行程草案，见 content/travel/README.md
   site/      ← 不属于任何页面：navigation.ts（导航表）、profile.json（站点身份）
 ```
 
 `travel/gallery/` 没有 `card.json`，`lib/travel/trips.ts` 扫目录时会跳过它 ——
 「是不是 trip」由有没有 `card.json` 决定，不由目录位置决定。
+
+`/travel/egypt2026/` 是直达的中文九日行程概览，正文在
+`content/travel/egypt2026/guide.md`，由 `lib/egypt2026.ts` 在构建时拆分，
+`components/travel/EgyptItinerary.tsx` 渲染。它没有 `card.json`，不进入
+Travel hub、Blog、首页 Recent Posts 或导航；页面设置 `noindex`，但并非访问控制。
 
 #### 单实例页 vs 集合页（为什么 about/cv 的 content 里有"页面骨架"）
 
@@ -182,7 +187,7 @@ about 首段的 CV 与 travel 段的 `Travel →` 已恢复成普通 markdown �
 **两条判据，按顺序问：**
 1. **是我做的吗？** 不是 → `public/data/vendor/`（第三方地理数据，`LICENSE.md` 记来源）。
 2. **是页面的一部分，还是内容创作？**
-   - **页面的一部分**（页头页脚要用的图、按钮位、印章）→ `assets/<页面>/`
+   - **页面的一部分**（页头页脚要用的图、按钮位）→ 浏览器直接读取时放 `public/assets/<页面>/`；构建时内联的 SVG 源放 `assets-src/`
    - **内容创作**（帖子/游记正文里出现的照片）→ `assets/photos/<主题>/`
 
 ```
@@ -191,7 +196,6 @@ public/assets/
   home/            avatar.jpg + nav/{7 张}.webp（首页导航窗格预览，按 SectionId 动态拼 URL）
   cv/              v1ncent19-cv-en.pdf
   project/<slug>/  各项目页的 PDF
-  gallery/         badges/*.svg（手绘印章，页面元数据；build-badges 的输入源）
   photos/          ← 内容创作，按主题
     gallery/{large,thumb}/            相册墙两档入库 webp（同一批照片的派生）
     gallery/original/                 49 张全分辨率原图（145 MB）—— **本地母版兼管线源目录，git-ignored、不上线**
@@ -202,21 +206,19 @@ public/assets/
 public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOutlineLow.svg（amCharts）
 ```
 
-**为什么 gallery 的 badge 留在 assets/ 而照片进了 photos/**：badge 是页面装饰（贴在每张卡片上的印章），按你的话属于"页面的一部分"；而 `photos/gallery/` 是同一批照片的三个尺寸档，属于内容创作。两者名字里都有 gallery，归属不同，别被名字骗了。
+**相册印章源与照片**：`assets-src/gallery-badges/*.svg` 是构建时内联的手绘图形源，`generated/gallery/badge-art.ts` 是可再生模块；照片的 WebP 浏览器直接读取，放在 `public/assets/photos/gallery/`。
 
 > **判断规则**
 > - "写给人看的正文" → `content/`
 > - "界面上的固定文字" → `lib/i18n.ts`
 > - "原始素材" → `assets-src/`（git-ignored）
-> - "要原样上网的数据文件" → 也放 `content/`，由 `sync:data` 镜像到 `public/data/`
+> - "脚本生成的地图或诊断数据" → `generated/`；需浏览器 fetch 时由 `sync:data` 镜像到 `public/data/`
 >
 > **`public/` 只有一个用处：给需要 URL 的东西一个 URL**（图片、PDF、字体，以及必须 `fetch()` 才能不进 bundle 的数据）。
 > 它不是"文件型内容的家"，是"构建产物的出口"，所以判据是**「它能不能 import」**：
-> 能 import 就留在 `content/`（只有一份，改哪份就是哪份）；只有大到不能进 bundle 的（目前只有 ptes 的 `track.json`）才需要 public 那一份。
+> 可编辑正文留在 `content/`，派生数据留在 `generated/`；两者都可在构建期 import。只有大到不能进初始 bundle 的（目前只有 PTES 的 `track.json`）才需要 public 镜像。
 >
-> **"不用人工维护" ≠ "构建产物"**：`public/` 里还有一类是**生成器产出但无可再生源**的文件
-> （巡礼页的 `route.json`、anitabi 快照）。它们放 `public/` 是因为没人手改，但**必须入库** —— 删掉就没了。
-> 判据不是"要不要维护"，而是"**能不能从仓库里重新跑出来**"。
+> **"不用人工维护" ≠ "可随手删除"**：巡礼页的 `route.json` 与 anitabi 时点快照虽不由人编辑，仓库内也没有完整可再生源。它们已移到 `generated/` 并继续入库。
 
 ## 地图旅行日志公共框架（2026-10-24）
 
@@ -259,7 +261,8 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 | `lib/` | `i18n.ts`（双语 UI 字典）、`localized.ts`（`pick`/`pickList` 唯一回退）、`blog.ts`/`blog-travel.ts`/`content.ts`（内容装载；`blog-travel.ts` = 行程并入 Blog 索引）、`site.ts`、`theme.ts`（`useSyncExternalStore` 主题）、`lede-math.ts`（卡片摘要 KaTeX）、`travel/`（`trips.ts` trip 注册表 + **`tripPostedAt()`** = 游记发布日期（取 `end`，见 CONVENTIONS） + `pilgrimage.ts` 巡礼领域模型 + `types.ts` + `use-story-controller.ts` 滚动状态机：弹簧缓动的文档阅读线共同驱动标点时间与地图镜头，单调三次插值平滑分节速度，章节坐标按布局缓存 + `gps.ts` + **`use-scrub-track.ts`** 进度条拖拽 hook（ref 驱动，禁 `useState`）+ **`scrub-chapters.ts`** 拖动比例 ↔ 章节换算 + **`map-split.tsx`** 移动端地图/文字分割 `useMapSplit`） | |
 | `lib/travel/log/` | 旅行日志公共模型、数据校验、章节与布局接口 | `definitions/<id>.ts` 为每篇内容入口；`reading-geometry.ts`、`navigation.ts` 共用测量与跳转；`camera.ts` 定义镜头所有权 |
 | `content/` | `site/{profile.json,navigation.ts}`、`blog/*.md`、`travel/gallery/items.json`、`cv/`、`project/`、`travel/` | manifest 类文件「脚本生成 + 人工编辑」模式 |
-| `public/data/travel/<trip>/` | 两个 trip 的**生成器产物**都在这里，但入库策略不同 | **ptes**：`track.json` 是 `sync:data` 的产物，gitignored；**just-because**：`route.json` + `anitabi-212278.json` 无仓库内可再生源（GPS 原始导出在 gitignored 的 `assets-src/`；anitabi 是时点快照），**必须入库**。共同点：都不用人工维护。**隐私红线见 §数据管线** |
+| `generated/travel/<trip>/` | 入库的派生路线、站点、位置、来源缓存与诊断 | 生成数据不放在 `content/`；部分私有源无法在干净 CI 重建，必须保留已审查的派生文件。**隐私红线见 §数据管线** |
+| `public/data/travel/ptes-2025/` | `track.json` 的浏览器可 fetch 镜像 | 由 `sync:data` 从 `generated/` 复制，gitignored；保持原 URL 和字节内容 |
 | `scripts/` | 见下表「脚本清单」 | 四个挂 `prebuild`/`predev`（`badges → sync:data → check:refs → check:i18n`）；Guatemala 的四个生成脚本只手动运行，不在 CI 中下载数据 |
 | `assets-src/` | 原始素材（字体 OTF、**travel 原始 GPS 数据**） | 绝不进 public/，git-ignored（部分） |
 
@@ -267,8 +270,8 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 
 | 脚本 | 命令 | 何时跑 | 作用 |
 |---|---|---|---|
-| `build-badges.mjs` | `npm run badges` | **prebuild/predev** | 合成 `components/gallery/badge-art.generated.ts`；改图标后需手动重跑 |
-| `sync-trip-data.mjs` | `npm run sync:data` | **prebuild/predev** | 按 `MIRRORED`/`KEEP` 清单把 trip JSON 镜像进 `public/data/travel/`，其余 prune |
+| `build-badges.mjs` | `npm run badges` | **prebuild/predev** | 从 `assets-src/gallery-badges/*.svg` 合成 `generated/gallery/badge-art.ts` |
+| `sync-trip-data.mjs` | `npm run sync:data` | **prebuild/predev** | 只把 `generated/travel/ptes-2025/track.json` 镜像进原 `public/data/travel/` URL，其余未声明 JSON prune |
 | `check-refs.mjs` | `npm run check:refs` | **prebuild/predev** | `content/` 里的 `/assets/…` 字符串引用解析不到 `public/` 就 exit 1 |
 | `check-i18n.mjs` | `npm run check:i18n` | **prebuild/predev** | 旧式双语键（`*_en`/`*_zh`/`*Zh`/`*En`）或两端全空的 `{en,zh}` → exit 1 |
 | `check-travel-log.mjs` | `node scripts/check-travel-log.mjs` | 改旅行日志后手动 | 四语言路由、布局、拖拽、导航、地图与错误兜底回归；需通过环境变量指定浏览器运行时 |
@@ -283,7 +286,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 | `pilgrimage-photos.mjs` | `npm run pilgrimage:photos` | 合成**之前** | 抽出 `photos.json`（位置真源） |
 | `pilgrimage-route.mjs` | — | 换 GPS 数据时 | 从全年 GPS 裁巡礼当天 → `route.json` |
 | `pilgrimage-derive.mjs` | `npm run pilgrimage:derive` | 加对比图后 | 母版 jpg → `compare/*.webp` + `cover.png` |
-| `pilgrimage-map.mjs` | — | 上游数据变了 | 组装 `content/travel/just-because/page.json` |
+| `pilgrimage-map.mjs` | — | 上游数据变了 | 组装 `generated/travel/just-because/page.json`；文案只在 `content/travel/just-because/story.json` |
 | `guatemala-travel.mjs` | `npm run guatemala:build` | 换 GPS、照片、分段时间时 | 私有全年 GPS + EXIF 原图 → 裁切路线、去元数据 WebP 与 `data.json` |
 | `guatemala-terrain.mjs` + `guatemala-terrain-style.mjs` + `guatemala-contours.mjs` | `npm run guatemala:terrain` | 地形范围/样式变化时 | 下载 Terrarium DEM，生成素色贴图和平滑等高线；需要网络，不进 prebuild |
 | `build-france-2024.py` / `build-france-2024-places.py` | `python scripts/<file>` | 私有核对稿或地点匹配变化后手动 | 生成公开正文、路段账本与可公开地点，不发布手稿或住处门牌 |
@@ -294,13 +297,13 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 
 ## 数据管线
 
-- **相册**：`public/assets/photos/gallery/original/` 原图 → `npm run gallery:gen` → `public/assets/photos/gallery/{thumb,large}` + `content/travel/gallery/items.json`（人工字段保留）。详细流程见 `GALLERY_ADDING_PHOTOS.md`。**源目录 2026-10-25 移到树内**（原为仓库根 `GalleryPhoto/`，已不存在），脚本对源目录只读；该目录被 `.gitignore` 挡住，所以仍**不上线**（2026-10-18 决定，下载按钮随之取消；见 `.gitignore` 注释）。需要换源目录时用 `GALLERY_SRC=<dir>`，不改脚本。
-- **Badge**：`npm run badges`（prebuild/predev 自动）合成 `badge-art.generated.ts`；改图标后需手动重跑。
+- **相册**：`public/assets/photos/gallery/original/` 原图 → `npm run gallery:gen` → `public/assets/photos/gallery/{thumb,large}` + `content/travel/gallery/items.json`（人工字段保留）。详细流程见 `GALLERY_ADDING_PHOTOS.md`。**源目录 2026-10-25 移到树内**（原为仓库根 `GalleryPhoto/`，已不存在），脚本对源目录只读；该目录被 `.gitignore` 挡住，所以仍**不上线**（2026-10-18 决定）。灯箱下载入口保存当前展示的 `large` WebP。需要换源目录时用 `GALLERY_SRC=<dir>`，不改脚本。
+- **Badge**：`assets-src/gallery-badges/*.svg` 是入库的源图，`npm run badges`（prebuild/predev 自动）合成 `generated/gallery/badge-art.ts`；徽章按照片主题绘制并复用同一双圆环框。
 - **中文字体**：`assets-src/fonts/GenWanMin2TC/` OTF → `scripts/subset-cjk-fonts.py` → `public/fonts/genwanmin2tc-{el,l,r,m,sb}.woff2`（对应 300/400/500/600/700，各 ~850 KB）；大改内容后用 venv python 重跑。
 - **英文字体（2026-10-25）**：`assets-src/fonts/EBGaramond/` 可变字体 woff2（上游 583 KB）→ `scripts/subset-ebgaramond.py` → `public/fonts/ebgaramond-{roman,italic}.woff2`（共 **106 KB**）。**可变轴 `wght 400–800` 必须保留**（子集化不能加 `--instance`），一个文件覆盖全站用到的 400/500/600/700。许可证 OFL 1.1，`EBGaramond-OFL.txt` 随字体一起放 `public/fonts/`（OFL 要求）。
-- **Travel GPS（隐私红线，最高优先）**：新增 trip = lab 预处理 → `scripts/sanitize-trip-gps.py` 清洗（home anchor 自动取轨迹首点、radius 3km 裁掉居家段并重排全部索引/bounds）→ 把结果拆两处：**人造内容（trip/scenes/attractions/diagnostics，~115 KB）直接放 `content/travel/<id>/`（import）；`track.json` 也放在同一层**，靠 `scripts/sync-trip-data.mjs` 的 `MIRRORED` 清单声明它需要 fetch —— **「要 URL」由清单表达，不由目录名表达**（早先的 `<id>/data/` 方案会把语义压在文件夹名上，且其 prune 曾清空过 `public/data/travel/ptes-2025/`）→ `npm run sync:data` 把它镜像到 `public/data/travel/<id>/`（产物，gitignored）→ `app/travel/<id>/page.tsx`(en+zh) + `content/travel/<id>/card.json`。**上网数据绝不含住址级 GPS；原始数据只留在 `assets-src/travel-data/`。注意 gitignored ≠ 私密：`public/` 里的一切仍然上网，只是不进版本控制。**
+- **Travel GPS（隐私红线）**：原始全年记录只留在 gitignored `assets-src/travel-data/`。公开前用 `scripts/sanitize-trip-gps.py` 裁掉不应发布的点，保留人工 `trip.json` / `scenes.json` / `attractions.json` 在 `content/travel/ptes-2025/`，已清洗的 `track.json` 与诊断文件在 `generated/travel/ptes-2025/`。`npm run sync:data` 只把轨迹镜像到原有 `/data/travel/ptes-2025/track.json` URL；`public/` 内的文件即使 gitignored 也会上网。
 - **Guatemala terrain**：`content/travel/guatemala-2026/story.json` 是唯一正文、章节与镜头源；页面直接与 `generated/travel/guatemala-2026/data.json` 组合。`assets-src/travel-data/` 全年 GPS + `assets-src/guatemala-masters/` EXIF 原图 → `npm run guatemala:build` → 派生地图数据 + `public/assets/photos/travel/guatemala-2026/*.webp`；地形由 `npm run guatemala:terrain` 生成到 `public/assets/terrain/guatemala*`。私有输入被忽略，裁切路线、照片位置、去元数据图和地形派生资源入库，完整边界见专项 FEATURE。
-- **引用完整性**：`npm run check:refs`（prebuild/predev 自动）扫描 `content/` 中所有 `/assets/…` 之类的路径字符串，解析不到 `public/` 就中断构建。字符串引用没有类型检查，写错只会静默出一张空白图。
+- **引用完整性**：`npm run check:refs`（prebuild/predev 自动）扫描 `content/` 与 `generated/` 中所有 `/assets/…` 之类的路径字符串，解析不到 `public/` 就中断构建。字符串引用没有类型检查，写错只会静默出一张空白图。
 
 ## 样式体系
 

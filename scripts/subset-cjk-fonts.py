@@ -6,7 +6,7 @@ subset-cactus.py (2026-09-07).
 
 Why: full CJK OTFs are ~22 MB each — never deployable raw. The subset keeps
 only glyphs present in the font among (a) every CJK char found in the repo's
-source of truth (content/, app/, components/, lib/) plus (b) a standing
+source of truth (content/, generated/, app/, components/, lib/) plus (b) a standing
 safety set — CJK punctuation, fullwidth forms, common units — so short edits
 rarely need a re-run. Chars outside a subset fall through the CSS stack to
 the next font; visitors with the font installed locally use their full copy
@@ -32,12 +32,17 @@ from tempfile import NamedTemporaryFile
 REPO = Path(__file__).resolve().parent.parent
 
 # Scan targets for harvestable CJK chars (UI strings + posts + JSON copy).
-# `public/data` matters: the travel/trip JSON (ptes-2025 scenes.json etc.)
-# renders as on-screen prose but lives outside content/app/components — before
+# `generated` and `public/data` matter: imported map labels and runtime JSON
+# can render on-screen text outside content/app/components — before
 # 2026-10-10 it was never harvested, so ~26% of the journal's CJK chars fell
 # through the serif stack to a system sans font.
 SCAN_DIRS = ["content", "app", "components", "public/data"]
-SCAN_FILES = ["lib/i18n.ts", "lib/content.ts", "lib/blog.ts"]
+SCAN_FILES = [
+    "lib/i18n.ts", "lib/content.ts", "lib/blog.ts",
+    "generated/travel/just-because/page.json",
+    "generated/travel/france-2024/places.json",
+    "generated/travel/guatemala-2026/data.json",
+]
 
 # Pinned characters, harvested from sources the scan cannot see. Re-running the
 # script REBUILDS every subset from scratch, so anything that is only in a

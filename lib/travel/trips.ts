@@ -1,32 +1,10 @@
 /**
  * Travel hub registry.
  *
- * 2026-10-17 reorganisation: each trip owns a directory under
- * `content/travel/<id>/`, and its hub-card metadata lives in that directory as
- * `card.json` beside the trip's own data files:
- *
- *   content/travel/ptes-2025/
- *     card.json          ← this file
- *     trip.json          ← imported by TravelLog (build-time, single copy)
- *     scenes.json        ← ditto
- *     attractions.json   ← ditto
- *     diagnostics.json   ← ditto (provenance for track.json, not rendered)
- *     track.json         ← ONLY this one is fetched, via
- *                          public/data/travel/<id>/ (mirrored by sync:data)
- *   content/travel/just-because/
- *     card.json          ← this file
- *     page.json          ← imported at build time by the page; GENERATED, but
- *                          overview/outro/stop-notes are hand-written and
- *                          preserved across generator runs
- *     (its generator outputs — route.json, anitabi-212278.json — live in
- *      public/data/travel/just-because/ because nothing hand-edits them)
- *
- * Why the change: the cards used to live as inline objects in one central
- * array, which meant adding a trip required editing a file in `lib/` — the
- * content was spread across the tree with nothing tying it to the trip it
- * described. Now `content/travel/<id>/` is the complete record of a trip
- * (metadata + data + generator inputs), and this module just sweeps the
- * directory.
+ * Each trip has a content/travel/<id>/card.json, discovered here by directory
+ * scan. Hand-authored story files stay beside the card. Imported derived map
+ * data lives in generated/travel/<id>/; PTES's large track is mirrored to the
+ * unchanged public/data/travel/ptes-2025/track.json runtime URL by sync:data.
  *
  * ORDER: sorted by `start` date, oldest first, with `id` as the tiebreak so
  * the result is deterministic. This module's order no longer decides the hub's
@@ -34,19 +12,15 @@
  * date and applies the `featured` band itself — so the sort here only needs to be
  * *stable and predictable*, which makes diffs and debugging sane.
  *
- * PRIVACY: `card.json` and the other imported JSONs are build-time content and
- * never ship as separate files, but the mirrored track under
- * `public/data/travel/<id>/` DOES ship. Run `scripts/sanitize-trip-gps.py` on
- * the trip folder before pointing the page at it (2026-09-26 user privacy
- * rule). That public/ file is generated and gitignored — but gitignored is not
- * private: it still reaches the web.
+ * PRIVACY: generated trip data is committed and may be bundled into the site.
+ * Only sanitized coordinates belong there. The PTES mirror under public/ also
+ * ships at its existing URL. Original GPS stays under ignored assets-src/.
  *
  * To add a trip: create `content/travel/<new-id>/card.json`, add
  * `app/travel/<new-id>/page.tsx` (+ the `/zh` mirror), import the hand-written
- * JSONs in TravelLog, and — if the GPS track is too big to inline — add its
- * `<new-id>/track.json` line to the `MIRRORED` list in
- * `scripts/sync-trip-data.mjs`. The trip folder is flat; "needs a URL" is
- * declared in that script, not by a `data/` subfolder (removed 2026-10-17).
+ * JSONs in its definition, and — if a GPS track is too big to inline — put
+ * the sanitized track under generated/ and add its `<new-id>/track.json` to
+ * `scripts/sync-trip-data.mjs`.
  * Never write public/data/ by hand. Nothing in this file needs editing.
  */
 

@@ -219,7 +219,7 @@ try {
 
       if (id === "just-because" && lang === "en") {
         // Exercise actual map picking, including the map -> story jump and dismissal latch.
-        const data = JSON.parse(await fs.readFile(path.join(root, "content/travel/just-because/page.json"), "utf8"));
+        const data = JSON.parse(await fs.readFile(path.join(root, "generated/travel/just-because/page.json"), "utf8"));
         const stop = data.stops[12];
         await page.waitForFunction(() => window.__pjMap?.getLayer("pj-stops-hit"));
         if (await page.locator(".pj-popup-close").count()) await page.locator(".pj-popup-close").click();

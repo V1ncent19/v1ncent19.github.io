@@ -16,7 +16,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTENT = ROOT / "content" / "travel" / "france-2024"
+CONTENT = ROOT / "generated" / "travel" / "france-2024"
 CACHE = CONTENT / "metro-network-source-cache.json"
 OUTPUT = CONTENT / "metro-geometries.json"
 LINE_CODES = {str(number) for number in [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14]}

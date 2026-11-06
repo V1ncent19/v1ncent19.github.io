@@ -56,10 +56,10 @@
   - 高度上限是**第二步**单独做的 `resize({ height: 1280 })`。一步同时给宽和高，
     会让极端长图反过来把宽度压小。
 - **不发布原图**（2026-10-18 决定）。原图不再复制进 `public/`，清单里也不再生成
-  `originalUrl`，灯箱因此**没有「下载原图」按钮**。原因：那 142 MB 一档被 `**/original/` 挡住不入库，
+  `originalUrl`，灯箱的下载按钮保存当前展示的 `large` WebP，**不是全分辨率原图**。原因：那 142 MB 一档被 `**/original/` 挡住不入库，
   干净 CI 检出没有这些文件 → `check:refs` 失败 → Pages 构建挂（run #12）；改成入库后
   142 MB 的 push 又反复 HTTP 408 超时。原图只留在磁盘上当母版。
-  想让某张有下载按钮，就手写一条 **外部**（http/https）`originalUrl`，脚本会保留它。
+  每张照片都有同源 `large` 下载入口；外部 `originalUrl` 即使保留在数据中，也不控制这个入口。
 - 合并 `content/travel/gallery/items.json`，**按 `source`（原始文件名）匹配行**：
   已存在的行只刷新生成字段；新文件追加一行，然后按日期倒序重排。
 - 自动填：`date`（EXIF `DateTimeOriginal` → `YYYY-MM-DD`）、`lat` / `lon`（EXIF GPS 十进制度，
@@ -85,7 +85,7 @@
 | `country_code` | 图片角标里的 ISO alpha-2（如 `TW`） |
 | `featured` | 精选集：**排到最前面**（不是筛选，其余照片接在后面）+ 橙红强调色 |
 | `badge` | 旅行印章预设 key（矢量图缺位时渲染占位符） |
-| `originalUrl` | 可选，**只认 http/https 外链**（如网盘/CDN）—— 有它才显示下载按钮；留空是常态 |
+| `originalUrl` | 可选历史字段，只认 http/https 外链；当前灯箱下载按钮始终下载 `large` WebP |
 | `color` | **不要手填** —— 由 `featured` 派生 |
 
 **双向回退**：`place` / `placeLocal` / `title` 只填一边也能两处都读通 ——

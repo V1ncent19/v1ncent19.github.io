@@ -132,8 +132,8 @@ export interface Copy {
     dirOld: string;
     /** Colophon / storage note at the bottom of the page. */
     note: string;
-    /** Link on an original full-res copy (shown only when the item has one). */
-    downloadOriginal: string;
+    /** Lightbox download for the displayed large WebP. */
+    downloadImage: string;
     /** Visible + a11y label for closing the lightbox. */
     close: string;
     /** Prev / next photo buttons in the lightbox. */
@@ -285,8 +285,8 @@ export const copy: Record<Lang, Copy> = {
       sortDir: "Toggle sort direction",
       dirNew: "Newest first",
       dirOld: "Oldest first",
-      note: "The images here are compressed WebP generated from full-resolution originals that stay off GitHub. Original files download through my shared drive — a link appears under the large view when one is shared for that photo.",
-      downloadOriginal: "Download original",
+      note: "The images here are compressed WebP generated from full-resolution originals that stay off GitHub. Open a photo to download the larger image shown in the lightbox.",
+      downloadImage: "Download image",
       close: "Close",
       prevPhoto: "Previous photo",
       nextPhoto: "Next photo",
@@ -429,8 +429,8 @@ export const copy: Record<Lang, Copy> = {
       sortDir: "切换正逆序",
       dirNew: "从新到旧",
       dirOld: "从旧到新",
-      note: "网页上的图片是由全分辨率原图生成的压缩 WebP，原图不存入 GitHub。需要原图时可从我的共享云盘下载——某张原图已公开共享时，其放大视图下会出现下载入口。",
-      downloadOriginal: "下载原图",
+      note: "网页上的图片是由全分辨率原图生成的压缩 WebP，原图不存入 GitHub。点开照片后可下载灯箱中展示的较清晰版本。",
+      downloadImage: "下载图片",
       close: "关闭",
       prevPhoto: "上一张",
       nextPhoto: "下一张",

@@ -15,9 +15,9 @@
  *              export copies public/ verbatim into out/ and nothing else).
  *              Correct when the file is too large to inline.
  *
- *   So most trip JSON lives in content/travel/<trip>/ and is imported. The few
- *   files that are big enough to warrant fetch() are listed in MIRRORED below,
- *   and this script copies exactly those into public/data/travel/<trip>/.
+ *   Hand-authored trip JSON lives in content/ and is imported. Large derived
+ *   data lives in generated/; only the files listed in MIRRORED get a runtime
+ *   copy under public/data/travel/<trip>/.
  *
  * WHY AN EXPLICIT LIST AND NOT A FOLDER
  *   An earlier version mirrored "whatever is in content/travel/<trip>/data/".
@@ -31,17 +31,10 @@
  *   yet. Both passes are now driven by names written down here, so a new file
  *   in the trip folder is inert until someone says what it is.
  *
- * THE THREE CLASSES OF FILE IN public/data/travel/<trip>/
- *   1. MIRRORED  — listed below. A byte-for-byte copy of a content/ file.
- *                  Ignored by git, regenerated on every build.
- *   2. KEEP      — listed below. Generated, but NOT reproducible from anything
- *                  in the repo, so it is committed on purpose. Never copied,
- *                  never pruned.
- *   3. everything else — stale. Pruned with a warning, because "public/ has a
- *                  JSON that nothing declares" means a rename left a copy
- *                  behind that out/ would keep serving.
+ * Every public/data/travel JSON is a declared MIRRORED runtime copy. Other
+ * files are stale and pruned; source snapshots now live under generated/.
  *
- * DIRECTION IS ONE-WAY: content/ → public/. Editing the public/ copy directly
+ * DIRECTION IS ONE-WAY: generated/ → public/. Editing the public/ copy directly
  *   gets you an overwrite on the next build; it is gitignored precisely so you
  *   are not tempted.
  */
@@ -51,6 +44,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CONTENT_TRAVEL = path.join(ROOT, "content", "travel");
+const GENERATED_TRAVEL = path.join(ROOT, "generated", "travel");
 const PUBLIC_TRAVEL = path.join(ROOT, "public", "data", "travel");
 
 const CHECK_ONLY = process.argv.includes("--check");
@@ -58,29 +52,13 @@ const CHECK_ONLY = process.argv.includes("--check");
 const rel = (p) => path.relative(ROOT, p).replace(/\\/g, "/");
 
 /**
- * `<trip>/<file>` pairs to copy from content/travel/<trip>/<file> to
+ * `<trip>/<file>` pairs to copy from generated/travel/<trip>/<file> to
  * public/data/travel/<trip>/<file>, byte for byte.
  *
- * Add a line here when a trip file is too large to import. Right now that is
- * exactly one file, for one reason: track.json is 1.6 MB of GPS scrape output,
- * and inlining it would put 1.6 MB in the JS bundle and make the page wait for
- * it. Everything else on that trip is ~115 KB and is imported.
+ * PTES track.json is 1.6 MB and needs a runtime fetch; all other derived trip
+ * JSON can be imported at build time from generated/.
  */
 const MIRRORED = new Set(["ptes-2025/track.json"]);
-
-/**
- * `<trip>/<file>` pairs that live under public/ and must NEVER be pruned,
- * because they cannot be rebuilt from anything in the repo.
- *
- * route.json is cut from a raw GPS export that lives gitignored under
- * assets-src/travel-data/; anitabi-212278.json is a snapshot of a remote
- * dataset as it existed on one day. Deleting either is unrecoverable, so they
- * are committed on purpose and belong to no build step.
- */
-const KEEP = new Set([
-  "just-because/route.json",
-  "just-because/anitabi-212278.json",
-]);
 
 /** JSON files directly inside a directory (flat by design, not recursive). */
 function jsonFiles(dir) {
@@ -132,14 +110,14 @@ const present = contentKeys();
  *   first makes both modes agree.
  */
 
-/* A MIRRORED entry with no content/ source is a bug in this file, not drift. */
+/* A MIRRORED entry with no generated/ source is a bug in this file, not drift. */
 for (const key of MIRRORED) {
-  if (!fs.existsSync(path.join(CONTENT_TRAVEL, key))) {
-    missingSource.push(`${rel(path.join(CONTENT_TRAVEL, key))}  (declared in MIRRORED but not in content/)`);
+  if (!fs.existsSync(path.join(GENERATED_TRAVEL, key))) {
+    missingSource.push(`${rel(path.join(GENERATED_TRAVEL, key))}  (declared in MIRRORED but not in generated/)`);
   }
 }
 if (missingSource.length) {
-  console.error("\n✗  MIRRORED declares a file that does not exist in content/:\n");
+  console.error("\n✗  MIRRORED declares a file that does not exist in generated/:\n");
   for (const line of missingSource) console.error(`    ${line}`);
   console.error("\n   Fix the path in scripts/sync-trip-data.mjs.\n");
   process.exit(1);
@@ -169,7 +147,7 @@ if (shadows.length) {
 
 /* Copy pass — driven entirely by MIRRORED. */
 for (const key of [...MIRRORED].sort()) {
-  const src = path.join(CONTENT_TRAVEL, key);
+  const src = path.join(GENERATED_TRAVEL, key);
   const dst = path.join(PUBLIC_TRAVEL, key);
 
   /* Existence was already proven by the guard above. */
@@ -185,8 +163,8 @@ for (const key of [...MIRRORED].sort()) {
 }
 
 /*
- * Prune pass — anything under public/data/travel/ that is neither MIRRORED nor
- * KEEP. Reported, never inferred silently: a leftover here means a rename or a
+ * Prune pass — anything under public/data/travel/ that is not MIRRORED.
+ * Reported, never inferred silently: a leftover here means a rename or a
  * deletion upstream, and out/ would keep serving the old bytes.
  */
 for (const trip of fs.existsSync(PUBLIC_TRAVEL) ? fs.readdirSync(PUBLIC_TRAVEL) : []) {
@@ -194,7 +172,7 @@ for (const trip of fs.existsSync(PUBLIC_TRAVEL) ? fs.readdirSync(PUBLIC_TRAVEL) 
   if (!fs.statSync(dir).isDirectory()) continue;
   for (const name of jsonFiles(dir)) {
     const key = `${trip}/${name}`;
-    if (MIRRORED.has(key) || KEEP.has(key)) continue;
+    if (MIRRORED.has(key)) continue;
     const dst = path.join(dir, name);
     if (CHECK_ONLY) {
       removed.push(rel(dst));
@@ -208,16 +186,16 @@ for (const trip of fs.existsSync(PUBLIC_TRAVEL) ? fs.readdirSync(PUBLIC_TRAVEL) 
 /* Guards already ran above, before either pass — see the note there. */
 
 if (CHECK_ONLY && (drifted.length || removed.length)) {
-  console.error("\n✗ public/data/travel/ is out of sync with content/travel/\n");
+  console.error("\n✗ public/data/travel/ is out of sync with generated/travel/\n");
   if (drifted.length) {
-    console.error("  content/ changed but public/ was not regenerated:");
+    console.error("  generated/ changed but public/ was not regenerated:");
     for (const d of drifted) console.error(`    ${d.src}  (${d.reason} at ${d.dst})`);
   }
   if (removed.length) {
     console.error("  public/ has JSON that nothing declares:");
     for (const s of removed) console.error(`    ${s}`);
   }
-  console.error("\n  Run `npm run sync:data` to regenerate. Edit content/, not public/.\n");
+  console.error("\n  Run `npm run sync:data` to regenerate. Edit generated/ source, not public/.\n");
   process.exit(1);
 }
 

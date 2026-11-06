@@ -9,18 +9,17 @@
  * INPUTS
  *   public/assets/photos/pilgrimage/just-because/compare/*.webp   (the shipped tier)
  *   assets-src/travel-data/pilgrimage/photos.json          (position truth, git-ignored)
- *   public/data/travel/just-because/route.json          (sanitized track)
- *   public/data/travel/just-because/anitabi-212278.json (anitabi point snapshot)
+ *   generated/travel/just-because/route.json          (sanitized track)
+ *   generated/travel/just-because/anitabi-212278.json (anitabi point snapshot)
  *
  * OUTPUT (committed)
- *   content/travel/just-because/page.json
+ *   generated/travel/just-because/page.json
  *
  * WHY IT IS DERIVED RATHER THAN HAND-WRITTEN
  *   The stop list has to stay in lockstep with what is actually on disk. If a
  *   composite is added or dropped, running this regenerates the list; the parts
- *   that ARE hand-authored — the trip overview, the closing note, and each
- *   stop's own caption — are preserved across runs by reading the previous
- *   output first and carrying those fields over.
+ *   Hand-authored title, overview, closing note and stop captions live in
+ *   content/travel/just-because/story.json and are never rewritten here.
  *
  * PRIVACY: the output only carries what the page renders — the composite's
  * pixel path, its capture time to the minute, and a rounded coordinate. The
@@ -48,21 +47,18 @@ const PHOTOS_ABS = path.resolve(
   root,
   arg("photos", "assets-src/travel-data/pilgrimage/photos.json"),
 );
-/* Layout (2026-10-17): one directory per trip under content/travel/<id>/ —
-   `<id>/page.json` is what the page imports, `<id>/source/` holds the inputs
-   that generators read. These defaults keep the whole pipeline runnable with
-   no flags; each is still overridable via --route / --points / --out. */
+/* Derived files live under generated/; editable story lives under content/. */
 const ROUTE_ABS = path.resolve(
   root,
-  arg("route", "public/data/travel/just-because/route.json"),
+  arg("route", "generated/travel/just-because/route.json"),
 );
 const POINTS_ABS = path.resolve(
   root,
-  arg("points", "public/data/travel/just-because/anitabi-212278.json"),
+  arg("points", "generated/travel/just-because/anitabi-212278.json"),
 );
 const OUT_ABS = path.resolve(
   root,
-  arg("out", "content/travel/just-because/page.json"),
+  arg("out", "generated/travel/just-because/page.json"),
 );
 
 /** Beyond this, the nearest anitabi point is not a match — leave it blank. */
@@ -149,14 +145,6 @@ async function main() {  for (const [label, abs] of [
   const snap = JSON.parse(fs.readFileSync(POINTS_ABS, "utf8"));
   const points = (snap.points ?? []).filter((p) => p.lat != null && p.lon != null);
 
-  /** Carry hand-authored prose across regenerations. */
-  const prev = fs.existsSync(OUT_ABS)
-    ? JSON.parse(fs.readFileSync(OUT_ABS, "utf8"))
-    : null;
-  const prevNotes = new Map(
-    (prev?.stops ?? []).map((s) => [s.id, s.note ?? ""]),
-  );
-
   const files = fs
     .readdirSync(COMPARE_DIR)
     .filter((f) => /\.webp$/i.test(f))
@@ -236,7 +224,6 @@ async function main() {  for (const [label, abs] of [
         : null,
       // Second-best, for the ambiguous ones — surfaced in the console only.
       _runnerUpM: n2 ? Math.round(n2.d) : null,
-      note: prevNotes.get(id) ?? "",
     });
   }
 
@@ -257,24 +244,6 @@ async function main() {  for (const [label, abs] of [
   }
 
   const doc = {
-    _note:
-      "Rendered data for the Just Because! pilgrimage page. Derived by " +
-      "scripts/pilgrimage-map.mjs — re-run it after adding/removing a composite. " +
-      "`overview`, `outro` and every stop's `note` are hand-authored and preserved.",
-    _generator: "scripts/pilgrimage-map.mjs",
-    generatedAt: new Date().toISOString(),
-    title: "Just Because! — 藤沢・镰仓",
-    subtitle: "2026-09-21",
-    // ── hand-authored, carried over on every re-run ────────────────────────
-    overview: prev?.overview ?? {
-      _placeholder: true,
-      text: "",
-    },
-    outro: prev?.outro ?? {
-      _placeholder: true,
-      title: "",
-      text: "",
-    },
     // ── attribution: anitabi is CC BY-NC-SA 4.0, credit + link are required ─
     attribution: {
       text: "圣地巡礼点位与动画截图来自 Anitabi",
@@ -330,9 +299,6 @@ async function main() {  for (const [label, abs] of [
   if (orphans.length) {
     console.warn(`[map]   ${orphans.length} composite(s) with no position — dropped:`);
     for (const o of orphans.slice(0, 10)) console.warn(`         ${o.f}`);
-  }
-  if (doc.overview?._placeholder || doc.outro?._placeholder) {
-    console.log("[map] note: overview/outro are still placeholders — write them in the JSON.");
   }
 }
 

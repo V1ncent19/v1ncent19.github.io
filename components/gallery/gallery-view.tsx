@@ -908,10 +908,8 @@ export function GalleryView({
    * point, then `alt` reads as a boxed "Thoughts / 随想" card (2026-09-06
    * user brief: thin border on a faint accent wash, first line is a small
    * accent label with a graphic backtick glyph, the text flows italic
-   * beneath), followed by the location map. The download link (shown only
-   * when the row carries a hand-authored EXTERNAL `originalUrl` — the local
-   * original tier is no longer published, see `items.json` / `.gitignore`)
-   * becomes a full-width CTA that settles at the bottom of the
+   * beneath), followed by the location map. The download link saves the
+   * same-origin `large` WebP displayed in the lightbox, at the bottom of the
    * rail on the two-pane layout (`pin`) while stacked/mobile content flows
    * naturally. As before, the accent location block is withheld while `title`
    * is empty — then the heading itself falls back to the place line, so the
@@ -1004,25 +1002,16 @@ export function GalleryView({
           <WorldLocationMap lat={item.lat} lon={item.lon} />
         </div>
 
-        {item.originalUrl ? (
-          <div className={pin ? "mt-auto pt-8" : "mt-7"}>
-            {/* download attribute: a same-origin url saves straight to disk
-                with the camera filename (IMG_xxxx.jpeg) instead of opening in
-                a tab; browsers ignore it for cross-origin urls, where
-                target=_blank is the behaviour (the normal case now that
-                originalUrl is external-only). */}
-            <a
-              href={item.originalUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-              download={item.source}
-              className="ui-text inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-on-brand shadow-sm transition hover:bg-brand-strong hover:no-underline"
-            >
-              <Download className="h-4 w-4" aria-hidden />
-              {s.gallery.downloadOriginal}
-            </a>
-          </div>
-        ) : null}
+        <div className={pin ? "mt-auto pt-8" : "mt-7"}>
+          <a
+            href={item.large}
+            download={item.source.replace(/\.[^.]+$/, ".webp")}
+            className="ui-text inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-on-brand shadow-sm transition hover:bg-brand-strong hover:no-underline"
+          >
+            <Download className="h-4 w-4" aria-hidden />
+            {s.gallery.downloadImage}
+          </a>
+        </div>
       </div>
     );
   };

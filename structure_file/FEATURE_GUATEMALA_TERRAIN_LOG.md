@@ -108,4 +108,4 @@ npx eslint components/travel/TerrainMap.tsx components/travel/TerrainStory.tsx c
 npm run build
 ```
 
-本篇当前开发分支不是 Pages 发布分支；只有合并或推送到 `nextjs-rebuild` 才会触发 `.github/workflows/deploy.yml`。
+本篇已并入 `main`；推送 `main` 会触发 `.github/workflows/deploy.yml`。

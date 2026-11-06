@@ -15,6 +15,7 @@ from france_2024_editorial import organize_story
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "content" / "travel" / "france-2024"
+DERIVED = ROOT / "generated" / "travel" / "france-2024"
 
 HAN_LATIN_BOUNDARY = re.compile(r"(?<=[\u3400-\u9fff])(?=[A-Za-z0-9])|(?<=[A-Za-z0-9])(?=[\u3400-\u9fff])")
 
@@ -85,8 +86,9 @@ FOCUS_BY_TITLE = [
 ]
 
 def write(name: str, value: object):
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / name).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    target = OUT if name == "story.json" else DERIVED
+    target.mkdir(parents=True, exist_ok=True)
+    (target / name).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 def main():
     parser = argparse.ArgumentParser()

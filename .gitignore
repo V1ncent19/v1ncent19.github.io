@@ -123,24 +123,9 @@ __pycache__/
 # Hence no rule below. If you ever add one here, you are re-losing the masters.
 # Originals (`original/`) still DO go under assets-src/photos/ and stay ignored.
 
-# ── public/data/travel/ — two trip pages, two policies ─────────────────────
+# ── public/data/travel/ — browser-fetched runtime mirror ──────────────────
 #
-# Both trip pages keep their generated payload under public/data/travel/<id>/,
-# because that is the only place with a URL. The similarity ends there.
-#
-# ptes-2025: track.json is a byte-for-byte copy of
-#   content/travel/ptes-2025/data/track.json, made by `npm run sync:data`
-#   (prebuild / predev). It is a pure build artifact — ignored, never committed,
-#   regenerated from source. Editing it gets a dirty tree and then an overwrite.
-#   Remove a tracked copy with `git rm --cached`; an ignore rule alone leaves the
-#   already-tracked files in the index and they keep shipping stale bytes.
-#
-# just-because: route.json and anitabi-212278.json are NOT artifacts. They are
-#   generator outputs with no reproducible source in the repo — route.json is
-#   cut from a raw GPS export that lives (gitignored) under
-#   assets-src/travel-data/, and anitabi-212278.json is a point-in-time
-#   snapshot of a remote dataset. Rebuilding either needs data that is not in
-#   git, so they MUST stay committed. Like ptes, no human hand-edits them; that
-#   is why they live beside the generated payload instead of in content/.
+# PTES track.json is a runtime mirror from generated/travel/ptes-2025/.
+# sync:data recreates it before dev/build. Derived snapshots and caches stay
+# committed under generated/ because private/historical inputs may be absent.
 /public/data/travel/ptes-2025/
-!/public/data/travel/just-because/

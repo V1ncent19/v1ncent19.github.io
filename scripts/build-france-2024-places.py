@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "content" / "travel" / "france-2024"
+OUT = ROOT / "generated" / "travel" / "france-2024"
 cache = json.loads((OUT / "geocode-cache.json").read_text(encoding="utf-8"))
 
 # Two searches did not resolve by name. These are public transport/airport

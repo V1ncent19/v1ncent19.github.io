@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * check-refs.mjs — fail the build when content/ points at a file that is not in
- * public/.
+ * check-refs.mjs — fail the build when content/ or generated/ points at a file
+ * that is not in public/.
  *
  *   node scripts/check-refs.mjs
  *   npm run check:refs
@@ -18,7 +18,7 @@
  *   the bad ref.
  *
  * WHAT IT SCANS
- *   content/**.{json,ts,tsx,md,mdx} — the hand-maintained tree. Four forms are
+ *   content/ and generated/ JSON, TS and Markdown. Four forms are
  *   matched because the site uses all four:
  *     " /assets/x.webp "            JSON / TS string literals
  *     ![alt](/assets/x.webp)        markdown image
@@ -43,6 +43,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CONTENT_DIR = path.join(ROOT, "content");
+const GENERATED_DIR = path.join(ROOT, "generated");
 const PUBLIC_DIR = path.join(ROOT, "public");
 
 /** Paths allowed to be missing. Every entry needs a comment saying why. */
@@ -93,7 +94,7 @@ function publicFiles() {
   return set;
 }
 
-const files = walk(CONTENT_DIR);
+const files = [...walk(CONTENT_DIR), ...walk(GENERATED_DIR)];
 const exists = publicFiles();
 
 const missing = [];
@@ -153,5 +154,5 @@ if (missing.length) {
    intentionally un-linked assets (fonts, world outline, badges) — so this only
    reports a count for the reader who wonders whether the scan ran. */
 console.log(
-  `[refs] ${checked} reference(s) across ${files.length} content file(s) — all resolve in public/.`,
+  `[refs] ${checked} reference(s) across ${files.length} source file(s) — all resolve in public/.`,
 );

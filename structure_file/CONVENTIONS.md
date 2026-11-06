@@ -44,7 +44,7 @@
 - 博客索引有搜索/分类 chips/排序；`/blog#<category>` 深链已实现。
 - 相册：瀑布流 + 灯箱，挂在 `/travel` 的「Stories & frames」；**只有两档 webp 上线**
   （`thumb/` + `large/`），全分辨率原图不上线、只在本地磁盘（`public/assets/photos/gallery/original/`，
-  git-ignored，唯一副本），灯箱也就没有下载按钮 —— 除非某行手写了外部 `originalUrl`。
+  git-ignored，唯一副本）；灯箱下载按钮保存当前展示的 `large` WebP。
   加照片流程见 `GALLERY_ADDING_PHOTOS.md`。**已否决（2026-10-18）：原图随站发布 + 同源下载按钮**
   —— 142 MB 既过不了 `check:refs` 又推不上去（408），别再把它纳入版本控制。
 - **双语内容只有一种写法**（2026-10-17 统一）：可翻译字段一律 `{ "en": …, "zh": … }`，
@@ -94,8 +94,8 @@
 - **深兜底是 Cactus Classical Serif（仙人掌明體）**：`scripts/subset-cactus.py` 从 28 MB 的完整 TTF
   子集出 `public/fonts/cactus-subset.woff2`（324 KB，OFL 随附）。`@font-face` 里 `local()` 优先，
   **完整 TTF 绝不进 `public/`**。它只在 GenWanMin2 缺字时接手，所以平时看不见它。
-- ⚠️ **子集扫描范围 = `scripts/subset-cjk-fonts.py` 的 `SCAN_DIRS`（现含 `content` 与 `public/data`）**。2026-10-09 前它只扫 `content/app/components`，**游记 JSON（当时在 `public/data/travel/*`）的字从未入子集** → 正文约 26% 的 CJK 掉进系统 sans（YaHei UI）。**凡是会渲染到屏幕的新内容（新 JSON 数据源）都要确认在扫描范围内，然后重跑子集**（`fontTools.subset` + brotli，managed venv）。
-  - 2026-10-17 起 trip 数据的源全部在 `content/travel/<trip>/`（**扁平，无 `data/` 子目录**），`public/data/` 只是 `sync:data` 对 `MIRRORED` 清单里那几个文件的镜像。两条路径都在 `SCAN_DIRS` 里，重复扫描无副作用，保留 `public/data` 是为了兜住别的 HTML 页面直接引用的静态 JSON。
+- ⚠️ **子集扫描范围 = `scripts/subset-cjk-fonts.py` 的 `SCAN_DIRS` 与 `SCAN_FILES`**：目录扫 `content`、`app`、`components`、`public/data`，另逐个扫会显示文字的 `generated/travel/` 文件；不扫描仅供核对的地理编码和路线来源缓存。2026-10-09 前游记 JSON 的字曾遗漏，正文约 26% 的 CJK 掉进系统 sans（YaHei UI）。**凡是会渲染到屏幕的新内容都要确认在扫描范围内，然后重跑子集**（`fontTools.subset` + brotli，managed venv）。
+  - 人工正文在 `content/travel/<trip>/`；派生地图数据显示文字的文件列在 `SCAN_FILES`；`public/data/travel/ptes-2025/track.json` 是运行时镜像。重复字符无副作用。
   - ⚠️ **子集是「字符集快照」，不是「只增不减」**：每次重跑都从零重建，**只保留当时扫描得到的字**。2026-10-25 核对发现 `75edc94` 重新生成 m/r/sb 时把 挖 / 掘 / 灣 三个字弄丢了（2282 → 2398 字形，多 119 少 3），已用 `git checkout 9c122fc -- public/fonts/genwanmin2tc-{m,r,sb}.woff2` 字节级还原，并在脚本里加了 `PINNED_CHARS = "挖掘灣"` 兜底（并入 `harvest_chars()` 的初始集合）。
   - **改字重映射 / 重跑子集之前先备份 woff2，跑完 diff cmap**：`set(new.getBestCmap()) - set(old.getBestCmap())` 的两个方向都要看，`old - new` 非空就是这次掉字。
 - ⚠️ **`.travel-layout` 是 sans 作用域**（`TravelLog.tsx`）。该布局里的正文元素必须**显式**声明衬线栈，否则继承 sans 违反 §44。现状：`.scene-body p` 与 `.excerpt` 显式 `var(--font-serif-latin), var(--font-serif-zh)`；chip/表头/控件保持 sans。
@@ -320,5 +320,5 @@
 - **⚠️ 底图合规**：`geo-map-compliance-guard` 要求腾讯/高德/百度/天地图；`/travel` 的
   MapLibre 地球仪、ptes-2025 与巡礼页都在用 Carto Positron / Dark Matter。**换底图会牵动全站视觉，
   等用户拍板前不要动。**
-- **⚠️ ptes-2025 隐私**：`content/travel/ptes-2025/track.json` 含 1217 个住址级坐标，
+- **⚠️ ptes-2025 隐私**：`generated/travel/ptes-2025/track.json` 含 1217 个住址级坐标，
   `sanitize-trip-gps.py` 还没跑在这份数据上。详见 `FEATURE_PILGRIMAGE.md` §7。

@@ -1,7 +1,7 @@
 import card from "@/content/travel/france-2024/card.json";
 import story from "@/content/travel/france-2024/story.json";
-import routes from "@/content/travel/france-2024/routes.json";
-import places from "@/content/travel/france-2024/places.json";
+import routes from "@/generated/travel/france-2024/routes.json";
+import places from "@/generated/travel/france-2024/places.json";
 import type { ReconstructedDefinition } from "../types";
 import type { ReconstructedData } from "../../reconstructed";
 import { placeForLabel } from "../../reconstructed";

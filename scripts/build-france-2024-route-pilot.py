@@ -18,7 +18,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTENT = ROOT / "content" / "travel" / "france-2024"
+CONTENT = ROOT / "generated" / "travel" / "france-2024"
 CACHE = CONTENT / "route-pilot-source-cache.json"
 OUTPUT = CONTENT / "route-geometries.json"
 # The cathedral centroid snapped to a west-facing pedestrian entrance; its

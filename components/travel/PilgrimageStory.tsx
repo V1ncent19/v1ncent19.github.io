@@ -421,7 +421,7 @@ export default function PilgrimageStory({
                 .map((p, i) => <p key={i}>{p}</p>)
             ) : (
               <p className="pj-placeholder">
-                巡礼概述待填写 —— 在 content/travel/just-because/page.json 的
+                巡礼概述待填写 —— 在 content/travel/just-because/story.json 的
                 overview.text 里写好后重新构建即可。
               </p>
             )}
@@ -487,7 +487,7 @@ export default function PilgrimageStory({
               outro.text.split("\n\n").map((p, i) => <p key={i}>{p}</p>)
             ) : (
               <p className="pj-placeholder">
-                结尾感言待填写 —— 在 content/travel/just-because/page.json 的
+                结尾感言待填写 —— 在 content/travel/just-because/story.json 的
                 outro.text 里写。
               </p>
             )}

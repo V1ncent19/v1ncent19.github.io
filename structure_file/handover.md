@@ -1,13 +1,33 @@
 # Handover — 站点现状与新功能启动入口
 
-**最后更新：2026-10-29。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
+**最后更新：2026-11-06。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
 `ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_TRAVEL_LOG.md`（公共日志）、`FEATURE_GUATEMALA_TERRAIN_LOG.md`（Guatemala 三维地形日志）、`FEATURE_PILGRIMAGE.md`（巡礼页）、`FEATURE_HOME_NAVIGATION.md`（首页、导航、标签与卡片）。
+
+---
+
+## 2026-11-06 发布分支统一
+
+`main` 定为唯一发布分支。Guatemala／France 日志和此前独立的 `/travel/egypt2026/`
+行程概览均汇入 `main`。埃及页只有直达 URL，无 `card.json`，不进入站内导航、
+Travel hub、Blog 或 Recent Posts；`noindex` 不是访问控制。正文真源在
+`content/travel/egypt2026/guide.md`。相册徽章源在 `assets-src/gallery-badges/`；
+灯箱可下载当前展示的 `large` WebP。
+
+---
+
+## 2026-11-05 内容与派生数据清理
+
+四篇旅行日志的人工内容保留在 `content/travel/<id>/`；PTES 轨迹与诊断、巡礼站点/路线/Anitabi 快照、France 地点/路线及路线试验缓存均移到 `generated/travel/<id>/`，并继续入库。巡礼标题、概述、结尾和各站 `note` 独立为 `content/travel/just-because/story.json`；定义文件在构建时组合两侧。Guatemala 沿用上一轮的同样分层。PTES 轨迹仍由 `sync:data` 镜像到原 `/data/travel/ptes-2025/track.json` URL；其他三个日志的派生 JSON 只在构建时 import，不再作为 `public/data/travel/` 里的独立文件。`check:refs` 覆盖 `generated/`，中文字体扫描按文件覆盖其中会显示的文字，跳过研究缓存。
+
+相册印章源 SVG 从 `public/assets/gallery/badges/` 移到入库的 `assets-src/gallery-badges/`，生成的 TS 从 `components/gallery/` 移到 `generated/gallery/`；`npm run badges` 产生的图形数据与迁移前逐字一致。使用说明移到 `structure_file/GALLERY_BADGES.md`。
+
+本节记录当前路径，下面各历史轮次中的旧路径以本节及对应 FEATURE 的最新部分为准。
 
 ---
 
 ## 1. 一句话现状
 
-Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代旧 Jekyll 站：
+Next.js 16 静态导出的个人站（发布分支 `main`）已完全取代旧 Jekyll 站：
 全部主路由（Home / About / CV / Blog / Project / Travel / Guestbook）上线真实内容，中文 `/zh` 覆盖主路由
 （`/about/zh` 是亲笔原文，其余挂机翻声明条）。
 **Travel 是当前最重的模块**：hub（地球仪 + 游记 tiles + 相册墙 + 心愿单）、ptes-2025 互动游记、just-because 巡礼地图、guatemala-2026 三维地形游记。
@@ -39,7 +59,7 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 - 新增 `/travel/guatemala-2026/` 与中文镜像，接入公共日志外壳的新 `terrain` 类型；中文正文、9 个章节、906 点路线、25 张去元数据照片与一张 Starbucks 占位图已可运行。
 - 地图使用本地 Terrarium DEM、素色贴图与平滑 100 m 等高线，支持三维跟随、手动探索后恢复、卫星切换、首尾环绕、山峰/营地/起点标记及滚动联动照片框。
 - 全年 GPS 与带 EXIF/QuickTime metadata 的原始媒体仅在 `assets-src/` 私有目录，均被 `.gitignore` 拦截；分支只提交裁切路线、位置展示数据、去元数据 WebP/MP4 与地形派生资源。另一台设备可直接继续正文、镜头和界面工作，重生成媒体/路线才需私下复制母版。
-- 完整职责、生成命令、交互不变量与异机接续见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`。本轮开发分支不触发 Pages；只有 `nextjs-rebuild` 会部署。
+- 完整职责、生成命令、交互不变量与异机接续见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`。`main` 推送触发 Pages；其他分支不触发。
 - 2026-10-29：三种日志共用开场阅读提示和三列元数据窗格；正文 autoplay 经体验后撤回，地图和不同密度内容继续由用户滚动协调。Guatemala 修复 PTES 式章节吸顶交接，并让地形/路线在幕布后预载、揭幕后直接环绕总览；路线联动、照片避让、相机校正和环绕均已限频/抽样。新增 10 张照片与 2 段去 metadata 的 H.264 MP4，地图对视频显示 WebP 代表帧；当前共 35 张发布照片、2 段视频及一张占位图。Guatemala 卡片显式显示 2026.06.01，排序以 `end` 为日期真源；除最高优先级的 PTES pinned 卡外，其余日志与 featured 照片共用同一精选时间线。
 
 ## 3. 当前状态（2026-10-25）
@@ -52,7 +72,7 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 | Travel hub | MapLibre 地球仪 + 游记 tiles + 「Stories & frames」相册墙 + 心愿单清单 + 双向 hover 联动 |
 | ptes-2025 游记 | 沉浸式互动游记（粘性地图 + 胶囊吸顶 + 进度条 + 幕布动画），景点标点 73 个，正文 14.8k 字按 GPS 投放。**移动端进度条已改成可拖拽条（2026-10-24）** |
 | 巡礼地图 | `/travel/just-because`（+zh）已上线：36 个对比点 + 273 点环线 + 可缩放相机 + 滚动联动。**还差用户填 `outro` 与 36 条 `note`** |
-| Guatemala 地形日志 | `/travel/guatemala-2026`（+zh）本地完成首轮：三维地形 + 等高线 + 906 点路线 + 25 张发布照片 + 9 章节镜头；当前在独立非部署分支继续打磨，线上尚未发布 |
+| Guatemala 地形日志 | `/travel/guatemala-2026`（+zh）本地完成首轮：三维地形 + 等高线 + 906 点路线 + 25 张发布照片 + 9 章节镜头；已并入 `main` |
 | 两页共用的进度条 | **移动端普通可拖拽条 + 拖动时浮出章节方框**（2026-10-24，v21，推翻 v17 水银温度计）；桌面竖轨圆点白环已修复。共享代码 `lib/travel/use-scrub-track.ts` + `lib/travel/scrub-chapters.ts` |
 | Blog 索引 | md 文章 + 游记卡合并（`lib/blog-travel.ts`，读取时合并，按日期倒序），无「假 md」。**游记卡日期用 `tripPostedAt()`（= `end`）** |
 | 相册 | 49 张（含 2026-10-25 新加的 `img-6308`），源目录 = `public/assets/photos/gallery/original/`。`thumb` 宽 640、`large` 长边 1680。**「精选集」= 置顶不是筛选**（2026-10-25），墙上永远 49 张全在 |
@@ -63,10 +83,10 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 
 ## 4. 发布（GitHub Pages）
 
-**唯一入口：`git push origin nextjs-rebuild`。** 推上去就自动部署 —— 不需要本地 `out/`，不需要 `gh-pages`
-分支，也不用把 `out/` 提交进仓库。`.github/workflows/deploy.yml` 在 push 到 `nextjs-rebuild`
+**唯一入口：`git push origin main`。** 推上去就自动部署 —— 不需要本地 `out/`，不需要 `gh-pages`
+分支，也不用把 `out/` 提交进仓库。`.github/workflows/deploy.yml` 在 push 到 `main`
 （或手动 `workflow_dispatch`）时执行 `npm ci` → `npm run build` → 上传 `out/` → `deploy-pages`。
-**`main` 分支只是旧 Jekyll 树的备份，不参与部署，也不用为了上线去动它。**
+**`main` 是唯一发布分支。**
 
 一次性前提（已配好，换仓库才需要）：Settings → Pages → Build and deployment → **Source = GitHub Actions**。
 

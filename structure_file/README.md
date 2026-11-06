@@ -8,6 +8,7 @@
 > 2026-10-18 增补了「站点上线 + 相册原图不发布」两条结论。
 > **2026-10-25 专项收尾**：已核对旅行日志框架、首页卡片、导航、标签及返回过渡；最终规则见两份 FEATURE 文档，历史试验见交互走查。此日期不代表重新全量审计或部署。
 > **2026-10-28 Guatemala 专项**：新增 terrain 类型、私有输入/派生输出边界与异机接续说明，见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`。
+> **2026-11-05 文件分层**：四篇游记的人工内容在 `content/`、派生地图数据在 `generated/`；相册印章源 SVG 在 `assets-src/gallery-badges/`，说明见 `GALLERY_BADGES.md`。现状路径见 `handover.md` 与 `content/travel/README.md`。
 
 ## 读哪一份
 
@@ -17,6 +18,7 @@
 | 知道某个功能长什么样、文件在哪、数据怎么流 | `ARCHITECTURE.md` |
 | 知道「该怎么做」、哪些设计已锁死、哪些被推翻过 | `CONVENTIONS.md` |
 | 加相册照片 | `GALLERY_ADDING_PHOTOS.md` |
+| 改相册印章图形 | `GALLERY_BADGES.md` |
 | 改首页卡片 / 总导航 / 标签 / 卡片确认与返回 | `FEATURE_HOME_NAVIGATION.md` |
 | 改旅行日志公共框架 / 新增日志 | `FEATURE_TRAVEL_LOG.md` |
 | 改 Guatemala 三维地形日志 | `FEATURE_GUATEMALA_TERRAIN_LOG.md` |
@@ -33,6 +35,7 @@ handover.md                  进度与入口
 ARCHITECTURE.md              系统现状
 CONVENTIONS.md               守则与基线
 GALLERY_ADDING_PHOTOS.md     相册 how-to
+GALLERY_BADGES.md            相册印章 SVG 源与生成方式
 FEATURE_HOME_NAVIGATION.md   首页、总导航、标签与卡片交互
 FEATURE_TRAVEL_LOG.md        旅行日志公共框架与新增流程
 FEATURE_GUATEMALA_TERRAIN_LOG.md  Guatemala 三维地形日志、数据边界与生成流程

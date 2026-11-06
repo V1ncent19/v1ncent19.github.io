@@ -6,7 +6,7 @@ name: Deploy Next.js site to Pages
 
 on:
   push:
-    branches: [nextjs-rebuild]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
