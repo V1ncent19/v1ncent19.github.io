@@ -195,9 +195,9 @@
   `featured: true`，与 `featured` 照片进入同一精选带，并按 `tripPostedAt()` 的日期一起排序；
   它们不是独立置顶区。关闭精选开关后，游记与全部照片合成一条完整日期时间线。
 - **三层优先级固定为 `pinned` → `featured` → 当前排序**：`pinned` 是最高优先级且不受
-  精选开关影响，目前仅 PTES 使用；其余日志不要因为是导航入口就自动 pinned。
-  `featured` 控制精选带归属，`showPinnedBadge` 只控制可见图标（默认 false）。目前仅 PTES
-  显示图标。
+  精选开关影响，当前没有游记使用；日志不要因为是导航入口就自动 pinned。
+  `featured` 控制精选带归属，`showPinnedBadge` 只控制可见图标（默认 false）。当前没有
+  游记显示置顶图标。
 - 返回条带、图例、tile hover、胶囊吸顶、幕布动画等交互均已逐项定稿（v7–v14.1）；动这些区域前**必读 `FEATURE_TRAVEL_LOG.md`、`FEATURE_PILGRIMAGE.md` 及 `FEATURE_HOME_NAVIGATION.md` 对应条目**，避免推翻已拍板细节。
 - **返回条 hover 只动 opacity，不动位移**（2026-10-24 定案，v13）：ptes 的
   `.tl-back-*` 与 just-because 的 `.pj-back-*` 都是两行网格

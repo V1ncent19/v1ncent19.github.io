@@ -93,7 +93,7 @@
 但 `npm run check:i18n` 会对**两端全空**的 `{ en, zh }` 直接让 build 失败，所以别留空壳对象，
 没有就整个字段省略。
 
-旅行日志入口不属于照片 `items.json`：真源在 `content/travel/<id>/card.json`。日志 `pinned` 默认 true，始终作为 featured 入口排在照片之前；`showPinnedBadge` 只控制图标（目前仅 PTES 为 true，Anitabi 为 false）。照片精选开关不改变日志这一排位。新增日志见 `FEATURE_TRAVEL_LOG.md`，卡片返回/悬浮规则见 `FEATURE_HOME_NAVIGATION.md`。
+旅行日志入口不属于照片 `items.json`：真源在 `content/travel/<id>/card.json`。日志 `featured` 默认 true，与精选照片按日期排序；`pinned` 默认 false，当前没有游记使用；`showPinnedBadge` 只控制图标，当前均为 false。照片精选开关仅改变精选内容的排列方式，不隐藏非精选内容。新增日志见 `FEATURE_TRAVEL_LOG.md`，卡片返回/悬浮规则见 `FEATURE_HOME_NAVIGATION.md`。
 
 ### 精选集是「置顶」不是「筛选」（2026-10-25 定案）
 

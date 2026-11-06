@@ -10,9 +10,11 @@
   "days": 12,
   "distanceKm": 0,
   "gpsPoints": 0,
-  "beta": true,
+  "beta": false,
   "featured": true,
   "showPinnedBadge": false,
+  "cover": "/assets/photos/gallery/thumb/img-0462.webp",
+  "coverPos": "65% center",
   "stops": {
     "en": ["Paris", "Cologne", "Amsterdam", "Rouen"],
     "zh": ["巴黎", "科隆", "阿姆斯特丹", "鲁昂"]

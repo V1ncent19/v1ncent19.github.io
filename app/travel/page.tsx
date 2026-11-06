@@ -52,7 +52,7 @@ export default function TravelPage() {
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
     coverPos: trip.coverPos,
-    /* A true pin outranks the featured band (currently PTES only). */
+    /* A true pin outranks the featured band; current logs use featured only. */
     pinned: trip.pinned ?? false,
     /* Travel logs join featured photos in the same date-sorted band. */
     featured: trip.featured ?? true,

@@ -13,7 +13,7 @@
   "days": 2,
   "distanceKm": 73.6,
   "gpsPoints": 906,
-  "beta": false,
+  "beta": true,
   "featured": true,
   "showPinnedBadge": false,
   "stops": {

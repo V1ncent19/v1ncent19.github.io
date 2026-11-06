@@ -33,13 +33,13 @@ sorted by `start` (oldest first, `id` as tiebreak) so the order is stable.
 Optional tile fields worth knowing (updated 2026-10-29):
 
 - `pinned: true` — keep the trip above both the featured and regular bands.
-  This is a separate, highest-priority state; currently only ptes-2025 uses it.
+  This is a separate, highest-priority state; no current travel log uses it.
 - `featured: true` — place the log in the same curated band as featured photos.
   Travel logs default to **true** and share the active date order with those
   photos; they are not a separate pinned queue.
 - `showPinnedBadge: true` — show the visible pin icon independently of the
-  featured placement. Currently only ptes-2025 enables it; Anitabi stays featured
-  without the icon. New trips default to no visible pin icon.
+  featured placement. No current travel log enables it; new trips default to no
+  visible pin icon.
 - `cardCta` / `cardMeta` / `cardFacts` — override the hub tile's CTA / eyebrow /
   stat line when the trip-log defaults would misdescribe the trip. Leave them
   out and every trip reads "Read the log" (中文 "阅读旅行志"), which is the

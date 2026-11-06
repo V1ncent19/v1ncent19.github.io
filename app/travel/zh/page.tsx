@@ -49,7 +49,7 @@ export default function TravelZhPage() {
     badge: trip.beta ? "Beta" : undefined,
     cover: trip.cover,
     coverPos: trip.coverPos,
-    /* 真正的 pinned 高于精选带（目前仅 PTES）。 */
+    /* 真正的 pinned 高于精选带；当前游记均只使用 featured。 */
     pinned: trip.pinned ?? false,
     /* 旅行日志与 featured 照片进入同一条按日期排序的精选带。 */
     featured: trip.featured ?? true,
@@ -112,7 +112,7 @@ export default function TravelZhPage() {
             <div className="mt-4 max-w-[62ch] text-[1.05rem]">
               <p className="leading-relaxed text-muted">
                 去过的地方的地图，还有路上的故事：可以跟着滚动生长的 GPS
-                互动游记（Beta）、偶尔写写的食记，以及精选照片墙。
+                互动游记、偶尔写写的食记，以及精选照片墙。
               </p>
             </div>
           </HubHoverLink>

@@ -63,7 +63,7 @@
 
 ## 新增一篇旅行日志
 
-1. 创建 `content/travel/<id>/card.json`；目录名与卡片 `id` 一致。此后各索引自动发现它。旅行日志 `featured` 默认 true，与精选照片按返程日进入同一条时间线；`pinned` 默认 false，是高于精选带的独立最高优先级，目前仅 PTES 使用；`showPinnedBadge` 默认 false，只控制可见图标。三个可选字段均校验为布尔值。
+1. 创建 `content/travel/<id>/card.json`；目录名与卡片 `id` 一致。此后各索引自动发现它。旅行日志 `featured` 默认 true，与精选照片按返程日进入同一条时间线；`pinned` 默认 false，是高于精选带的独立最高优先级，当前没有游记使用；`showPinnedBadge` 默认 false，只控制可见图标。三个可选字段均校验为布尔值。
 2. 按现有 journal、pilgrimage、terrain 或 reconstructed 模型准备本篇内容。正文保留自己的创作语言；公共界面语言由路由传入。reconstructed 的地点精度单独标记，不从地点顺序自动补出地图轨迹。
 3. 创建 `lib/travel/log/definitions/<id>.ts`，直接导入本篇小文件、调用对应校验器并提供 `kind/id/card/wordmark`。journal 另提供 `trip/scenes/attractions/trackUrl`，pilgrimage 提供 `data`。浏览器标题不同于卡片标题时可提供 `pageTitles`。
 4. 添加两个薄入口：`app/travel/<id>/page.tsx`、`app/travel/zh/<id>/page.tsx`，只导入定义和 `TravelLogPage`，分别传 `lang="en"` / `"zh"`；metadata 调用 `logMetadata()`。

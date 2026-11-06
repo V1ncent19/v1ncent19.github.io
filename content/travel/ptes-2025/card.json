@@ -13,10 +13,10 @@
   "days": 17,
   "distanceKm": 18039.7,
   "gpsPoints": 21863,
-  "beta": true,
-  "pinned": true,
+  "beta": false,
+  "pinned": false,
   "featured": true,
-  "showPinnedBadge": true,
+  "showPinnedBadge": false,
   "stops": {
     "en": [
       "Lisbon",

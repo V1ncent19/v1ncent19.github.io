@@ -68,9 +68,9 @@
 
 ## 旅行日志 featured 与可见图标
 
-- 两篇 travel log 都是 featured 导航入口，位于照片流之前；新日志 `pinned` 默认 true，照片精选开关和排序不将它们混回照片中。
+- 四篇 travel log 均为 featured 导航入口，与精选照片按日期排序；新日志 `pinned` 默认 false。
 - `pinned` 控制排位，`showPinnedBadge` 控制可见图标，二者独立。
-- **仅 PTES 显示置顶图标**：PTES 两字段均为 true；Anitabi 的 pinned 为 true、showPinnedBadge 为 false。新日志默认不显示图标。
+- **当前没有置顶游记或置顶图标**：PTES 已取消置顶；四篇游记仍为 featured。Beta 仅 Guatemala 显示，PTES 与 France 不显示。
 - 卡片内容真源为 `content/travel/<id>/card.json`；字段及新增流程见 `FEATURE_TRAVEL_LOG.md` 与 `content/travel/README.md`。
 
 ## 验收与边界
