@@ -80,15 +80,16 @@ content/travel/ptes-2025/        (flat — six JSONs side by side)
 public/data/travel/ptes-2025/track.json    GENERATED — gitignored, do not edit
 ```
 
-**`track.json` sits in the same folder as the rest, and that is fine**, because
-"needs a URL" is not expressed by location — it is one line in
-`scripts/sync-trip-data.mjs`:
+**`track.json` in `content/` is a legacy exception to the authoring-only
+directory rule.** Its runtime URL is declared in `scripts/sync-trip-data.mjs`:
 
 ```js
 const MIRRORED = new Set(["ptes-2025/track.json"]);
 ```
 
-**The split follows "who edits it", not "what type of file it is".**
+The PTES split currently follows payload size; the Guatemala split below
+separates hand-edited content from derived data. A future PTES migration can
+move the source track out of `content/` without changing its runtime URL.
 
 - **Hand-written → imported.** `trip`/`scenes`/`attractions`/`diagnostics` are
   ~115 KB together. The journal definition imports them, they land in the JS bundle, and
@@ -174,9 +175,10 @@ gone. `photos.json` (the position source of truth) stays gitignored under
 
 ### Terrain shape (guatemala-2026) — public derivatives, private masters
 
-`story.json` is the hand-maintained narrative and camera source. `data.json`
-combines it with a cropped 906-point route and photo placement metadata.
-`TerrainTravelLog` imports that payload at build time; the DEM, contour GeoJSON
+`story.json` is the sole hand-maintained narrative, chapter timing, photo-caption
+and camera source. `generated/travel/guatemala-2026/data.json` contains only the
+cropped route, photo placement, places and attribution. The definition combines
+both imports at build time; editing prose or camera needs no generator run. The DEM, contour GeoJSON
 and re-encoded WebP photos are served from `public/assets/`.
 
 The year-long GPS file and full-resolution phone originals remain ignored under

@@ -15,15 +15,15 @@ app/travel/{,zh/}guatemala-2026/page.tsx
       └─ TravelLogShell       公共章节导航、工具栏、返回与分隔布局
 ```
 
-内容入口是 `content/travel/guatemala-2026/`：
+人工内容入口是 `content/travel/guatemala-2026/`：
 
 - `card.json`：Travel / Blog 卡片；
 - `story.json`：唯一应手工维护的标题、段落、分段时间、照片编排与相机关键帧；
-- `data.json`：`guatemala:build` 根据私有 GPS、照片 EXIF、视频 QuickTime metadata 与 `story.json` 生成的页面数据。当前为 906 个路线点、9 个场景、35 张发布照片、2 段视频加 1 张 Starbucks 占位图。
+- `generated/travel/guatemala-2026/data.json`：`guatemala:build` 根据私有 GPS、照片 EXIF 和视频 QuickTime metadata 生成的地图派生数据。当前为 906 个路线点、35 张发布照片、2 段视频加 1 张 Starbucks 占位图；不含正文。页面在定义文件中把它与 `story.json` 的 9 个场景组合。
 
 九个场景均用单层 `title` 命名章节（例如 `序章 · Antigua`、`第一段 · 北麓`），
 不设置 `eyebrow`。正文标题、章节栏、目录和地图角标读取同一名称；生成数据也省略
-`eyebrow`。改章节文字须同步到 `story.json`，避免下一次生成覆盖 `data.json` 中的改动。
+`eyebrow`。章节文字只编辑 `story.json`，改动由页面直接读取。
 正文 `paragraphs` 按行程阶段拆分用户原文，保留原有措辞、拼写与不确定表达；暂不代为润色。
 
 `lib/travel/terrain.ts` 定义路线、照片、场景、地点与相机数据形状；`lib/travel/log/validate.ts` 在构建期验证数据。不要把 Guatemala 的字段塞进 journal 或 pilgrimage 的可选字段。
@@ -47,7 +47,7 @@ app/travel/{,zh/}guatemala-2026/page.tsx
 - 开屏直接以总览相机初始化；地图、地形、路线和标记在幕布后等待首个 idle（1.8 秒兜底），就绪后立即启动环绕，再通知公共外壳揭幕。不得先显示章节相机、回缩、停顿后才环绕。
 - 地图默认是素色三维地形与平滑的 100 m 等高线；可切换卫星模式。工具栏只显示图标，文字在 hover / focus tooltip 中出现。
 - 路线使用全站旅行日志的蓝色；照片位置使用较小的橙色标点。右侧照片进入可见阅读区域时，在对应地理位置叠加一个前景强调点，由 CSS 在约 300 ms 内缩放和淡入；离开时淡出，快速返回同一点可直接反转过渡。尊重系统减少动态效果设置。地图不另行显示照片预览或连接线；点击底层标点仍可跳到对应章节。
-- `img-0593` 的 EXIF 位置距 GPS 路线最近约 351 米，标记 `mapVisible: false`：不改照片素材或 `story.json` 编排，地图基础标点与激活强调点都不显示。生成器保留这一标记，避免重建 `data.json` 后复发。
+- `img-0593` 的 EXIF 位置距 GPS 路线最近约 351 米，标记 `mapVisible: false`：不改照片素材或 `story.json` 编排，地图基础标点与激活强调点都不显示。生成器保留这一标记，避免重建派生地图数据后复发。
 - `Trail start` 与 `Camp` 在总览中只显示图标，路线进行到附近时才浮出标签。
 - 完整路线从 Antigua 到 trail start、登山、Fuego 往返、下山，再回到 Antigua；完成页不得在山脚提前结束。
 
@@ -65,7 +65,7 @@ assets-src/guatemala-masters/*.{jpg,jpeg,MOV,mov} 手机照片/视频原片，�
 可提交、也是页面运行所需的派生输出：
 
 ```
-content/travel/guatemala-2026/data.json
+generated/travel/guatemala-2026/data.json
 public/assets/photos/travel/guatemala-2026/*.webp
 public/assets/photos/travel/guatemala-2026/*.mp4
 public/assets/terrain/guatemala/                   Terrarium DEM，z8–z14
@@ -73,7 +73,7 @@ public/assets/terrain/guatemala-tint/              素色贴图
 public/assets/terrain/guatemala-contours.geojson   平滑 100 m 等高线
 ```
 
-发布照片由 Sharp 重新编码成最长边 2200px、quality 84 的 WebP；视频由 `ffmpeg-static` 转为最长边 1600px 的 H.264/AAC MP4，并另取 WebP poster 供地图浮窗显示。生成器剥离媒体 metadata，并拒绝仍含 EXIF/XMP 的图片输出。`data.json` 仍包含为地图展示所需的媒体位置、拍摄时间与裁切后的路线，因此它是公开数据，不应混入全年 GPS。
+发布照片由 Sharp 重新编码成最长边 2200px、quality 84 的 WebP；视频由 `ffmpeg-static` 转为最长边 1600px 的 H.264/AAC MP4，并另取 WebP poster 供地图浮窗显示。生成器剥离媒体 metadata，并拒绝仍含 EXIF/XMP 的图片输出。派生 `data.json` 仍包含为地图展示所需的媒体位置、拍摄时间与裁切后的路线，因此它是公开数据，不应混入全年 GPS。
 
 视频 `8E332595-6A9E-44EF-8F91-A3843F77DAB3.mov` 没有位置 atom，且导出时间为 UTC+8；其时间换算后对应营地 04:54 的连续喷发，生成器在 `VIDEO_CONFIG` 中把它锚定到同一分钟的营地照片位置。`IMG_0772.MOV` 则直接使用自带的 18:53、Fuego 观景平台 QuickTime GPS。
 
@@ -83,11 +83,11 @@ Travel 卡片日期由 `card.json.end`（`2026-06-01`）参与 `tripPostedAt()` 
 
 | 命令 | 输入 | 输出 / 何时运行 |
 |---|---|---|
-| `npm run guatemala:build` | 私有全年 GPS、照片/视频母版、`story.json` | 重建 `data.json`、照片 WebP、视频 MP4 与 poster；改正文后通常不必跑，改时间/媒体/GPS 时才跑 |
+| `npm run guatemala:build` | 私有全年 GPS、照片/视频母版、`story.json` 的照片 ID | 重建 `generated/travel/guatemala-2026/data.json`、照片 WebP、视频 MP4 与 poster；仅换 GPS/媒体或照片集合时运行；正文、章节时间、镜头改动直接读取 `story.json` |
 | `npm run guatemala:terrain` | AWS Mapzen Terrarium tiles | 下载 DEM，再生成素色贴图与等高线；需要网络，日常镜头编辑不跑 |
 | `npm run guatemala:contours` | 已存在的本地 DEM | 仅重建等高线 |
 
-`guatemala:terrain` 的范围固定在危地马拉火山区域，数据源署名写入 `data.json` 与 `public/assets/terrain/guatemala/attribution.txt`。不要把它挂进 `prebuild`：干净 CI 应直接使用仓库中的派生资源，不在构建时访问外网。
+`guatemala:terrain` 的范围固定在危地马拉火山区域，数据源署名写入 `generated/travel/guatemala-2026/data.json` 与 `public/assets/terrain/guatemala/attribution.txt`。不要把它挂进 `prebuild`：干净 CI 应直接使用仓库中的派生资源，不在构建时访问外网。
 
 ## 在另一台设备继续
 
@@ -98,7 +98,7 @@ npm ci
 npm run dev
 ```
 
-主要编辑顺序：正文/章节/相机先改 `content/travel/guatemala-2026/story.json`；若只改文案和相机，可直接同步同字段到 `data.json`，或在已具备私有输入时运行 `npm run guatemala:build`。组件交互改 `TerrainMap.tsx` / `TerrainStory.tsx`，公共框架改动要同时回归 PTES 与 Anitabi。
+主要编辑顺序：正文、照片说明、章节时间及相机只改 `content/travel/guatemala-2026/story.json`，页面自动与已提交的派生地图数据组合；不必手工同步第二份 JSON。照片集合或 GPS/媒体位置变化才在具备私有输入时运行 `npm run guatemala:build`。组件交互改 `TerrainMap.tsx` / `TerrainStory.tsx`，公共框架改动要同时回归 PTES 与 Anitabi。
 
 提交前至少执行：
 

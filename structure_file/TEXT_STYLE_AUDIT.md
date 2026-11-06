@@ -12,7 +12,7 @@
 
 | 范围 | 现象与例子 | 初步建议 |
 |---|---|---|
-| Guatemala 正文 | `content/travel/guatemala-2026/data.json` 的实显正文有 `平均60分钟`、`的camp`、`camp 去`、`3-4小时`、`每3-5分钟`；共找到 9 个汉字／拉丁或数字直接相接的边界。`story.json` 还有更多作者原稿式连写，不能只改生成的 `data.json`。 | 纯排版层面可统一为 `平均 60 分钟`、`的 camp`、`3–4 小时`、`每 3–5 分钟`；保留原句语气。需先决定是否允许调整作者原稿的排版。 |
+| Guatemala 正文 | 旧记录：原 `content/travel/guatemala-2026/data.json` 的实显正文有 `平均60分钟`、`的camp`、`camp 去`、`3-4小时`、`每3-5分钟` 等边界。2026-11-05 起正文只由 `story.json` 提供，派生地图数据已移到 `generated/` 且不再含正文。 | 后续纯排版修改只改 `story.json`，保留原句语气。 |
 | France 正文 | `content/travel/france-2024/story.json` 有 `btw还`、`2025年暑假`、`“Vincent”的 t恤`、`3月21号`、`Salle Ovale很好看` 等；有 11 个直接相接的边界。此 JSON 会由手稿核对／构建流程再生成。 | 先改核对稿／编辑规则，再生成发布数据；不要只在产物中手改，以免下次重建丢失。拼写或事实问题另核，不和空格自动修复混在一起。 |
 | PTES 长篇游记 | `content/travel/ptes-2025/scenes.json` 的正文经常用 `&`、`+`、`/` 作速记，如 `排队很久&害怕飞机晚点`、`银卡+美联航 app bug`、`材质/主题/呈现形式`；路线日题也用 `芝加哥-纽约-里斯本`。英文引语 `“no need cause you just paid us”` 也在此。 | 可仅加分隔空格；若要换成“和／以及／至”等自然语言，会改变原文口吻，须另行决定。行程连接线建议与正文算式分规则。 |
 | Just Because! | `content/travel/just-because/page.json` 与 `card.json` 有 `26年暑假`；作品名用 `『Just Because!』`。数据中的 `JR藤沢駅`、`7-Eleven鎌倉常盤店付近` 是日本原名，不能简单视为漏空格。 | 中文叙述的年份建议规范为 `2026 年`；作品名书名号／引号形式及日文官方地名是否保持原样，待统一决定。 |

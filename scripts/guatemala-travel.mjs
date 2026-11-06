@@ -2,7 +2,7 @@
 /**
  * Build the Acatenango/Fuego travel-log data from private GPS and photo masters.
  * Raw EXIF and the year-long GPS export never enter public/. Published photos
- * are re-encoded by sharp, and only the cropped route is written to content/.
+ * are re-encoded by sharp, and only derived map data is written to generated/.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -17,7 +17,7 @@ const GPS = path.join(ROOT, "assets-src", "travel-data", "2026.01.01-2026.12.31.
 const MASTERS = path.join(ROOT, "assets-src", "guatemala-masters");
 const TRIP = path.join(ROOT, "content", "travel", "guatemala-2026");
 const STORY = path.join(TRIP, "story.json");
-const OUT = path.join(TRIP, "data.json");
+const OUT = path.join(ROOT, "generated", "travel", "guatemala-2026", "data.json");
 const PHOTO_OUT = path.join(ROOT, "public", "assets", "photos", "travel", "guatemala-2026");
 // IMG_0593 has a GPS fix about 350 m off the recorded trail. Keep the story
 // photo, but do not regenerate its misplaced map marker.
@@ -266,10 +266,6 @@ async function buildMedia(route) {
   return photos;
 }
 
-function indexAt(route, iso) {
-  return nearestRouteIndex(route, Date.parse(iso) / 1000);
-}
-
 const route = routeFromGps();
 const photos = await buildMedia(route);
 const trailStartPhoto = photos.find(photo => photo.id === "img-0758");
@@ -284,22 +280,8 @@ for (const scene of story.scenes) {
 }
 
 const data = {
-  title: story.title,
-  subtitle: story.subtitle,
-  dateLabel: story.dateLabel,
-  introduction: story.introduction,
   route,
   photos,
-  scenes: story.scenes.map(scene => ({
-    id: scene.id,
-    ...(scene.eyebrow ? { eyebrow: scene.eyebrow } : {}),
-    title: scene.title,
-    time: scene.time,
-    route: [indexAt(route, scene.startAt), indexAt(route, scene.endAt)],
-    camera: scene.camera,
-    paragraphs: scene.paragraphs,
-    photos: scene.photos,
-  })),
   places: [
     { id: "antigua", label: "Antigua", lon: -90.7342, lat: 14.5570 },
     { id: "acatenango", label: "Acatenango · 3976 m", lon: -90.8758, lat: 14.5008 },
@@ -315,6 +297,6 @@ const data = {
   },
 };
 
-fs.mkdirSync(TRIP, { recursive: true });
+fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, `${JSON.stringify(data, null, 2)}\n`);
 console.log(`[guatemala] ${route.points.length} route points, ${photos.length} media items, ${route.distanceKm} km`);

@@ -14,12 +14,14 @@
 | 相册照片地点/标题 | `content/travel/gallery/items.json` | 服务于 `/travel` 的「Stories & frames」；`place` / `placeLocal` / `title` 是 `{ en, zh }`；人工字段，`gallery:gen` 不会覆盖 |
 | 站点身份（名字/站训/邮箱/GitHub） | `content/site/profile.json` | `lib/site.ts` 只是它的类型化出口，勿再硬编码 |
 | 游记 trip 注册表（标题/日期/统计行） | `content/travel/<trip>/card.json` | 每 trip 一个，`lib/travel/trips.ts` 扫描目录，无中央注册表 |
-| 游记叙事（每站文字） | ptes：`trip.json` + `scenes.json` + `attractions.json`（+ `diagnostics.json` 溯源）<br>巡礼：`page.json` 的 `overview` / `outro` / 各站 `note`<br>Guatemala：`story.json` | 构建期 import 进 bundle；Guatemala 的 `data.json` 是结合私有 GPS/EXIF 的派生输出，规则见 `FEATURE_GUATEMALA_TERRAIN_LOG.md` |
+| 游记叙事（每站文字） | ptes：`trip.json` + `scenes.json` + `attractions.json`（+ `diagnostics.json` 溯源）<br>巡礼：`page.json` 的 `overview` / `outro` / 各站 `note`<br>Guatemala：`story.json` | 构建期 import 进 bundle；Guatemala 派生地图数据位于 `generated/travel/guatemala-2026/data.json`，不含正文，规则见 `FEATURE_GUATEMALA_TERRAIN_LOG.md` |
 | 界面文案（按钮/标题/图例/标签） | `lib/i18n.ts`（双语字典） | 全站 UI copy 唯一出处；发现组件内硬编码文案应收拢到这里 |
 | zh 首页文案 | `app/zh/page.tsx`（内嵌） | **有意保留**：手写翻译约定（zh 首页不走自动翻译，en/zh 是两个平行维护的页面） |
 | 照片/字体素材 | `public/assets/`（上网）＋ `assets-src/`（原始，勿放 public） | 内部**按页面归属**，见下方 § public/assets 布局 |
 
 ### `content/` 布局 = 站点架构（2026-10-17）
+
+Guatemala 已把可编辑 `story.json` 与不可手编的 `generated/travel/guatemala-2026/data.json` 分开。其他游记仍有历史例外：PTES 的 `track.json`、巡礼的 `page.json`、France 的部分派生位置/路线 JSON 尚在 `content/`；不要把这些例外当作新增游记的模板。`out/` 是 Next.js 最终静态导出，不作为源数据目录。
 
 **一个子目录对应一个路由段**，没有例外：
 
@@ -297,7 +299,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 - **中文字体**：`assets-src/fonts/GenWanMin2TC/` OTF → `scripts/subset-cjk-fonts.py` → `public/fonts/genwanmin2tc-{el,l,r,m,sb}.woff2`（对应 300/400/500/600/700，各 ~850 KB）；大改内容后用 venv python 重跑。
 - **英文字体（2026-10-25）**：`assets-src/fonts/EBGaramond/` 可变字体 woff2（上游 583 KB）→ `scripts/subset-ebgaramond.py` → `public/fonts/ebgaramond-{roman,italic}.woff2`（共 **106 KB**）。**可变轴 `wght 400–800` 必须保留**（子集化不能加 `--instance`），一个文件覆盖全站用到的 400/500/600/700。许可证 OFL 1.1，`EBGaramond-OFL.txt` 随字体一起放 `public/fonts/`（OFL 要求）。
 - **Travel GPS（隐私红线，最高优先）**：新增 trip = lab 预处理 → `scripts/sanitize-trip-gps.py` 清洗（home anchor 自动取轨迹首点、radius 3km 裁掉居家段并重排全部索引/bounds）→ 把结果拆两处：**人造内容（trip/scenes/attractions/diagnostics，~115 KB）直接放 `content/travel/<id>/`（import）；`track.json` 也放在同一层**，靠 `scripts/sync-trip-data.mjs` 的 `MIRRORED` 清单声明它需要 fetch —— **「要 URL」由清单表达，不由目录名表达**（早先的 `<id>/data/` 方案会把语义压在文件夹名上，且其 prune 曾清空过 `public/data/travel/ptes-2025/`）→ `npm run sync:data` 把它镜像到 `public/data/travel/<id>/`（产物，gitignored）→ `app/travel/<id>/page.tsx`(en+zh) + `content/travel/<id>/card.json`。**上网数据绝不含住址级 GPS；原始数据只留在 `assets-src/travel-data/`。注意 gitignored ≠ 私密：`public/` 里的一切仍然上网，只是不进版本控制。**
-- **Guatemala terrain**：`assets-src/travel-data/` 全年 GPS + `assets-src/guatemala-masters/` EXIF 原图 → `npm run guatemala:build` → `content/travel/guatemala-2026/data.json` + `public/assets/photos/travel/guatemala-2026/*.webp`；地形由 `npm run guatemala:terrain` 生成到 `public/assets/terrain/guatemala*`。私有输入被忽略，裁切路线、照片位置、去元数据图和地形派生资源入库，完整边界见专项 FEATURE。
+- **Guatemala terrain**：`content/travel/guatemala-2026/story.json` 是唯一正文、章节与镜头源；页面直接与 `generated/travel/guatemala-2026/data.json` 组合。`assets-src/travel-data/` 全年 GPS + `assets-src/guatemala-masters/` EXIF 原图 → `npm run guatemala:build` → 派生地图数据 + `public/assets/photos/travel/guatemala-2026/*.webp`；地形由 `npm run guatemala:terrain` 生成到 `public/assets/terrain/guatemala*`。私有输入被忽略，裁切路线、照片位置、去元数据图和地形派生资源入库，完整边界见专项 FEATURE。
 - **引用完整性**：`npm run check:refs`（prebuild/predev 自动）扫描 `content/` 中所有 `/assets/…` 之类的路径字符串，解析不到 `public/` 就中断构建。字符串引用没有类型检查，写错只会静默出一张空白图。
 
 ## 样式体系

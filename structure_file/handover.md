@@ -35,6 +35,7 @@ Next.js 16 静态导出的个人站（分支 `nextjs-rebuild`）已完全取代�
 
 ## Guatemala 三维地形日志（2026-10-28）
 
+- 内容分层修订（2026-11-05）：`content/travel/guatemala-2026/story.json` 是唯一正文、章节时间、照片说明与镜头真源；`generated/travel/guatemala-2026/data.json` 只存公开的路线、媒体位置、地点和署名。定义文件在构建时组合两者；改文字不再手工同步生成文件。迁移时把原页面正在显示的文字并回 `story.json`，保留既有未提交修改。私有输入只在更新 GPS/照片时需要。
 - 新增 `/travel/guatemala-2026/` 与中文镜像，接入公共日志外壳的新 `terrain` 类型；中文正文、9 个章节、906 点路线、25 张去元数据照片与一张 Starbucks 占位图已可运行。
 - 地图使用本地 Terrarium DEM、素色贴图与平滑 100 m 等高线，支持三维跟随、手动探索后恢复、卫星切换、首尾环绕、山峰/营地/起点标记及滚动联动照片框。
 - 全年 GPS 与带 EXIF/QuickTime metadata 的原始媒体仅在 `assets-src/` 私有目录，均被 `.gitignore` 拦截；分支只提交裁切路线、位置展示数据、去元数据 WebP/MP4 与地形派生资源。另一台设备可直接继续正文、镜头和界面工作，重生成媒体/路线才需私下复制母版。
