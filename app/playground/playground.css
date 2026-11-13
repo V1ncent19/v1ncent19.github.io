@@ -1,0 +1,150 @@
+body:has(.playground-page) .site-chrome-header,
+body:has(.playground-page) .site-chrome-footer,
+body:has(.playground-page) > canvas {
+  display: none !important;
+}
+
+body:has(.playground-page) {
+  overflow: hidden;
+  background: #182c32;
+}
+
+body:has(.playground-page) #main {
+  min-height: 100svh;
+}
+
+body:has(.playground-page) .route-fade {
+  animation: none;
+}
+
+.playground-page {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 62% 36%, #dfcbb4 0%, #a7aa92 47%, #334b49 100%);
+  color: #f5eee1;
+  isolation: isolate;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.playground-scene,
+.playground-scene-loading,
+.playground-vignette {
+  position: absolute;
+  inset: 0;
+}
+
+.playground-scene canvas {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+
+.playground-scene canvas[data-window-hover] { cursor: pointer; }
+.playground-scene canvas[data-dragging] { cursor: grabbing; }
+.playground-scene canvas:focus-visible { outline: 1px solid #f8e3bd; outline-offset: -2px; }
+
+.playground-scene-loading {
+  background: radial-gradient(ellipse at 66% 45%, #c6b59344, transparent 45%);
+}
+
+.playground-vignette {
+  pointer-events: none;
+  background: linear-gradient(0deg, #152528b8, transparent 20%, transparent 89%, #27312f85),
+    radial-gradient(ellipse at 50% 46%, transparent 51%, #22302a26 100%);
+}
+
+.playground-header {
+  position: absolute;
+  z-index: 2;
+  top: clamp(18px, 3.6vh, 44px);
+  left: clamp(24px, 4.8vw, 82px);
+  right: clamp(24px, 4.8vw, 82px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  pointer-events: none;
+  font: 600 11px/1.2 Arial, Helvetica, sans-serif;
+  letter-spacing: .19em;
+}
+
+.playground-home {
+  justify-self: start;
+  pointer-events: auto;
+  color: #f3eee5;
+  text-decoration: none;
+  border: 1px solid #f6eee54f;
+  background: #152b31a3;
+  border-radius: 100px;
+  padding: 11px 17px;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+
+.playground-home:hover,
+.playground-home:focus-visible {
+  background: #36545a;
+  border-color: #f6eee5b0;
+  transform: translateY(-2px);
+}
+
+.playground-header h1 {
+  margin: 0;
+  color: #fff7e9;
+  font: 400 clamp(26px, 3.2vw, 45px)/1 Georgia, "Times New Roman", serif;
+  letter-spacing: -.04em;
+  text-shadow: 0 2px 22px #16282a99;
+}
+
+.playground-header h1 em { color: #f0d9b0; }
+
+.playground-pan-hint {
+  justify-self: end;
+  color: #f3e5c9;
+  letter-spacing: .08em;
+  text-shadow: 0 1px 9px #17282a;
+}
+
+.playground-logs {
+  position: absolute;
+  z-index: 2;
+  bottom: clamp(20px, 3.8vh, 42px);
+  inset-inline: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px clamp(20px, 4.5vw, 68px);
+  pointer-events: none;
+}
+
+.playground-logs a {
+  padding: 7px 2px;
+  border-bottom: 1px solid #e7c79275;
+  color: #f8e3bd;
+  font: 600 12px/1.2 Arial, Helvetica, sans-serif;
+  letter-spacing: .07em;
+  text-decoration: none;
+  pointer-events: auto;
+  transition: color .2s, border-color .2s;
+}
+
+.playground-logs a:hover,
+.playground-logs a:focus-visible {
+  color: #fff;
+  border-color: currentColor;
+}
+
+.playground-logs a span { margin-left: 3px; }
+
+@media (max-width: 430px) {
+  .playground-header { left: 20px; right: 20px; }
+  .playground-home span { display: none; }
+  .playground-pan-hint { max-width: 42px; text-align: right; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playground-page *, .playground-page *::before, .playground-page *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}

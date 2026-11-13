@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",
+    "@react-three/fiber": "^9.8.2",
     "d3-geo": "^3.1.1",
     "gray-matter": "^4.0.3",
     "katex": "^0.18.5",
@@ -37,6 +38,7 @@
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
+    "three": "^0.187.0",
     "topojson-client": "^3.1.0"
   },
   "devDependencies": {
@@ -45,6 +47,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.187.0",
     "@types/topojson-client": "^3.1.5",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",

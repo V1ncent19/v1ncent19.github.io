@@ -240,6 +240,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 /travel/just-because(+/zh) 巡礼地图（MapLibre + 36 站滚动联动 + 可缩放相机）
 /travel/guatemala-2026(+/zh) 三维地形游记（DEM + 等高线 + GPS 路线 + 照片/章节滚动联动）
 /travel/france-2024(+/zh) 手稿重建游记（12 天正文、时刻表、地点及逐段路网候选；无当次 GPS）
+/playground             独立花窗 3D 试验页（仅 playground 分支；不在站内导航）
 /guestbook, /guestbook/zh 留言板（giscus，term 固定 "index"，勿动）
 /zh/*                    双语镜像（`bilingualBases` 由 `navItems` 推导，不再手工维护）
 ```

@@ -1,7 +1,13 @@
 # Handover — 站点现状与新功能启动入口
 
-**最后更新：2026-11-06。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
+**最后更新：2026-11-12。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
 `ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_TRAVEL_LOG.md`（公共日志）、`FEATURE_GUATEMALA_TERRAIN_LOG.md`（Guatemala 三维地形日志）、`FEATURE_PILGRIMAGE.md`（巡礼页）、`FEATURE_HOME_NAVIGATION.md`（首页、导航、标签与卡片）。
+
+---
+
+## 2026-11-12 花窗 Playground（仅 `playground` 分支）
+
+独立 `/playground/` 三维花窗场景陈列 France 2024、PTES、Guatemala 2026 和 Anitabi，仍只在 `playground` 分支。上层两扇窗与两道空拱围住小花园，拱后留小平台。法国窗墙与第二道跌水对齐，Anitabi 侧拱后有浅凹室。镜头朝北偏东 30°，太阳在北偏西 45°，高度 32°。默认视角可同时看见四扇窗，拖动平移，点击窗体进入游记。地面彩光按各窗的高度和角度投射并随窗面亮暗同步变化。实现和重建说明见 `FEATURE_PLAYGROUND_STAINED_GLASS.md`。
 
 ---
 

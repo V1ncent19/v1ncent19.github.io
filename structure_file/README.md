@@ -23,6 +23,7 @@
 | 改旅行日志公共框架 / 新增日志 | `FEATURE_TRAVEL_LOG.md` |
 | 改 Guatemala 三维地形日志 | `FEATURE_GUATEMALA_TERRAIN_LOG.md` |
 | 2024 春季手写游记数字化、路线重建与交互初版 | `PLAN_FRANCE_2024_LOG.md` |
+| 规划 3D 游记 Playground 的浮空日晷、花窗扩展与光影 | [PLAN_PLAYGROUND_SUNDIAL.md](PLAN_PLAYGROUND_SUNDIAL.md) |
 | 改巡礼页（`/travel/just-because`） | `FEATURE_PILGRIMAGE.md` |
 | 查看全站交互走查与改进建议 | `INTERACTION_AUDIT.md` |
 | 核对全站中英混排、引号与数字单位规则 | `TEXT_STYLE_AUDIT.md`（待用户定稿） |
