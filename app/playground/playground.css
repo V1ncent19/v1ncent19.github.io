@@ -122,8 +122,13 @@ body:has(.playground-page) .route-fade {
   margin: 0;
   transition: opacity var(--opening-text-fade) ease, visibility 0s linear var(--opening-text-fade);
 }
-.sundial-opening-wait span { animation: sundial-opening-breathe 2.8s ease-in-out infinite; }
+.sundial-opening-wait span {
+  display: inline-block;
+  will-change: opacity;
+  animation: sundial-opening-breathe 4.4s cubic-bezier(.37, 0, .63, 1) infinite;
+}
 .sundial-opening-wait[aria-hidden="true"] { opacity: 0; visibility: hidden; }
+.sundial-opening-wait[aria-hidden="true"] span { animation-play-state: paused; }
 .sundial-opening-options {
   position: relative;
   display: grid;
@@ -152,8 +157,15 @@ body:has(.playground-page) .route-fade {
 }
 .sundial-opening-audio:not([aria-hidden]) { opacity: 1; transition-delay: .4s; }
 @keyframes sundial-opening-breathe {
-  0%, 100% { opacity: .68; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: .52; }
+  45% { opacity: .96; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sundial-opening-wait span {
+    animation: none;
+    opacity: .8;
+    will-change: auto;
+  }
 }
 @keyframes sundial-opening-options-in {
   from { opacity: 0; visibility: hidden; }
