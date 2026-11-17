@@ -357,10 +357,6 @@ const glassPass = {
         c = mix(c, soft * .25, blur * .68);
       }
       if (scatterReady) c += resolvedAir(at, viewDistance) * (1.0 - entrance);
-      if (entrance > .01) {
-        c.r = texture2D(tDiffuse, sampleAt + bend * .22).r;
-        c.b = texture2D(tDiffuse, sampleAt - bend * .25).b;
-      }
       gl_FragColor = vec4(c, 1.0);
     }`,
 };
