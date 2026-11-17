@@ -1,5 +1,7 @@
 "use client";
 
+import { whenInitialTravelMapPaints, type ReportLogMap } from "@/lib/travel/log/map-preparation";
+
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Map as MLMap, GeoJSONSource, MapMouseEvent, Point } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -235,7 +237,7 @@ interface Props {
   /** Fired once the style is loaded and the initial framing has been applied.
    *  The entry curtain (body.pj-boot) waits on this so it never retracts onto
    *  a grey half-painted canvas — same gate the trip log uses. */
-  onMapReady?: () => void;
+  onMapPrepared?: ReportLogMap;
 }
 
 /** Seconds from the route's first sample to a stop's photo, i.e. the value to
@@ -689,7 +691,7 @@ export default function PilgrimageMap({
   attribution,
   isDark,
   lang = "en",
-  onMapReady,
+  onMapPrepared,
 }: Props) {
   const holderRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -1017,10 +1019,6 @@ export default function PilgrimageMap({
         m.resize();
         frame();
 
-        // Reveal gate: the style is loaded and the initial framing is applied,
-        // so the curtain retracts onto a painted map rather than a grey canvas.
-        onMapReady?.();
-
         // Seed the cursor: overview starts at the first stop, so the dot has
         // somewhere sensible to be before the reader scrolls at all.
         const startFrac = stops[0] ? stopFrac(route, routeProjRef.current, stops[0], 0) : 0;
@@ -1080,8 +1078,13 @@ export default function PilgrimageMap({
         });
 
         setReady(true);
+        whenInitialTravelMapPaints(m, () => onMapPrepared?.("ready"));
       });
-    })();
+    })().catch(cause => {
+      if (cancelled) return;
+      console.error("Pilgrimage map setup failed", cause);
+      onMapPrepared?.("failed");
+    });
 
     return () => {
       cancelled = true;

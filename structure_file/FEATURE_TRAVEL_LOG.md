@@ -25,6 +25,7 @@
 |---|---|
 | `components/travel/log/TravelLogPage.tsx` | 解析期沉浸/幕布脚本；连接语言与内容类型；生成页面 metadata |
 | `TravelLogShell.tsx` | 公共框架、返回、离场动画、幕布就绪/超时/失败处理、加载与错误状态、布局 context |
+| `lib/travel/log/map-preparation.ts` | 四种地图共用的首帧就绪检测与状态类型 |
 | `ChapterNavigation.tsx` | 一份章节测量、阅读百分比、桌面轨道、移动端拖拽提示、目录与返回顶部逻辑；保留两套正文边栏的视觉 skin |
 | `MapToolbar.tsx` | 公共主题控件与定位；地图专属按钮通过 children 接入 |
 | `TravelLogFacts.tsx` | 三列开场元数据窗格；每种日志提供自己的 label/value，但不再复制结构和样式 |
@@ -48,7 +49,8 @@
 - PTES 的光标与镜头继续使用同一条缓动阅读线。正文日期进度通过实例内 `readTime()` 读取，已移除 `window.__ttime` 内部通信；原地图调试接口不参与正文通信。
 - 巡礼导航直接消费正文 observer 得出的当前章节，不再自行运行第二套章节评分。
 - 手动探索不因后续滚动恢复；显式恢复回到当前阅读位置；巡礼查看全程后保持 overview。
-- 入场幕布完整加载时由解析期脚本设置 body 类，Next Link 导航由 `useLayoutEffect` 在绘制前补齐；统一通过 `body::before` 绘制。禁止水合前插入真实 DOM 幕布。动画监听同时检查名称与 `pseudoElement`，失败及超时应释放幕布，卸载须清理类。
+- 入场幕布完整加载时由解析期脚本设置 body 类，Next Link 导航由 `useLayoutEffect` 在绘制前补齐；统一通过 `body::before` 绘制。禁止水合前插入真实 DOM 幕布。动画监听同时检查名称与 `pseudoElement`，卸载须清理类。
+- 所有类型在幕布上显示本地化的地图加载提示。数据就绪后，地图适配器完成初始相机、底图及游记图层（如路线、标点或地形）的设置，再调用 `whenInitialTravelMapPaints`。它通过 `render` 事件以及 `isStyleLoaded()`、`areTilesLoaded()` 与相机状态检测绘制后的就绪情况，然后报告 `ready`，兼容会持续更新绘制属性的标点动效。地图初始化失败时报告 `failed`，以便尽快放行；15 秒 CSS 兜底也覆盖脚本未运行或地图无响应的情况。减少动态效果时直接显示页面。
 - `lib/travel/log/return-navigation.ts` 将本站入口地址记在本次游记的浏览器历史条目上。首页、博客、旅行页和 Playground 的同标签页入口使用历史返回，沿用浏览器的滚动恢复和 Playground 的花窗选择。新标签页可通过同站来源地址返回，直接访问则返回对应语言的旅行页。
 - 旅行页在 Stories & frames 之前通过 `components/travel/playground-intro.tsx` 引用 [Atelier du vitrail](AtelierDuVitrail/README.md)。三维花窗的内容与渲染独立维护。
 - 四种日志的开场必须使用同一套 `TravelLogFacts` 与 `TravelLogScrollCue`。元数据内容可以不同：PTES 显示天数/里程/GPS，Anitabi 显示时长/路线点/对比图，Guatemala 显示最高点/爬升/路线点，France 显示天数/文字章节/GPS 缺失。
@@ -82,6 +84,8 @@ France 的 reconstructed 页面只绘地点标点。`routes.json` 的 135 段核
 
 每阶段执行类型、改动文件 lint、静态构建，保留阶段截图；最终浏览器回归脚本为 `scripts/check-travel-log.mjs`。需要可用的 `playwright-core` 和 Chromium，通过 `PLAYWRIGHT_MODULE`（file URL）及 `CHROME_PATH` 指定；测试自行启动仅限 loopback 的静态服务器，读取 `out/`，不访问线上站点。
 
+统一开屏等待的专项回归使用 `node scripts/check-travel-log.mjs --loading`（相同环境变量）。四篇日志分别检查英文桌面和中文手机：将地图资源暂停超过 4 秒，验证幕布完整覆盖及本地化提示，再放行资源并等待地图绘制后揭幕。二维底图使用本地 raster 测试瓦片，Guatemala 读取实际 DEM；另验数据失败、脚本无法运行时的 15 秒兜底，以及减少动态效果。
+
 卡片入口的回退/缓存状态另用 `scripts/check-card-launch.mjs`（相同环境变量，先构建 out/）。检查中英文、1440/390px、首页和两篇旅行日志反复进入/返回、浏览器快照恢复、重复点击及遗留计时器取消。StoryTile 还需检查返回后封面不因恢复的 hover/focus 展开，新的鼠标移动和 Tab 聚焦可重新启用。Headless Chrome 不执行部分浏览器快捷键，脚本发送 Alt+Left 建立键盘输入状态后，必要时调用相同的 history.back 操作；不会把 DOMContentLoaded 当作缓存恢复事件。
 
 Travel gallery 的 StoryTile 使用 Next Link/router.push，不再通过 window.location.href 整页跳转。行程卡片数据声明 travelLog: true；确认结束时 lib/travel/log/entry-transition.ts 先加 body.travel-log-launch，以同色全屏伪元素覆盖源页，目标 TravelLogShell 在 useLayoutEffect 先加 boot 再 clearTravelEntry 接管，之后按原逻辑从左向右展开。源页有取消/6s 超时清理，减少动态效果时不启动。沉浸页禁用 .route-fade 的通用 transform 动画并约束横向溢出，避免固定地图短暂错位及水平滚动条。
@@ -109,7 +113,7 @@ Travel gallery 的 StoryTile 使用 Next Link/router.push，不再通过 window.
 ## 开屏幕布修复（2026-10-24）
 
 - 开屏应从全屏蓝色覆盖开始，再固定右边缘向右收走，使页面由左向右显露；返回则从右向左铺满。旧实现的 5%–8% 窄条已移除。
-- 统一使用 `travel-log-entry-open` 与有定义的 `travel-log-entry-fallback`；释放规则放在兜底 shorthand 之后，明确重置延迟。动画时长 0.46s，兜底等待 3.5s；CSS-only 兜底也会隐藏竖排标题。
+- 统一使用 `travel-log-entry-open` 与有定义的 `travel-log-entry-fallback`；释放规则放在兜底 shorthand 之后，明确重置延迟。当时动画时长 0.46s，兜底等待 3.5s。现行等待规范见上文。
 - `useLayoutEffect` 补齐 Next Link 进入时的启动类。监听仍过滤 `::before` 与动画名；迟到的就绪信号不能重新挂幕布；运行中切换 reduce 时立即清理。
 - 验收命令 `node scripts/check-travel-log.mjs --entry`：1440px/390px × 两篇 × 两种语言，采样真实 CSS 动画的起始/中间/结束阶段，检查全屏覆盖、右侧固定原点、覆盖范围单调缩小、返回动画反向、清理后不残留类；另外检查真实 Blog Next Link 同文档导航、阻止应用脚本后的 CSS-only 退场、减少动态效果。
 - 此修复补上了上一轮静态截图无法检查的动画过程验证。类型、lint 和 Webpack 静态导出通过。

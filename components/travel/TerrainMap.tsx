@@ -1,5 +1,7 @@
 "use client";
 
+import { whenInitialTravelMapPaints, type ReportLogMap } from "@/lib/travel/log/map-preparation";
+
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { GeoJSONSource, Map as MLMap, Marker as MLMarker, StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -349,11 +351,11 @@ function ContourIcon() {
   </svg>;
 }
 
-export default function TerrainMap({ data, reading, lang, onMapReady, onNavigateScene }: {
+export default function TerrainMap({ data, reading, lang, onMapPrepared, onNavigateScene }: {
   data: TerrainTravelData;
   reading: TerrainReadingState;
   lang: LogLang;
-  onMapReady: () => void;
+  onMapPrepared: ReportLogMap;
   onNavigateScene: (id: string) => void;
 }) {
   const holderRef = useRef<HTMLDivElement>(null);
@@ -364,7 +366,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   const followingRef = useRef(true);
   const readyRef = useRef(false);
   const readingRef = useRef(reading);
-  const onReadyRef = useRef(onMapReady);
+  const onMapPreparedRef = useRef(onMapPrepared);
   const onNavigateRef = useRef(onNavigateScene);
   const previousCameraSceneRef = useRef<string | null>(null);
   const [ready, setReady] = useState(false);
@@ -383,7 +385,7 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
   const routeRenderIndex = Math.round(reading.routeIndex * 4) / 4;
 
   useEffect(() => { readingRef.current = reading; }, [reading]);
-  useEffect(() => { onReadyRef.current = onMapReady; }, [onMapReady]);
+  useEffect(() => { onMapPreparedRef.current = onMapPrepared; }, [onMapPrepared]);
   useEffect(() => { onNavigateRef.current = onNavigateScene; }, [onNavigateScene]);
 
   const routeCoordinates = useMemo(() => data.route.points.map(point => [point[0], point[1]] as [number, number]), [data.route.points]);
@@ -401,8 +403,6 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
     let map: MLMap | null = null;
     let resizeObserver: ResizeObserver | null = null;
     let resizeFrame = 0;
-    let readyFallback = 0;
-    let releaseReady: (() => void) | null = null;
     let cancelled = false;
     const photoFocusMarkers = photoFocusMarkersRef.current;
     const syncCompass = () => {
@@ -464,23 +464,14 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
         });
         map.on("mouseenter", "photo-hit", () => { if (map) map.getCanvas().style.cursor = "pointer"; });
         map.on("mouseleave", "photo-hit", () => { if (map) map.getCanvas().style.cursor = ""; });
-        let released = false;
-        releaseReady = () => {
-          if (released || cancelled) return;
-          released = true;
-          window.clearTimeout(readyFallback);
+        whenInitialTravelMapPaints(map, () => {
           previousCameraSceneRef.current = TERRAIN_INTRO_SCENE_ID;
           readyRef.current = true;
           followingRef.current = true;
           setFollow(true);
           setReady(true);
-          onReadyRef.current();
-        };
-        // Wait for the terrain and route to paint while the entry sheet is
-        // still closed. The fallback prevents a slow tile from blocking the
-        // article indefinitely; TravelLogShell adds one final reveal beat.
-        map.once("idle", releaseReady);
-        readyFallback = window.setTimeout(releaseReady, 1_800);
+          onMapPreparedRef.current("ready");
+        });
       });
       const manual = () => { followingRef.current = false; setFollow(false); };
       map.on("dragstart", manual);
@@ -494,12 +485,14 @@ export default function TerrainMap({ data, reading, lang, onMapReady, onNavigate
         resizeFrame = requestAnimationFrame(() => map?.resize());
       });
       resizeObserver.observe(holderRef.current);
-    })();
+    })().catch(cause => {
+      if (cancelled) return;
+      console.error("Terrain map setup failed", cause);
+      onMapPreparedRef.current("failed");
+    });
     return () => {
       cancelled = true;
       cancelAnimationFrame(resizeFrame);
-      window.clearTimeout(readyFallback);
-      if (map && releaseReady) map.off("idle", releaseReady);
       resizeObserver?.disconnect();
       for (const { marker, frame, timer } of photoFocusMarkers.values()) {
         cancelAnimationFrame(frame);

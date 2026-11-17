@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { PilgrimageDefinition, LogLang } from "@/lib/travel/log/types";
+import type { LogMapPhase } from "@/lib/travel/log/map-preparation";
 import TravelLogShell from "./log/TravelLogShell";
 import PilgrimageMap from "./PilgrimageMap";
 import PilgrimageStory from "./PilgrimageStory";
@@ -59,7 +60,7 @@ export default function PilgrimageLog({ log, lang }: { log: PilgrimageDefinition
     return () => obs.disconnect();
   }, []);
 
-  const [mapReady, setMapReady] = useState(false);
+  const [mapPhase, reportMap] = useState<LogMapPhase>("loading");
 
   /** The story column reports the stop it is reading. Everything the map needs
    *  is derived in one place, so the popup can never disagree with the dot. */
@@ -101,7 +102,7 @@ export default function PilgrimageLog({ log, lang }: { log: PilgrimageDefinition
   }, []);
 
   return (
-    <TravelLogShell kind="pilgrimage" id={log.id} wordmark={log.wordmark} lang={lang} legacyStorageKey={log.legacySplitKey} dataReady mapReady={mapReady}
+    <TravelLogShell kind="pilgrimage" id={log.id} wordmark={log.wordmark} lang={lang} legacyStorageKey={log.legacySplitKey} dataReady mapPhase={mapPhase}
       map={
       <PilgrimageMap
         stops={data.stops}
@@ -113,7 +114,7 @@ export default function PilgrimageLog({ log, lang }: { log: PilgrimageDefinition
         attribution={data.attribution}
         isDark={isDark}
         lang={lang}
-        onMapReady={() => setMapReady(true)}
+        onMapPrepared={reportMap}
       />
 
       }

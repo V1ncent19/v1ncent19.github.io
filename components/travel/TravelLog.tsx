@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { TripTrack } from "@/lib/travel/types";
 import type { JournalDefinition, LogLang } from "@/lib/travel/log/types";
 import { useStoryController } from "@/lib/travel/use-story-controller";
+import type { LogMapPhase } from "@/lib/travel/log/map-preparation";
 import TravelLogShell, { TravelLogStatus } from "./log/TravelLogShell";
 import TravelMap from "./TravelMap";
 import TravelStory from "./TravelStory";
@@ -13,7 +14,7 @@ export default function TravelLog({ log, lang }: { log: JournalDefinition; lang:
   const { trip, scenes, attractions, trackUrl } = log;
   const [track, setTrack] = useState<TripTrack | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [mapReady, setMapReady] = useState(false);
+  const [mapPhase, reportMap] = useState<LogMapPhase>("loading");
   useEffect(() => {
     const abort = new AbortController();
     fetch(trackUrl, { signal: abort.signal })
@@ -31,9 +32,9 @@ export default function TravelLog({ log, lang }: { log: JournalDefinition; lang:
   }, [trackUrl]);
   const { state, registerSection, enterExplore, resumeStory, readTime } = useStoryController(trip, track, scenes);
   return <TravelLogShell kind="journal" id={log.id} wordmark={log.wordmark} lang={lang} legacyStorageKey={log.legacySplitKey}
-    dataReady={!!track} mapReady={mapReady} failed={!!error}
+    dataReady={!!track} mapPhase={mapPhase} failed={!!error}
     map={track && <TravelMap trip={trip} track={track} scenes={scenes} attractions={attractions}
-      state={state} onUserInteract={enterExplore} onResume={resumeStory} onMapReady={() => setMapReady(true)} lang={lang} />}
+      state={state} onUserInteract={enterExplore} onResume={resumeStory} onMapPrepared={reportMap} lang={lang} />}
     story={track && <TravelStory trip={trip} scenes={scenes} registerSection={registerSection} activeSceneId={state.activeSceneId} lang={lang} readTime={readTime} />}>
     {(error || !track) && <TravelLogStatus error={error} />}
   </TravelLogShell>;

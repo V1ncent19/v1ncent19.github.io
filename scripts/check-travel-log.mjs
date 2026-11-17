@@ -46,7 +46,90 @@ async function drag(page, x, y, toY) {
   await page.mouse.move(x, toY, { steps: 12 }); await page.mouse.up(); await delay(350);
 }
 try {
-  if (process.argv.includes("--entry") || process.argv.includes("--entry-spa")) {
+  if (process.argv.includes("--loading")) {
+    // Hold actual map resources beyond both of the former early-reveal timers.
+    // A local raster fixture keeps these checks independent of public tile servers.
+    const sharp = (await import("sharp")).default;
+    const tile = await sharp({ create: { width: 256, height: 256, channels: 3, background: "#dde5de" } }).png().toBuffer();
+    for (const id of ["ptes-2025", "just-because", "guatemala-2026", "france-2024"]) {
+      for (const lang of ["en", "zh"]) {
+        const page = await browser.newPage({ viewport: { width: lang === "en" ? 1440 : 390, height: 900 } });
+        const errors = [];
+        const mapErrors = [];
+        page.on("pageerror", e => errors.push(e.message));
+        page.on("console", entry => { if (entry.type() === "error") mapErrors.push(entry.text()); });
+        await page.addInitScript(() => {
+          window.__mapReveal = false;
+          document.addEventListener("animationstart", event => {
+            if (event.pseudoElement === "::before" && event.animationName === "travel-log-entry-open") window.__mapReveal = true;
+          });
+        });
+        await page.route("https://basemaps.cartocdn.com/**/style.json", route => route.fulfill({
+          json: { version: 8, glyphs: base + "/test-fonts/{fontstack}/{range}.pbf",
+            sources: { test: { type: "raster", tiles: [base + "/test-tiles/{z}/{x}/{y}.png"], tileSize: 256 } },
+            layers: [{ id: "test", type: "raster", source: "test" }] },
+        }));
+        await page.route("**/test-fonts/**", route => route.fulfill({ body: Buffer.alloc(0) }));
+        let release;
+        const held = new Promise(resolve => { release = resolve; });
+        let requested;
+        const firstRequest = new Promise(resolve => { requested = resolve; });
+        await page.route(id === "guatemala-2026" ? "**/assets/terrain/guatemala/*/*/*.png" : "**/test-tiles/**", async route => {
+          requested();
+          await held;
+          if (id === "guatemala-2026") await route.continue();
+          else await route.fulfill({ contentType: "image/png", body: tile });
+        });
+        await page.goto(base + "/travel/" + (lang === "zh" ? "zh/" : "") + id + "/", { waitUntil: "domcontentloaded" });
+        try {
+          await Promise.race([firstRequest, delay(8000).then(() => { throw new Error(id + ": no map tile requested"); })]);
+          await delay(4300);
+          assert.equal(await page.evaluate(() => new DOMMatrixReadOnly(getComputedStyle(document.body, "::before").transform).a), 1, id + ": slow map stays covered");
+          assert.equal(await page.evaluate(() => window.__mapReveal), false, id + ": no premature reveal");
+          const message = page.locator(".tl-veil-loading");
+          assert.equal(await message.textContent(), lang === "zh" ? "正在加载游记地图…" : "Loading the travel map…");
+          assert.equal(await message.evaluate(el => getComputedStyle(el).opacity), "1");
+          release();
+          await page.waitForFunction(() => window.__mapReveal, null, { timeout: 8000 });
+          await page.waitForFunction(() => !/\b(tl-veil-boot|pj-boot|terrain-boot)\b/.test(document.body.className));
+          assert.equal(await message.isVisible(), false);
+          assert.deepEqual(errors, [], id + ": browser exceptions");
+          console.log(id + "/" + lang + ": slow map held, localized message, painted map revealed OK");
+        } catch (cause) {
+          console.log(id, lang, await page.evaluate(() => {
+            const map = window.__tmap ?? window.__pjMap;
+            return { body: document.body.className, styleLoaded: map?.isStyleLoaded(),
+              tiles: map?.areTilesLoaded(), moving: map?.isMoving(), revealed: window.__mapReveal };
+          }), errors, mapErrors);
+          throw cause;
+        } finally { release(); await page.close(); }
+      }
+    }
+    const failed = await browser.newPage();
+    await failed.route("**/data/travel/ptes-2025/track.json", route => route.fulfill({ status: 503, body: "unavailable" }));
+    await failed.goto(base + "/travel/ptes-2025/");
+    await failed.waitForSelector('[role="alert"]');
+    await failed.waitForFunction(() => !document.body.classList.contains("tl-veil-boot"), null, { timeout: 4000 });
+    await failed.close();
+    console.log("Data failure: error visible and curtain released OK");
+
+    const fallback = await browser.newPage();
+    await fallback.route("**/_next/static/**/*.js", route => route.abort());
+    await fallback.goto(base + "/travel/guatemala-2026/");
+    await delay(4300);
+    assert.equal(await fallback.evaluate(() => new DOMMatrixReadOnly(getComputedStyle(document.body, "::before").transform).a), 1);
+    await fallback.waitForFunction(() => new DOMMatrixReadOnly(getComputedStyle(document.body, "::before").transform).a < -.005, null, { timeout: 16000 });
+    await fallback.locator(".tl-veil-loading").waitFor({ state: "hidden", timeout: 2000 });
+    await fallback.close();
+    console.log("Hydration unavailable: shared timeout reveals page and clears loading message OK");
+
+    const reduced = await browser.newPage({ reducedMotion: "reduce" });
+    await reduced.goto(base + "/travel/zh/france-2024/");
+    assert.equal(await reduced.evaluate(() => getComputedStyle(document.body, "::before").content), "none");
+    assert.equal(await reduced.locator(".tl-veil-loading").isVisible(), false);
+    await reduced.close();
+    console.log("Reduced motion: curtain and curtain message disabled OK");
+  } else if (process.argv.includes("--entry") || process.argv.includes("--entry-spa")) {
     // Freeze the real CSS animation at animationstart, then sample its actual
     // transforms. A screenshot taken after loading would miss this regression.
     const watchEntry = () => {
@@ -155,7 +238,7 @@ try {
       await fs.mkdir(process.env.TRAVEL_ENTRY_SHOTS, { recursive: true });
       await fallback.screenshot({ path: path.join(process.env.TRAVEL_ENTRY_SHOTS, "initial-full-coverage.png") });
     }
-    await delay(4200);
+    await fallback.waitForFunction(() => new DOMMatrixReadOnly(getComputedStyle(document.body, "::before").transform).a < -.005, null, { timeout: 20000 });
     assert((await fallback.evaluate(() => new DOMMatrixReadOnly(getComputedStyle(document.body, "::before").transform).a)) < -.005);
     assert.equal(await fallback.locator(".tl-veil-band").evaluate(el => getComputedStyle(el).opacity), "0");
     await fallback.close(); console.log("Hydration unavailable: CSS curtain and wordmark fallback OK");

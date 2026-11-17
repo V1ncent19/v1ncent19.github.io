@@ -1,5 +1,7 @@
 "use client";
 
+import { whenInitialTravelMapPaints, type ReportLogMap } from "@/lib/travel/log/map-preparation";
+
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { GeoJSONSource, Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -78,9 +80,9 @@ function fitPlaces(map: MLMap, places: ReconstructedPlace[], reduceMotion: boole
     { padding: 52, maxZoom: 12.2, duration: reduceMotion ? 0 : 750 });
 }
 
-export default function ReconstructedMap({ data, reading, lang, onMapReady, onNavigate }: {
+export default function ReconstructedMap({ data, reading, lang, onMapPrepared, onNavigate }: {
   data: ReconstructedData; reading: ReconstructedReading; lang: LogLang;
-  onMapReady: () => void; onNavigate: (dayId: string, placeId: string | null) => void;
+  onMapPrepared: ReportLogMap; onNavigate: (dayId: string, placeId: string | null) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -150,6 +152,12 @@ export default function ReconstructedMap({ data, reading, lang, onMapReady, onNa
     if (!containerRef.current) return;
     let removed = false;
     let map: MLMap | null = null;
+    const reportFailure = (cause: unknown) => {
+      if (removed) return;
+      console.error("Reconstructed map setup failed", cause);
+      setError(true);
+      onMapPrepared("failed");
+    };
     const start = async () => {
       try {
         const maplibre = (await import("maplibre-gl")).default;
@@ -162,21 +170,26 @@ export default function ReconstructedMap({ data, reading, lang, onMapReady, onNa
           center: [4.1, 50.5], zoom: 5.2, attributionControl: false, cooperativeGestures: true });
         const current = map;
         mapRef.current = current;
-        current.on("load", () => {
+        current.once("load", () => {
           if (removed) return;
-          void paintMarkers(current, readingRef.current.dayId);
-          fitPlaces(current, data.places, true);
-          setReady(true);
+          void paintMarkers(current, readingRef.current.dayId).then(() => {
+            if (removed) return;
+            fitPlaces(current, data.places, true);
+            setReady(true);
+            whenInitialTravelMapPaints(current, () => {
+              setVisualReady(true);
+              onMapPrepared("ready");
+            });
+          }).catch(reportFailure);
         });
-        current.once("idle", () => { if (!removed) { setVisualReady(true); onMapReady(); } });
         current.on("style.load", () => { if (!removed) void paintMarkers(current, readingRef.current.dayId); });
         current.on("dragstart", () => setCameraMode("manual"));
         current.getCanvas().addEventListener("wheel", () => setCameraMode("manual"), { passive: true });
-      } catch (cause) { if (!removed) { console.error("France draft map", cause); setError(true); onMapReady(); } }
+      } catch (cause) { reportFailure(cause); }
     };
     void start();
     return () => { removed = true; markersRef.current.forEach(marker => marker.remove()); markersRef.current = []; map?.remove(); mapRef.current = null; };
-  }, [data, paintMarkers, onMapReady]);
+  }, [data, paintMarkers, onMapPrepared]);
 
   useEffect(() => {
     const map = mapRef.current;

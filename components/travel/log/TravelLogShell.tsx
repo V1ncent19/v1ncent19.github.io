@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode, type CSSProperties } from "react";
+import type { LogMapPhase } from "@/lib/travel/log/map-preparation";
 import type { LogKind, LogLang } from "@/lib/travel/log/types";
 
 import { LogLayoutContext, LOG_LAYOUTS } from "@/lib/travel/log/layout";
@@ -15,8 +16,8 @@ const TRANSITIONS = {
 } as const;
 const ENTRY_ANIMATIONS = ["travel-log-entry-open", "travel-log-entry-fallback"];
 
-/** One lifecycle for both pages; the sheet must remain a body pseudo-element. */
-function useTravelTransition(kind: LogKind, dataReady: boolean, mapReady: boolean, failed: boolean) {
+/** Shared by every log. The sheet stays a body pseudo-element for the first paint. */
+function useTravelTransition(kind: LogKind, dataReady: boolean, mapPhase: LogMapPhase, failed: boolean) {
   const config = TRANSITIONS[kind];
   useLayoutEffect(() => {
     const body = document.body;
@@ -41,14 +42,18 @@ function useTravelTransition(kind: LogKind, dataReady: boolean, mapReady: boolea
     };
   }, [config]);
   useEffect(() => {
-    if (!dataReady && !failed) return;
-    const release = () => {
-      if (document.body.classList.contains(config.boot)) document.body.classList.add(config.open);
-    };
-    // Failure is visible immediately; a missing map cannot hold the reader hostage.
-    const timer = window.setTimeout(release, failed ? 0 : mapReady ? config.beat : 1500);
+    const cannotLoad = failed || mapPhase === "failed";
+    if (!cannotLoad && (!dataReady || mapPhase !== "ready")) return;
+    const timer = window.setTimeout(() => {
+      const body = document.body;
+      if (!body.classList.contains(config.boot)) return;
+      // If the CSS timeout already started opening the sheet, let it finish.
+      const { transform } = getComputedStyle(body, "::before");
+      if (new DOMMatrixReadOnly(transform === "none" ? undefined : transform).a < 1) return;
+      body.classList.add(config.open);
+    }, cannotLoad ? 0 : config.beat);
     return () => window.clearTimeout(timer);
-  }, [config, dataReady, mapReady, failed]);
+  }, [config, dataReady, mapPhase, failed]);
 }
 
 function TravelLogBack({ lang }: { lang: LogLang }) {
@@ -98,13 +103,13 @@ export function TravelLogStatus({ error }: { error: string | null }) {
     : <div className="boot-loading" role="status" aria-live="polite"><span className="boot-loading-dot" aria-hidden="true" />Loading trip data…</div>;
 }
 
-export default function TravelLogShell({ kind, id, wordmark, lang, dataReady, mapReady, failed = false, map, story, children, legacyStorageKey }: {
+export default function TravelLogShell({ kind, id, wordmark, lang, dataReady, mapPhase, failed = false, map, story, children, legacyStorageKey }: {
   kind: LogKind; id: string; wordmark: string; lang: LogLang;
-  dataReady: boolean; mapReady: boolean; failed?: boolean;
+  dataReady: boolean; mapPhase: LogMapPhase; failed?: boolean;
   map?: ReactNode; story?: ReactNode; children?: ReactNode;
   legacyStorageKey?: string;
 }) {
-  useTravelTransition(kind, dataReady, mapReady, failed);
+  useTravelTransition(kind, dataReady, mapPhase, failed);
   const layout = useMemo(() => ({ storageKey: `travel-log-split:${id}`, legacyStorageKey, ...LOG_LAYOUTS[kind] }), [id, kind, legacyStorageKey]);
   const journalLayout = kind === "journal" || kind === "reconstructed";
   return <LogLayoutContext.Provider value={layout}>
@@ -115,5 +120,6 @@ export default function TravelLogShell({ kind, id, wordmark, lang, dataReady, ma
       {dataReady && <TravelLogBack lang={lang} />}
     </div>
     <span className="tl-veil-band" aria-hidden="true">{wordmark}</span>
+    <p className="tl-veil-loading" role="status">{lang === "zh" ? "正在加载游记地图…" : "Loading the travel map…"}</p>
   </LogLayoutContext.Provider>;
 }

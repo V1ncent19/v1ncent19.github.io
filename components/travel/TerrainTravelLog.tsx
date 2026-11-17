@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import type { LogLang, TerrainDefinition } from "@/lib/travel/log/types";
+import type { LogMapPhase } from "@/lib/travel/log/map-preparation";
 import TravelLogShell from "./log/TravelLogShell";
 import TerrainMap from "./TerrainMap";
 import TerrainStory from "./TerrainStory";
@@ -19,7 +20,7 @@ export default function TerrainTravelLog({ log, lang }: { log: TerrainDefinition
     routeIndex: log.data.scenes[0]?.route[0] ?? 0,
     photoId: null,
   });
-  const [mapReady, setMapReady] = useState(false);
+  const [mapPhase, reportMap] = useState<LogMapPhase>("loading");
   const [focus, setFocus] = useState<{ id: string; nonce: number } | null>(null);
   const navigate = useCallback((id: string) => setFocus(current => ({ id, nonce: (current?.nonce ?? 0) + 1 })), []);
 
@@ -29,8 +30,8 @@ export default function TerrainTravelLog({ log, lang }: { log: TerrainDefinition
     wordmark={log.wordmark}
     lang={lang}
     dataReady
-    mapReady={mapReady}
-    map={<TerrainMap data={log.data} reading={reading} lang={lang} onMapReady={() => setMapReady(true)} onNavigateScene={navigate} />}
+    mapPhase={mapPhase}
+    map={<TerrainMap data={log.data} reading={reading} lang={lang} onMapPrepared={reportMap} onNavigateScene={navigate} />}
     story={<TerrainStory data={log.data} lang={lang} reading={reading} onReading={setReading} focus={focus} />}
   />;
 }

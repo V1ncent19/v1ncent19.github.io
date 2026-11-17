@@ -68,7 +68,7 @@ try {
     const target = `${source}${id}/`;
     await page.waitForURL(url => url.pathname === target, { waitUntil: "commit" });
     assert(await page.evaluate(token => token === window.__entryIdentity, identity), "Travel entry must stay in the same document");
-    await page.waitForFunction(() => document.querySelector("[data-travel-log]") && !document.body.classList.contains("travel-log-launch") && !/\b(tl-veil-boot|pj-boot)\b/.test(document.body.className), undefined, { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelector("[data-travel-log]") && !document.body.classList.contains("travel-log-launch") && !/\b(tl-veil-boot|pj-boot)\b/.test(document.body.className), undefined, { timeout: 20000 });
     const { frames, sheet } = await page.evaluate(() => { window.__recordEntry = false; return { frames: window.__entryFrames, sheet: window.__sourceSheet }; });
     if (!reduced) {
       assert(sheet?.sheet && sheet.scale === 1 && sheet.fixed, "Source must be covered before swapping routes");

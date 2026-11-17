@@ -1,5 +1,7 @@
 "use client";
 
+import { whenInitialTravelMapPaints, type ReportLogMap } from "@/lib/travel/log/map-preparation";
+
 // REQUIRED: maplibre-gl.css carries the container (.maplibregl-map is
 // position:relative / overflow:hidden) plus the attribution + control chrome.
 // Without it maplibre's own absolutely-positioned controls fall back to
@@ -158,7 +160,7 @@ interface Props {
   /** Fired once when the MapLibre map fires its initial "load" (style ready,
    *  first frame drawn). v11 entry veil: the trip page stays covered until
    *  this fires, so the reveal never exposes a half-initialised map. */
-  onMapReady?: () => void;
+  onMapPrepared?: ReportLogMap;
   /** Page language, used to localise maplibre's OWN UI strings — currently
    *  the cooperative-gesture hint ("Ctrl + scroll to zoom"). Optional so the
    *  English routes need no change; anything other than "zh" falls through
@@ -590,7 +592,7 @@ export default function TravelMap({
   state,
   onUserInteract,
   onResume,
-  onMapReady,
+  onMapPrepared,
   lang = "en",
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -853,7 +855,7 @@ export default function TravelMap({
         // `.map-pane` no longer needs maplibre's popup CSS.)
         setMapReady(true);
         (window as unknown as Record<string, unknown>).__tmapReady = true;
-        onMapReady?.();
+        whenInitialTravelMapPaints(map, () => onMapPrepared?.("ready"));
         console.log("[map] load complete, mapReady=true");
       });
 
@@ -893,7 +895,11 @@ export default function TravelMap({
         attributes: true,
         attributeFilter: ["class"],
       });
-    })();
+    })().catch(cause => {
+      if (cancelled) return;
+      console.error("Travel map setup failed", cause);
+      onMapPrepared?.("failed");
+    });
     return () => {
       cancelled = true;
       cancelAnimationFrame(stateRaf);

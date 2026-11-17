@@ -2839,6 +2839,9 @@ body.pj-immersive .pj-page {
    then retract to the RIGHT, revealing the page from LEFT to RIGHT.
    Keep this on body::before so it paints before hydration and is unaffected
    by RouteFade's temporary transform containing block. */
+body:is(.tl-veil-boot, .pj-boot, .terrain-boot) {
+  --tl-veil-max-wait: 15s;
+}
 body.travel-log-launch::before,
 body.tl-veil-boot::before,
 body.pj-boot::before,
@@ -2852,7 +2855,7 @@ body.terrain-boot::before {
   transform: scaleX(1);
   pointer-events: none;
   /* Covers the page throughout the delay; also works if hydration never runs. */
-  animation: travel-log-entry-fallback 0.58s linear 3.5s both;
+  animation: travel-log-entry-fallback 0.58s linear var(--tl-veil-max-wait, 15s) both;
 }
 body.travel-log-launch {
   overflow-x: clip;
@@ -2883,28 +2886,41 @@ body.travel-log-launch::before {
   letter-spacing: 4px;
   writing-mode: vertical-lr;
   text-transform: uppercase;
-  opacity: 0;
   pointer-events: none;
 }
-body.tl-veil-boot .tl-veil-band,
-body.pj-boot .tl-veil-band,
-body.terrain-boot .tl-veil-band {
-  opacity: 1;
-  animation: travel-log-entry-wordmark 0.18s linear 3.5s forwards;
+.tl-veil-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 97;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 1.25rem;
+  color: var(--tl-accent-strong, #0f7f99);
+  font: 500 0.875rem/1.5 var(--font-ui, system-ui);
+  text-align: center;
+  pointer-events: none;
 }
-/* A distinct animation name restarts at full coverage when readiness arrives.
-   This rule must follow the fallback shorthand and reset its 3.5s delay. */
+:is(.tl-veil-band, .tl-veil-loading) {
+  opacity: 0;
+  visibility: hidden;
+}
+body:is(.tl-veil-boot, .pj-boot, .terrain-boot) :is(.tl-veil-band, .tl-veil-loading) {
+  opacity: 1;
+  visibility: visible;
+  animation: travel-log-entry-wordmark 0.18s linear var(--tl-veil-max-wait) forwards;
+}
+/* Readiness replaces the delayed fallback with an immediate opening. */
 body.tl-veil-boot.tl-veil-open::before,
 body.pj-boot.pj-veil-open::before,
 body.terrain-boot.terrain-veil-open::before {
   animation: travel-log-entry-open 0.58s linear both;
 }
-body.tl-veil-boot.tl-veil-open .tl-veil-band,
-body.pj-boot.pj-veil-open .tl-veil-band,
-body.terrain-boot.terrain-veil-open .tl-veil-band {
+body:is(.tl-veil-boot.tl-veil-open, .pj-boot.pj-veil-open, .terrain-boot.terrain-veil-open) :is(.tl-veil-band, .tl-veil-loading) {
   opacity: 0;
+  visibility: hidden;
   animation: none;
-  transition: opacity 0.18s linear;
+  transition: opacity 0.18s linear, visibility 0s linear 0.18s;
 }
 @keyframes travel-log-entry-open {
   0% { transform: scaleX(1); background-color: var(--tl-accent-soft-2, #eef9fd); animation-timing-function: cubic-bezier(.45, 0, .7, .6); }
@@ -2921,14 +2937,15 @@ body.terrain-boot.terrain-veil-open .tl-veil-band {
   100% { transform: scaleX(-.01); background-color: var(--tl-accent-soft-2, #eef9fd); }
 }
 @keyframes travel-log-entry-wordmark {
-  to { opacity: 0; }
+  95%, 100% { opacity: 0; visibility: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   body.travel-log-launch::before,
   body.tl-veil-boot::before,
   body.pj-boot::before,
   body.terrain-boot::before,
-  .tl-veil-band { display: none; }
+  .tl-veil-band,
+  .tl-veil-loading { display: none; }
 }
 
 .pj-loading {
