@@ -1,6 +1,6 @@
 # 首页、总导航与标签：当前定稿
 
-最后核对：2026-10-25。本文记录当前实现；交互试验与被撤销方案见 `INTERACTION_AUDIT.md`，不要将旧参数当作现行规则。
+最后核对：2026-11-17。本文记录当前实现；交互试验与被撤销方案见 `INTERACTION_AUDIT.md`，不要将旧参数当作现行规则。
 
 ## 文件与职责
 
@@ -10,6 +10,7 @@
 | `components/layout/site-header.tsx` | 页头、当前栏目识别、移动导航菜单；路径匹配先去掉尾斜杠 |
 | `components/layout/lang-switch.tsx` | 中英文切换；记录当前章节和章节内进度，并在目标页面布局完成后恢复阅读位置 |
 | `components/layout/desktop-nav.tsx` | 桌面导航的共享胶囊底板、鼠标/焦点跟随、位置测量 |
+| `content/site/navigation.ts` | 栏目顺序、双语链接与栏目 Beta 状态；主导航及首页卡片共同读取 |
 | `components/home/gateway-link.tsx` | 首页导航卡片确认。Playground 卡片由 `direct` 使用直接链接 |
 | `lib/use-card-launch.ts` | 首页/画廊卡片的确认计时器、重复点击保护、返回复位 |
 | `components/gallery/gallery-view.tsx` | StoryTile 的 320ms 确认、站内路由、画廊返回设置恢复 |
@@ -22,6 +23,7 @@
 
 - 保留左侧 About 大卡、右侧四张小卡的网格、原断点及尺寸规则。
 - 卡内顶部为编号/状态；下方只保留标题和一句说明，不恢复关键词行。
+- 栏目 Beta 状态由 `NavItem.beta` 控制。当前 Playground 显示 Beta，Travel 已取消。中英文首页、桌面导航及折叠菜单同步消费；单篇游记的 Beta 状态继续由各篇 `card.json` 独立维护。
 - About 英文说明保留 “Who I am & what I do, plus a few fun facts.”；中文对应“我是谁、在做什么，以及一些趣事。”。
 - 标题与说明左对齐；磨砂标题胶囊保留。featured 标题做字形光学校准：英文 `translate: 0.02em -0.1em`，中文 `0.05em 0.01em`；字体、行盒和卡片外框不变。
 - 此前对所有卡片留白和标题位置的微调已撤销。**About 整组文字桌面端再下移的建议尚未实施**：测得英文约 12px、中文约 9px 可与下排标题基线对齐，仅是候选方案；手机布局不因此改变。
@@ -30,10 +32,11 @@
 
 - 桌面是一个浅色胶囊底板在栏目之间移动，`transform/width/height` 过渡为 200ms；快速切换直接衔接当前动画，不排队、不回弹。
 - 鼠标离开后回到当前栏目；键盘仍聚焦在导航内时跟随焦点。当前栏文字保持主题色，另有细小下划线。
-- 下划线位于 `.primary-nav-label::after`，按**文字**居中，不能将 Travel 的 Beta 纳入宽度；底部 3px、宽 0.6rem、高 2px。
+- 下划线位于 `.primary-nav-label::after`，按**文字**居中，Beta 标签在文字宽度之外；底部 3px、宽 0.6rem、高 2px。
 - 链接原布局及 15px 字号保留。底板、链接回退背景均为完整胶囊圆角，尤其不能让 Home 左端重新出现圆角矩形。
 - `ResizeObserver`、字体就绪及路由变化后重新测量。减少动态效果时直接定位；无 JS 时保留逐项背景。
 - 当前页点击仍回到顶部；修饰键/中键保持原生新标签页行为。手机继续使用原 FAB 菜单、Escape 关闭与滚动锁，不强行套用悬浮移动。
+- 总导航以 `64rem`（默认 1024px）切换完整栏目与折叠模式。桌面链接统一保留 `px-4` 和 `gap-1.5`，平板宽度使用当前栏目名称与 FAB 菜单。JavaScript 的 `(width < 64rem)` 与 CSS 的 `lg` 对齐，回顶按钮、菜单可见性和行为同步切换；展开菜单后放大到桌面宽度会关闭菜单并释放页面滚动锁。
 
 ## 首页语言切换
 
@@ -77,7 +80,7 @@
 
 ## 验收与边界
 
-- 导航：中英、明暗主题、1440/1024/768/390px；核对链接坐标/宽高/字号、连续 hover、离开回位、Tab/Enter、回顶、新标签页、手机菜单/Escape、reduced-motion。
+- 导航：中英、明暗主题、1440/1280/1100/1024/1023/900/820/768/390px；核对链接坐标/宽高/字号、连续 hover、离开回位、Tab/Enter、回顶、新标签页、折叠菜单/Escape、跨断点释放滚动锁、reduced-motion。
 - 标签：核对字号、行高、内边距、圆角和大小写；正文与导航主文字大小不变。瀑布流 DOM 可因布局重排，应按内容匹配比较，而非只比较 DOM 索引。
 - 回退自动回归：`scripts/check-card-launch.mjs`；蓝幕连续交接：`scripts/check-travel-entry.mjs`（另支持 `--dark`、`--reduced --smoke`）；公共日志：`scripts/check-travel-log.mjs`。
 - 浏览器脚本需先成功构建 `out/`，通过 `PLAYWRIGHT_MODULE`（playwright-core 的 file URL）和 `CHROME_PATH` 提供本地运行时；自行启动 loopback 静态服务器。

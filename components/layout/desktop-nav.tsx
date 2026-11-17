@@ -58,7 +58,7 @@ export function DesktopNav({ entries, routeKey, onCurrentPage }: {
   }, [routeKey, returnToSelection]);
 
   return <ul ref={rail}
-    className="primary-nav-rail no-scrollbar relative isolate hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto md:flex lg:gap-1.5"
+    className="primary-nav-rail no-scrollbar relative isolate hidden min-w-0 flex-1 items-center gap-1.5 overflow-x-auto lg:flex"
     onPointerLeave={() => { hovered.current = null; returnToSelection(); }}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) returnToSelection(); }}>
     <li ref={indicator} className="primary-nav-indicator" aria-hidden="true" />
@@ -66,7 +66,7 @@ export function DesktopNav({ entries, routeKey, onCurrentPage }: {
       <Link href={entry.href} data-nav-id={entry.id} aria-current={entry.active ? "page" : undefined}
         prefetch={entry.id === "playground" ? false : undefined}
         className={[
-          "primary-nav-link ui-text relative inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-full px-1.5 text-[15px] font-medium leading-none transition-colors hover:no-underline lg:px-4",
+          "primary-nav-link ui-text relative inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-full px-4 text-[15px] font-medium leading-none transition-colors hover:no-underline",
           entry.active ? "bg-surface-sink font-semibold text-brand" : "text-muted hover:bg-surface-tint hover:text-ink",
         ].join(" ")}
         onPointerEnter={event => { if (event.pointerType !== "touch") { hovered.current = event.currentTarget; place(event.currentTarget); } }}

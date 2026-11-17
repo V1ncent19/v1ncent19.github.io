@@ -32,7 +32,7 @@ import { DesktopNav } from "./desktop-nav";
  * scroll position. Home appears first in the nav (user-confirmed deviation
  * from the Stitch mock).
  *
- * MOBILE (below md, redesigned 2026-09-05 per user brief): the capsule drops
+ * COMPACT (below lg): the capsule drops
  * the scrolling chip row and shows only the current section's name (plus
  * back-to-top / lang / theme, the first always visible on mobile); chapter
  * switching moved into a floating directory button pinned bottom-right whose
@@ -51,7 +51,7 @@ function uiLang(pathname: string): "en" | "zh" {
   return pathname.split("/").includes("zh") ? "zh" : "en";
 }
 
-/** Tiny "Beta" flag for nav items still in preview (currently Travel). */
+/** Tiny "Beta" flag for nav items still in preview. */
 function NavBetaTag() {
   return (
     <sup
@@ -80,21 +80,24 @@ function scrollTopSmooth() {
 }
 
 /**
- * Below-768px detector (2026-09-05 mobile nav). SSR/hydration-safe via
+ * Compact navigation detector, matching Tailwind's lg breakpoint (64rem).
+ * SSR/hydration-safe via
  * useSyncExternalStore: the server snapshot is `false` (desktop), the client
  * re-evaluates after hydration — no DOM mismatch, same pattern GalleryTile
  * uses for its "days ago" flip. Used ONLY for behaviour (the always-visible
- * mobile back-to-top); all mobile/desktop visibility itself is CSS-driven.
+ * compact back-to-top); all compact/desktop visibility itself is CSS-driven.
  */
-function subscribeMobile(cb: () => void) {
-  const mq = window.matchMedia("(max-width: 767.98px)");
+const COMPACT_NAV_QUERY = "(width < 64rem)";
+
+function subscribeCompactNavigation(cb: () => void) {
+  const mq = window.matchMedia(COMPACT_NAV_QUERY);
   mq.addEventListener("change", cb);
   return () => mq.removeEventListener("change", cb);
 }
-function useIsMobile(): boolean {
+function useCompactNavigation(): boolean {
   return useSyncExternalStore(
-    subscribeMobile,
-    () => window.matchMedia("(max-width: 767.98px)").matches,
+    subscribeCompactNavigation,
+    () => window.matchMedia(COMPACT_NAV_QUERY).matches,
     () => false,
   );
 }
@@ -106,10 +109,8 @@ export function SiteHeader() {
   /** A11y label for the capsule back-to-top control (appears once pinned). */
   const topLabel = lang === "zh" ? "回到顶部" : "Back to top";
 
-  // Mobile nav mode (2026-09-05): below md the capsule shows only the current
-  // section's name and the chapter switching moves into a bottom-right FAB
-  // whose menu expands in place (user-reviewed animation choice).
-  const isMobile = useIsMobile();
+  // The compact layout also covers tablets where eight full links feel crowded.
+  const compactNavigation = useCompactNavigation();
   const currentItem = navItems.find((item) => isActive(pathname, item));
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -146,7 +147,7 @@ export function SiteHeader() {
   // covers the viewport; without the lock a touch-drag on it would scroll the
   // page underneath).
   const [prevPath, setPrevPath] = useState(pathname);
-  if (prevPath !== pathname) {
+  if (prevPath !== pathname || (menuOpen && !compactNavigation)) {
     setPrevPath(pathname);
     setMenuOpen(false);
   }
@@ -222,9 +223,9 @@ export function SiteHeader() {
                 the bottom-right FAB menu (2026-09-05 user brief). */}
             <DesktopNav routeKey={pathname} onCurrentPage={scrollTopSmooth} entries={navItems.map(item => ({
               id: item.id, href: item.href[lang], label: item.label[lang], active: isActive(pathname, item),
-              badge: item.id === "travel" ? <NavBetaTag /> : undefined,
+              badge: item.beta ? <NavBetaTag /> : undefined,
             }))} />
-            <span className="flex min-w-0 flex-1 items-center gap-2 md:hidden">
+            <span className="flex min-w-0 flex-1 items-center gap-2 lg:hidden">
               <span
                 aria-hidden
                 className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand"
@@ -256,15 +257,15 @@ export function SiteHeader() {
                   onClick={scrollTopSmooth}
                   aria-label={topLabel}
                   title={topLabel}
-                  aria-hidden={!stuck && !isMobile}
-                  tabIndex={!stuck && !isMobile ? -1 : 0}
+                  aria-hidden={!stuck && !compactNavigation}
+                  tabIndex={!stuck && !compactNavigation ? -1 : 0}
                   className={[
                     "ui-text inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line-strong bg-surface text-brand shadow-sm hover:bg-surface-tint hover:text-brand-strong hover:no-underline",
                     /* one transition list for colour + reveal (two competing
                        transition-property utilities would resolve by
                        stylesheet order, not class order) */
                     "transition-[opacity,transform,visibility,background-color,border-color,color,box-shadow] duration-300 ease-out",
-                    stuck || isMobile
+                    stuck || compactNavigation
                       ? "translate-y-0 opacity-100"
                       : "pointer-events-none invisible -translate-y-1.5 opacity-0",
                   ].join(" ")}
@@ -288,7 +289,7 @@ export function SiteHeader() {
         </div>
       </nav>
 
-      {/* ---- 3 · Mobile-only FAB navigation (md:hidden, 2026-09-05) ----
+      {/* ---- 3 · Compact FAB navigation (lg:hidden) ----
           A floating directory button pinned bottom-right; tapping it expands
           the chapter menu in place. The whole thing lives BELOW the gallery
           lightbox (z-50): while a photo is open the FAB sits under the dim and
@@ -299,7 +300,7 @@ export function SiteHeader() {
           rows stagger upward 35ms apart, the icon crossfades menu→✕ with a
           quarter turn, and the backdrop fades. Reduced motion is flattened by
           the global rule. */}
-      <div className="md:hidden">
+      <div className="lg:hidden">
         {/* Dimmed backdrop — closes on tap */}
         <button
           type="button"
@@ -315,6 +316,7 @@ export function SiteHeader() {
         {/* Expanding menu panel, anchored to the FAB corner */}
         <div
           id="mobile-nav-menu"
+          inert={!menuOpen}
           className={[
             "fixed right-5 bottom-[4.75rem] z-40 max-h-[calc(100dvh-6rem)] w-56 origin-bottom-right overflow-y-auto rounded-2xl border border-line bg-surface p-1.5 shadow-2xl transition-[transform,opacity] duration-300 ease-out",
             menuOpen
@@ -364,7 +366,7 @@ export function SiteHeader() {
                         ].join(" ")}
                       />
                       {item.label[lang]}
-                      {item.id === "travel" ? <NavBetaTag /> : null}
+                      {item.beta ? <NavBetaTag /> : null}
                     </Link>
                   </li>
                 );

@@ -607,9 +607,7 @@ function GatewayCard({
         >
           {String(index + 1).padStart(2, "0")}
         </span>
-        {/* Travel is the interactive trip-log hub — flagged Beta until the
-            owner declares it stable (2026-09-25). */}
-        {id === "travel" ? (
+        {item.beta ? (
           <span className="beta-badge ml-auto bg-brand-soft text-brand">
             Beta
           </span>

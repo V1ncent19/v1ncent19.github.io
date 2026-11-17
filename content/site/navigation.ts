@@ -5,7 +5,7 @@
  *
  * 2026-09-25: the former Gallery slot became Travel (user decision — same
  * gateway tile, no grid re-layout). Travel is the interactive trip-log hub
- * (/travel, MapLibre narrative maps — Beta). The standalone /gallery pages
+ * (/travel, MapLibre narrative maps). The standalone /gallery pages
  * were removed on 2026-09-28 (user decision — the full gallery experience
  * lives inside the /travel hub flow), so `gallery` is gone from
  * `bilingualBases` too.
@@ -36,6 +36,7 @@ export type NavId =
 export interface NavItem {
   id: NavId;
   order: number;
+  beta?: boolean;
   label: Bilingual;
   summary: Bilingual;
   /**
@@ -80,8 +81,8 @@ export const navItems: NavItem[] = [
     order: 3,
     label: { en: "Travel", zh: "旅行" },
     summary: {
-      en: "Interactive trip logs with GPS maps (Beta).",
-      zh: "交互式旅行志与 GPS 地图（Beta）。",
+      en: "Interactive trip logs with GPS maps.",
+      zh: "交互式旅行志与 GPS 地图。",
     },
     href: { en: "/travel", zh: "/travel/zh" },
   },
@@ -108,6 +109,7 @@ export const navItems: NavItem[] = [
   {
     id: "playground",
     order: 6,
+    beta: true,
     label: { en: "Playground", zh: "Playground" },
     summary: {
       en: "A stained-glass garden of travel stories.",

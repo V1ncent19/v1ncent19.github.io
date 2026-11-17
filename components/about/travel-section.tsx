@@ -14,8 +14,8 @@ import { TravelBoard } from "@/components/about/travel-board";
 
 /** Cross link copy for the /travel hub (2026-09-25). */
 const HUB_LINK: Record<Lang, { text: string; label: string }> = {
-  en: { text: "Interactive trip logs (beta) now live at", label: "Travel" },
-  zh: { text: "交互式旅行志（beta）已上线，见", label: "旅行志" },
+  en: { text: "Interactive trip logs now live at", label: "Travel" },
+  zh: { text: "交互式旅行志已上线，见", label: "旅行志" },
 };
 
 export function TravelSection({
