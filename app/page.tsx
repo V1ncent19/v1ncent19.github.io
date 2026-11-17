@@ -28,7 +28,7 @@ import { MathDivider } from "@/components/home/math-divider";
 import { GatewayReveal } from "@/components/home/gateway-reveal";
 import { GatewayLink } from "@/components/home/gateway-link";
 import { PostCardLink } from "@/components/blog/post-card-link";
-import { SitePv } from "@/components/home/busuanzi";
+import { SitePageViews } from "@/components/home/site-page-views";
 import { SiteComments } from "@/components/home/giscus-count";
 import { ConstructionBanner } from "@/components/home/construction-banner";
 import { SectionMark } from "@/components/layout/section-mark";
@@ -581,9 +581,9 @@ export default function HomePage() {
               </ul>
 
               {/* Site metadata (2026-09-05, Task D #8) — compact row card in
-                  place of the old three StatTiles. Page views are LIVE via
-                  busuanzi 3.6.9 (official backend), offset by the legacy
-                  baseline from content/site/profile.json; the comment count is
+                  place of the old three StatTiles. Page views are tracked by
+                  GoatCounter and offset by the legacy baseline from
+                  content/site/profile.json; the comment count is
                   summed live from the repo's GitHub Discussions (same source
                   giscus renders); the license text is editable in
                   content/site/profile.json. */}
@@ -599,7 +599,12 @@ export default function HomePage() {
                     icon={Eye}
                     label="Page views"
                     // note="All-time — live count + legacy baseline"
-                    value={<SitePv baseline={sitePvBaseline} />}
+                    value={
+                      <SitePageViews
+                        baseline={sitePvBaseline}
+                        goatCounterCode={profile.analytics.goatCounterCode}
+                      />
+                    }
                   />
                   <MetaRow
                     icon={MessageSquare}
@@ -794,7 +799,7 @@ function MetaRow({
   icon: LucideIcon;
   label: string;
   note?: string;
-  /** Plain string, or a client component (e.g. the live SitePv counter). */
+  /** Plain string, or a client component (e.g. the live page-view counter). */
   value: ReactNode;
   href?: string;
 }) {

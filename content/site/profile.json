@@ -23,8 +23,11 @@
     }
   ],
   "legacyStats": {
-    "sitePvBaseline": 21739,
+    "sitePvBaseline": 24823,
     "siteUvBaseline": 0
+  },
+  "analytics": {
+    "goatCounterCode": "v1ncent19"
   },
   "license": {
     "label": "CC BY-NC-SA 4.0",

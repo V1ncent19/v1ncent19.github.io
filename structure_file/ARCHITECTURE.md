@@ -14,6 +14,7 @@
 | 相册照片地点/标题 | `content/travel/gallery/items.json` | 服务于 `/travel` 的「Stories & frames」；`place` / `placeLocal` / `title` 是 `{ en, zh }`；人工字段，`gallery:gen` 不会覆盖 |
 | 站点身份（名字/站训/邮箱/GitHub） | `content/site/profile.json` | `lib/site.ts` 只是它的类型化出口，勿再硬编码 |
 | 游记 trip 注册表（标题/日期/统计行） | `content/travel/<trip>/card.json` | 每 trip 一个，`lib/travel/trips.ts` 扫描目录，无中央注册表 |
+| 访问量服务代号与旧站基线 | `content/site/profile.json` | `analytics.goatCounterCode` + `legacyStats.sitePvBaseline`；代号公开、无密钥 |
 | 游记叙事（每站文字） | PTES：`trip.json` + `scenes.json` + `attractions.json`<br>巡礼、Guatemala、France：各自 `story.json` | 人工正文只在 `content/travel/<id>/`；地图派生数据在 `generated/travel/<id>/`，定义文件在构建时组合 |
 | 界面文案（按钮/标题/图例/标签） | `lib/i18n.ts`（双语字典） | 全站 UI copy 唯一出处；发现组件内硬编码文案应收拢到这里 |
 | zh 首页文案 | `app/zh/page.tsx`（内嵌） | **有意保留**：手写翻译约定（zh 首页不走自动翻译，en/zh 是两个平行维护的页面） |

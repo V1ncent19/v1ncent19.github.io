@@ -11,7 +11,9 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { RouteFade } from "@/components/layout/route-fade";
 import { SpacetimeCanvas } from "@/components/background/spacetime-canvas";
+import { GoatCounter } from "@/components/analytics/goatcounter";
 import { site } from "@/lib/site";
+import profile from "@/content/site/profile.json";
 
 const baseTitle = 'Tuorui "v1ncent19" Peng';
 
@@ -54,6 +56,7 @@ export default function RootLayout({
         className="flex min-h-svh flex-col bg-canvas font-serif text-ink antialiased"
       >
         <ThemeScript />
+        <GoatCounter code={profile.analytics.goatCounterCode} />
         {/* Site-wide spacetime backdrop: faint grid behind all content,
             pointer acts as a mass (see CONFIG in the component). */}
         <SpacetimeCanvas />

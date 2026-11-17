@@ -40,8 +40,9 @@ export interface Profile {
    *  card (home intentionally lists GitHub-only links). */
   linkedin?: string;
   links: ProfileLink[];
-  /** PV/UV baselines to be filled in at final migration (legacy busuanzi). */
+  /** Historical counters retained when the live analytics provider changes. */
   legacyStats: { sitePvBaseline: number; siteUvBaseline: number };
+  analytics: { goatCounterCode: string };
   /** Site content license, shown on the home metadata card. `href` optional
    * (a bare label like "CC BY-NC-SA 4.0" is common). Optional so older
    * profile.json files without it keep type-checking. */

@@ -28,7 +28,7 @@ import { MathDivider } from "@/components/home/math-divider";
 import { GatewayReveal } from "@/components/home/gateway-reveal";
 import { GatewayLink } from "@/components/home/gateway-link";
 import { PostCardLink } from "@/components/blog/post-card-link";
-import { SitePv } from "@/components/home/busuanzi";
+import { SitePageViews } from "@/components/home/site-page-views";
 import { SiteComments } from "@/components/home/giscus-count";
 import { ConstructionBanner } from "@/components/home/construction-banner";
 import { SectionMark } from "@/components/layout/section-mark";
@@ -521,7 +521,12 @@ export default function ZhHomePage() {
                     icon={Eye}
                     label="页面浏览量"
                     note="历史累计 — 实时计数 + 旧站基线"
-                    value={<SitePv baseline={sitePvBaseline} />}
+                    value={
+                      <SitePageViews
+                        baseline={sitePvBaseline}
+                        goatCounterCode={profile.analytics.goatCounterCode}
+                      />
+                    }
                   />
                   <MetaRow
                     icon={MessageSquare}

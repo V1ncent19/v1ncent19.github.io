@@ -1,7 +1,23 @@
 # Handover — 站点现状与新功能启动入口
 
-**最后更新：2026-11-16。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
+**最后更新：2026-11-17。** 这是 `structure_file/` 的主入口。接手时**先读这一份**，再按需查：
 `ARCHITECTURE.md`（系统怎么搭的）、`CONVENTIONS.md`（该怎么做）、`FEATURE_TRAVEL_LOG.md`（公共日志）、`FEATURE_GUATEMALA_TERRAIN_LOG.md`（Guatemala 三维地形日志）、`FEATURE_PILGRIMAGE.md`（巡礼页）、`FEATURE_HOME_NAVIGATION.md`（首页、导航、标签与卡片）。
+
+---
+
+## 2026-11-17 页面访问量迁移到 GoatCounter
+
+首页 Page views 不再请求 Busuanzi。全站追踪组件在
+`components/analytics/goatcounter.tsx`：根布局只在 `tuoruipeng.com` / `www.tuoruipeng.com`
+加载固定 SRI 的 GoatCounter v5 脚本，并在每次 Next.js pathname 变化时手动发送 page view；
+`no_onload` 防止首屏重复，`no_session` 让指标与页面上的 Page views 文案一致。本地开发和
+GitHub Pages 预览域名不计数。
+
+中英文首页通过 `components/home/site-page-views.tsx` 读取公开的 `TOTAL.json`，显示
+`content/site/profile.json` 中 `legacyStats.sitePvBaseline`（当前 24,823）加 GoatCounter
+新计数。GoatCounter 账号代号也配置在同一文件的 `analytics.goatCounterCode`；它不是密钥。
+账号设置必须打开 **Allow adding visitor counts on your website**，否则公开总数接口只会回退
+显示旧基线。GoatCounter 的公开访客计数最多缓存约四小时，因此首页数字不会逐次实时跳动。
 
 ---
 
