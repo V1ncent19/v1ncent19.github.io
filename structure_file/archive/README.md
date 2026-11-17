@@ -7,6 +7,8 @@
 
 以下为原稿，未改动。This folder contains planning drafts for the Next.js rebuild of the Jekyll-based personal homepage.
 
+后续项目归档见 [Atelier du vitrail 原型与施工记录](atelier-du-vitrail/PLAN_PLAYGROUND_SUNDIAL.md)。
+
 ## Read this first
 
 - `IMPLEMENTATION_STATUS.md`: current-state report **as of 2026-09-04** — what was built route-by-route,

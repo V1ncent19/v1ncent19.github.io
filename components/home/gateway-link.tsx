@@ -28,11 +28,13 @@ const CONFIRM_MS = 360;
 
 export function GatewayLink({
   href,
+  direct = false,
   style,
   className,
   children,
 }: {
   href: string;
+  direct?: boolean;
   style?: CSSProperties;
   className?: string;
   children: ReactNode;
@@ -42,7 +44,8 @@ export function GatewayLink({
   const { ref, onClick } = useCardLaunch({ delay: CONFIRM_MS, navigate: () => router.push(href) });
 
   return (
-    <Link ref={ref} href={href} style={style} className={className} onClick={onClick}>
+    <Link ref={ref} href={href} style={style} className={className}
+      prefetch={direct ? false : undefined} onClick={direct ? undefined : onClick}>
       {children}
     </Link>
   );

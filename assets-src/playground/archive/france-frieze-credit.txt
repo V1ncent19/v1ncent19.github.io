@@ -1,0 +1,10 @@
+1D FRIEZE collection for free — Paul Kotelevets (1d_inc)
+https://sketchfab.com/3d-models/1d-frieze-collection-for-free-264ee40d6fcc442d991b4b56b01906aa
+Licensed under CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+
+Source copy: Allen Institute for AI, Objaverse 1.0
+https://huggingface.co/datasets/allenai/objaverse/blob/main/glbs/000-063/264ee40d6fcc442d991b4b56b01906aa.glb
+
+Adapted excerpts: original frieze motifs 18, 22, 23 and 33 were cropped, resized,
+mirrored and arranged for the France 2024 stained-glass frame. The recesses
+have been shaded and the original materials replaced with a warm stone finish.

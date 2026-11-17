@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SectionMark } from "@/components/layout/section-mark";
 import { HubHoverLink } from "@/components/travel/hub-hover-link";
+import { PlaygroundIntro } from "@/components/travel/playground-intro";
 import { GalleryView, type GalleryStoryTile } from "@/components/gallery/gallery-view";
 import { getGalleryItems, getTravel } from "@/lib/content";
 import { blogPostPath, getBlogPosts } from "@/lib/blog";
@@ -117,6 +118,8 @@ export default function TravelZhPage() {
             </div>
           </HubHoverLink>
         </header>
+
+        <PlaygroundIntro lang="zh" />
 
         {/* ---- 游记与照片：文字卡与照片共用精选/日期排序和画廊交互。 ---- */}
         <section className="mt-12" aria-label="游记与照片">

@@ -49,6 +49,8 @@
 - 巡礼导航直接消费正文 observer 得出的当前章节，不再自行运行第二套章节评分。
 - 手动探索不因后续滚动恢复；显式恢复回到当前阅读位置；巡礼查看全程后保持 overview。
 - 入场幕布完整加载时由解析期脚本设置 body 类，Next Link 导航由 `useLayoutEffect` 在绘制前补齐；统一通过 `body::before` 绘制。禁止水合前插入真实 DOM 幕布。动画监听同时检查名称与 `pseudoElement`，失败及超时应释放幕布，卸载须清理类。
+- `lib/travel/log/return-navigation.ts` 将本站入口地址记在本次游记的浏览器历史条目上。首页、博客、旅行页和 Playground 的同标签页入口使用历史返回，沿用浏览器的滚动恢复和 Playground 的花窗选择。新标签页可通过同站来源地址返回，直接访问则返回对应语言的旅行页。
+- 旅行页在 Stories & frames 之前通过 `components/travel/playground-intro.tsx` 引用 [Atelier du vitrail](AtelierDuVitrail/README.md)。三维花窗的内容与渲染独立维护。
 - 四种日志的开场必须使用同一套 `TravelLogFacts` 与 `TravelLogScrollCue`。元数据内容可以不同：PTES 显示天数/里程/GPS，Anitabi 显示时长/路线点/对比图，Guatemala 显示最高点/爬升/路线点，France 显示天数/文字章节/GPS 缺失。
 - 不提供正文自动播放：地图镜头与不同密度的文字、图片、视频没有一套始终舒适的统一速度。开场只提示手动滚动，让现有 observer 按真实阅读位置更新地图；不要另建地图时间轴。
 

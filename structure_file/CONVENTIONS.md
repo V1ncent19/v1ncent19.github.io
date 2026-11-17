@@ -28,8 +28,9 @@
 ## 三、导航与路由
 
 - 首页、总导航、标签和卡片确认的当前规则以 `FEATURE_HOME_NAVIGATION.md` 为准；不要恢复被撤销的留白调整或试验印章。
-- 首页卡片序 About → CV → Travel → Blog → Project（`homeCards` = `navItems` 去掉 `home` / `guestbook`）；胶囊导航第一项是 Home。
-- **导航现行七项**：Home · About · CV · **Travel**（第四项）· Blog · Project · **Guestbook**（第七项，无 gateway 卡，唯一入口在 Direct access）。
+- 首页卡片序 About → CV → Travel → Blog → Playground。Playground 占用原 Project 卡位，点击直接进入 `/playground/`。
+- 主导航顺序为 Home · About · CV · Travel · Blog · Project · Playground · Guestbook。Project 和 Guestbook 有主导航入口，Guestbook 也可从首页 Direct access 进入。
+- 中英文站点共用一条 Playground 路由，场景用英文界面和法语标题。旅行页的简介在 Stories & frames 之前。素材和后续扩展见 [Atelier du vitrail 工程手册](AtelierDuVitrail/README.md)。
 - ⚠️ 旧计划「Gallery 在主导航」已废，**且 `/gallery` 路由本身已于 2026-09-28 删除** ——
   完整相册体验并进 `/travel` 的「Stories & frames」（`GalleryView` 组件仍被 `/travel` 消费）。
 - 中文嵌套 `/zh`；blog slug kebab-case；单数 `project`。

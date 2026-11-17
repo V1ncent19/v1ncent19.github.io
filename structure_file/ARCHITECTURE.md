@@ -193,7 +193,8 @@ about 首段的 CV 与 travel 段的 `Travel →` 已恢复成普通 markdown �
 ```
 public/assets/
   about/           cal.png（about 页练字样图）
-  home/            avatar.jpg + nav/{7 张}.webp（首页导航窗格预览，按 SectionId 动态拼 URL）
+  home/            avatar.jpg + nav/*.webp（首页导航窗格预览，按 HomeCardId 动态拼 URL）
+  playground/      glass/（浏览器读取的花窗图集）和 sundial/（按需播放的循环 MP3）
   cv/              v1ncent19-cv-en.pdf
   project/<slug>/  各项目页的 PDF
   photos/          ← 内容创作，按主题
@@ -235,14 +236,14 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 /blog, /blog/zh          博客索引（客户端搜索 + 分类 chips + 排序）；/blog/[year]/[slug] 详情
                         索引条目 = md 文章 + 游记卡（`lib/blog-travel.ts` 读取时合并）
 /project, /project/zh    项目索引与详情
-/travel, /travel/zh      旅行志 hub（MapLibre 地球仪 + 游记 tiles + 相册墙 Stories & frames + 心愿单清单）——导航第四项
+/travel, /travel/zh      旅行志 hub（MapLibre 地球仪、Atelier du vitrail 简介、Stories & frames 瀑布流）
 /travel/ptes-2025(+/zh)  互动游记（粘性地图 + 文字流 + 幕布动画 + 总进度条）
 /travel/just-because(+/zh) 巡礼地图（MapLibre + 36 站滚动联动 + 可缩放相机）
 /travel/guatemala-2026(+/zh) 三维地形游记（DEM + 等高线 + GPS 路线 + 照片/章节滚动联动）
 /travel/france-2024(+/zh) 手稿重建游记（12 天正文、时刻表、地点及逐段路网候选；无当次 GPS）
-/playground             独立花窗 3D 试验页（仅 playground 分支；不在站内导航）
+/playground/             浮空日晷与游记花窗（中英文导航、首页和旅行页共用入口）
 /guestbook, /guestbook/zh 留言板（giscus，term 固定 "index"，勿动）
-/zh/*                    双语镜像（`bilingualBases` 由 `navItems` 推导，不再手工维护）
+/zh/*                    双语镜像（`bilingualBases` 从中英文地址不同的导航项推导）
 ```
 
 > **`/gallery` 已删除**（2026-09-28 用户决定）：完整的相册体验并进 `/travel` 的
@@ -254,6 +255,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 |---|---|---|
 | `components/travel/` | Travel 模块全部组件 | **ptes**：`TravelMap.tsx`、`TravelLog.tsx`、`TravelNav.tsx`、`TravelStory.tsx`；**hub**：`hub-globe.tsx`、`hub-hover-link.tsx`；**巡礼**：`PilgrimageLog.tsx`、`PilgrimageMap.tsx`、`PilgrimageStory.tsx`；**Guatemala terrain**：`TerrainTravelLog.tsx`（适配器）、`TerrainStory.tsx`（正文）、`TerrainMap.tsx`（DEM、等高线、路线、照片与章节镜头）。三类共用 `ResumeStoryButton.tsx` |
 | `components/travel/log/` | 旅行日志公共组件 | `TravelLogPage`、`TravelLogShell`、`ChapterNavigation`、`MapToolbar`、`TravelLogFacts`、`TravelLogScrollCue`，详见 `FEATURE_TRAVEL_LOG.md` |
+| `components/playground/` | Atelier du vitrail 场景与交互 | `app/playground/` 读入场景清单并延迟加载 WebGL。节点布局、光照、玻璃、镜头和入口详见 [工程手册](AtelierDuVitrail/README.md) |
 | `components/gallery/` | `gallery-view.tsx` 同文件承载照片画廊 + 游记 StoryTile + 排序条；`gallery-hover.css` 仅负责照片 tile 的磨砂条展开、文字淡入与 hover/focus 动画 | 被 `/travel` 消费（`/gallery` 路由 2026-09-28 已删）；排序条方向格移动端独立成行 |
 | `lib/use-card-launch.ts` | 首页 GatewayLink 与画廊 StoryTile 的共享点击确认状态 | 跳转前清理 is-launching；在 pagehide/pageshow/popstate、effect 清理时取消计时器并复位。StoryTile 可启用 resetHoverOnReturn，返回后以 data-return-idle 抑制浏览器恢复的 hover/focus 封面，真实鼠标移动或重新 Tab 聚焦后恢复交互 |
 | `components/background/` | `spacetime-canvas.tsx` 时空背景（质量引力井 warp 网格） | 维护接口：CONFIG；各井的**位移向量累加后一次性施加**（不可逐井原地改写），网格向视口外延伸 **Σstrength** 防「引力拉伸露边界」；静态井按**影响半径**剔除而非元素包围盒 |
@@ -263,6 +265,7 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 | `lib/travel/log/` | 旅行日志公共模型、数据校验、章节与布局接口 | `definitions/<id>.ts` 为每篇内容入口；`reading-geometry.ts`、`navigation.ts` 共用测量与跳转；`camera.ts` 定义镜头所有权 |
 | `content/` | `site/{profile.json,navigation.ts}`、`blog/*.md`、`travel/gallery/items.json`、`cv/`、`project/`、`travel/` | manifest 类文件「脚本生成 + 人工编辑」模式 |
 | `generated/travel/<trip>/` | 入库的派生路线、站点、位置、来源缓存与诊断 | 生成数据不放在 `content/`；部分私有源无法在干净 CI 重建，必须保留已审查的派生文件。**隐私红线见 §数据管线** |
+| `content/playground/`、`assets-src/playground/`、`generated/playground/` | 场景清单、简介和色板，玻璃绘稿及配准，派生分片邻接和地图 | 源和衍生数据边界见 [Playground 素材与数据](AtelierDuVitrail/ASSETS.md) |
 | `public/data/travel/ptes-2025/` | `track.json` 的浏览器可 fetch 镜像 | 由 `sync:data` 从 `generated/` 复制，gitignored；保持原 URL 和字节内容 |
 | `scripts/` | 见下表「脚本清单」 | 四个挂 `prebuild`/`predev`（`badges → sync:data → check:refs → check:i18n`）；Guatemala 的四个生成脚本只手动运行，不在 CI 中下载数据 |
 | `assets-src/` | 原始素材（字体 OTF、**travel 原始 GPS 数据**） | 绝不进 public/，git-ignored（部分） |
@@ -278,6 +281,8 @@ public/data/vendor/  ← 第三方：land-110m.json（Natural Earth）、worldOu
 | `check-travel-log.mjs` | `node scripts/check-travel-log.mjs` | 改旅行日志后手动 | 四语言路由、布局、拖拽、导航、地图与错误兜底回归；需通过环境变量指定浏览器运行时 |
 | `check-card-launch.mjs` | `node scripts/check-card-launch.mjs` | 改卡片导航/返回后手动 | 首页及两篇旅行日志重复进入/返回、悬浮复位、计时器；运行环境见 FEATURE 文档 |
 | `check-travel-entry.mjs` | `node scripts/check-travel-entry.mjs` | 改源页/目标幕布交接后手动 | 逐帧检查蓝幕覆盖、同文档导航与横向溢出；支持 `--dark`、`--reduced --smoke` |
+| `build-playground-glass.mjs`、`build-playground-pane-paths.mjs`、`build-playground-light-map.mjs` | [Playground 生成命令](AtelierDuVitrail/ASSETS.md) | 手动改资产时 | 更新显示图集、玻璃分片和世界地图衍生数据 |
+| `check-playground-sundial.mjs` | `node scripts/check-playground-sundial.mjs` | 改花窗、布局或光照后手动 | 验证资产、游记路由、槽位和黄铜连通、日月和晨光起始位置 |
 | `gallery.mjs` | `npm run gallery:gen` | 加照片时手动 | 相册两档 webp（thumb/large）+ `items.json` 合并（原图不再发布；源目录 = `public/assets/photos/gallery/original/`） |
 | `subset-cjk-fonts.py` | — | 大改内容后手动 | GenWanMin2 TC 子集化 → `public/fonts/*.woff2` |
 | `subset-cactus.py` | — | 手动 | 单字替换用的独立子集（见 `CONVENTIONS.md` §5.2） |

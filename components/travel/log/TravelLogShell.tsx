@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useState, type ReactNode, type CSSProperties } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode, type CSSProperties } from "react";
 import type { LogKind, LogLang } from "@/lib/travel/log/types";
 
 import { LogLayoutContext, LOG_LAYOUTS } from "@/lib/travel/log/layout";
 import { clearTravelEntry } from "@/lib/travel/log/entry-transition";
+import { resolveTravelLogOrigin, type TravelLogOrigin } from "@/lib/travel/log/return-navigation";
 
 const TRANSITIONS = {
   journal: { immersive: ["tl-immersive"], boot: "tl-veil-boot", open: "tl-veil-open", beat: 200 },
@@ -52,17 +53,35 @@ function useTravelTransition(kind: LogKind, dataReady: boolean, mapReady: boolea
 
 function TravelLogBack({ lang }: { lang: LogLang }) {
   const [leaving, setLeaving] = useState(false);
-  const href = lang === "zh" ? "/travel/zh" : "/travel";
-  const label = lang === "zh" ? "返回旅行志" : "Back to Travel";
+  const [origin, setOrigin] = useState<TravelLogOrigin | null>(null);
+  const href = origin?.href ?? (lang === "zh" ? "/travel/zh/" : "/travel/");
+  const isTravelHub = /^\/travel(?:\/zh)?\/?(?:[?#]|$)/.test(href);
+  const label = isTravelHub ? (lang === "zh" ? "返回旅行志" : "Back to Travel") : (lang === "zh" ? "返回上一页" : "Go Back");
+  const goBack = useCallback(() => {
+    const destination = origin ?? resolveTravelLogOrigin();
+    if (destination?.inHistory && window.history.length > 1) window.history.back();
+    else window.location.assign(destination?.href ?? href);
+  }, [href, origin]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setOrigin(resolveTravelLogOrigin()), 0);
+    const restore = (event: PageTransitionEvent) => { if (event.persisted) setLeaving(false); };
+    window.addEventListener("pageshow", restore);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("pageshow", restore);
+    };
+  }, []);
   useEffect(() => {
     if (!leaving) return;
-    const timer = window.setTimeout(() => { window.location.href = href; }, 300);
+    const timer = window.setTimeout(goBack, 300);
     return () => window.clearTimeout(timer);
-  }, [leaving, href]);
+  }, [leaving, goBack]);
   return <>
     <a href={href} className="tl-back-strip travel-log-back" aria-label={label} onClick={e => {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      e.preventDefault(); setLeaving(true);
+      e.preventDefault();
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) goBack();
+      else setLeaving(true);
     }}>
       <svg className="travel-log-back-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M11 17 6 12l5-5" /><path d="M18 17l-5-5 5-5" />

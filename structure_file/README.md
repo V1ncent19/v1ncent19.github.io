@@ -23,7 +23,7 @@
 | 改旅行日志公共框架 / 新增日志 | `FEATURE_TRAVEL_LOG.md` |
 | 改 Guatemala 三维地形日志 | `FEATURE_GUATEMALA_TERRAIN_LOG.md` |
 | 2024 春季手写游记数字化、路线重建与交互初版 | `PLAN_FRANCE_2024_LOG.md` |
-| 规划 3D 游记 Playground 的浮空日晷、花窗扩展与光影 | [PLAN_PLAYGROUND_SUNDIAL.md](PLAN_PLAYGROUND_SUNDIAL.md) |
+| 维护 Playground 的浮空日晷、花窗、站内入口及扩展 | [AtelierDuVitrail/README.md](AtelierDuVitrail/README.md) |
 | 改巡礼页（`/travel/just-because`） | `FEATURE_PILGRIMAGE.md` |
 | 查看全站交互走查与改进建议 | `INTERACTION_AUDIT.md` |
 | 核对全站中英混排、引号与数字单位规则 | `TEXT_STYLE_AUDIT.md`（待用户定稿） |
@@ -41,6 +41,7 @@ FEATURE_HOME_NAVIGATION.md   首页、总导航、标签与卡片交互
 FEATURE_TRAVEL_LOG.md        旅行日志公共框架与新增流程
 FEATURE_GUATEMALA_TERRAIN_LOG.md  Guatemala 三维地形日志、数据边界与生成流程
 FEATURE_PILGRIMAGE.md        巡礼页
+AtelierDuVitrail/            花窗场景、素材、交互、扩展与验收
 INTERACTION_AUDIT.md         全站交互走查与建议
 archive/                     旧规划原稿 + Stitch 导出（8 MB）
 ```
@@ -53,7 +54,7 @@ archive/                     旧规划原稿 + Stitch 导出（8 MB）
 | `ARCHITECTURE.md` | 系统**现在**由什么组成 | 时间线、待办清单 |
 | `CONVENTIONS.md` | 规则、基线、决策与作废记录 | 目录树（会有一百行） |
 
-一个功能只需要一份深文档。首页、总导航与标签当前定稿见 `FEATURE_HOME_NAVIGATION.md`。旅行日志公共框架见 `FEATURE_TRAVEL_LOG.md`，Guatemala 地形日志见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`，巡礼细节见 `FEATURE_PILGRIMAGE.md`；
+一个功能只需要一处工程手册。首页、总导航与标签当前定稿见 `FEATURE_HOME_NAVIGATION.md`。旅行日志公共框架见 `FEATURE_TRAVEL_LOG.md`，Guatemala 地形日志见 `FEATURE_GUATEMALA_TERRAIN_LOG.md`，巡礼细节见 `FEATURE_PILGRIMAGE.md`；
 ptes-2025 的细节散在 `ARCHITECTURE.md` §数据管线 与 `content/travel/README.md`。
 
 ## 改完之后，哪份文档要跟着改
@@ -70,6 +71,7 @@ ptes-2025 的细节散在 `ARCHITECTURE.md` §数据管线 与 `content/travel/R
 | 改发布流程 / CI / 部署状态 | `handover.md` §4；`.github/workflows/deploy.yml` |
 | 改首页/导航/标签/卡片交互 | `FEATURE_HOME_NAVIGATION.md`；交互验收追加 `INTERACTION_AUDIT.md` |
 | 改旅行日志公共骨架/入口幕布 | `FEATURE_TRAVEL_LOG.md` |
+| 改 Playground 布局、光影、交互或花窗内容 | [AtelierDuVitrail](AtelierDuVitrail/README.md) |
 | 改 Guatemala 地形、镜头、照片弹窗或数据管线 | `FEATURE_GUATEMALA_TERRAIN_LOG.md`；涉及公共骨架时同时更新 `FEATURE_TRAVEL_LOG.md` |
 | 本轮做了什么 | `handover.md` 当前状态；最终规则落到对应 FEATURE；试验和验收留在 `INTERACTION_AUDIT.md` |
 

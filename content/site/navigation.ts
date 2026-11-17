@@ -1,7 +1,7 @@
 /**
  * Data-driven navigation. Order is significant and follows the "Home – Desktop
  * Layout Variant 3" Stitch direction: the homepage itself appears as the first
- * nav item ("Home"), followed by About, CV, Travel, Blog, Project, Guestbook.
+ * nav item ("Home"), followed by About, CV, Travel, Blog, Project, Playground and Guestbook.
  *
  * 2026-09-25: the former Gallery slot became Travel (user decision — same
  * gateway tile, no grid re-layout). Travel is the interactive trip-log hub
@@ -15,11 +15,13 @@
  * "Direct access" row card, and the standalone page lives at /guestbook.
  *
  * English is the default interface; Chinese pages live under nested /zh
- * routes. Homepage section cards (app/page.tsx) intentionally exclude `home`
- * and `guestbook`, and only render the real sections.
+ * routes, with Playground shared by both languages. The homepage gateway
+ * grid includes Playground in the space formerly used for Project.
  */
 
 import type { Bilingual, Lang } from "@/lib/localized";
+
+export const PLAYGROUND_PATH = "/playground/";
 
 export type NavId =
   | "home"
@@ -28,6 +30,7 @@ export type NavId =
   | "travel"
   | "blog"
   | "project"
+  | "playground"
   | "guestbook";
 
 export interface NavItem {
@@ -103,8 +106,18 @@ export const navItems: NavItem[] = [
     href: { en: "/project", zh: "/project/zh" },
   },
   {
-    id: "guestbook",
+    id: "playground",
     order: 6,
+    label: { en: "Playground", zh: "Playground" },
+    summary: {
+      en: "A stained-glass garden of travel stories.",
+      zh: "在浮空花园里，从彩窗重访旅程。",
+    },
+    href: { en: PLAYGROUND_PATH, zh: PLAYGROUND_PATH },
+  },
+  {
+    id: "guestbook",
+    order: 7,
     label: { en: "Guestbook", zh: "留言板" },
     summary: {
       en: "Say hi, leave a note, or report a bug.",
@@ -114,16 +127,16 @@ export const navItems: NavItem[] = [
   },
 ];
 
-/** Sections shown as homepage gateway cards — the real content sections.
- *  Guestbook is reachable from the top nav and the "Direct access" card,
- *  but does not take a slot in the gateway grid. */
-export const homeCards: NavItem[] = navItems.filter(
-  (n) => n.id !== "home" && n.id !== "guestbook",
+export type HomeCardId = Exclude<NavId, "home" | "project" | "guestbook">;
+export type HomeCard = NavItem & { id: HomeCardId };
+
+export const homeCards = navItems.filter(
+  (item): item is HomeCard => item.id !== "home" && item.id !== "project" && item.id !== "guestbook",
 );
 
 /** Top-level routes that have an English + Chinese (nested /zh) pair. */
 export const bilingualBases = new Set<string>([
-  ...navItems.filter((n) => n.id !== "home").map((n) => n.id),
+  ...navItems.filter((n) => n.id !== "home" && n.href.en !== n.href.zh).map((n) => n.id),
 ]);
 
 export function labelFor(id: NavId, lang: Lang): string {

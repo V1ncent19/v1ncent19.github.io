@@ -755,6 +755,8 @@ html :is(.text-\[9px\], .text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .te
 
   /* motion */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --route-in-duration: .26s;
+  --sundial-veil-fill: radial-gradient(ellipse at 52% 38%, #fff9eb 0%, #f5e7d4 50%, #d6b8ad 125%);
   --dur-fast: 160ms;
   --dur: 240ms;
 
@@ -1046,7 +1048,25 @@ html:not([data-theme]) .ti-system {
      off-position and oversized. `backwards` covers the (zero) delay before the
      run and nothing after it, so once the fade finishes the element returns to
      its base style (no transform) and fixed overlays are unaffected again. */
-  animation: route-in 0.26s var(--ease) backwards;
+  animation: route-in var(--route-in-duration) var(--ease) backwards;
+}
+
+/* Carry the fully opened Playground light beyond the keyed route content. */
+.sundial-home-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 96;
+  background: var(--sundial-veil-fill);
+}
+body:has([data-sundial-home-arrival]):not(:has(.playground-page)) .sundial-home-veil {
+  animation: sundial-home-reveal .68s ease-in-out var(--route-in-duration) both;
+}
+@keyframes sundial-home-reveal {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sundial-home-veil { animation-delay: 0s !important; }
 }
 
 /* ---------------------------------------------------------------------------

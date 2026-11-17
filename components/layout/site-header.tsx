@@ -316,7 +316,7 @@ export function SiteHeader() {
         <div
           id="mobile-nav-menu"
           className={[
-            "fixed right-5 bottom-[4.75rem] z-40 w-56 origin-bottom-right rounded-2xl border border-line bg-surface p-1.5 shadow-2xl transition-[transform,opacity] duration-300 ease-out",
+            "fixed right-5 bottom-[4.75rem] z-40 max-h-[calc(100dvh-6rem)] w-56 origin-bottom-right overflow-y-auto rounded-2xl border border-line bg-surface p-1.5 shadow-2xl transition-[transform,opacity] duration-300 ease-out",
             menuOpen
               ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
               : "pointer-events-none translate-y-2 scale-90 opacity-0",
@@ -340,6 +340,7 @@ export function SiteHeader() {
                   >
                     <Link
                       href={target}
+                      prefetch={item.id === "playground" ? false : undefined}
                       aria-current={active ? "page" : undefined}
                       onClick={(e) => {
                         if (normalizePath(target) === normalizePath(pathname)) {

@@ -7,19 +7,18 @@ import {
   ExternalLink,
   Eye,
   FileText,
-  FolderOpen,
   GitBranch,
   GraduationCap,
   MessageSquare,
   Rocket,
   Scale,
   Sigma,
+  Sparkles,
   User,
   type LucideIcon,
 } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
-import type { NavId, NavItem } from "@/content/site/navigation";
-import { homeCards } from "@/content/site/navigation";
+import { homeCards, type HomeCard, type HomeCardId } from "@/content/site/navigation";
 import { getProfile, getProjects, projectSummary } from "@/lib/content";
 import { type BlogCategory } from "@/lib/blog";
 import { blogIndexCards } from "@/lib/blog-travel";
@@ -28,6 +27,7 @@ import { EmailCopyButton } from "@/components/home/email-copy-button";
 import { MathDivider } from "@/components/home/math-divider";
 import { GatewayReveal } from "@/components/home/gateway-reveal";
 import { GatewayLink } from "@/components/home/gateway-link";
+import { PostCardLink } from "@/components/blog/post-card-link";
 import { SitePv } from "@/components/home/busuanzi";
 import { SiteComments } from "@/components/home/giscus-count";
 import { ConstructionBanner } from "@/components/home/construction-banner";
@@ -43,19 +43,16 @@ import { TranslationNotice } from "@/components/translation-notice";
  * with translated category chips.
  */
 
-type SectionId = Exclude<NavId, "home">;
-
-const sectionIcons: Record<SectionId, LucideIcon> = {
+const sectionIcons: Record<HomeCardId, LucideIcon> = {
   about: User,
   cv: FileText,
   travel: Map,
   blog: BookOpen,
-  project: FolderOpen,
-  guestbook: MessageSquare,
+  playground: Sparkles,
 };
 
 /** Short section descriptor shown under each gateway card title (zh draft). */
-const sectionBlurbs: Record<SectionId, { desc: string }> = {
+const sectionBlurbs: Record<HomeCardId, { desc: string }> = {
   about: {
     desc: "我是谁、在做什么，以及一些趣事。",
   },
@@ -68,11 +65,8 @@ const sectionBlurbs: Record<SectionId, { desc: string }> = {
   blog: {
     desc: "关于统计、做饭、语言的笔记与随想。",
   },
-  project: {
-    desc: "持续整理与更新的学习笔记和小作品。",
-  },
-  guestbook: {
-    desc: "问候、闲谈与 bug 反馈汇入同一块留言板。",
+  playground: {
+    desc: "在浮空花园里，从彩窗重访旅程。",
   },
 };
 
@@ -118,14 +112,13 @@ const tones = {
 type ToneName = keyof typeof tones;
 const toneSeq: ToneName[] = ["brand", "accent", "brand", "tertiary", "accent"];
 
-const PEEK_FRAME: Record<SectionId, { pos: string; fit: "cover" | "contain" }> =
+const PEEK_FRAME: Record<HomeCardId, { pos: string; fit: "cover" | "contain" }> =
   {
     about: { pos: "50% 20%", fit: "cover" },
     cv: { pos: "50% 50%", fit: "contain" },
     travel: { pos: "50% 50%", fit: "cover" },
     blog: { pos: "50% 50%", fit: "cover" },
-    project: { pos: "50% 10%", fit: "cover" },
-    guestbook: { pos: "50% 50%", fit: "cover" },
+    playground: { pos: "50% 52%", fit: "cover" },
   };
 
 const POST_TONE: Record<BlogCategory, string> = {
@@ -416,6 +409,7 @@ export default function ZhHomePage() {
                 <GatewayLink
                   key={item.id}
                   href={item.href.zh}
+                  direct={item.id === "playground"}
                   style={{ "--gw-i": j + 1 } as CSSProperties}
                   className="gw-item group block h-full no-underline hover:no-underline"
                 >
@@ -561,11 +555,11 @@ function GatewayCard({
   index,
   featured = false,
 }: {
-  item: NavItem;
+  item: HomeCard;
   index: number;
   featured?: boolean;
 }) {
-  const id = item.id as SectionId;
+  const { id } = item;
   const Icon = sectionIcons[id];
   const tone = tones[toneSeq[index]];
 
@@ -653,7 +647,7 @@ function RecentPostList({ items }: { items: FeedItem[] }) {
     <ul className="space-y-4">
       {items.map((item) => (
         <li key={item.key}>
-          <Link
+          <PostCardLink
             href={item.href}
             className="group block rounded-xl border border-line bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift hover:no-underline"
           >
@@ -686,7 +680,7 @@ function RecentPostList({ items }: { items: FeedItem[] }) {
                 ) : null}
               </div>
             </div>
-          </Link>
+          </PostCardLink>
         </li>
       ))}
     </ul>

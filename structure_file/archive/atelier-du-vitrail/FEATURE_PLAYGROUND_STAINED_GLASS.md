@@ -1,5 +1,7 @@
 # 花窗陈列试验（`playground` 分支）
 
+这份记录对应旧庭院原型。现役资料见 [Atelier du vitrail 工程手册](../../AtelierDuVitrail/README.md)，原型文件见 Git 提交 `3598146`。
+
 ## 入口与范围
 
 - 直接访问 `/playground/`；主导航、旅行志和站内卡片都不链接此页。页面设 `noindex`，但它不是访问控制。
@@ -19,7 +21,7 @@
 - `components/playground/glass-optics.ts`：依据花窗图案布置色片表面的倾角，并计算随观察角度变化的反光、石砖上的彩色投光。
 - 四张选定原稿保存在 `assets-src/playground/`，分别是 `france-louvre-a.png`、`ptes-porto.png`、`guatemala-fuego-b.png` 和 `anitabi-station.png`。法国以 `IMG_0462` 为参考，Anitabi 以 `IMG_2852` 为参考。早期法国试稿和分片数据也保存在这里。
 - `assets-src/playground/window-gallery.mjs` 记录陈列顺序、游记地址和各原稿边界。`louvre-panel.mjs` 定义四扇共用的尖拱尺寸、纵向增高比例及窗洞参数。窗面和投光使用同一套窗面坐标。
-- 运行 `node scripts/build-playground-glass.mjs` 更新 `public/assets/playground/` 下的 `gallery-window.webp`、`gallery-window-optics.png` 和 `gallery-window-light.webp`。脚本用局部深色接缝估算分片，并将四扇窗的窗面、材质和透光数据按陈列顺序拼成三张同布局的横向纹理。每片的平均颜色用于显示投影中的色块。
+- 运行 `node scripts/build-playground-glass.mjs` 更新 `public/assets/playground/` 下的窗面、材质、透光和色片编号图集，以及 `generated/playground/pane-networks.json`。脚本用局部深色接缝估算分片，并按陈列顺序将四扇窗拼成同布局的横向纹理。每片的平均颜色用于投影，色片编号与邻接表用于相邻色片之间的亮暗接力。只需从现有材质图集更新编号和邻接表时，运行 `node scripts/build-playground-pane-paths.mjs`。
 
 早期试稿的图像生成提示词（内置工具，输入图为 `public/assets/photos/gallery/large/img-0462.webp`）：
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SectionMark } from "@/components/layout/section-mark";
 import { HubHoverLink } from "@/components/travel/hub-hover-link";
+import { PlaygroundIntro } from "@/components/travel/playground-intro";
 import { GalleryView, type GalleryStoryTile } from "@/components/gallery/gallery-view";
 import { getGalleryItems, getTravel } from "@/lib/content";
 import { blogPostPath, getBlogPosts } from "@/lib/blog";
@@ -124,6 +125,8 @@ export default function TravelPage() {
             </div>
           </HubHoverLink>
         </header>
+
+        <PlaygroundIntro lang="en" />
 
         {/* ---- Stories & frames: story tiles and photos share the embedded
             gallery's featured/date ordering, toolbar and lightbox. ---- */}

@@ -1510,7 +1510,7 @@ function StoryTile({ story, onLeave }: { story: GalleryStoryTile; onLeave: () =>
     delay: 320,
     navigate: () => {
       onLeave();
-      if (story.travelLog) beginTravelEntry();
+      if (story.travelLog) beginTravelEntry(story.href);
       router.push(story.href);
     },
     resetHoverOnReturn: true,

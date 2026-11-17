@@ -5,10 +5,11 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { panel, panelHalfWidth } from "../assets-src/playground/louvre-panel.mjs";
 import { windows } from "../assets-src/playground/window-gallery.mjs";
+import { buildPanePaths } from "./build-playground-pane-paths.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const input = path.join(root, "assets-src/playground");
-const output = path.join(root, "public/assets/playground");
+const output = path.join(root, "public/assets/playground/glass");
 const width = 887;
 const height = 1774;
 const pixels = width * height;
@@ -201,3 +202,4 @@ await Promise.all([
   sharp(atlases.optics, { raw }).png({ compressionLevel: 9 }).toFile(path.join(output, "gallery-window-optics.png")),
   sharp(atlases.transmission, { raw }).webp({ quality: 94, alphaQuality: 100 }).toFile(path.join(output, "gallery-window-light.webp")),
 ]);
+await buildPanePaths();

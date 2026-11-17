@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "travelogues": [
+    { "id": "france-2024", "tripId": "france-2024", "assetId": "france", "slotId": "ring-1-01", "label": "France 2024" },
+    { "id": "ptes-2025", "tripId": "ptes-2025", "assetId": "ptes", "slotId": "ring-1-03", "label": "Iberia 2025" },
+    {
+      "id": "guatemala-2026", "tripId": "guatemala-2026", "assetId": "guatemala", "slotId": "ring-1-05", "label": "Guatemala 2026",
+      "summary": {
+        "en": "An overnight hike on Acatenango to watch Fuego erupt.",
+        "zh": "在 Acatenango 山上过一夜，看 Fuego 火山喷发。"
+      }
+    },
+    {
+      "id": "just-because", "tripId": "just-because", "assetId": "anitabi", "slotId": "ring-1-07", "label": "Anitabi 2026",
+      "summary": {
+        "en": "A visit to Fujisawa and Fukasawa to find the places that appear in one of my favorite anime, 『Just Because!』.",
+        "zh": "沿着最喜欢的动画之一『Just Because!』，到藤泽和深泽寻找故事里的场景。"
+      }
+    }
+  ]
+}

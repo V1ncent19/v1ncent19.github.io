@@ -1,9 +1,12 @@
 "use client";
 
+import { rememberTravelLogSource } from "./return-navigation";
+
 let cancelLaunch: (() => void) | null = null;
 
 /** Keep the source covered until the destination's pre-paint curtain takes over. */
-export function beginTravelEntry() {
+export function beginTravelEntry(destination: string) {
+  rememberTravelLogSource(destination);
   clearTravelEntry();
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const body = document.body;

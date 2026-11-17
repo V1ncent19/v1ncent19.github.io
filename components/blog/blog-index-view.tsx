@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ArrowRight, ArrowDownWideNarrow, ArrowUpNarrowWide, BookOpen, Search } from "lucide-react";
 import type { BlogPostCard, BlogCategory } from "@/lib/blog";
@@ -9,6 +8,7 @@ import { copy } from "@/lib/i18n";
 import { SectionMark } from "@/components/layout/section-mark";
 import { POST_TONE } from "./post-tone";
 import { LedText } from "./led-text";
+import { PostCardLink } from "./post-card-link";
 
 /** Chip order on the index. `travel` is last: the logs are the newest arrival
  *  and belong after the three writing categories. */
@@ -360,7 +360,7 @@ function PostCard({
     post.meta ??
     (post.minutes ? `≈ ${post.minutes} ${s.blog.minRead}` : null);
   return (
-    <Link
+    <PostCardLink
       href={href}
       className="group block rounded-xl border border-line bg-surface p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift hover:no-underline sm:p-6"
     >
@@ -412,6 +412,6 @@ function PostCard({
           </span>
         </span>
       </div>
-    </Link>
+    </PostCardLink>
   );
 }

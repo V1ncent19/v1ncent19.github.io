@@ -10,13 +10,15 @@
 | `components/layout/site-header.tsx` | 页头、当前栏目识别、移动导航菜单；路径匹配先去掉尾斜杠 |
 | `components/layout/lang-switch.tsx` | 中英文切换；记录当前章节和章节内进度，并在目标页面布局完成后恢复阅读位置 |
 | `components/layout/desktop-nav.tsx` | 桌面导航的共享胶囊底板、鼠标/焦点跟随、位置测量 |
-| `components/home/gateway-link.tsx` | 首页导航卡片确认，等待 360ms 后使用 router.push |
+| `components/home/gateway-link.tsx` | 首页导航卡片确认。Playground 卡片由 `direct` 使用直接链接 |
 | `lib/use-card-launch.ts` | 首页/画廊卡片的确认计时器、重复点击保护、返回复位 |
 | `components/gallery/gallery-view.tsx` | StoryTile 的 320ms 确认、站内路由、画廊返回设置恢复 |
 | `lib/travel/log/entry-transition.ts` | Travel 卡片源页蓝幕及目标页接管；详细机制见 `FEATURE_TRAVEL_LOG.md` |
 | `app/globals.css` | 导航底板、标题胶囊、确认图形及辅助标签样式 |
 
 ## 首页导航卡片
+
+- 中英文首页的最后一格为 Playground，预览图来自 `/playground/` 的无界面渲染。卡片保留悬浮揭示，点击直接跳转。Project 继续在主导航显示。资产维护见 [Atelier du vitrail 工程手册](AtelierDuVitrail/ASSETS.md)。
 
 - 保留左侧 About 大卡、右侧四张小卡的网格、原断点及尺寸规则。
 - 卡内顶部为编号/状态；下方只保留标题和一句说明，不恢复关键词行。

@@ -30,19 +30,19 @@ function interpolateBounds(rows, y) {
 
 export const windows = [
   {
-    id: "france", title: "France 2024", href: "/travel/zh/france-2024/",
+    id: "france",
     file: "france-louvre-a.png", top: 39, bottom: 1732, bounds: sourceBounds,
   },
   {
-    id: "ptes", title: "PTES", href: "/travel/zh/ptes-2025/",
+    id: "ptes",
     file: "ptes-porto.png", top: 40, bottom: 1596, bounds: (y) => interpolateBounds(portoBounds, y),
   },
   {
-    id: "guatemala", title: "Guatemala 2026", href: "/travel/zh/guatemala-2026/",
+    id: "guatemala",
     file: "guatemala-fuego-b.png", top: 40, bottom: 1900, bounds: (y) => interpolateBounds(fuegoBounds, y),
   },
   {
-    id: "anitabi", title: "Anitabi", href: "/travel/zh/just-because/",
+    id: "anitabi",
     file: "anitabi-station.png", top: 40, bottom: 1734, bounds: (y) => interpolateBounds(stationBounds, y),
   },
 ];
