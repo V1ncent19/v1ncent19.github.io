@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowLeft, ArrowUpRight, Volume2, VolumeX } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, SlidersHorizontal, Volume2, VolumeX, X } from "lucide-react";
 import { beginTravelEntry, clearTravelEntry } from "@/lib/travel/log/entry-transition";
 import { rememberTravelLogSource } from "@/lib/travel/log/return-navigation";
 import SundialLightMap, { type MapLightLocation } from "./SundialLightMap";
@@ -58,6 +58,7 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
   const [musicState, setMusicState] = useState<"paused" | "loading" | "primed" | "playing" | "failed">("paused");
   const [opening, setOpening] = useState<Opening>("waiting");
   const [closing, setClosing] = useState<Closing | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [irisStarted, setIrisStarted] = useState(false);
   const [openingChoice, setOpeningChoice] = useState<"sound" | "quiet" | null>(null);
   const [lighting, setLighting] = useState<LightingState | null>(null);
@@ -67,11 +68,10 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
   const music = useRef<ReturnType<typeof createSundialMusic> | null>(null);
   const sundial = useRef<HTMLDivElement>(null);
   const viewInterface = useRef<HTMLDivElement>(null);
+  const sidebarToggle = useRef<HTMLButtonElement>(null);
   const mainActions = useRef<HTMLElement>(null);
   const sceneAction = useRef<HTMLDivElement>(null);
   const titleLight = useRef<HTMLSpanElement>(null);
-  const openingVeil = useRef<HTMLDivElement>(null);
-  const openingOptions = useRef<HTMLDivElement>(null);
   const moveFocus = useRef<"menu" | "preview" | null>(null);
   const clearFlight = useCallback(() => {
     timers.current.forEach(clearTimeout);
@@ -107,7 +107,7 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
     if (opening !== "waiting" || status === "loading") return;
     if (status === "ready" && (!openingChoice || (openingChoice === "sound" && musicState !== "primed" && musicState !== "failed"))) return;
 
-    function reveal() {
+    const frame = window.requestAnimationFrame(() => {
       if (status === "unavailable") {
         music.current?.dispose();
         music.current = null;
@@ -118,38 +118,20 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
       if (openingChoice === "sound" && musicState === "primed") {
         setMusicState(music.current?.startPrepared() ? "playing" : "failed");
       }
-      if (reduced || selectedIndex >= 0 || !anchorIris(openingVeil.current, titleLight.current)) {
+      if (reduced || selectedIndex >= 0 || !anchorIris(sundial.current, titleLight.current)) {
         setOpening("done");
         return;
       }
       setIrisStarted(true);
       setOpening("revealing");
-    }
-
-    let fade: Animation | undefined;
-    let fadingOptions: HTMLDivElement | undefined;
-    const frame = window.requestAnimationFrame(() => {
-      const options = openingOptions.current;
-      if (!options || reduced || status !== "ready" || selectedIndex >= 0) {
-        reveal();
-        return;
-      }
-      fadingOptions = options;
-      options.inert = true;
-      const opacity = Number(getComputedStyle(options).opacity);
-      fade = options.animate({ opacity: [opacity, 0] }, { duration: 300, easing: "ease-in-out", fill: "forwards" });
-      void fade.finished.then(reveal, () => {});
     });
-    return () => {
-      window.cancelAnimationFrame(frame);
-      fade?.cancel();
-      if (fadingOptions) fadingOptions.inert = false;
-    };
+    return () => window.cancelAnimationFrame(frame);
   }, [musicState, opening, openingChoice, reduced, selectedIndex, status]);
 
   useEffect(() => {
     if (opening !== "revealing") return;
-    const timer = window.setTimeout(() => setOpening("done"), 1450);
+    // Fallback if the veil's animationend event is interrupted.
+    const timer = window.setTimeout(() => setOpening("done"), 1800);
     return () => window.clearTimeout(timer);
   }, [opening]);
 
@@ -228,6 +210,10 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
       if (opening !== "done" || event.key !== "Escape" || event.defaultPrevented) return;
       if (flightLock.current) {
         if (!handedOff.current) clearFlight();
+      } else if (sidebarOpen && sidebarToggle.current?.getClientRects().length) {
+        event.preventDefault();
+        setSidebarOpen(false);
+        sidebarToggle.current.focus();
       } else if (selectedIndex >= 0) onMenu();
     };
     const onBack = () => {
@@ -243,7 +229,7 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
       window.removeEventListener("popstate", onBack);
       window.removeEventListener("pageshow", onRestore);
     };
-  }, [clearFlight, onMenu, opening, selectedIndex]);
+  }, [clearFlight, onMenu, opening, selectedIndex, sidebarOpen]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   useEffect(() => {
@@ -372,40 +358,48 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
           onAnimationEnd={(event) => {
             if (event.target === event.currentTarget && event.animationName === "sundial-interface-out") startClosingIris();
           }}>
-          <aside className="sundial-sidebar" aria-label="Workshop sidebar" inert={Boolean(flight)}>
-            {status !== "unavailable" && lighting && (
-              <SundialLightMap clock={lighting.clock} location={lighting.location}
-                onSelect={selectLightLocation} onTogglePlayback={toggleLightPlayback} />
-            )}
-            <div className="sundial-credit">
-              <p>Inspired by
-                <a href="https://store.steampowered.com/app/4160210/The_Artisan_of_Glimmith/" target="_blank" rel="noopener noreferrer"
-                  aria-label="The Artisan of Glimmith on Steam (opens in a new tab)">
-                  <cite>The Artisan of Glimmith</cite><ArrowUpRight size={11} aria-hidden="true" />
-                </a>
-              </p>
-              <div className="sundial-music-credit">
-                <p>Music by sasakure.UK
-                  <a href="https://www.youtube.com/watch?v=Ao4KwcZX16k" target="_blank" rel="noopener noreferrer"
-                    aria-label="uzumakinoharu on YouTube (opens in a new tab)">
-                    <cite>uzumakinoharu</cite><ArrowUpRight size={11} aria-hidden="true" />
+          <aside className="sundial-sidebar" aria-label="Workshop sidebar" inert={Boolean(flight)} data-open={sidebarOpen}>
+            <button ref={sidebarToggle} className="sundial-sidebar-toggle" type="button"
+              aria-label="Workshop controls" aria-controls="sundial-sidebar-content" aria-expanded={sidebarOpen}
+              title={sidebarOpen ? "Hide workshop controls" : "Show workshop controls"}
+              onClick={() => setSidebarOpen((open) => !open)}>
+              {sidebarOpen ? <X size={20} aria-hidden="true" /> : <SlidersHorizontal size={20} aria-hidden="true" />}
+            </button>
+            <div className="sundial-sidebar-content" id="sundial-sidebar-content">
+              {status !== "unavailable" && lighting && (
+                <SundialLightMap clock={lighting.clock} location={lighting.location}
+                  onSelect={selectLightLocation} onTogglePlayback={toggleLightPlayback} />
+              )}
+              <div className="sundial-credit">
+                <p>Inspired by
+                  <a href="https://store.steampowered.com/app/4160210/The_Artisan_of_Glimmith/" target="_blank" rel="noopener noreferrer"
+                    aria-label="The Artisan of Glimmith on Steam (opens in a new tab)">
+                    <cite>The Artisan of Glimmith</cite><ArrowUpRight size={11} aria-hidden="true" />
                   </a>
                 </p>
-                {status === "ready" && (
-                  <button className="sundial-sound" type="button" aria-label="Music" aria-pressed={musicState === "playing"}
-                    aria-busy={musicState === "loading"} disabled={Boolean(flight) || musicState === "loading"}
-                    title={musicState === "playing" ? "Pause music" : musicState === "failed" ? "Retry music" : "Play music"}
-                    onClick={() => void toggleMusic()}>
-                    {musicState === "playing" ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />}
-                  </button>
-                )}
+                <div className="sundial-music-credit">
+                  <p>Music by sasakure.UK
+                    <a href="https://www.youtube.com/watch?v=Ao4KwcZX16k" target="_blank" rel="noopener noreferrer"
+                      aria-label="uzumakinoharu on YouTube (opens in a new tab)">
+                      <cite>uzumakinoharu</cite><ArrowUpRight size={11} aria-hidden="true" />
+                    </a>
+                  </p>
+                  {status === "ready" && (
+                    <button className="sundial-sound" type="button" aria-label="Music" aria-pressed={musicState === "playing"}
+                      aria-busy={musicState === "loading"} disabled={Boolean(flight) || musicState === "loading"}
+                      title={musicState === "playing" ? "Pause music" : musicState === "failed" ? "Retry music" : "Play music"}
+                      onClick={() => void toggleMusic()}>
+                      {musicState === "playing" ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />}
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="sundial-reading" aria-live="polite" inert={!selected}>
-              {displayed && <article key={displayed.id}>
-                <h2>{displayed.title}</h2>
-                <p>{displayed.summary}</p>
-              </article>}
+              <div className="sundial-reading" aria-live="polite" inert={!selected}>
+                {displayed && <article key={displayed.id}>
+                  <h2>{displayed.title}</h2>
+                  <p>{displayed.summary}</p>
+                </article>}
+              </div>
             </div>
           </aside>
           {displayed && (
@@ -442,31 +436,37 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
         </div>
       </div>
       {opening !== "done" && (
-        <div ref={openingVeil} className="sundial-opening" role={opening === "waiting" ? "dialog" : undefined}
-          aria-label="Atelier entrance" aria-modal={opening === "waiting" ? true : undefined} aria-hidden={opening === "revealing"}
+        <div className="sundial-opening" role={opening === "waiting" ? "dialog" : undefined}
+          aria-label={status === "ready" ? undefined : "Atelier entrance"}
+          aria-labelledby={opening === "waiting" && status === "ready" ? "sundial-opening-title" : undefined}
+          aria-modal={opening === "waiting" ? true : undefined} aria-hidden={opening === "revealing"}
           onAnimationEnd={(event) => {
-            if (event.target === event.currentTarget && event.animationName === "sundial-opening-iris") setOpening("done");
+            if (event.target === event.currentTarget && event.animationName === "sundial-entry-iris") setOpening("done");
           }}>
-          {opening === "waiting" && (
-            <div className="sundial-opening-actions">
-              <p className="sundial-opening-wait" role="status" aria-hidden={status !== "loading" || undefined}>
-                <span>Gathering light…</span>
-              </p>
-              {status === "ready" && (
-                <div className="sundial-opening-options" ref={openingOptions}>
-                  <h2>Welcome to my TravelLog Garden</h2>
+          <div className="sundial-opening-actions" inert={opening === "revealing"}>
+            <p className="sundial-opening-wait" role="status" aria-hidden={status !== "loading" || undefined}>
+              <span>Gathering light…</span>
+            </p>
+            {status === "ready" && (
+              <div className="sundial-opening-options">
+                <h2 id="sundial-opening-title">
+                  <span className="sundial-opening-greeting">Welcome to my TravelLog Garden</span>{" "}
+                  <span lang="fr">Atelier du <em>Vitrail</em></span>
+                </h2>
+                <div>
                   <div className="sundial-opening-buttons">
-                    <button type="button" disabled={openingChoice === "sound"} onClick={() => {
+                    <button className="sundial-opening-music" type="button" disabled={openingChoice === "sound"} onClick={() => {
                       setOpeningChoice("sound");
                       void toggleMusic(true);
                     }}>Enter with music</button>
                     <button type="button" onClick={enterQuietly}>Enter quietly</button>
                   </div>
-                  <p className="sundial-opening-audio" role="status" aria-hidden={musicState !== "loading" || undefined}>Preparing music…</p>
+                  <p className="sundial-opening-desktop-note">Best experienced on a desktop or laptop.</p>
                 </div>
-              )}
-            </div>
-          )}
+                <p className="sundial-opening-audio" role="status" aria-hidden={musicState !== "loading" || undefined}>Preparing music…</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
       {lightCovering && (

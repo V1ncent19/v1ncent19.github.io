@@ -2,7 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
-import type { SundialLighting } from "./sundial-optics";
+import { nightSkyDirection, type SundialLighting } from "./sundial-optics";
 
 const dawn = ["#707da6", "#f1b8bc", "#efcedc", "#9985a3", "#f8ceb6"];
 const day = ["#5b83ac", "#d7e3e8", "#eef4f7", "#788895", "#f3ead7"];
@@ -138,8 +138,10 @@ const cloudFragment = /* glsl */ `
   uniform float islandRadius;
   uniform vec3 cloud;
   uniform vec3 cloudRim;
-  uniform vec3 cloudKeyRay;
+  uniform vec3 skyFillRay;
+  uniform vec3 moonRay;
   uniform float moonWeight;
+  uniform float nightWeight;
   ${skyColors}
 
   void main() {
@@ -152,11 +154,13 @@ const cloudFragment = /* glsl */ `
     float farBank = smoothstep(3.1, 8.5, bankDistance);
 
     // Light the cloud volume with continuous normals, then bring back some of the planar facets at close range.
-    float facingSun = mix(dot(softNormal, sunRay), dot(softNormal, cloudKeyRay), moonWeight);
+    vec3 nightRay = normalize(mix(skyFillRay, moonRay, moonWeight));
+    vec3 lightRay = mix(sunRay, nightRay, nightWeight);
+    float facingLight = dot(softNormal, lightRay);
     float crown = smoothstep(-.61, .82, vHeight);
-    float wrapLight = smoothstep(-.63, .83, facingSun);
+    float wrapLight = smoothstep(-.63, .83, facingLight);
     float facetCarry = (1.0 - smoothstep(2.55, 6.2, distanceToEye)) * (1.0 - farBank);
-    float facet = clamp(dot(facetNormal - softNormal, sunRay), -.49, .49) * .28 * facetCarry;
+    float facet = clamp(dot(facetNormal - softNormal, lightRay), -.49, .49) * .28 * facetCarry;
     float lit = clamp(.18 + .36 * crown + .41 * wrapLight + facet, 0.0, 1.0);
     vec3 cool = mix(cloudShade * .79, cloud, .13 + .25 * crown);
     vec3 color = mix(cool, cloud * 1.22, lit) * (.95 + .10 * vCloudSeed);
@@ -164,11 +168,12 @@ const cloudFragment = /* glsl */ `
     // The warm edge is most visible through thin parts of the cloud facing the low sun.
     float grazing = 1.0 - clamp(dot(softNormal, -ray), 0.0, 1.0);
     float lowSun = 1.0 - smoothstep(.23, .64, sunRay.y);
-    float sunward = smoothstep(-.40, .82, dot(ray, sunRay));
-    float rim = pow(grazing, 2.25) * smoothstep(-.49, .68, facingSun) * (.31 + .69 * sunward);
-    float warmEdge = mix(lowSun * (rim * .48 + wrapLight * crown * .16) * (.62 + .38 * warmth),
-      .28 * rim, moonWeight);
-    color = mix(color, cloudRim * 1.19, warmEdge);
+    float lightward = smoothstep(-.40, .82, dot(ray, lightRay));
+    float rim = pow(grazing, 2.25) * smoothstep(-.49, .68, facingLight) * (.31 + .69 * lightward);
+    float solarEdge = lowSun * (rim * .48 + wrapLight * crown * .16) * (.62 + .38 * warmth);
+    float nightEdge = rim * (.055 + .20 * moonWeight) * mix(.40, 1.0, farBank);
+    color = mix(color, cloudRim * 1.19, mix(solarEdge, nightEdge, nightWeight));
+    color *= 1.0 - .18 * nightWeight * (1.0 - farBank);
 
     float fogDistance = max(distanceToEye - 1.85, 0.0);
     float groundMist = .11 * (1.0 - smoothstep(-.61, .18, vHeight)) * smoothstep(1.8, 4.8, bankDistance);
@@ -344,7 +349,8 @@ export function SundialSky({ islandRadius, optics }: {
   const skyMaterial = useRef<THREE.ShaderMaterial>(null);
   const palette = useMemo(() => createSkyPalette(), []);
   const uniforms = useMemo(() => ({
-    ...palette, sunRay: optics.ray, cloudKeyRay: optics.keyRay, moonWeight: optics.moonlight,
+    ...palette, sunRay: optics.ray, skyFillRay: { value: nightSkyDirection },
+    nightWeight: optics.lamps, moonWeight: optics.moonlight,
     moonRay: optics.moonRay, moonVisibility: optics.moonVisibility, islandRadius: { value: islandRadius },
   }), [palette, optics, islandRadius]);
   useFrame(() => {

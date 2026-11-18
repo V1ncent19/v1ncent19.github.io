@@ -1,20 +1,21 @@
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, type RefObject } from "react";
+import { useEffect, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { panel, panelHalfWidth } from "@/assets-src/playground/louvre-panel.mjs";
 import { SUNDIAL_PAVING_INSET, sundialLayout, TREE_SEAT_BASE_RADIUS, WINDOW_SCALE, type Slot } from "./sundial-layout";
-import { installTreeTransmission, paneMaterial, stoneProjection, type SundialLighting } from "./sundial-optics";
-import { agedBrass, carvedStone, cherryCrownTexture, plantingSoil, windowLimestone } from "./sundial-materials";
+import { installTreeTransmission, moonlitStone, paneMaterial, stoneProjection, type SundialLighting } from "./sundial-optics";
+import { agedBrass, cherryCrownTexture, plantingSoil, windowLimestone } from "./sundial-materials";
 import { sundialFloorSurface } from "./sundial-floor";
 import type { SundialInlay } from "./sundial-inlay";
 import { makeSundialPlanter, plantingSoilHeight } from "./sundial-planter";
-import { makeGothicFrame } from "./france-window-frame";
+import { groundedSillBottom, makeGothicFrame, plainSillBase } from "./france-window-frame";
 import { makeTraceryGlass } from "./tracery-glass";
 import { CHERRY_ANCHOR, CHERRY_CROWN_HEIGHT, CHERRY_REBOUND_START, cherryFlex, cherryTreeHeight, type CherryMotion } from "./sundial-cherry-motion";
 
 const brass = "#bd9759";
+const windowBounceColor = new THREE.Color("#ffd0a4");
 const tau = Math.PI * 2;
 
 function random(seed: number) {
@@ -97,14 +98,16 @@ export function SundialIsland({ layout, optics, floor, inlay }: {
   }, [layout.plate, layout.island]);
   const projection = useMemo(() => stoneProjection(optics, inlay), [optics, inlay]);
   const bevelProjection = useMemo(() => stoneProjection(optics), [optics]);
+  const contactCount = optics.contactPlanes.value.length;
+  const trayFinish = useMemo(() => moonlitStone(optics.moonlight), [optics]);
   const brassFinish = useMemo(() => illuminatedBrass(optics), [optics]);
   useEffect(() => () => Object.values(parts).forEach((geometry) => geometry.dispose()), [parts]);
 
   return (
     <>
-      <mesh geometry={parts.tray} receiveShadow><meshStandardMaterial color="#b5b1aa" roughness={.83} side={THREE.DoubleSide} onBeforeCompile={carvedStone} /></mesh>
+      <mesh geometry={parts.tray} receiveShadow><meshStandardMaterial color="#b5b1aa" roughness={.83} side={THREE.DoubleSide} onBeforeCompile={trayFinish} /></mesh>
       <mesh geometry={parts.upper} receiveShadow><meshStandardMaterial color="#b1a89a" roughness={.84} side={THREE.DoubleSide} onBeforeCompile={bevelProjection}
-        customProgramCacheKey={() => `sundial-bevel-${optics.layers.value.length}-${optics.tracery.columns}`} /></mesh>
+        customProgramCacheKey={() => `sundial-bevel-${optics.layers.value.length}-${optics.tracery.columns}-${contactCount}`} /></mesh>
       <mesh name="Sundial rim inlay" geometry={parts.rim} receiveShadow>
         <meshStandardMaterial color="#b29563" metalness={.73} roughness={.49} onBeforeCompile={brassFinish}
           customProgramCacheKey={() => `sundial-lit-brass-${optics.layers.value.length}-${optics.tracery.columns}`} />
@@ -112,7 +115,7 @@ export function SundialIsland({ layout, optics, floor, inlay }: {
       <mesh geometry={parts.metal} receiveShadow><meshPhysicalMaterial color="#b5945d" metalness={.88} roughness={.33} clearcoat={.13} side={THREE.DoubleSide} onBeforeCompile={agedBrass} /></mesh>
       <mesh geometry={floor} receiveShadow>
         <meshStandardMaterial color="#afa89d" roughness={.84} onBeforeCompile={projection}
-          customProgramCacheKey={() => `sundial-stone-${optics.layers.value.length}-${optics.tracery.enabled ? optics.tracery.columns : 0}-${inlay.arcs.length}-${inlay.radials.length}-${inlay.elbows.length}-${inlay.junctions.length}`} />
+          customProgramCacheKey={() => `sundial-stone-${optics.layers.value.length}-${optics.tracery.enabled ? optics.tracery.columns : 0}-${contactCount}-${inlay.arcs.length}-${inlay.radials.length}-${inlay.elbows.length}-${inlay.junctions.length}`} />
       </mesh>
     </>
   );
@@ -141,7 +144,7 @@ function makeWindowGeometry() {
   const frame = new THREE.ExtrudeGeometry(outer, { depth: .25, bevelEnabled: true, bevelThickness: .036, bevelSize: .024, bevelSegments: 3, curveSegments: 24 });
   const molding = new THREE.ExtrudeGeometry(outer, { depth: .075, bevelEnabled: true, bevelThickness: .022, bevelSize: .029, bevelSegments: 3, curveSegments: 24 });
   return {
-    pane, frame, molding, block: new RoundedBoxGeometry(1, 1, 1, 4, .067),
+    pane, frame, molding, block: new RoundedBoxGeometry(1, 1, 1, 4, plainSillBase.bevel),
     ...makeGothicFrame(), traceryGlass: makeTraceryGlass(),
   };
 }
@@ -152,16 +155,17 @@ export function useWindowGeometry() {
   return details;
 }
 
-function GothicWindowStone({ seed, geometry, hover, index }: {
+function GothicWindowStone({ seed, geometry, moonlight, hover, index }: {
   seed: number; geometry: ReturnType<typeof useWindowGeometry>;
+  moonlight: SundialLighting["moonlight"];
   hover?: SundialLighting["activation"]["illumination"]; index?: number;
 }) {
   const stone = useMemo(() => {
     const surface = new THREE.MeshStandardMaterial({ color: "#aaa295", roughness: .76 });
-    surface.onBeforeCompile = windowLimestone(seed, hover, index);
+    surface.onBeforeCompile = moonlitStone(moonlight, windowLimestone(seed, hover, index));
     surface.customProgramCacheKey = () => `sundial-frame-${hover?.value.length ?? 0}`;
     return surface;
-  }, [seed, hover, index]);
+  }, [seed, moonlight, hover, index]);
   useEffect(() => () => stone.dispose(), [stone]);
   return (
     <>
@@ -175,34 +179,41 @@ function GothicWindowStone({ seed, geometry, hover, index }: {
 }
 
 function GothicWindowFrame({ optics, layer, atlasIndex, slot, geometry }: {
-  optics: SundialLighting; layer: number; atlasIndex: number; slot: number; geometry: ReturnType<typeof useWindowGeometry>;
+  optics: SundialLighting; layer: number; atlasIndex: number; slot: number;
+  geometry: ReturnType<typeof useWindowGeometry>;
 }) {
   const material = useMemo(() => paneMaterial(optics, atlasIndex, slot, layer), [optics, atlasIndex, slot, layer]);
   useEffect(() => () => material.dispose(), [material]);
   return (
     <>
-      <GothicWindowStone seed={atlasIndex} geometry={geometry} hover={optics.activation.illumination} index={slot} />
+      <GothicWindowStone seed={atlasIndex} geometry={geometry} moonlight={optics.moonlight}
+        hover={optics.activation.illumination} index={slot} />
       <mesh geometry={geometry.traceryGlass} material={material} />
     </>
   );
 }
 
-function SundialWindowFrame({ geometry }: { geometry: ReturnType<typeof useWindowGeometry> }) {
+function SundialWindowFrame({ geometry, moonlight }: {
+  geometry: ReturnType<typeof useWindowGeometry>; moonlight: SundialLighting["moonlight"];
+}) {
+  const stoneFinish = useMemo(() => moonlitStone(moonlight), [moonlight]);
+  const { width, height: sillTop, depth } = plainSillBase;
   return (
     <>
       <mesh geometry={geometry.frame} position-z={-.125} castShadow receiveShadow>
-        <meshStandardMaterial color="#d8ceba" roughness={.72} onBeforeCompile={carvedStone} />
+        <meshStandardMaterial color="#d8ceba" roughness={.72} onBeforeCompile={stoneFinish} />
       </mesh>
       {[-.157, .085].map((offset) => (
         <mesh key={offset} position-z={offset} geometry={geometry.molding}>
           <meshPhysicalMaterial color="#c49a57" metalness={.87} roughness={.32} clearcoat={.15} onBeforeCompile={agedBrass} />
         </mesh>
       ))}
-      <mesh geometry={geometry.block} position-y={.165} scale={[3.65, .33, 1.02]} castShadow receiveShadow>
-        <meshStandardMaterial color="#b5aea4" roughness={.81} onBeforeCompile={carvedStone} />
+      <mesh geometry={geometry.block} position-y={(sillTop + groundedSillBottom) / 2}
+        scale={[width, sillTop - groundedSillBottom, depth]} castShadow receiveShadow>
+        <meshStandardMaterial color="#b5aea4" roughness={.81} onBeforeCompile={stoneFinish} />
       </mesh>
       <mesh geometry={geometry.block} position-y={.42} scale={[3.11, .29, .75]} castShadow receiveShadow>
-        <meshStandardMaterial color="#d6cebe" roughness={.73} onBeforeCompile={carvedStone} />
+        <meshStandardMaterial color="#d6cebe" roughness={.73} onBeforeCompile={stoneFinish} />
       </mesh>
       <mesh geometry={geometry.block} position-y={.29} scale={[3.51, .036, .95]} receiveShadow>
         <meshStandardMaterial color={brass} metalness={.81} roughness={.36} onBeforeCompile={agedBrass} />
@@ -211,14 +222,15 @@ function SundialWindowFrame({ geometry }: { geometry: ReturnType<typeof useWindo
   );
 }
 
-export function SundialEmptyWindow({ slot, seed, geometry, clearHover }: {
-  slot: Slot; seed: number; geometry: ReturnType<typeof useWindowGeometry>; clearHover: (index: number) => void;
+export function SundialEmptyWindow({ slot, seed, geometry, moonlight, clearHover }: {
+  slot: Slot; seed: number; geometry: ReturnType<typeof useWindowGeometry>;
+  moonlight: SundialLighting["moonlight"]; clearHover: (index: number) => void;
 }) {
   return (
     <group name={`Travel window ${slot.id}`} position={[slot.x, 0, slot.z]} rotation-y={slot.yaw} scale={WINDOW_SCALE}
       onPointerMove={(event) => { event.stopPropagation(); clearHover(-1); }}
       onClick={(event) => event.stopPropagation()}>
-      <GothicWindowStone seed={seed} geometry={geometry} />
+      <GothicWindowStone seed={seed} geometry={geometry} moonlight={moonlight} />
     </group>
   );
 }
@@ -230,17 +242,30 @@ export function SundialWindow({ slot, index, optics, geometry, hover, activate, 
   const atlasIndex = optics.layers.value[index];
   const opticsMaterial = useMemo(() => paneMaterial(optics, atlasIndex, index), [optics, atlasIndex, index]);
   const traceryLayer = optics.tracery.layers.value[index];
+  const spill = useRef<THREE.PointLight>(null);
+  const tint = optics.tints.value[index];
   useEffect(() => () => opticsMaterial.dispose(), [opticsMaterial]);
+  useFrame(() => {
+    const light = spill.current;
+    if (!light) return;
+    const night = optics.lamps.value;
+    // At night the existing pane light spills onto the stone just inside the sill.
+    light.position.y = THREE.MathUtils.lerp(3.1, 1.65, night);
+    light.position.z = THREE.MathUtils.lerp(-.53, 1.10, night);
+    light.color.copy(tint).lerp(windowBounceColor, night * .84);
+    light.intensity = THREE.MathUtils.lerp(.54, 1.23, night);
+    light.distance = THREE.MathUtils.lerp(3.15, 2.70, night);
+  }, -.75);
   return (
     <group name={`Travel window ${slot.id}`} position={[slot.x, 0, slot.z]} rotation-y={slot.yaw} scale={WINDOW_SCALE}
       onPointerMove={(event) => { event.stopPropagation(); if (!drag.current) hover(index); }}
       onPointerOut={(event) => { if (event.intersections[0]?.eventObject !== event.eventObject) hover(-1); }}
       onClick={(event) => { event.stopPropagation(); if (!drag.current && event.delta < 6) activate(index); }}>
-      <pointLight position={[0, 3.1, -.53]} color={optics.tints.value[index]} intensity={.54} distance={3.15} decay={2} />
+      <pointLight ref={spill} position={[0, 3.1, -.53]} color={tint} intensity={.54} distance={3.15} decay={2} />
       <mesh geometry={geometry.pane} material={opticsMaterial} />
       {traceryLayer >= 0
         ? <GothicWindowFrame optics={optics} layer={traceryLayer} atlasIndex={atlasIndex} slot={index} geometry={geometry} />
-        : <SundialWindowFrame geometry={geometry} />}
+        : <SundialWindowFrame geometry={geometry} moonlight={optics.moonlight} />}
     </group>
   );
 }

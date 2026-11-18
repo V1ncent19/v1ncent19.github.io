@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo, useRef, type RefObject } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
@@ -14,7 +14,8 @@ import { SundialScatterPass } from "./SundialAtmosphere";
 import { SundialSky } from "./SundialSky";
 import { makeSundialFloor } from "./sundial-floor";
 import { sundialInlay } from "./sundial-inlay";
-import { sundialLighting } from "./sundial-optics";
+import { nightSkyDirection, sundialLighting } from "./sundial-optics";
+import { createOrbitInertia } from "./sundial-orbit-inertia";
 import { createSundialTitleLight } from "./sundial-title-light";
 import { createCherryMotion, createCherrySwipe, type CherryMotion } from "./sundial-cherry-motion";
 import { PORTAL_DURATION, SUNDIAL_PAVING_INSET, sundialLayout, type Slot, type TravelWindow } from "./sundial-layout";
@@ -49,6 +50,8 @@ const morningFill = new THREE.Color("#f2c5d4");
 const nightFill = new THREE.Color("#a1b7d6");
 const lightGlideSeconds = 1.15;
 const noLightTurn = new THREE.Quaternion();
+const overviewMotionHoldMs = 130;
+const movingShadowIntervalMs = 48;
 
 function createLightGlide(location: LightLocation) {
   return {
@@ -127,8 +130,10 @@ type CherryInteraction = {
 
 function wireCanvas(element: HTMLCanvasElement, dragging: RefObject<boolean>, settings: RefObject<SundialSceneProps>, picking: {
   camera: THREE.Camera; scene: THREE.Scene; windows: Slot[]; cherry: CherryInteraction; shaking: RefObject<boolean>;
+  orbit: OrbitControls; inertia: ReturnType<typeof createOrbitInertia>;
   refreshHover: (event: PointerEvent) => void;
 }) {
+  const { orbit, inertia } = picking;
   const position = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
   const screen = new THREE.Vector2();
@@ -161,13 +166,19 @@ function wireCanvas(element: HTMLCanvasElement, dragging: RefObject<boolean>, se
   };
 
   const onPointerDown = (event: PointerEvent) => {
+    inertia.finishDrag(picking.camera);
+    inertia.stop();
     if (swipe) { event.stopImmediatePropagation(); return; }
     if (pointer !== null) return;
     suppressDragClick = false;
     dragging.current = false;
     pointer = event.pointerId;
     position.set(event.clientX, event.clientY);
-    if (event.button !== 0 || !hitsCherry(event)) return;
+    if (event.button !== 0) return;
+    if (!hitsCherry(event)) {
+      if (orbit.enabled && !settings.current.reduced) inertia.begin(event.timeStamp);
+      return;
+    }
     swipe = createCherrySwipe(event.clientX, event.clientY, event.timeStamp);
     suppressDragClick = true;
     picking.shaking.current = true;
@@ -206,6 +217,12 @@ function wireCanvas(element: HTMLCanvasElement, dragging: RefObject<boolean>, se
     element.removeAttribute("data-window-hover");
     settings.current.onHover(-1);
   };
+  const sampleOrbit = (event: PointerEvent) => {
+    // OrbitControls applies the pointer delta on document, before it bubbles to window.
+    if (event.pointerId === pointer && !swipe && orbit.enabled && !settings.current.reduced) {
+      inertia.sample(event.timeStamp);
+    }
+  };
   const endPointer = () => {
     const captured = pointer;
     pointer = null;
@@ -218,8 +235,19 @@ function wireCanvas(element: HTMLCanvasElement, dragging: RefObject<boolean>, se
     }
     element.removeAttribute("data-dragging");
   };
+  const cancelPointer = () => {
+    inertia.finishDrag(picking.camera);
+    inertia.stop();
+    endPointer();
+  };
   const onPointerEnd = (event: PointerEvent) => {
     if (event.pointerId !== pointer) return;
+    if (dragging.current && !swipe && orbit.enabled && !settings.current.reduced && event.type === "pointerup") {
+      inertia.release(picking.camera, event.timeStamp);
+    } else {
+      inertia.finishDrag(picking.camera);
+      inertia.stop();
+    }
     const overScene = dragging.current && event.type === "pointerup"
       && document.elementFromPoint(event.clientX, event.clientY) === element;
     endPointer();
@@ -235,13 +263,21 @@ function wireCanvas(element: HTMLCanvasElement, dragging: RefObject<boolean>, se
     event.stopImmediatePropagation();
   };
   const onLeave = () => { element.removeAttribute("data-tree-hover"); settings.current.onHover(-1); };
-  // OrbitControls owns the wheel for the free camera. A captured tree gesture keeps it still.
-  const wheelWhileShaking = (event: WheelEvent) => {
-    if (!swipe) return;
+  const onOverviewWheel = (event: WheelEvent) => {
+    if (!swipe && (!orbit.enabled || event.ctrlKey || event.metaKey)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
+    if (swipe || pointer !== null || !event.deltaY) return;
+    inertia.stop();
+
+    // Apply wheel input immediately. OrbitControls still handles pinch gestures.
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 100 : 1;
+    const scale = Math.exp(-Math.min(Math.abs(event.deltaY) * unit * .00095, .24));
+    if (event.deltaY < 0) orbit.dollyIn(scale);
+    else orbit.dollyOut(scale);
   };
   const onWheel = (event: WheelEvent) => {
+    if (pointer === null) inertia.stop();
     const current = settings.current;
     if (current.flight || current.selected < 0 || event.ctrlKey || event.metaKey) {
       wheel = 0;
@@ -273,27 +309,29 @@ function wireCanvas(element: HTMLCanvasElement, dragging: RefObject<boolean>, se
   element.addEventListener("pointerdown", onPointerDown, true);
   element.addEventListener("pointermove", onPointerMove, true);
   element.addEventListener("click", onClick, true);
+  window.addEventListener("pointermove", sampleOrbit);
   window.addEventListener("pointerup", onPointerEnd);
   window.addEventListener("pointercancel", onPointerEnd);
-  window.addEventListener("blur", endPointer);
+  window.addEventListener("blur", cancelPointer);
   element.addEventListener("lostpointercapture", onPointerEnd);
   element.addEventListener("pointerleave", onLeave);
-  element.addEventListener("wheel", wheelWhileShaking, { capture: true, passive: false });
+  element.addEventListener("wheel", onOverviewWheel, { capture: true, passive: false });
   element.addEventListener("wheel", onWheel, { passive: false });
   element.addEventListener("keydown", onKey);
   return () => {
     element.removeEventListener("pointerdown", onPointerDown, true);
     element.removeEventListener("pointermove", onPointerMove, true);
     element.removeEventListener("click", onClick, true);
+    window.removeEventListener("pointermove", sampleOrbit);
     window.removeEventListener("pointerup", onPointerEnd);
     window.removeEventListener("pointercancel", onPointerEnd);
-    window.removeEventListener("blur", endPointer);
+    window.removeEventListener("blur", cancelPointer);
     element.removeEventListener("lostpointercapture", onPointerEnd);
     element.removeEventListener("pointerleave", onLeave);
-    element.removeEventListener("wheel", wheelWhileShaking, true);
+    element.removeEventListener("wheel", onOverviewWheel, true);
     element.removeEventListener("wheel", onWheel);
     element.removeEventListener("keydown", onKey);
-    endPointer();
+    cancelPointer();
   };
 }
 
@@ -301,7 +339,7 @@ const glassPass = {
   uniforms: {
     tDiffuse: { value: null }, sceneDepth: { value: null }, focusDistance: { value: 10 }, nearPlane: { value: .08 }, farPlane: { value: 150 },
     sharpness: { value: 0 }, flight: { value: 0 }, pixel: { value: new THREE.Vector2() }, origin: { value: new THREE.Vector2(.5, .5) },
-    scatteredLight: { value: null }, scatterReady: { value: false },
+    scatteredLight: { value: null }, scatterReady: { value: false }, scatterSize: { value: new THREE.Vector2(1, 1) },
   },
   vertexShader: /* glsl */ `
     varying vec2 at;
@@ -311,6 +349,7 @@ const glassPass = {
     uniform sampler2D sceneDepth;
     uniform sampler2D scatteredLight;
     uniform bool scatterReady;
+    uniform vec2 scatterSize;
     uniform float focusDistance;
     uniform float nearPlane;
     uniform float farPlane;
@@ -320,8 +359,8 @@ const glassPass = {
     uniform vec2 origin;
     varying vec2 at;
     vec3 resolvedAir(vec2 uv, float surfaceDepth) {
-      ivec2 size = textureSize(scatteredLight, 0);
-      vec2 pixel = uv * vec2(size) - .5;
+      ivec2 size = ivec2(scatterSize);
+      vec2 pixel = uv * scatterSize - .5;
       vec2 portion = fract(pixel);
       ivec2 base = ivec2(floor(pixel));
       vec3 sum = vec3(0.0);
@@ -361,9 +400,10 @@ const glassPass = {
     }`,
 };
 
-function SceneCamera({ props, layout, dragging, previewAtRef, optics, light, treeTargets, shake, elapsed }: {
+function SceneCamera({ props, layout, dragging, previewAtRef, optics, light, prepareShadow, treeTargets, shake, elapsed }: {
   props: SundialSceneProps; layout: ReturnType<typeof sundialLayout>; dragging: RefObject<boolean>;
   optics: ReturnType<typeof sundialLighting>; light: RefObject<THREE.DirectionalLight | null>;
+  prepareShadow: (now: number, overviewMoving: boolean) => void;
   previewAtRef: RefObject<number>;
   treeTargets: CherryInteraction["targets"];
   shake: CherryMotion;
@@ -371,34 +411,39 @@ function SceneCamera({ props, layout, dragging, previewAtRef, optics, light, tre
 }) {
   const { camera, get, gl, scene, size } = useThree();
   const controls = useRef<OrbitControls | null>(null);
+  const orbitInertia = useRef<ReturnType<typeof createOrbitInertia> | null>(null);
   const shaking = useRef(false);
   const pipeline = useRef<{ composer: EffectComposer; pass: ShaderPass; scatter?: SundialScatterPass } | null>(null);
   const cameraFocus = useRef(menuFocus.clone());
   const viewAmount = useRef(0);
   const menuEye = useRef<THREE.Vector3 | null>(null);
+  const lastOverviewMotion = useRef(-Infinity);
   const from = useRef<{ flight: PortalFlight; eye: THREE.Vector3; focus: THREE.Vector3 } | null>(null);
   const rail = useRef({ stop: -1, linked: false, eye: createGlide(), focus: createGlide() });
   const settings = useRef(props);
   useEffect(() => { settings.current = props; }, [props]);
 
   useEffect(() => {
-    const orbit = new OrbitControls(camera, gl.domElement);
+    // OrbitControls tracks the raw pointer pose. The render camera can lag it slightly.
+    const orbit = new OrbitControls(camera.clone(), gl.domElement);
     orbit.enabled = false;
-    orbit.enableDamping = true;
-    orbit.dampingFactor = .095;
+    orbit.enableDamping = false;
     orbit.enablePan = false;
     orbit.minPolarAngle = .20;
     orbit.maxPolarAngle = 1.32;
     orbit.minDistance = 6.3;
     orbit.maxDistance = layout.island * 4.1;
     orbit.target.copy(cameraFocus.current);
+    const inertia = createOrbitInertia(orbit);
     controls.current = orbit;
+    orbitInertia.current = inertia;
     const cherry = { targets: treeTargets, motion: shake, elapsed };
     const refreshHover = (event: PointerEvent) => get().events.handlers?.onPointerMove(event);
-    const detach = wireCanvas(gl.domElement, dragging, settings, { camera, scene, windows: layout.slots, cherry, shaking, refreshHover });
+    const detach = wireCanvas(gl.domElement, dragging, settings, { camera, scene, windows: layout.slots, cherry, shaking, orbit, inertia, refreshHover });
     return () => {
       orbit.dispose();
       controls.current = null;
+      orbitInertia.current = null;
       detach();
     };
   }, [camera, get, gl, scene, layout.island, layout.slots, dragging, treeTargets, shake, elapsed]);
@@ -421,6 +466,7 @@ function SceneCamera({ props, layout, dragging, previewAtRef, optics, light, tre
       composer.addPass(scatter);
       pass.uniforms.scatteredLight.value = scatter.target.texture;
       pass.uniforms.scatterReady = scatter.ready;
+      pass.uniforms.scatterSize = scatter.sampleSize;
     }
     composer.addPass(bloom);
     composer.addPass(pass);
@@ -453,12 +499,16 @@ function SceneCamera({ props, layout, dragging, previewAtRef, optics, light, tre
   const full = useMemo(() => overview(layout.island).multiplyScalar(Math.max(1, 1.24 / (size.width / size.height))), [layout.island, size.width, size.height]);
   useFrame((_, delta) => {
     const orbit = controls.current;
+    const inertia = orbitInertia.current;
     const fx = pipeline.current;
     const { selected } = props;
     const target = poses[selected];
+    const now = performance.now();
+    let overviewMoving = false;
     let progress = 0;
     const blend = props.reduced ? 1 : 1 - Math.exp(-3.2 * Math.min(delta, .1));
     const railMove = rail.current;
+    if (props.reduced || props.flight || target || shaking.current) inertia?.stop();
 
     if (props.flight) {
       railMove.stop = -1;
@@ -470,7 +520,7 @@ function SceneCamera({ props, layout, dragging, previewAtRef, optics, light, tre
       if (orbit) orbit.enabled = false;
       if (from.current?.flight !== props.flight) from.current = { flight: props.flight, eye: camera.position.clone(), focus: cameraFocus.current.clone() };
       const { target: at, inward, tangent } = poses[props.flight.index];
-      progress = THREE.MathUtils.clamp((performance.now() - props.flight.started) / PORTAL_DURATION, 0, 1);
+      progress = THREE.MathUtils.clamp((now - props.flight.started) / PORTAL_DURATION, 0, 1);
       const approach = at.clone().addScaledVector(inward, 2.4).addScaledVector(tangent, 1.15).addScaledVector(up, .48);
       const through = at.clone().addScaledVector(inward, -.42);
       const settle = THREE.MathUtils.smootherstep(progress, 0, 1);
@@ -482,10 +532,13 @@ function SceneCamera({ props, layout, dragging, previewAtRef, optics, light, tre
       camera.lookAt(cameraFocus.current);
     } else if (!shaking.current && !target && orbit?.enabled) {
       from.current = null;
-      orbit.enableDamping = !props.reduced;
-      orbit.update();
+      inertia?.advance(now);
+      inertia?.follow(camera, delta);
       cameraFocus.current.copy(orbit.target);
-      (menuEye.current ??= new THREE.Vector3()).copy(camera.position);
+      const previousEye = menuEye.current ??= camera.position.clone();
+      if (previousEye.distanceToSquared(camera.position) > 1e-6) lastOverviewMotion.current = now;
+      previousEye.copy(camera.position);
+      overviewMoving = now - lastOverviewMotion.current < overviewMotionHoldMs;
     } else if (!shaking.current) {
       from.current = null;
       if (orbit) orbit.enabled = false;
@@ -521,6 +574,8 @@ function SceneCamera({ props, layout, dragging, previewAtRef, optics, light, tre
         camera.position.copy(nextEye);
         cameraFocus.current.copy(nextFocus);
         orbit.target.copy(nextFocus);
+        orbit.object.position.copy(nextEye);
+        orbit.update();
         orbit.enabled = true;
       }
       camera.lookAt(cameraFocus.current);
@@ -546,8 +601,10 @@ function SceneCamera({ props, layout, dragging, previewAtRef, optics, light, tre
         optics.daylight.value, optics.moonlight.value);
     }
 
+    prepareShadow(now, overviewMoving);
     if (fx) {
       fx.scatter?.setPreview(selected);
+      fx.scatter?.setOverviewMoving(overviewMoving);
       const screen = scratch.screen.copy(cameraFocus.current).project(camera);
       fx.pass.uniforms.origin.value.set(.5 + screen.x * .5, .5 + screen.y * .5);
       fx.pass.uniforms.sceneDepth.value = fx.composer.readBuffer.depthTexture;
@@ -575,10 +632,27 @@ function SundialContents(props: SundialSceneProps) {
   const layout = useMemo(() => sundialLayout(props.entries), [props.entries]);
   const floor = useMemo(() => makeSundialFloor(layout.plate - SUNDIAL_PAVING_INSET), [layout.plate]);
   const inlay = useMemo(() => sundialInlay(layout), [layout]);
-  const optics = useMemo(() => sundialLighting(images, props.entries, layout.windows), [images, props.entries, layout]);
+  const emptySlots = useMemo(() => layout.spare.filter(({ ring }) => ring === 1), [layout.spare]);
+  const optics = useMemo(() => sundialLighting(images, props.entries, layout.windows, emptySlots),
+    [images, props.entries, layout.windows, emptySlots]);
   const light = useRef<THREE.DirectionalLight>(null);
+  const lastShadowUpdate = useRef({ time: -Infinity, ray: new THREE.Vector3() });
+  const prepareShadow = useCallback((now: number, overviewMoving: boolean) => {
+    const shadow = light.current?.shadow;
+    if (!shadow) return;
+    const last = lastShadowUpdate.current;
+    const keyRay = optics.keyRay.value;
+    // Camera motion leaves the light-space map valid. Only the idle tree sway
+    // needs periodic refreshes while the light direction holds steady.
+    if (!overviewMoving || !shadow.map || !last.ray.equals(keyRay) || now - last.time >= movingShadowIntervalMs) {
+      shadow.needsUpdate = true;
+      last.time = now;
+      last.ray.copy(keyRay);
+    }
+  }, [optics]);
   const ambient = useRef<THREE.AmbientLight>(null);
   const hemisphere = useRef<THREE.HemisphereLight>(null);
+  const skyFill = useRef<THREE.DirectionalLight>(null);
   const elapsed = useRef(0);
   const lightGlide = useRef(createLightGlide(props.lightLocation));
   const heldLight = useMemo(() => worldLightSnapshot(new Date(props.lightClock.time)).at(props.lightLocation),
@@ -653,14 +727,18 @@ function SundialContents(props: SundialSceneProps) {
       hemisphere.current.intensity = THREE.MathUtils.lerp(.64, .25, dark);
       hemisphere.current.color.copy(dayFill).lerp(morningFill, .48 * sunrise).lerp(nightFill, dark);
     }
+    if (skyFill.current) {
+      const moonTakesOver = THREE.MathUtils.smoothstep(moonlight, 0, .72);
+      skyFill.current.intensity = lamps * THREE.MathUtils.lerp(.57, .20, moonTakesOver);
+    }
     optics.keyRay.value.copy(daylight > 0 ? optics.ray.value : optics.moonRay.value);
     if (light.current) {
       light.current.position.copy(optics.keyRay.value).multiplyScalar(layout.island * 3.8);
       light.current.shadow.radius = THREE.MathUtils.lerp(2.4, 1.85, clearNoon);
       if (daylight <= 0) {
-        // Keep the long shadows legible while the moon grazes the stone at the end of twilight.
+        // Let the shadow-casting moon define the lit sides of the stone and window frames.
         const highMoon = THREE.MathUtils.smoothstep(moonHeight, 18, 43);
-        light.current.intensity = THREE.MathUtils.lerp(.93, .63, highMoon) * moonlight;
+        light.current.intensity = THREE.MathUtils.lerp(2.45, 1.55, highMoon) * moonlight;
         light.current.color.copy(moonColor);
       } else {
         light.current.intensity = (2.50 + .62 * clearNoon) * daylight * (1 + .10 * clearNoon);
@@ -680,18 +758,21 @@ function SundialContents(props: SundialSceneProps) {
       <SundialSky islandRadius={layout.island} optics={optics} />
       <ambientLight ref={ambient} color="#eee9e2" intensity={.16} />
       <hemisphereLight ref={hemisphere} color="#f4f1ef" groundColor="#8294ba" intensity={.64} />
-      <directionalLight ref={light} castShadow shadow-mapSize={[2048, 2048]}
+      <directionalLight ref={skyFill} position={nightSkyDirection} color="#c4dcff" intensity={0} />
+      <directionalLight ref={light} castShadow shadow-autoUpdate={false} shadow-mapSize={[2048, 2048]}
         shadow-camera-left={-layout.island * 1.24} shadow-camera-right={layout.island * 1.24}
         shadow-camera-top={layout.island * 1.24} shadow-camera-bottom={-layout.island * 1.24}
         shadow-camera-far={layout.island * 6.6} shadow-normalBias={.021} shadow-bias={-.00018} shadow-radius={2.4} />
       <SundialIsland layout={layout} optics={optics} floor={floor} inlay={inlay} />
       <CherryTree elapsed={elapsed} reduced={props.reduced} optics={optics} floor={floor} shake={shake} targets={cherryTargets} />
       {layout.windows.map((slot, index) => <SundialWindow key={props.entries[index].id} slot={slot} index={index} optics={optics}
-        geometry={geometry} hover={props.onHover} activate={(index) => props.onActivateWindow(index, previewAtRef.current === index)} drag={dragging} />)}
-      {layout.spare.filter(({ ring }) => ring === 1).map((slot) => (
-        <SundialEmptyWindow key={slot.id} slot={slot} seed={layout.slots.indexOf(slot)} geometry={geometry} clearHover={props.onHover} />
+        geometry={geometry} hover={props.onHover}
+        activate={(index) => props.onActivateWindow(index, previewAtRef.current === index)} drag={dragging} />)}
+      {emptySlots.map((slot) => (
+        <SundialEmptyWindow key={slot.id} slot={slot} seed={layout.slots.indexOf(slot)} geometry={geometry}
+          moonlight={optics.moonlight} clearHover={props.onHover} />
       ))}
-      <SceneCamera props={props} layout={layout} dragging={dragging} previewAtRef={previewAtRef} optics={optics} light={light}
+      <SceneCamera props={props} layout={layout} dragging={dragging} previewAtRef={previewAtRef} optics={optics} light={light} prepareShadow={prepareShadow}
         treeTargets={cherryTargets} shake={shake} elapsed={elapsed} />
     </>
   );

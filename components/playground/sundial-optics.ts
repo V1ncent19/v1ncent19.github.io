@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { windows } from "@/assets-src/playground/window-gallery.mjs";
 import { panel } from "@/assets-src/playground/louvre-panel.mjs";
-import { gothicSilhouette } from "./france-window-frame";
+import { gothicSilhouette, gothicSillBase, plainSillBase } from "./france-window-frame";
 import { WINDOW_SCALE, type Slot, type TravelWindow } from "./sundial-layout";
 import type { SundialInlay } from "./sundial-inlay";
 import { createSundialHover } from "./sundial-hover";
@@ -11,6 +11,7 @@ import { createTraceryAtlas, tracerySampling } from "./tracery-glass";
 
 export const PANE_Z = 0;
 export const PLANE_HEIGHT = panel.height * panel.heightScale * WINDOW_SCALE;
+export const nightSkyDirection = new THREE.Vector3(7, 6, 4).normalize();
 const paneWidth = panel.width * WINDOW_SCALE;
 const windowTints: Record<string, string> = {
   france: "#e19eb7", ptes: "#afcfca", guatemala: "#b8a8df", anitabi: "#9ac9e2",
@@ -171,7 +172,7 @@ export function installTreeTransmission(
   }
 }
 
-export function sundialLighting(textures: THREE.Texture[], entries: TravelWindow[], slots: Slot[]) {
+export function sundialLighting(textures: THREE.Texture[], entries: TravelWindow[], slots: Slot[], emptySlots: Slot[]) {
   const [art, facets, transmission, paneIds] = textures.map((map, i) => {
     const texture = map.clone();
     texture.colorSpace = i === 1 || i === 3 ? THREE.NoColorSpace : THREE.SRGBColorSpace;
@@ -189,6 +190,8 @@ export function sundialLighting(textures: THREE.Texture[], entries: TravelWindow
   const lamps = { value: 0 };
   const clearNoon = { value: 0 };
   const moonVisibility = { value: 0 };
+  const contactSlots = [...slots, ...emptySlots];
+  const plane = ({ x, z, yaw }: Slot) => new THREE.Vector4(x, z, Math.cos(yaw), Math.sin(yaw));
   return {
     art: { value: art }, facets: { value: facets }, transmission: { value: transmission },
     paneIds: { value: paneIds }, panePaths,
@@ -208,13 +211,66 @@ export function sundialLighting(textures: THREE.Texture[], entries: TravelWindow
     },
     tints: { value: entries.map(({ assetId }) => new THREE.Color(windowTints[assetId] ?? "#cfba9c")) },
     activation: createSundialHover(slots.length),
-    planes: { value: slots.map(({ x, z, yaw }) => new THREE.Vector4(x, z, Math.cos(yaw), Math.sin(yaw))) },
+    planes: { value: slots.map(plane) },
+    contactPlanes: { value: contactSlots.map(plane) },
+    contactSills: { value: contactSlots.map((_, i) => {
+      const plain = tracery.layers.value[i] === -1;
+      const { width, depth, bevel } = plain ? plainSillBase : gothicSillBase;
+      return new THREE.Vector3(width / 2, depth / 2, plain ? bevel * depth : bevel).multiplyScalar(WINDOW_SCALE);
+    }) },
     layers: { value: entries.map(({ atlasIndex }) => atlasIndex) },
     tracery,
   };
 }
 
 export type SundialLighting = ReturnType<typeof sundialLighting>;
+
+function silverDirectMoonlight(lights: string, mask = "1.0") {
+  return lights.replace(
+    /(getDirectionalLightInfo\( directionalLight, directLight \);[\s\S]*?)(RE_Direct\( directLight, [^\n]+\);)/,
+    `$1
+    #if defined(USE_SHADOWMAP) && NUM_DIR_LIGHT_SHADOWS > 0 && UNROLLED_LOOP_INDEX == 0
+      vec3 diffuseBeforeMoon = reflectedLight.directDiffuse;
+    #endif
+    $2
+    #if defined(USE_SHADOWMAP) && NUM_DIR_LIGHT_SHADOWS > 0 && UNROLLED_LOOP_INDEX == 0
+      if (sundialMoonlight > 0.0) {
+        vec3 moonDiffuse = reflectedLight.directDiffuse - diffuseBeforeMoon;
+        vec3 silverDiffuse = moonDiffuse * vec3(.68, 1.035, 1.52);
+        const vec3 luma = vec3(.2126, .7152, .0722);
+        silverDiffuse *= dot(moonDiffuse, luma) / max(dot(silverDiffuse, luma), 1e-6);
+        reflectedLight.directDiffuse += (silverDiffuse - moonDiffuse) * (${mask});
+      }
+    #endif
+    `,
+  );
+}
+
+export function moonlitStone(moonlight: SundialLighting["moonlight"], surface = carvedStone): typeof carvedStone {
+  return (shader) => {
+    surface(shader);
+    shader.uniforms.sundialMoonlight = moonlight;
+    shader.fragmentShader = shader.fragmentShader
+      .replace("#include <common>", "#include <common>\nuniform float sundialMoonlight;")
+      .replace("#include <lights_fragment_begin>", silverDirectMoonlight(THREE.ShaderChunk.lights_fragment_begin));
+  };
+}
+
+// The window sill lamps are the scene's point lights. Keep their diffuse contribution on the glass.
+const paneDirectLighting = THREE.ShaderChunk.lights_fragment_begin.replace(
+  /(#pragma unroll_loop_start\s+for \( int i = 0; i < NUM_POINT_LIGHTS; i \+\+ \) \{[\s\S]*?#pragma unroll_loop_end)/,
+  /* glsl */ `
+    vec3 paneSpecularBeforeLamps = reflectedLight.directSpecular;
+    #ifdef USE_CLEARCOAT
+      vec3 paneClearcoatBeforeLamps = clearcoatSpecularDirect;
+    #endif
+    $1
+    reflectedLight.directSpecular = paneSpecularBeforeLamps;
+    #ifdef USE_CLEARCOAT
+      clearcoatSpecularDirect = paneClearcoatBeforeLamps;
+    #endif
+  `,
+);
 
 export function paneMaterial(optics: SundialLighting, layer: number, slot: number, traceryLayer?: number) {
   const material = new THREE.MeshPhysicalMaterial({
@@ -299,6 +355,7 @@ export function paneMaterial(optics: SundialLighting, layer: number, slot: numbe
         vec3 lampGlass = warmLampGlass(mix(paneArt.rgb, paneLight, paneLead)) * (.54 + .10 * paneLead);
         totalEmissiveRadiance += mix(daylightGlass, lampGlass, windowLamps) * glassLift;
       `)
+      .replace("#include <lights_fragment_begin>", paneDirectLighting)
       .replace("#include <transmission_fragment>", THREE.ShaderChunk.transmission_fragment.replace(
         "material.transmission = transmission;", "material.transmission = transmission * paneLead;",
       ));
@@ -308,12 +365,14 @@ export function paneMaterial(optics: SundialLighting, layer: number, slot: numbe
 
 export function stoneProjection(optics: SundialLighting, inlay?: SundialInlay): THREE.MeshStandardMaterial["onBeforeCompile"] {
   const count = optics.layers.value.length;
+  const contacts = optics.contactPlanes.value.length;
   return (shader) => {
     if (inlay) floorMarble(shader, inlay, optics.activation.inlay);
     else carvedStone(shader);
     Object.assign(shader.uniforms, {
       paneIds: optics.paneIds, panePathState: optics.panePaths.texture, sundialTrans: optics.transmission,
       keyRay: optics.keyRay, sundialPlanes: optics.planes, sundialLayers: optics.layers, sundialHover: optics.activation.illumination,
+      sundialContactPlanes: optics.contactPlanes, sundialContactSills: optics.contactSills,
       sundialTime: optics.time,
       sundialDaylight: optics.daylight, sundialMoonlight: optics.moonlight,
       clearNoon: optics.clearNoon,
@@ -323,6 +382,8 @@ export function stoneProjection(optics: SundialLighting, inlay?: SundialInlay): 
       .replace("#include <common>", `#include <common>
         uniform vec3 keyRay;
         uniform vec4 sundialPlanes[${count}];
+        uniform vec4 sundialContactPlanes[${contacts}];
+        uniform vec3 sundialContactSills[${contacts}];
         uniform float sundialLayers[${count}];
         uniform float sundialHover[${count}];
         uniform sampler2D sundialTrans;
@@ -356,11 +417,13 @@ export function stoneProjection(optics: SundialLighting, inlay?: SundialInlay): 
           float shade = .24 * exp(-dot(ground.xz, ground.xz) * 4.6);
           float treeRim = (length(ground.xz) - 1.51) / .16;
           shade += .20 * exp(-treeRim * treeRim);
-          for (int i = 0; i < ${count}; i++) {
-            vec4 slot = sundialPlanes[i];
+          for (int i = 0; i < ${contacts}; i++) {
+            vec4 slot = sundialContactPlanes[i];
             vec3 local = paneAxes(ground - vec3(slot.x, 0.0, slot.y), slot.zw);
-            vec2 offset = max(abs(local.xz) - vec2(1.09, .30), 0.0);
-            shade = max(shade, .34 * exp(-dot(offset, offset) / .034));
+            vec3 sill = sundialContactSills[i];
+            vec2 offset = abs(local.xz) - sill.xy + sill.z;
+            float edge = max(length(max(offset, 0.0)) + min(max(offset.x, offset.y), 0.0) - sill.z, 0.0);
+            shade = max(shade, .34 * exp(-edge * edge / .0049));
           }
           return 1.0 - shade;
         }
@@ -521,8 +584,8 @@ export function stoneProjection(optics: SundialLighting, inlay?: SundialInlay): 
           float rim = crown * (1.0 - smoothstep(.13, .66, colored));
           tint = mix(tint, vec3(dot(tint, glassLuma)), .58 * rim);
           if (sundialMoonlight > 0.0) {
-            // Tinted moonlight replaces the same rays that the glass intercepts.
-            vec3 moonTint = min(vec3(.88), vec3(.17) + .51 * tint);
+            // Keep the colored peaks and lead seams distinct in the weaker moonlight.
+            vec3 moonTint = min(vec3(1.28), vec3(.13) + .82 * tint);
             return StoneProjection(vec3(visible - coverage) + moonTint * coverage, moonTint, coverage, 1.0);
           }
           float skyBounce = (.13 * reach * feather + .38 * crown) * (1.0 - visible);
@@ -547,7 +610,7 @@ export function stoneProjection(optics: SundialLighting, inlay?: SundialInlay): 
       `)
       .replace("#include <lights_fragment_begin>", `
         StoneProjection sundialBeam = projectThroughWindow(vCraftPosition, transformNormalByInverseViewMatrix(normal, viewMatrix));
-        ${THREE.ShaderChunk.lights_fragment_begin.replace(
+        ${silverDirectMoonlight(THREE.ShaderChunk.lights_fragment_begin.replace(
           "directLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowIntensity, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;",
           `#if defined(SHADOWMAP_TYPE_PCF) && UNROLLED_LOOP_INDEX == 0
             if (sundialBeam.weight >= 1.0) directLight.color *= sundialBeam.direct;
@@ -559,7 +622,7 @@ export function stoneProjection(optics: SundialLighting, inlay?: SundialInlay): 
             directLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowIntensity, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
           #endif
           `,
-        )}`)
+        ), `(1.0 - smoothstep(0.0, .18, sundialBeam.coverage))${inlay ? " * (1.0 - inlayMask)" : ""}`)}`)
       .replace("#include <lights_fragment_end>", `#include <lights_fragment_end>
         // White environment fill otherwise washes out the filtered sunlight on pale stone.
         // Scale the existing PBR terms so the stone texture and real shadows still contribute.
@@ -567,6 +630,12 @@ export function stoneProjection(optics: SundialLighting, inlay?: SundialInlay): 
         vec3 bounceTint = mix(.74, .40, daylight) + .12 * clamp(sundialBeam.tint, 0.0, 1.0);
         float bounceCoverage = sundialBeam.coverage * (sundialDaylight > 0.0 ? 1.0 : .20 * sundialMoonlight);
         reflectedLight.indirectDiffuse *= mix(vec3(.91), bounceTint, bounceCoverage) * contactShade(vCraftPosition);
+        if (sundialMoonlight > 0.0) {
+          // The sample coverage already includes shadow visibility and the pane aperture.
+          vec3 filteredMoon = clamp(sundialBeam.tint - vec3(.13), 0.0, 1.0);
+          reflectedLight.indirectDiffuse += material.diffuseColor * filteredMoon
+            * (.34 * sundialMoonlight * sundialBeam.coverage);
+        }
         reflectedLight.directSpecular *= mix(mix(.30, .50, daylight), .68, ${inlay ? "inlayMask" : "0.0"}) * mix(1.0, .72, sundialBeam.coverage);
         reflectedLight.indirectSpecular *= mix(mix(.57, mix(.61, .48, daylight), bounceCoverage), .70, ${inlay ? "inlayMask" : "0.0"});`);
   };

@@ -82,6 +82,8 @@ body:has(.playground-page) .route-fade {
   --sundial-top: clamp(18px, 3.6vh, 44px);
   --sundial-bottom: clamp(20px, 3.8vh, 42px);
   --sundial-back-size: 54px;
+  --sundial-entry-duration: 1.55s;
+  --sundial-entry-ease: cubic-bezier(.44, .04, .28, 1);
   --sundial-iris-duration: 1.24s;
   --sundial-ink: #fff4e2;
   --sundial-glass: #312821d9;
@@ -111,7 +113,9 @@ body:has(.playground-page) .route-fade {
   --opening-text-fade: .28s;
   display: grid;
   place-items: center;
-  padding: 18px;
+  box-sizing: border-box;
+  width: min(100%, 68rem);
+  padding: 24px clamp(20px, 5vw, 64px);
   color: #584334;
   font: 500 13px/1.4 var(--font-ui), Arial, sans-serif;
   text-align: center;
@@ -133,18 +137,36 @@ body:has(.playground-page) .route-fade {
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 13px;
+  gap: clamp(24px, 5.6svh, 56px);
   animation: sundial-opening-options-in .36s var(--opening-text-fade) ease-out both;
 }
 .sundial-opening-options h2 {
   margin: 0;
-  font: 400 clamp(21px, 3vw, 32px)/1.2 Georgia, "Times New Roman", serif;
+  color: #3d3027;
+  font: 400 clamp(2.75rem, 7.5vw, 7rem)/1.03 Georgia, "Times New Roman", serif;
+  letter-spacing: -.055em;
+  text-wrap: balance;
 }
+.sundial-opening-greeting {
+  display: block;
+  margin-bottom: clamp(12px, 2.5svh, 22px);
+  color: #6c5140;
+  font: 1000 clamp(.875rem, 1.25vw, 1.125rem)/1.35 var(--font-ui), Arial, sans-serif;
+  letter-spacing: .06em;
+}
+.sundial-opening-options h2 em { color: #79513a; }
 .sundial-opening-buttons {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: 10px 14px;
+}
+.sundial-opening-desktop-note {
+  display: none;
+  margin: 12px 0 0;
+  color: #6c5140;
+  font-size: .8125rem;
+  text-wrap: balance;
 }
 .sundial-opening-audio {
   position: absolute;
@@ -172,29 +194,118 @@ body:has(.playground-page) .route-fade {
   to { opacity: 1; visibility: visible; }
 }
 .sundial-opening-actions button {
-  padding: 9px 13px;
-  border: 1px solid #8b6e525c;
+  min-height: 46px;
+  padding: 10px clamp(16px, 3vw, 26px);
+  border: 1px solid #96775f;
   border-radius: 30px;
-  background: #fff9ed66;
+  background: transparent;
   color: #4e3625;
   transition: background .2s, border-color .2s, opacity .22s;
 }
 .sundial-opening-actions button:not(:disabled):hover { background: #fffaf2; border-color: #8b6e52a6; }
+.sundial-opening-actions .sundial-opening-music { background: #634735; border-color: #634735; color: #fff9f0; }
+.sundial-opening-actions .sundial-opening-music:not(:disabled):hover { background: #4b3427; border-color: #4b3427; }
+.sundial-opening-actions .sundial-opening-music:disabled { opacity: .65; }
 .playground-sundial .sundial-opening-actions button:focus-visible { outline-color: #7a5536; }
 
-.playground-sundial[data-opening="revealing"] .sundial-opening,
+@media (max-height: 440px) {
+  .sundial-opening-options { gap: 20px; }
+  .sundial-opening-options h2 { font-size: clamp(2.25rem, 10svh, 4rem); }
+}
+
+.playground-sundial[data-opening="revealing"]::before,
+.playground-sundial[data-opening="revealing"] .sundial-opening:not(.sundial-closing),
 .playground-sundial[data-closing="iris"] .sundial-closing {
   --iris-feather: clamp(12px, calc(.24 * var(--sundial-iris-radius)), 136px);
+}
+.playground-sundial[data-opening="revealing"] .sundial-opening:not(.sundial-closing),
+.playground-sundial[data-closing="iris"] .sundial-closing {
   mask-image: radial-gradient(circle at var(--sundial-iris-x) var(--sundial-iris-y),
     #000 max(0px, calc(var(--sundial-iris-radius) - .58 * var(--iris-feather))),
     rgb(0 0 0 / .84) max(0px, calc(var(--sundial-iris-radius) - .25 * var(--iris-feather))),
     rgb(0 0 0 / .49) calc(var(--sundial-iris-radius) + .10 * var(--iris-feather)),
     rgb(0 0 0 / .15) calc(var(--sundial-iris-radius) + .49 * var(--iris-feather)),
     transparent calc(var(--sundial-iris-radius) + var(--iris-feather)));
-  animation: sundial-opening-iris var(--sundial-iris-duration) cubic-bezier(.42, .05, .35, 1) both;
 }
-.playground-sundial[data-closing="iris"] .sundial-closing { animation-direction: reverse; }
+.playground-sundial[data-opening="revealing"] .sundial-opening:not(.sundial-closing) {
+  animation:
+    sundial-entry-iris var(--sundial-entry-duration) var(--sundial-entry-ease) both,
+    sundial-entry-light-fade .36s calc(var(--sundial-entry-duration) - .36s) ease-out both;
+}
+.playground-sundial[data-opening="revealing"] .sundial-opening:not(.sundial-closing)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle 32px at var(--sundial-iris-x) var(--sundial-iris-y), #fffbf2, transparent);
+  animation: sundial-entry-light-fade .48s calc(var(--sundial-entry-duration) - .84s) ease-in reverse both;
+}
+.playground-sundial[data-opening="revealing"] .sundial-opening-actions {
+  animation: sundial-opening-options-out .39s ease-out both;
+}
 
+/* Two lights sit below the veil: its moving edge and the glow it leaves at the dot. */
+.playground-sundial[data-opening="revealing"]::before {
+  content: "";
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--sundial-iris-x) var(--sundial-iris-y),
+    transparent max(0px, calc(var(--sundial-iris-radius) - .32 * var(--iris-feather))),
+    #ffe9c34f calc(var(--sundial-iris-radius) + .22 * var(--iris-feather)),
+    #ffdfad36 calc(var(--sundial-iris-radius) + .64 * var(--iris-feather)),
+    #ffd19918 calc(var(--sundial-iris-radius) + 1.06 * var(--iris-feather)),
+    transparent calc(var(--sundial-iris-radius) + 1.64 * var(--iris-feather)));
+  animation:
+    sundial-entry-iris var(--sundial-entry-duration) var(--sundial-entry-ease) both,
+    sundial-entry-trail-fade var(--sundial-entry-duration) linear both;
+}
+
+@keyframes sundial-entry-trail-fade {
+  0%, 14% { opacity: 0; }
+  36%, 80% { opacity: .8; }
+  92% { opacity: .54; }
+  100% { opacity: 0; }
+}
+
+.playground-sundial[data-iris-started]:not([data-closing], [data-flight])::after {
+  content: "";
+  position: absolute;
+  z-index: 6;
+  left: var(--sundial-iris-x);
+  top: var(--sundial-iris-y);
+  width: clamp(104px, 13vw, 176px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  background: radial-gradient(circle closest-side,
+    #fff5e0bd 0%, #ffe0ab66 18%, #ffd08c30 40%, #ecad6814 65%, transparent 100%);
+  animation: sundial-afterglow .82s calc(var(--sundial-entry-duration) - .22s) ease-out both;
+}
+
+@keyframes sundial-afterglow {
+  0% { opacity: 0; scale: .68; }
+  27% { opacity: .78; scale: .86; }
+  55% { opacity: .44; scale: 1.02; }
+  100% { opacity: 0; scale: 1.2; visibility: hidden; }
+}
+
+.playground-sundial[data-closing="iris"] .sundial-closing {
+  animation: sundial-opening-iris var(--sundial-iris-duration) cubic-bezier(.42, .05, .35, 1) reverse both;
+}
+
+@keyframes sundial-opening-options-out {
+  to { opacity: 0; transform: translateY(-6px); }
+}
+@keyframes sundial-entry-iris {
+  0%, 10% { --sundial-iris-radius: var(--sundial-iris-start); }
+  100% { --sundial-iris-radius: 0px; }
+}
+@keyframes sundial-entry-light-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
 @keyframes sundial-opening-iris {
   0% { --sundial-iris-radius: var(--sundial-iris-start); opacity: 1; }
   81% { --sundial-iris-radius: 14px; opacity: 1; }
@@ -251,7 +362,7 @@ body:has(.playground-page) .route-fade {
   filter: blur(2px);
 }
 .playground-sundial[data-iris-started] .sundial-title-spark::before {
-  animation: sundial-opening-spark .9s var(--sundial-iris-duration) ease-out both;
+  animation: sundial-opening-spark .7s calc(var(--sundial-entry-duration) - .2s) ease-out both;
 }
 @keyframes sundial-opening-spark {
   from { transform: translate(-50%, -50%) scale(1.13); filter: blur(2px) brightness(1.23); }
@@ -283,7 +394,7 @@ body:has(.playground-page) .route-fade {
     text-shadow: none;
   }
   .playground-sundial[data-iris-started] .sundial-heading em {
-    animation: sundial-title-glint .72s .18s ease-in-out both;
+    animation: sundial-title-glint .8s calc(var(--sundial-entry-duration) - .46s) ease-in-out both;
   }
 }
 
@@ -300,10 +411,10 @@ body:has(.playground-page) .route-fade {
   z-index: 3;
   pointer-events: none;
 }
-.playground-sundial:not([data-opening="done"]) .sundial-interface,
+.playground-sundial[data-opening="waiting"] .sundial-interface,
 .playground-sundial:is([data-closing="iris"], [data-closing="covered"]) .sundial-interface { visibility: hidden; }
-.playground-sundial[data-opening="done"][data-iris-started]:not([data-closing]) .sundial-interface {
-  animation: sundial-interface-in .5s .12s ease-out backwards;
+.playground-sundial[data-iris-started]:not([data-closing]) .sundial-interface {
+  animation: sundial-interface-in .54s calc(var(--sundial-entry-duration) - .23s) ease-out backwards;
 }
 .playground-sundial[data-closing="controls"] .sundial-interface {
   animation: sundial-interface-out .32s ease-in both;
@@ -329,12 +440,13 @@ body:has(.playground-page) .route-fade {
   top: var(--sundial-top);
   right: var(--sundial-edge);
   display: grid;
-  gap: 9px;
   width: clamp(196px, 19vw, 256px);
   pointer-events: none;
   transition: opacity .22s ease-out;
 }
-.sundial-sidebar > * { min-width: 0; pointer-events: auto; }
+.sundial-sidebar-toggle { display: none; }
+.sundial-sidebar-content { display: grid; gap: 9px; min-width: 0; }
+.sundial-sidebar-content > * { min-width: 0; pointer-events: auto; }
 .playground-sundial[data-flight] .sundial-sidebar { opacity: 0; }
 .sundial-reading:empty { display: none; }
 
@@ -549,14 +661,50 @@ body:has(.playground-page) .route-fade {
 @keyframes sundial-summary-in { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes sundial-title-glint { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
-@media (max-width: 720px) {
-  .playground-sundial[data-stage="menu"] .sundial-sidebar { top: calc(var(--sundial-top) + 46px); }
-  .sundial-sidebar { transition: opacity .22s ease-out, top .45s ease-in-out; }
+@media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
+  .sundial-opening-desktop-note { display: block; }
+  .sundial-sidebar {
+    --sidebar-top: calc(max(var(--sundial-top), env(safe-area-inset-top)) + 42px);
+    --sidebar-toggle-size: 44px;
+    --sidebar-bottom: max(calc(var(--sundial-bottom) + var(--sundial-back-size)), env(safe-area-inset-bottom));
+    top: var(--sidebar-top);
+    right: max(var(--sundial-edge), env(safe-area-inset-right));
+    width: min(248px, calc(100vw - 2 * var(--sundial-edge)));
+    gap: 8px;
+  }
+  .sundial-sidebar-toggle {
+    display: grid;
+    place-items: center;
+    justify-self: end;
+    width: var(--sidebar-toggle-size);
+    height: var(--sidebar-toggle-size);
+    border: 1px solid #ffedd34f;
+    border-radius: 50%;
+    background: var(--sundial-glass);
+    color: var(--sundial-ink);
+    pointer-events: auto;
+  }
+  .sundial-sidebar-toggle[aria-expanded="true"] { color: #ffdfa1; border-color: #d9b47d; }
+  .sundial-sidebar[data-open="false"] .sundial-sidebar-content { display: none; }
+  .sundial-sidebar-content {
+    gap: 7px;
+    max-height: calc(100svh - var(--sidebar-top) - var(--sidebar-toggle-size) - 8px - var(--sidebar-bottom));
+    padding: 3px;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    pointer-events: auto;
+    animation: sundial-sidebar-in .2s ease-out both;
+  }
+}
+
+@keyframes sundial-sidebar-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 600px) {
   .playground-sundial { --sundial-edge: 17px; --sundial-top: 16px; --sundial-bottom: 18px; --sundial-back-size: 46px; }
-  .sundial-sidebar { width: min(178px, 48vw); gap: 7px; }
   .sundial-reading article { padding: 9px 10px; }
   .sundial-reading p { font-size: 11px; }
   .sundial-back svg { width: 26px; height: 26px; }
@@ -569,10 +717,12 @@ body:has(.playground-page) .route-fade {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .playground-sundial[data-opening="revealing"]::before,
+  .playground-sundial[data-iris-started]::after { display: none; }
   .sundial-light-map-pin { transition: none; }
   .sundial-opening-wait { transition: none; }
   .sundial-opening-wait span, .sundial-opening-options,
   .playground-sundial[data-iris-started] .sundial-title-spark::before,
   .playground-sundial[data-iris-started] .sundial-heading em { animation: none; }
-  .playground-sundial[data-opening="done"][data-iris-started] .sundial-interface { animation: none; }
+  .playground-sundial[data-iris-started] .sundial-interface { animation: none; }
 }

@@ -231,6 +231,7 @@ export class SundialScatterPass extends Pass {
     depthBuffer: false,
   });
   readonly ready = { value: false };
+  readonly sampleSize = { value: new THREE.Vector2(1, 1) };
   private readonly material: THREE.ShaderMaterial;
   private readonly quad: FullScreenQuad;
   private readonly select = { value: -1 };
@@ -276,6 +277,16 @@ export class SundialScatterPass extends Pass {
 
   setSize(width: number, height: number) {
     this.target.setSize(Math.max(1, Math.ceil(width / 2)), Math.max(1, Math.ceil(height / 2)));
+  }
+
+  setOverviewMoving(moving: boolean) {
+    // Keep the texture allocated and render into a smaller viewport during motion.
+    // The depth-aware resolve reads only the active pixels.
+    const scale = moving ? .75 : 1;
+    const width = Math.max(1, Math.ceil(this.target.width * scale));
+    const height = Math.max(1, Math.ceil(this.target.height * scale));
+    this.target.viewport.set(0, 0, width, height);
+    this.sampleSize.value.set(width, height);
   }
 
   render(renderer: THREE.WebGLRenderer, _writeBuffer: THREE.WebGLRenderTarget, readBuffer: THREE.WebGLRenderTarget) {

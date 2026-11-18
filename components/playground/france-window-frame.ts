@@ -2,7 +2,8 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { panel, panelHalfWidth } from "@/assets-src/playground/louvre-panel.mjs";
-import { GOTHIC_SILL_DEPTH } from "./sundial-layout";
+import { jointBed } from "./sundial-floor";
+import { GOTHIC_SILL_DEPTH, WINDOW_SCALE } from "./sundial-layout";
 
 const bottom = panel.glassBottom * panel.heightScale;
 const height = (panel.glassTop - panel.glassBottom) * panel.heightScale;
@@ -12,6 +13,9 @@ export const gothicSilhouette = { halfWidth: 1.621, spring: 4.82, crown: 8.22 };
 const { crown: frameCrown, spring } = gothicSilhouette;
 const frontFace = .125;
 const backFace = -.21;
+export const gothicSillBase = { width: 3.60, depth: GOTHIC_SILL_DEPTH, bevel: .028 };
+export const plainSillBase = { width: 3.65, depth: 1.02, height: .33, bevel: .067 };
+export const groundedSillBottom = jointBed / WINDOW_SCALE - gothicSillBase.bevel - .008;
 
 // Polish, cavity occlusion and grain strength, in that order.
 type StoneFinish = [number, number, number];
@@ -304,22 +308,24 @@ export function makeGothicFrame() {
     return apertureStone(roundel(.459), foilContour(.986), rear ? rearDepth(z + depth) : z,
       rear ? depth * .86 : depth, .004);
   };
+  const sillTop = .2315;
   const sills = [
-    sillCourse(3.60, .225, GOTHIC_SILL_DEPTH, .119, .028),
+    sillCourse(gothicSillBase.width, sillTop - groundedSillBottom, gothicSillBase.depth,
+      (sillTop + groundedSillBottom) / 2, gothicSillBase.bevel),
     sillCourse(3.43, .154, .748, .294, .018),
     sillCourse(3.29, .299, .676, .514, .024),
   ];
   const front = paneTrim(false);
   const rear = paneTrim(true);
   const gothicStone = mergeStone([
-    identifyStone(web.clone(), 0), ...sills.map((sill, i) => identifyStone(sill.clone(), sillFirstBlock + i)),
+    ...sills.map((sill, i) => identifyStone(sill.clone(), sillFirstBlock + i)), identifyStone(web.clone(), 0),
     ...[...front, ...rear].map((trim) => identifyStone(trim.clone(), paneSurroundBlock)),
     identifyStone(roundelSeat(false), roundelSeatBlock), identifyStone(roundelSeat(true), roundelSeatBlock),
     ...archStones(false), ...archStones(true), ...archStoneReturns(), ...roundelStones(false), ...roundelStones(true),
   ]);
   rear.forEach((trim) => trim.dispose());
   const gothicShadow = mergeStone([
-    web, shadowMoulding(), ...front, apertureStone(roundel(.459), foilContour(.986), .106, .043, .012), ...sills,
+    ...sills, web, shadowMoulding(), ...front, apertureStone(roundel(.459), foilContour(.986), .106, .043, .012),
   ]);
   return { gothicStone, gothicShadow };
 }

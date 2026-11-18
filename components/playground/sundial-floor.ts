@@ -5,7 +5,7 @@ const segments = 192;
 const treeSeatRadius = 1.42;
 const innerTrackRadius = 3.18;
 const jointHalfWidth = .004;
-const jointBed = -.054;
+export const jointBed = -.054;
 export const slabFinish = { standard: 0, honed: 1, bevel: 2, cut: 3 } as const;
 
 function polar(angle: number, radius: number) {
