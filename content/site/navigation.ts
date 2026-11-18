@@ -110,7 +110,7 @@ export const navItems: NavItem[] = [
     id: "playground",
     order: 6,
     beta: true,
-    label: { en: "Playground", zh: "Playground" },
+    label: { en: "Playground", zh: "工坊" },
     summary: {
       en: "A stained-glass garden of travel stories.",
       zh: "在浮空花园里，从彩窗重访旅程。",

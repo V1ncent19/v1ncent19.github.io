@@ -11,7 +11,7 @@ import SundialLightMap, { type MapLightLocation } from "./SundialLightMap";
 import { carrySundialLightToHome } from "./sundial-home-transition";
 import { PORTAL_DURATION, type TravelWindow } from "./sundial-layout";
 import { createSundialMusic } from "./sundial-music";
-import { equatorialSunrise, sundialTimeAt, worldLightSnapshot, type SundialClock } from "./sundial-world-light";
+import { equatorialSunrise, resumeSundialClock, sundialTimeAt, worldLightSnapshot, type SundialClock } from "./sundial-world-light";
 import type { PortalFlight } from "./SundialScene";
 
 const SundialScene = dynamic(() => import("./SundialScene"), { ssr: false });
@@ -118,6 +118,8 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
       if (openingChoice === "sound" && musicState === "primed") {
         setMusicState(music.current?.startPrepared() ? "playing" : "failed");
       }
+      const now = performance.now();
+      setLighting((current) => current && { ...current, clock: resumeSundialClock(current.clock, now) });
       if (reduced || selectedIndex >= 0 || !anchorIris(sundial.current, titleLight.current)) {
         setOpening("done");
         return;
@@ -172,7 +174,7 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
 
   function selectLightLocation(location: MapLightLocation) {
     const now = performance.now();
-    setLighting((current) => current && { location, clock: { time: sundialTimeAt(current.clock, now), runningSince: null } });
+    setLighting((current) => current && { location, clock: resumeSundialClock(current.clock, now) });
   }
 
   function toggleLightPlayback() {
@@ -181,7 +183,7 @@ export default function PlaygroundExperience({ entries }: { entries: TravelWindo
       if (!current) return current;
       const { clock } = current;
       return { ...current, clock: clock.runningSince === null
-        ? { ...clock, runningSince: now }
+        ? resumeSundialClock(clock, now)
         : { time: sundialTimeAt(clock, now), runningSince: null } };
     });
   }

@@ -142,11 +142,64 @@ function addCarvedStone(shader: MaterialShader, strength: number) {
     `);
 }
 
-export function carvedStone(shader: MaterialShader) {
-  addCarvedStone(shader, 1);
+function addUndersideFill(shader: MaterialShader) {
   shader.fragmentShader = shader.fragmentShader.replace("#include <lights_fragment_end>", `#include <lights_fragment_end>
     float downwardFace = smoothstep(.0, .88, -normalize(vCraftNormal).y);
     reflectedLight.indirectDiffuse += diffuseColor.rgb * vec3(.087, .112, .22) * downwardFace;`);
+}
+
+export function carvedStone(shader: MaterialShader) {
+  addCarvedStone(shader, 1);
+  addUndersideFill(shader);
+}
+
+export function quarriedStone(shader: MaterialShader) {
+  addSurfacePosition(shader);
+  shader.fragmentShader = shader.fragmentShader
+    .replace("#include <common>", `#include <common>
+      ${driftNoise}
+
+      vec3 quarryLayers(vec2 point) {
+        vec2 at = vec2(dot(point, vec2(.82, .57)), dot(point, vec2(-.57, .82)));
+        return vec3(drift(at * .66), drift(at * 3.4 + vec2(12.7, 7.3)), drift(at * 14.0 + vec2(2.4, 17.3)));
+      }
+    `)
+    .replace("#include <color_fragment>", `#include <color_fragment>
+      vec3 rockPoint = vCraftPosition;
+      vec3 rockNormal = normalize(vCraftNormal);
+      vec3 rockWeights = pow(abs(rockNormal), vec3(4.0));
+      rockWeights /= max(dot(rockWeights, vec3(1.0)), 1e-5);
+      vec3 layers = quarryLayers(rockPoint.zy) * rockWeights.x + quarryLayers(rockPoint.xz) * rockWeights.y
+        + quarryLayers(rockPoint.xy) * rockWeights.z;
+      vec3 rockDx = dFdx(rockPoint);
+      vec3 rockDy = dFdy(rockPoint);
+      float rockPixel = max(length(rockDx), length(rockDy));
+      vec3 visibility = 1.0 - smoothstep(vec3(.30), vec3(.90), rockPixel * vec3(.66, 3.4, 14.0));
+      vec3 resolved = layers * visibility;
+
+      float bedPhase = (dot(rockPoint, vec3(.22, .92, -.17)) + .35 * layers.x + .05 * layers.y) * 6.7;
+      float seam = (1.0 - smoothstep(.045, .25, abs(sin(bedPhase)))) * smoothstep(-.18, .23, layers.x + .46 * layers.y);
+      float seamVisibility = 1.0 - smoothstep(.22, .86, fwidth(bedPhase));
+      float shale = .68 * resolved.x + .32 * resolved.y;
+      vec3 rockTint = mix(vec3(.78, .81, .86), vec3(1.07, 1.04, .98), smoothstep(-.34, .34, shale));
+      rockTint *= 1.0 + .22 * resolved.y + .16 * resolved.z - .19 * seam * seamVisibility;
+      diffuseColor.rgb *= rockTint;
+    `)
+    .replace("#include <roughnessmap_fragment>", `#include <roughnessmap_fragment>
+      roughnessFactor = clamp(roughnessFactor + .13 * resolved.y + .09 * resolved.z, .72, .96);
+    `)
+    .replace("#include <normal_fragment_maps>", `#include <normal_fragment_maps>
+      vec4 rockHeight = vec4(layers, seam);
+      // Filter the slope of each frequency by its projected size.
+      vec4 relief = vec4(vec3(.052, .025, .003) * visibility, -.012 * seamVisibility);
+      vec3 across = cross(rockDy, rockNormal);
+      vec3 along = cross(rockNormal, rockDx);
+      float area = dot(rockDx, across);
+      vec3 bump = (across * dot(dFdx(rockHeight), relief) + along * dot(dFdy(rockHeight), relief))
+        * sign(area) / max(abs(area), 1e-6);
+      normal = normalize(normal - mat3(viewMatrix) * bump / (1.0 + 1.8 * length(bump)));
+    `);
+  addUndersideFill(shader);
 }
 
 export function plantingSoil(shader: MaterialShader) {

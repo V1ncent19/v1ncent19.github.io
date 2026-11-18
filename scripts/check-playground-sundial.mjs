@@ -15,7 +15,7 @@ const compilerOptions = {
 const moduleUrl = (source) => `data:text/javascript;base64,${Buffer.from(ts.transpile(source, compilerOptions)).toString("base64")}`;
 const layoutUrl = moduleUrl(await read("components/playground/sundial-layout.ts"));
 const { sundialLayout, WINDOW_WIDTH, TREE_SEAT_BASE_RADIUS } = await import(layoutUrl);
-const { worldLightSnapshot, equatorialSunrise, lightElevation, sundialTimeAt, SUNDIAL_EXPOSURE } =
+const { worldLightSnapshot, equatorialSunrise, lightElevation, resumeSundialClock, sundialTimeAt, SUNDIAL_EXPOSURE } =
   await import(moduleUrl((await read("components/playground/sundial-world-light.ts"))
     .replace('"astronomy-engine"', JSON.stringify(pathToFileURL(createRequire(import.meta.url).resolve("astronomy-engine")).href))));
 const { sundialInlay } = await import(moduleUrl((await read("components/playground/sundial-inlay.ts"))
@@ -154,11 +154,13 @@ assert(lightElevation(sky.at({ longitude, latitude }).sun[1]) < -89.8);
 const opening = equatorialSunrise(sky);
 const oneDay = 86_400_000;
 const parked = { time: date.valueOf(), runningSince: null };
-const running = { ...parked, runningSince: 600 };
+const running = resumeSundialClock(parked, 600);
 assert.equal(sundialTimeAt(parked, 240_600), parked.time);
 assert.equal(sundialTimeAt(running, 600), parked.time);
-assert.equal(sundialTimeAt(running, 240_600), parked.time + oneDay);
-const dayLater = worldLightSnapshot(new Date(sundialTimeAt(running, 240_600)));
+assert.equal(resumeSundialClock(running, 120_600), running);
+assert.equal(sundialTimeAt(running, 240_600), parked.time + oneDay * .7);
+const simulatedDay = 240_000 / .7;
+const dayLater = worldLightSnapshot(new Date(sundialTimeAt(running, 600 + simulatedDay)));
 assert.notDeepEqual(dayLater.at(opening), sky.at(opening));
 // Openings around solstices and equinoxes must always be on the morning
 // side and high enough to light the floor.

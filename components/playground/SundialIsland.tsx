@@ -6,7 +6,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { panel, panelHalfWidth } from "@/assets-src/playground/louvre-panel.mjs";
 import { SUNDIAL_PAVING_INSET, sundialLayout, TREE_SEAT_BASE_RADIUS, WINDOW_SCALE, type Slot } from "./sundial-layout";
 import { installTreeTransmission, moonlitStone, paneMaterial, stoneProjection, type SundialLighting } from "./sundial-optics";
-import { agedBrass, cherryCrownTexture, plantingSoil, windowLimestone } from "./sundial-materials";
+import { agedBrass, cherryCrownTexture, plantingSoil, quarriedStone, windowLimestone } from "./sundial-materials";
 import { sundialFloorSurface } from "./sundial-floor";
 import type { SundialInlay } from "./sundial-inlay";
 import { makeSundialPlanter, plantingSoilHeight } from "./sundial-planter";
@@ -60,21 +60,39 @@ function illuminatedBrass(optics: SundialLighting): THREE.MeshStandardMaterial["
 }
 
 function quarriedUnderside(profile: [number, number][]) {
-  const stone = new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r, y)), 128);
+  const segments = 224;
+  const capRings = 8;
+  const [capRadius, capHeight] = profile[0];
+  const cap = Array.from({ length: capRings }, (_, i) => new THREE.Vector2(capRadius * i / capRings, capHeight));
+  const profilePoints = [...cap, ...profile.map(([r, y]) => new THREE.Vector2(r, y))];
+  const stone = new THREE.LatheGeometry(profilePoints, segments);
   const position = stone.getAttribute("position");
   for (let i = 0; i < position.count; i++) {
     const px = position.getX(i), py = position.getY(i), pz = position.getZ(i);
     const angle = Math.atan2(pz, px);
     const radius = Math.hypot(px, pz);
     const shoulder = THREE.MathUtils.smoothstep(-py, .65, 1.55);
+    const rimWeight = shoulder * THREE.MathUtils.smoothstep(radius, capRadius * .43, capRadius);
     const split = Math.sin(angle * 8 + py * .48);
     const cut = .28 * split * Math.abs(split) + .15 * Math.sin(angle * 13 + py * 1.6) + .095 * Math.sin(angle * 23 - py * 2.1)
-      + .054 * Math.cos(angle * 41 + py * 4.7);
-    const offset = shoulder * cut * Math.min(radius, 1);
-    const chippedY = shoulder * (.18 * Math.sin(angle * 8) + .09 * Math.cos(angle * 19)) * Math.min(radius, 1);
-    position.setXYZ(i, px + Math.cos(angle) * offset, py + chippedY, pz + Math.sin(angle) * offset);
+      + .028 * Math.cos(angle * 41 + py * 4.7);
+    const capWeight = shoulder * (1 - THREE.MathUtils.smoothstep(radius, capRadius * .54, capRadius));
+    const capRelief = .048 * Math.sin(px * .62 + pz * .35) + .029 * Math.cos(px * .31 - pz * .78);
+    const offset = rimWeight * cut;
+    const chippedY = rimWeight * (.18 * Math.sin(angle * 8) + .09 * Math.cos(angle * 19));
+    position.setXYZ(i, px + Math.cos(angle) * offset, py + chippedY + capWeight * capRelief, pz + Math.sin(angle) * offset);
   }
   stone.computeVertexNormals();
+  const normals = stone.getAttribute("normal");
+  const seamNormal = new THREE.Vector3();
+  const wrappedNormal = new THREE.Vector3();
+  const stride = profilePoints.length;
+  for (let i = 0; i < stride; i++) {
+    const wrapped = i + segments * stride;
+    seamNormal.fromBufferAttribute(normals, i).add(wrappedNormal.fromBufferAttribute(normals, wrapped)).normalize();
+    normals.setXYZ(i, seamNormal.x, seamNormal.y, seamNormal.z);
+    normals.setXYZ(wrapped, seamNormal.x, seamNormal.y, seamNormal.z);
+  }
   return stone;
 }
 
@@ -92,20 +110,23 @@ export function SundialIsland({ layout, optics, floor, inlay }: {
         [rimOuter, -.011], [rimOuter, -.022], [rimInner, -.022], [rimInner, -.008], [paving - .021, -.008], [paving - .043, -.021]]),
       rim: diskProfile([[rimOuter, -.0125], [rimInner, -.0095]]),
       metal: diskProfile([[e - .26, -.72], [e - .085, -.62], [e, -.50], [e, -.27], [e - .025, -.20], [e - .072, -.16]]),
-      tray: quarriedUnderside([[0, -2.0], [e - 1.28, -2.0], [e - .98, -1.88], [e - .76, -1.72], [e - .62, -1.51],
+      tray: quarriedUnderside([[e - 1.28, -2.0], [e - .98, -1.88], [e - .76, -1.72], [e - .62, -1.51],
         [e - .39, -1.29], [e - .26, -1.13], [e - .16, -.95], [e - .09, -.78], [e - .062, -.53], [0, -.53]]),
     };
   }, [layout.plate, layout.island]);
   const projection = useMemo(() => stoneProjection(optics, inlay), [optics, inlay]);
   const bevelProjection = useMemo(() => stoneProjection(optics), [optics]);
   const contactCount = optics.contactPlanes.value.length;
-  const trayFinish = useMemo(() => moonlitStone(optics.moonlight), [optics]);
+  const trayFinish = useMemo(() => moonlitStone(optics.moonlight, quarriedStone), [optics]);
   const brassFinish = useMemo(() => illuminatedBrass(optics), [optics]);
   useEffect(() => () => Object.values(parts).forEach((geometry) => geometry.dispose()), [parts]);
 
   return (
     <>
-      <mesh geometry={parts.tray} receiveShadow><meshStandardMaterial color="#b5b1aa" roughness={.83} side={THREE.DoubleSide} onBeforeCompile={trayFinish} /></mesh>
+      <mesh geometry={parts.tray} receiveShadow>
+        <meshStandardMaterial color="#b5b1aa" roughness={.83} side={THREE.DoubleSide} onBeforeCompile={trayFinish}
+          customProgramCacheKey={() => "sundial-quarried-underside"} />
+      </mesh>
       <mesh geometry={parts.upper} receiveShadow><meshStandardMaterial color="#b1a89a" roughness={.84} side={THREE.DoubleSide} onBeforeCompile={bevelProjection}
         customProgramCacheKey={() => `sundial-bevel-${optics.layers.value.length}-${optics.tracery.columns}-${contactCount}`} /></mesh>
       <mesh name="Sundial rim inlay" geometry={parts.rim} receiveShadow>

@@ -5,7 +5,7 @@ export interface SundialClock { time: number; runningSince: number | null }
 type Vector = [number, number, number];
 
 export const SUNDIAL_EXPOSURE = .90;
-const playbackRate = 24 * 60 * 60 / (4 * 60);
+const playbackRate = 252; // Simulated seconds per real second.
 const openingSunHeight = 11;
 
 const radians = Math.PI / 180;
@@ -15,6 +15,10 @@ const astronomicalUnit = 149_597_870.7;
 
 export function sundialTimeAt(clock: SundialClock, now: number) {
   return clock.runningSince === null ? clock.time : clock.time + Math.max(0, now - clock.runningSince) * playbackRate;
+}
+
+export function resumeSundialClock(clock: SundialClock, now: number): SundialClock {
+  return clock.runningSince === null ? { ...clock, runningSince: now } : clock;
 }
 
 export function equatorialSunrise({ midnight }: WorldLightSnapshot): LightLocation {

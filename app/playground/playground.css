@@ -388,6 +388,10 @@ body:has(.playground-page) .route-fade {
 .sundial-heading em { position: relative; color: #f0d9b0; }
 @supports (background-clip: text) {
   .sundial-heading em {
+    /* Leave room to paint the final italic glyph beyond its advance width. */
+    display: inline-block;
+    padding-inline-end: .14em;
+    margin-inline-end: -.14em;
     color: transparent;
     background: linear-gradient(112deg, #e7c99b 32%, #f7dfba 50%, #e7c99b 68%) 0 0 / 255% 100%;
     background-clip: text;

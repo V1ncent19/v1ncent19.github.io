@@ -128,7 +128,7 @@ export default function SundialLightMap({ clock, location, onSelect, onTogglePla
             style={{ left: `clamp(48px, ${cursor.x / map.width * 100}%, calc(100% - 48px))`, top: `${cursor.y / map.height * 100}%` }}>{cursor.region}</span>
         )}
       </div>
-      <p id={hint} className="sr-only">Use the arrow keys to move the marker and Enter to select. Changing locations pauses playback.</p>
+      <p id={hint} className="sr-only">Use the arrow keys to move the marker and Enter to select. Selecting a location resumes playback if paused.</p>
       <div className="sundial-light-map-selection" aria-live="polite"><span>{location.region}</span><span>{phase}</span></div>
     </section>
   );
